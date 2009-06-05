@@ -65,7 +65,7 @@ License: クリエイティブ・コモンズの表示 2.1 日本ライセンス
 	は、バックスラッシュでエスケープしてください。
 
 	{type} は、-type {type} の省略形です。
-	<{input} は、-input {input} の省略形です。 ※現在使用不可
+	<{input} は、-input {input} の省略形です。
 	>{output} は、-output {output} の省略形です。
 	>>{output} は、-append 1 -output {output} の省略形です。
 
@@ -108,7 +108,7 @@ type					*QuickRun-option-type*
 			さい。
 
 exec (*)				*QuickRun-option-exec*
-			必須です。実行するコマンドの書式を指定します。詳細は
+			実行するコマンドの書式を指定します。詳細は
 			|QuickRun-exec-format| を参照してください。
 
 command					*QuickRun-option-command*
@@ -247,7 +247,6 @@ TODO						*QuickRun-TODO*
 9 エラー処理見直し
 8 出力窓の開き方のカスタマイズ
 6 直前の結果を出力する(消えてしまったものをもう一度見たいときのため)
-5 引数パースアルゴリズム見直し
 5 exec 複数指定
 5 args 複数指定
 4 eval対応
@@ -259,6 +258,10 @@ TODO						*QuickRun-TODO*
 
 ==============================================================================
 更新履歴					*QuickRun-changelog*
+
+x.x.x	xxxx-xx-xx
+	- 引数の処理方法を変更。
+	- <{input} が動かないバグを修正。
 
 0.0.1	2009-06-01
 	- 初版。

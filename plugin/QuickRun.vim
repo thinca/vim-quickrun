@@ -33,37 +33,42 @@ endfunction
 " ----------------------------------------------------------------------------
 " Parse arguments.
 function! s:Runner.parse_args(args) " {{{2
-  let rule = [
-        \ ['\v^\>(\>?\s*%(\!|\@[a-zA-Z0-9"*+_]|[^-][^[:space:]]*)?)', 'output'],
-        \ ['\v^\<(\s*\{.{-}\\@<!\}|\s*\@[a-zA-Z0-9":.#%=+*~/_-]|\s*[$&]?\w+)', 'input'],
-        \ ['\v^-(\w+)%(\s+|\=)((["'']).{-}\\@<!\3|[^[:space:]"''-]+)'],
-        \ ['\v^(\w+)', 'type'],
-        \]
-  for r in rule
-    let r[0] .= '\ze\s*'
-  endfor
-  let i = -1
-  while i < strlen(a:args)
-    let i = match(a:args, '\S', i)
-    if i < 0
-      break
+  " foo 'bar buz' "hoge \"huga"
+  " => ['foo', 'bar buz', 'hoge "huga']
+  let args = a:args
+  let arglist = []
+  while args != ''
+    let args = substitute(args, '^\s*', '', '')
+    if args[0] =~ '[''"]'
+      let arg = matchstr(args, '\v([''"])\zs.{-}\ze\\@<!\1')
+      let args = args[strlen(arg) + 2 :]
+    else
+      let arg = matchstr(args, '\S\+')
+      let args = args[strlen(arg) :]
     endif
-
-    for r in rule
-      let hit = matchlist(a:args, r[0], i)
-      if 0 < len(hit)
-        if hit[2] == ''
-          let self[r[1]] = hit[1]
-        else
-          let self[hit[1]] = hit[2][0] !~ '["'']' ? hit[2]
-                \ : substitute(hit[2][1:-2],
-                \ '\\\(.\)', '\=eval("\"\\".submatch(1)."\"")', 'g')
-        endif
-        let i += strlen(hit[0])
-        break
-      endif
-    endfor
+    let arg = substitute(arg, '\\.', '\=eval("\"".submatch(0)."\"")', 'g')
+    call add(arglist, arg)
   endwhile
+
+  let option = ''
+  for arg in arglist
+    if option != ''
+      let self[option] = arg
+      let option = ''
+    elseif arg[0] == '-'
+      let option = arg[1:]
+    elseif arg[0] == '>'
+      if arg[1] == '>'
+        let self.append = 1
+        let arg = arg[1:]
+      endif
+      let self.output = arg[1:]
+    elseif arg[0] == '<'
+      let self.input = arg[1:]
+    else
+      let self.type = arg
+    endif
+  endfor
 endfunction
 
 " ----------------------------------------------------------------------------
