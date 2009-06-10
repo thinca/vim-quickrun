@@ -46,7 +46,6 @@ function! s:Runner.parse_args(args) " {{{2
       let arg = matchstr(args, '\S\+')
       let args = args[strlen(arg) :]
     endif
-    let arg = substitute(arg, '\\.', '\=eval("\"".submatch(0)."\"")', 'g')
     call add(arglist, arg)
   endwhile
 
@@ -358,24 +357,46 @@ endfunction
 " - $ENV_NAME ${ENV_NAME}
 " - {expr}
 " Escape by \ if you does not want to expand.
-" FIXME: Expanded sometimes.
 function! s:Runner.expand(str) " {{{2
   if type(a:str) != type('')
     return ''
   endif
-  let rule = [
-        \ ['\v(\\)?(([@$&])?\{(.+)\})',
-        \  '\=submatch(1)==""?eval(submatch(3).submatch(4)):submatch(2)'],
-        \ ['\v(\\)?([$&]\w+)',
-        \  '\=submatch(1)==""?eval(submatch(2)):submatch(2)'],
-        \ ['\v(\\)?(\@[a-zA-Z0-9":.#%=+*~/_-])',
-        \  '\=submatch(1)==""?eval(submatch(2)):submatch(2)'],
-        \ ['\\', '\']
-        \]
-  let result = a:str
-  for [pat, replace] in rule
-    let result = substitute(result, pat, replace, 'g')
-  endfor
+  let i = 0
+  let rest = a:str
+  let result = ''
+  while 1
+    let f = match(rest, '\\\?[@&${]')
+    if f < 0
+      let result .= rest
+      break
+    endif
+
+    if f != 0
+      let result .= rest[: f - 1]
+      let rest = rest[f :]
+    endif
+
+    if rest[0] == '\'
+      let result .= rest[1]
+      let rest = rest[2 :]
+    else
+      if rest =~ '^[@&$]{'
+        let rest = rest[1] . rest[0] . rest[2 :]
+      endif
+      if rest[0] == '@'
+        let e = 2
+        let expr = rest[0 : 1]
+      elseif rest =~ '^[&$]'
+        let e = matchend(rest, '.\w\+')
+        let expr = rest[: e - 1]
+      else  " rest =~ '^{'
+        let e = matchend(rest, '\\\@<!}')
+        let expr = substitute(rest[1 : e - 2], '\\}', '}', 'g')
+      endif
+      let result .= eval(expr)
+      let rest = rest[e :]
+    endif
+  endwhile
   return result
 endfunction
 
