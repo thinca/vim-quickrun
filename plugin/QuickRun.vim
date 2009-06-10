@@ -400,15 +400,15 @@ function! s:Runner.expand(str) " {{{2
   return result
 endfunction
 
-" MISC Functions. {{{1
 " ----------------------------------------------------------------------------
 " Open the output buffer, and return the buffer number.
-function! s:open_result_window() " {{{2
+function! s:Runner.open_result_window() " {{{2
   if !exists('s:bufnr')
-    let s:bufnr = -1 " Number that doesn't exist.
+    let s:bufnr = -1 " A number that doesn't exist.
   endif
   if !bufexists(s:bufnr)
-    new `='[QuickRun Output]'`
+    execute self.expand(self.split) 'split'
+    edit `='[QuickRun Output]'`
     let s:bufnr = bufnr('%')
     setlocal bufhidden=hide buftype=nofile noswapfile nobuflisted
     setlocal filetype=quickrun
@@ -423,6 +423,7 @@ function! s:is_win() " {{{2
   return has('win32') || has('win64')
 endfunction
 
+" MISC Functions. {{{1
 " ----------------------------------------------------------------------------
 " function for main command.
 function! s:QuickRun(args) " {{{2
@@ -440,7 +441,7 @@ function! s:QuickRun(args) " {{{2
   let append = get(runner, 'append')
   if out is ''
     " Output to the exclusive window.
-    call s:open_result_window()
+    call runner.open_result_window()
     if !append
       silent % delete _
     endif
@@ -513,6 +514,7 @@ function! s:init()
         \   'output_encode' : '&fenc:&enc',
         \   'tempfile'  : '{tempname()}',
         \   'exec' : '%c %s %a',
+        \   'split' : '{winwidth(0) < winheight(0) ? "" : "vertical"}',
         \ },
         \ 'awk' : {
         \   'exec' : '%c -f %s %a',
