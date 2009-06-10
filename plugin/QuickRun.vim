@@ -126,14 +126,6 @@ function! s:Runner.normalize() " {{{2
             \ 'enc' : &fenc, 'ff' : &ff, 'bin' : &bin}
     endif
   end
-
-  if get(self, 'output') =~ '^>'
-    let self.append = 1
-    let self.output = self.output[1:]
-  endif
-  if has_key(self, 'output')
-    let self.output = matchstr(self.output, '^\s*\zs.*\ze\s*$')
-  endif
 endfunction
 
 " ----------------------------------------------------------------------------
