@@ -83,13 +83,10 @@ function! s:Runner.normalize() " {{{2
 
   let self.type = get(self, 'type', &filetype)
 
-  " TODO: Allow that type is empty.
-  if !has_key(g:QuickRunConfig, self.type)
-    throw 'QuickRun:Type config not found: ' . string(self.type)
+  if has_key(g:QuickRunConfig, self.type)
+    call extend(self, g:QuickRunConfig[self.type], 'keep')
   endif
-
-  call extend(extend(self, g:QuickRunConfig[self.type], 'keep'),
-        \ g:QuickRunConfig['*'], 'keep')
+  call extend(self, g:QuickRunConfig['*'], 'keep')
 
   if has_key(self, 'input')
     let input = self.input
