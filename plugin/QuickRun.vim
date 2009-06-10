@@ -523,24 +523,24 @@ function! s:init()
         \     'command' : 'cl',
         \     'exec' : ['%c %s /nologo /Fo%s:p:r.obj /Fe%s:p:r.exe > nul',
         \               '%s:p:r.exe %a', 'del %s:p:r.exe %s:p:r.obj'],
-        \     'tempfile' : '{tempname() . ".c"}',
+        \     'tempfile' : '{tempname()}.c',
         \   } :
         \   executable('gcc') ? {
         \     'command' : 'gcc',
         \     'exec' : ['%c %s -o %s:p:r', '%s:p:r %a', 'rm -f %s:p:r'],
-        \     'tempfile' : '{tempname() . ".c"}',
+        \     'tempfile' : '{tempname()}.c',
         \   } : {},
         \ 'cpp' :
         \   s:is_win() && executable('cl') ? {
         \     'command' : 'cl',
         \     'exec' : ['%c %s /nologo /Fo%s:p:r.obj /Fe%s:p:r.exe > nul',
         \               '%s:p:r.exe %a', 'del %s:p:r.exe %s:p:r.obj'],
-        \     'tempfile' : '{tempname() . ".cpp"}',
+        \     'tempfile' : '{tempname()}.cpp',
         \   } :
         \   executable('g++') ? {
         \     'command' : 'g++',
         \     'exec' : ['%c %s -o %s:p:r', '%s:p:r %a', 'rm -f %s:p:r'],
-        \     'tempfile' : '{tempname() . ".cpp"}',
+        \     'tempfile' : '{tempname()}.cpp',
         \   } : {},
         \ 'eruby' : {
         \   'command' : 'erb',
@@ -551,7 +551,7 @@ function! s:init()
         \ },
         \ 'haskell' : {
         \   'command' : 'runghc',
-        \   'tempfile' : '{tempname() . ".hs"}',
+        \   'tempfile' : '{tempname()}.hs',
         \ },
         \ 'java' : {
         \   'exec' : ['javac %s', '%c %s:t:r', ':call delete("%S:t:r.class")'],
@@ -560,13 +560,13 @@ function! s:init()
         \   'command' : executable('js') ? 'js' :
         \               executable('jrunscript') ? 'jrunscript' :
         \               executable('cscript') ? 'cscript' : '',
-        \   'tempfile' : '{tempname() . ".js"}',
+        \   'tempfile' : '{tempname()}.js',
         \ },
         \ 'lua' : {},
         \ 'dosbatch' : {
         \   'command' : '',
         \   'exec' : 'call %s %a',
-        \   'tempfile' : '{tempname() . ".bat"}',
+        \   'tempfile' : '{tempname()}.bat',
         \ },
         \ 'io' : {},
         \ 'ocaml' : {},
