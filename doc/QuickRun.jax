@@ -152,7 +152,7 @@ split (*)				*QuickRun-option-split*
 			|:tab| も指定できますが、タブページ内に出力専用バッフ
 			ァが存在しない場合常に新しく開くのでおすすめしません。
 			デフォルトは
-			'{winwidth(0) < winheight(0) ? "" : "vertical"}'
+			'{winwidth(0) * 2 < winheight(0) * 5 ? "" : "vertical"}'
 			です。
 
 mode					*QuickRun-option-mode*
@@ -269,6 +269,7 @@ TODO						*QuickRun-TODO*
 
 x.x.x	xxxx-xx-xx
 	- |g:QuickRunConfig| の初期化がうまくいかないバグを修正。
+	- |QuickRun-option-split| の初期値を変更。
 
 0.0.2	2009-06-10
 	- 引数の処理方法を変更。

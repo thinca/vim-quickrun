@@ -503,7 +503,7 @@ function! s:init()
         \   'output_encode' : '&fenc:&enc',
         \   'tempfile'  : '{tempname()}',
         \   'exec' : '%c %s %a',
-        \   'split' : '{winwidth(0) < winheight(0) ? "" : "vertical"}',
+        \   'split' : '{winwidth(0) * 2 < winheight(0) * 5 ? "" : "vertical"}',
         \ },
         \ 'awk' : {
         \   'exec' : '%c -f %s %a',
