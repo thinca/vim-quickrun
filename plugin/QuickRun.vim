@@ -587,7 +587,13 @@ function! s:init()
         \}
 
   if type(g:QuickRunConfig) == type({})
-    call extend(defaultConfig, g:QuickRunConfig)
+    for [key, value] in items(g:QuickRunConfig)
+      if !has_key(defaultConfig, key)
+        let defaultConfig[key] = value
+      else
+        call extend(defaultConfig[key], value)
+      endif
+    endfor
   endif
   unlet! g:QuickRunConfig
   let g:QuickRunConfig = defaultConfig
