@@ -1,5 +1,5 @@
 " Run a command quickly.
-" Version: 0.0.2
+" Version: 0.0.3
 " Author : thinca <http://d.hatena.ne.jp/thinca/>
 " License: Creative Commons Attribution 2.1 Japan License
 "          <http://creativecommons.org/licenses/by/2.1/jp/deed.en>
