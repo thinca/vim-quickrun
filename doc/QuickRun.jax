@@ -108,8 +108,9 @@ type					*QuickRun-option-type*
 			さい。
 
 exec (*)				*QuickRun-option-exec*
-			実行するコマンドの書式を指定します。詳細は
-			|QuickRun-exec-format| を参照してください。
+			実行するコマンドの書式を指定します。詳細
+			は|QuickRun-exec-format| を参照してください。複数の値
+			を指定することも可能です。
 
 command					*QuickRun-option-command*
 			exec 内の %c に展開される文字列です。指定されなかった
@@ -226,8 +227,9 @@ exec を展開した結果先頭の文字が ":" だった場合、Vim のコマ
 
 複数のコマンドを指定する
 ------------------------
-|g:QuickRunConfig| の exec にリストを指定した場合、先頭から順に実行します。コ
-ンパイルや後始末が必要な場合に便利です。
+|:QuickRun| コマンドに exec オプションを複数回指定したり、 |g:QuickRunConfig|
+の exec にリストを指定した場合、先頭から順に実行します。コンパイルや後始末が必
+要な場合に便利です。
 
 
 ==============================================================================
@@ -255,7 +257,6 @@ TODO						*QuickRun-TODO*
 
 9 エラー処理見直し
 6 直前の結果を出力する(消えてしまったものをもう一度見たいときのため)
-5 exec 複数指定
 5 args 複数指定
 4 eval対応
 3 出力形式の追加(ファイル, 置換)
@@ -269,6 +270,7 @@ TODO						*QuickRun-TODO*
 x.x.x	xxxx-xx-xx
 	- |g:QuickRunConfig| の初期化がうまくいかないバグを修正。
 	- |QuickRun-option-split| の初期値を変更。
+	- コマンドから |QuickRun-option-exec| を複数指定できるようにした。
 
 0.0.2	2009-06-10
 	- 引数の処理方法を変更。

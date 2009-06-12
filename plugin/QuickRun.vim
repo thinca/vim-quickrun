@@ -52,7 +52,17 @@ function! s:Runner.parse_args(args) " {{{2
   let option = ''
   for arg in arglist
     if option != ''
-      let self[option] = arg
+      if has_key(self, option)
+        if type(self[option]) == type([])
+          call add(self[option], arg)
+        else
+          let newarg = [self[option], arg]
+          unlet self[option]
+          let self[option] = newarg
+        endif
+      else
+        let self[option] = arg
+      endif
       let option = ''
     elseif arg[0] == '-'
       let option = arg[1:]
