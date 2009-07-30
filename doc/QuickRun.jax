@@ -142,6 +142,7 @@ output					*QuickRun-option-output*
 			  ます。
 			- ={var} を指定すると、{var} に指定した変数、オプショ
 			  ン、環境変数へ出力します。
+			- それ以外の場合はファイルに出力します。
 
 append					*QuickRun-option-append*
 			0 以外が指定された場合、(可能ならば)出力先に対して追記
@@ -266,7 +267,7 @@ TODO						*QuickRun-TODO*
 6 直前の結果を出力する(消えてしまったものをもう一度見たいときのため)
 5 args 複数指定
 4 eval対応
-3 出力形式の追加(ファイル, 置換)
+3 出力形式の追加(置換)
 1 標準エラー出力対応?
 1 非同期実行(可能ならば)
 
@@ -277,6 +278,7 @@ TODO						*QuickRun-TODO*
 x.x.x	xxxx-xx-xx
 	- 引数なしで実行した場合、filetype が認識されないバグを修正。
 	- shellcmd オプション (QuickRun-option-shellcmd) を追加。
+	- ファイルに対して出力する機能を追加。
 
 0.0.3	2009-06-12
 	- |g:QuickRunConfig| の初期化がうまくいかないバグを修正。

@@ -465,7 +465,12 @@ function! s:QuickRun(args) " {{{2
       execute 'let' out '= result'
     endif
   else
-    " TODO: Output to file.
+    let size = strlen(result)
+    if append && filereadable(out)
+      let result = join(readfile(out, 'b'), "\n") . result
+    endif
+    call writefile(split(result, "\n"), out, 'b')
+    echo printf('Output to %s: %d bytes', out, size)
   endif
 endfunction
 
