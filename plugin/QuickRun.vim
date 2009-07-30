@@ -37,7 +37,7 @@ function! s:Runner.parse_args(args) " {{{2
   " => ['foo', 'bar buz', 'hoge "huga']
   let args = a:args
   let arglist = []
-  while args != ''
+  while args !~ '^\s*$'
     let args = substitute(args, '^\s*', '', '')
     if args[0] =~ '[''"]'
       let arg = matchstr(args, '\v([''"])\zs.{-}\ze\\@<!\1')

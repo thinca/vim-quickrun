@@ -267,6 +267,9 @@ TODO						*QuickRun-TODO*
 ==============================================================================
 更新履歴					*QuickRun-changelog*
 
+x.x.x	xxxx-xx-xx
+	- 引数なしで実行した場合、filetype が認識されないバグを修正。
+
 0.0.3	2009-06-12
 	- |g:QuickRunConfig| の初期化がうまくいかないバグを修正。
 	- |QuickRun-option-split| の初期値を変更。
