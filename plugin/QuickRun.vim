@@ -120,7 +120,7 @@ function! s:Runner.normalize() " {{{2
     if type(self.src) == type('')
       let src = self.src
       unlet self.src
-      let self.src = {'src' : split(src, "\n")}
+      let self.src = {'src': split(src, "\n")}
     end
   else
     if self.mode == 'n' && filereadable(expand('%:p'))
@@ -129,8 +129,8 @@ function! s:Runner.normalize() " {{{2
       let self.src = bufnr('%')
     else
       " Executes on the temporary file.
-      let self.src = {'src' : self.get_region(),
-            \ 'enc' : &fenc, 'ff' : &ff, 'bin' : &bin}
+      let self.src = {'src': self.get_region(),
+            \ 'enc': &fenc, 'ff': &ff, 'bin': &bin}
     endif
   end
 endfunction
@@ -280,9 +280,9 @@ function! s:Runner.get_region() " {{{2
   if self.mode == 'o'
     " Operation mode
     let vm = {
-        \ 'line' : 'V',
-        \ 'char' : 'v',
-        \ 'block' : "\<C-v>" }[self.visualmode]
+        \ 'line': 'V',
+        \ 'char': 'v',
+        \ 'block': "\<C-v>" }[self.visualmode]
     let [sm, em] = ['[', ']']
     let save_sel = &selection
     set selection=inclusive
@@ -508,92 +508,92 @@ function! s:init()
   endif
 
   let defaultConfig = {
-        \ '*' : {
-        \   'shebang' : 1,
-        \   'output_encode' : '&fenc:&enc',
+        \ '*': {
+        \   'shebang': 1,
+        \   'output_encode': '&fenc:&enc',
         \   'tempfile'  : '{tempname()}',
-        \   'exec' : '%c %s %a',
-        \   'split' : '{winwidth(0) * 2 < winheight(0) * 5 ? "" : "vertical"}',
+        \   'exec': '%c %s %a',
+        \   'split': '{winwidth(0) * 2 < winheight(0) * 5 ? "" : "vertical"}',
         \ },
-        \ 'awk' : {
-        \   'exec' : '%c -f %s %a',
+        \ 'awk': {
+        \   'exec': '%c -f %s %a',
         \ },
-        \ 'bash' : {},
-        \ 'c' :
+        \ 'bash': {},
+        \ 'c':
         \   s:is_win() && executable('cl') ? {
-        \     'command' : 'cl',
-        \     'exec' : ['%c %s /nologo /Fo%s:p:r.obj /Fe%s:p:r.exe > nul',
+        \     'command': 'cl',
+        \     'exec': ['%c %s /nologo /Fo%s:p:r.obj /Fe%s:p:r.exe > nul',
         \               '%s:p:r.exe %a', 'del %s:p:r.exe %s:p:r.obj'],
-        \     'tempfile' : '{tempname()}.c',
+        \     'tempfile': '{tempname()}.c',
         \   } :
         \   executable('gcc') ? {
-        \     'command' : 'gcc',
-        \     'exec' : ['%c %s -o %s:p:r', '%s:p:r %a', 'rm -f %s:p:r'],
-        \     'tempfile' : '{tempname()}.c',
+        \     'command': 'gcc',
+        \     'exec': ['%c %s -o %s:p:r', '%s:p:r %a', 'rm -f %s:p:r'],
+        \     'tempfile': '{tempname()}.c',
         \   } : {},
-        \ 'cpp' :
+        \ 'cpp':
         \   s:is_win() && executable('cl') ? {
-        \     'command' : 'cl',
-        \     'exec' : ['%c %s /nologo /Fo%s:p:r.obj /Fe%s:p:r.exe > nul',
+        \     'command': 'cl',
+        \     'exec': ['%c %s /nologo /Fo%s:p:r.obj /Fe%s:p:r.exe > nul',
         \               '%s:p:r.exe %a', 'del %s:p:r.exe %s:p:r.obj'],
-        \     'tempfile' : '{tempname()}.cpp',
+        \     'tempfile': '{tempname()}.cpp',
         \   } :
         \   executable('g++') ? {
-        \     'command' : 'g++',
-        \     'exec' : ['%c %s -o %s:p:r', '%s:p:r %a', 'rm -f %s:p:r'],
-        \     'tempfile' : '{tempname()}.cpp',
+        \     'command': 'g++',
+        \     'exec': ['%c %s -o %s:p:r', '%s:p:r %a', 'rm -f %s:p:r'],
+        \     'tempfile': '{tempname()}.cpp',
         \   } : {},
-        \ 'eruby' : {
-        \   'command' : 'erb',
-        \   'exec' : '%c -T - %s %a',
+        \ 'eruby': {
+        \   'command': 'erb',
+        \   'exec': '%c -T - %s %a',
         \ },
-        \ 'groovy' : {
-        \   'exec' : '%c -c {&fenc==""?&enc:&fenc} %s %a',
+        \ 'groovy': {
+        \   'exec': '%c -c {&fenc==""?&enc:&fenc} %s %a',
         \ },
-        \ 'haskell' : {
-        \   'command' : 'runghc',
-        \   'tempfile' : '{tempname()}.hs',
+        \ 'haskell': {
+        \   'command': 'runghc',
+        \   'tempfile': '{tempname()}.hs',
         \ },
-        \ 'java' : {
-        \   'exec' : ['javac %s', '%c %s:t:r', ':call delete("%S:t:r.class")'],
+        \ 'java': {
+        \   'exec': ['javac %s', '%c %s:t:r', ':call delete("%S:t:r.class")'],
         \ },
-        \ 'javascript' : {
-        \   'command' : executable('js') ? 'js' :
-        \               executable('jrunscript') ? 'jrunscript' :
-        \               executable('cscript') ? 'cscript' : '',
-        \   'tempfile' : '{tempname()}.js',
+        \ 'javascript': {
+        \   'command': executable('js') ? 'js':
+        \               executable('jrunscript') ? 'jrunscript':
+        \               executable('cscript') ? 'cscript': '',
+        \   'tempfile': '{tempname()}.js',
         \ },
-        \ 'lua' : {},
-        \ 'dosbatch' : {
-        \   'command' : '',
-        \   'exec' : 'call %s %a',
-        \   'tempfile' : '{tempname()}.bat',
+        \ 'lua': {},
+        \ 'dosbatch': {
+        \   'command': '',
+        \   'exec': 'call %s %a',
+        \   'tempfile': '{tempname()}.bat',
         \ },
-        \ 'io' : {},
-        \ 'ocaml' : {},
-        \ 'perl' : {
-        \   'eval' : 'print eval{use Data::Dumper;$Data::Dumper::Terse = 1;$Data::Dumper::Indent = 0;Dumper %s}'
+        \ 'io': {},
+        \ 'ocaml': {},
+        \ 'perl': {
+        \   'eval': 'print eval{use Data::Dumper;$Data::Dumper::Terse = 1;$Data::Dumper::Indent = 0;Dumper %s}'
         \ },
-        \ 'python' : {'eval' : 'print(%s)'},
-        \ 'php' : {},
-        \ 'r' : {
-        \   'command' : 'R',
-        \   'exec' : '%c --no-save --slave %a < %s',
+        \ 'python': {'eval': 'print(%s)'},
+        \ 'php': {},
+        \ 'r': {
+        \   'command': 'R',
+        \   'exec': '%c --no-save --slave %a < %s',
         \ },
-        \ 'ruby' : {'eval' : " p proc {\n%s\n}.call"},
-        \ 'scala' : {},
-        \ 'scheme' : {
-        \   'command' : 'gosh',
-        \   'exec' : '%c %s:p %a',
-        \   'eval' : '(display (begin %s))',
+        \ 'ruby': {'eval': " p proc {\n%s\n}.call"},
+        \ 'scala': {},
+        \ 'scheme': {
+        \   'command': 'gosh',
+        \   'exec': '%c %s:p %a',
+        \   'eval': '(display (begin %s))',
         \ },
-        \ 'sed' : {},
-        \ 'sh' : {},
-        \ 'vim' : {
-        \   'command' : ':source',
-        \   'exec' : '%c %s',
+        \ 'sed': {},
+        \ 'sh': {},
+        \ 'vim': {
+        \   'command': ':source',
+        \   'exec': '%c %s',
         \ },
-        \ 'zsh' : {},
+        \ 'zsh': {},
         \}
 
   if type(g:QuickRunConfig) == type({})
