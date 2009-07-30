@@ -1,6 +1,6 @@
 *QuickRun.txt* コマンドを素早く実行します。
 
-Version: 0.0.3
+Version: 0.0.4
 Author : thinca <http://d.hatena.ne.jp/thinca/>
 License: クリエイティブ・コモンズの表示 2.1 日本ライセンス
          <http://creativecommons.org/licenses/by/2.1/jp/>
@@ -275,7 +275,7 @@ TODO						*QuickRun-TODO*
 ==============================================================================
 更新履歴					*QuickRun-changelog*
 
-x.x.x	xxxx-xx-xx
+0.0.4	2009-07-30
 	- 引数なしで実行した場合、filetype が認識されないバグを修正。
 	- shellcmd オプション (QuickRun-option-shellcmd) を追加。
 	- ファイルに対して出力する機能を追加。
