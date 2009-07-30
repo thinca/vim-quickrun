@@ -494,7 +494,7 @@ function! s:QuickRun_complete(lead, cmd, pos) " {{{2
   elseif head =~ '^-'
     let options = map(['type', 'src', 'input', 'output', 'append',
       \ 'command', 'exec', 'args', 'tempfile', 'shebang',
-      \ 'output_encode'], '"-".v:val')
+      \ 'mode', 'split', 'output_encode'], '"-".v:val')
     return filter(options, 'v:val =~ "^".head')
   end
   return filter(keys(g:QuickRunConfig), 'v:val != "*" && v:val =~ "^".a:lead')
