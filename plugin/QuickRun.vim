@@ -181,11 +181,9 @@ function! s:Runner.execute(cmd) " {{{2
       call writefile(split(in, "\n"), inputfile)
       let cmd .= ' <' . shellescape(inputfile)
     endif
-    if s:is_win()
-      execute 'silent !"' . cmd . '" & pause'
-    else
-      execute '!' . cmd
-    endif
+
+    execute printf(self.shellcmd, cmd)
+
     if exists('inputfile') && filereadable(inputfile)
       call delete(inputfile)
     endif
@@ -514,6 +512,7 @@ function! s:init()
         \   'tempfile'  : '{tempname()}',
         \   'exec': '%c %s %a',
         \   'split': '{winwidth(0) * 2 < winheight(0) * 5 ? "" : "vertical"}',
+        \   'shellcmd': s:is_win() ? 'silent !"%s" & pause' : '!%s',
         \ },
         \ 'awk': {
         \   'exec': '%c -f %s %a',

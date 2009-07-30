@@ -183,6 +183,13 @@ tempfile (*)				*QuickRun-option-tempfile*
 			一時ファイルは実行する度に削除されます。
 			デフォルトは "{tempname()}" です。
 
+shellcmd				*QuickRun-option-shellcmd*
+			output が ! の時に実行する Vim コマンドのテンプレート
+			です。%s が exec オプションで生成されたコマンドに置換
+			されます。
+			デフォルトは MS Windows の場合は
+			'silent !"%s" & pause' それ以外の場合は '!%s' です。
+
 
 ------------------------------------------------------------------------------
 オプション値の展開				*QuickRun-expand-option*
@@ -269,6 +276,7 @@ TODO						*QuickRun-TODO*
 
 x.x.x	xxxx-xx-xx
 	- 引数なしで実行した場合、filetype が認識されないバグを修正。
+	- shellcmd オプション (QuickRun-option-shellcmd) を追加。
 
 0.0.3	2009-06-12
 	- |g:QuickRunConfig| の初期化がうまくいかないバグを修正。
