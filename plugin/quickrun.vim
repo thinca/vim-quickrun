@@ -116,21 +116,30 @@ function! s:Runner.normalize() " {{{2
   let self.end = get(self, 'end', line('$'))
   let self.output = get(self, 'output', '')
 
-  if exists('self.src')
-    if type(self.src) == type('')
-      let src = self.src
-      unlet self.src
-      let self.src = {'src': split(src, "\n")}
-    end
-  else
+  if !exists('self.src')
     if self.mode == 'n' && filereadable(expand('%:p'))
           \ && self.start == 1 && self.end == line('$') && !&modified
       " Use file in direct.
       let self.src = bufnr('%')
     else
       " Executes on the temporary file.
-      let self.src = {'src': self.get_region(),
-            \ 'enc': &fenc, 'ff': &ff, 'bin': &bin}
+      let body = self.get_region()
+
+      let conv = iconv(body, &enc, &fenc)
+      if conv != ''
+        let body = conv
+      endif
+
+      if &l:ff == 'mac'
+        let body = substitute(body, "\n", "\r", 'g')
+      elseif &l:ff == 'dos'
+        if !&l:bin
+          let body .= "\n"
+        endif
+        let body = substitute(body, "\n", "\r\n", 'g')
+      endif
+
+      let self.src = body
     endif
   end
 endfunction
@@ -152,6 +161,7 @@ function! s:Runner.run() " {{{2
   finally
     if has_key(self, '_temp') && filereadable(self._temp)
       call delete(self._temp)
+      unlet self._temp
     endif
   endtry
   return result
@@ -239,8 +249,8 @@ endfunction
 " ----------------------------------------------------------------------------
 " Detect the shebang, and return the shebang command if it exists.
 function! s:Runner.detect_shebang()
-  if type(self.src) == type({})
-    let line = self.src.src[0]
+  if type(self.src) == type('')
+    let line = matchstr(self.src, '^.\{-}\ze\(\n\|$\)')
   elseif type(self.src) == type(0)
     let line = getbufline(self.src, 1)[0]
   endif
@@ -256,10 +266,10 @@ endfunction
 function! s:Runner.get_source_file() " {{{2
   let fname = expand('%')
   if exists('self.src')
-    if type(self.src) == type({})
+    if type(self.src) == type('')
       let fname = self.expand(self.tempfile)
       let self._temp = fname
-      call self.write(fname, self.src)
+      call writefile(split(self.src, "\n", 'b'), fname)
     elseif type(self.src) == type(0)
       let fname = expand('#'.self.src.':p')
     endif
@@ -268,14 +278,13 @@ function! s:Runner.get_source_file() " {{{2
 endfunction
 
 " ----------------------------------------------------------------------------
-" Get the text of specified region by list.
+" Get the text of specified region.
 function! s:Runner.get_region() " {{{2
-  " Normal mode
   if self.mode == 'n'
-    return getline(self.start, self.end)
-  endif
+    " Normal mode
+    return join(getline(self.start, self.end), "\n")
 
-  if self.mode == 'o'
+  elseif self.mode == 'o'
     " Operation mode
     let vm = {
         \ 'line': 'V',
@@ -284,9 +293,11 @@ function! s:Runner.get_region() " {{{2
     let [sm, em] = ['[', ']']
     let save_sel = &selection
     set selection=inclusive
+
   elseif self.mode == 'v'
     " Visual mode
     let [vm, sm, em] = [visualmode(), '<', '>']
+
   else
     return ''
   end
@@ -309,42 +320,7 @@ function! s:Runner.get_region() " {{{2
   if self.mode == 'o'
     let &selection = save_sel
   endif
-  return split(selected, "\n")
-endfunction
-
-" ----------------------------------------------------------------------------
-" Output the dictionary of the following forms in the file.
-" src: text with string or texts with list.
-" bin: binary flag.
-" ff: &fileformat.
-" enc: file encoding.
-function! s:Runner.write(file, src) " {{{2
-  let body = get(a:src, 'src', '')
-  let bin = get(a:src, 'bin', &bin)
-  let ff = get(a:src, 'ff', &ff)
-  let enc = get(a:src, 'enc', &fenc)
-
-  if type(body) == type([])
-    let tmp = body
-    unlet body
-    let body = join(tmp, "\n")
-  endif
-
-  let conv = iconv(body, &enc, enc)
-  if conv != ''
-    let body = conv
-  endif
-
-  if ff == 'mac'
-    let body = substitute(body, "\n", "\r", 'g')
-  elseif ff == 'dos'
-    if !bin
-      let body .= "\n"
-    endif
-    let body = substitute(body, "\n", "\r\n", 'g')
-  endif
-
-  return writefile(split(body, "\n", 1), a:file, bin ? 'b' : '')
+  return selected
 endfunction
 
 " ----------------------------------------------------------------------------
@@ -563,8 +539,8 @@ function! s:init()
         \ },
         \ 'javascript': {
         \   'command': executable('js') ? 'js':
-        \               executable('jrunscript') ? 'jrunscript':
-        \               executable('cscript') ? 'cscript': '',
+        \              executable('jrunscript') ? 'jrunscript':
+        \              executable('cscript') ? 'cscript': '',
         \   'tempfile': '{tempname()}.js',
         \ },
         \ 'lua': {},
