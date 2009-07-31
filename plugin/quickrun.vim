@@ -5,10 +5,10 @@
 "          <http://creativecommons.org/licenses/by/2.1/jp/deed.en>
 scriptencoding utf-8
 
-if exists('g:loaded_QuickRun') || v:version < 702
+if exists('g:loaded_quickrun') || v:version < 702
   finish
 endif
-let g:loaded_QuickRun = 1
+let g:loaded_quickrun = 1
 
 let s:save_cpo = &cpo
 set cpo&vim
@@ -107,7 +107,7 @@ function! s:Runner.normalize() " {{{2
         let self.input = join(readfile(input), "\n")
       endif
     catch
-      throw 'QuickRun:Can not treat input:' . v:exception
+      throw 'quickrun:Can not treat input:' . v:exception
     endtry
   endif
 
@@ -405,7 +405,7 @@ function! s:Runner.open_result_window() " {{{2
   endif
   if !bufexists(s:bufnr)
     execute self.expand(self.split) 'split'
-    edit `='[QuickRun Output]'`
+    edit `='[quickrun Output]'`
     let s:bufnr = bufnr('%')
     setlocal bufhidden=hide buftype=nofile noswapfile nobuflisted
     setlocal filetype=quickrun
@@ -423,7 +423,7 @@ endfunction
 " MISC Functions. {{{1
 " ----------------------------------------------------------------------------
 " function for main command.
-function! s:QuickRun(args) " {{{2
+function! s:quickrun(args) " {{{2
   try
     let runner = s:Runner.new(a:args)
     " let g:runner = runner " for debug
@@ -483,7 +483,7 @@ function! QuickRun(mode) " {{{2
   execute 'QuickRun -mode o -visualmode' a:mode
 endfunction
 
-function! s:QuickRun_complete(lead, cmd, pos) " {{{2
+function! s:quickrun_complete(lead, cmd, pos) " {{{2
   let line = split(a:cmd[:a:pos], '', 1)
   let head = line[-1]
   if 2 <= len(line) && line[-2] =~ '^-'
@@ -615,10 +615,10 @@ endfunction
 
 call s:init()
 
-command! -nargs=* -range=% -complete=customlist,s:QuickRun_complete QuickRun
-\ call s:QuickRun('-start <line1> -end <line2> ' . <q-args>)
+command! -nargs=* -range=% -complete=customlist,s:quickrun_complete QuickRun
+\ call s:quickrun('-start <line1> -end <line2> ' . <q-args>)
 
-nnoremap <silent> <Plug>(QuickRun-op) :<C-u>set operatorfunc=QuickRun<CR>g@
+nnoremap <silent> <Plug>(quickrun-op) :<C-u>set operatorfunc=QuickRun<CR>g@
 
 let &cpo = s:save_cpo
 unlet s:save_cpo

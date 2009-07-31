@@ -1,4 +1,4 @@
-*QuickRun.txt* コマンドを素早く実行します。
+*quickrun.txt* コマンドを素早く実行します。
 
 Version: 0.0.4
 Author : thinca <http://d.hatena.ne.jp/thinca/>
@@ -7,12 +7,12 @@ License: クリエイティブ・コモンズの表示 2.1 日本ライセンス
 
 
 ==============================================================================
-概要						*QuickRun-introduction*
+概要						*quickrun-introduction*
 
-*QuickRun* は編集中のファイルの全体もしくは一部を実行する Vim プラグインです。
+*quickrun* は編集中のファイルの全体もしくは一部を実行する Vim プラグインです。
 実行するためのコマンド |:QuickRun| が提供されます。
 
-						*QuickRun-synopsis*
+						*quickrun-synopsis*
 >
 	" 現在のバッファを実行
 	:QuickRun
@@ -46,15 +46,15 @@ License: クリエイティブ・コモンズの表示 2.1 日本ライセンス
 <
 
 ==============================================================================
-インターフェース				*QuickRun-interface*
+インターフェース				*quickrun-interface*
 
 ------------------------------------------------------------------------------
-コマンド					*QuickRun-commands*
+コマンド					*quickrun-commands*
 
 						*:QuickRun*
 :[range]QuickRun [{type}] [<{input}] [>[>][{output}]] [-option value]...
 	プログラムを実行します。実行する際にオプションを指定できます。指定でき
-	るオプションについては |QuickRun-options| を参照してください。
+	るオプションについては |quickrun-options| を参照してください。
 	オプションは名前と値の組で、
 >
 	-オプション名 値
@@ -71,7 +71,7 @@ License: クリエイティブ・コモンズの表示 2.1 日本ライセンス
 
 	range に実行する範囲を指定します。指定しなかった場合はファイル全体を指
 	定したことになります。'<,'>を指定して mode オプション
-	(|QuickRun-option-mode|)を指定しなかった場合はビジュアル選択された部分
+	(|quickrun-option-mode|)を指定しなかった場合はビジュアル選択された部分
 	が対象になります。この場合矩形選択なども有効です。ただし、キーマッピン
 	グからコマンドを実行する場合はビジュアルモードかどうか自動で判断できな
 	いのでキーマッピング内で mode オプションを指定して実行するようにしてく
@@ -79,7 +79,7 @@ License: クリエイティブ・コモンズの表示 2.1 日本ライセンス
 
 
 ------------------------------------------------------------------------------
-関数				*QuickRun-functions* *QuickRun-operator*
+関数				*quickrun-functions* *quickrun-operator*
 
 QuickRun({type})
 			'operatorfunc' に対して設定するための関数です。
@@ -89,48 +89,48 @@ QuickRun({type})
 
 
 ------------------------------------------------------------------------------
-キーマッピング					*QuickRun-keymappings*
+キーマッピング					*quickrun-keymappings*
 
-<Plug>(QuickRun-op)				*<Plug>(QuickRun-op)*
+<Plug>(quickrun-op)				*<Plug>(quickrun-op)*
 			続くモーションの範囲を実行します。これは
 			'operatorfunc' の値を "QuickRun" に変更します。
 
 
 ==============================================================================
-オプション					*QuickRun-options*
+オプション					*quickrun-options*
 コマンドラインで指定するオプションのリストです。省略したオプションは
 |g:QuickRunConfig| で設定しているものが使用されます。(*) が付いているものにつ
-いては |QuickRun-expand-option| を参照してください。
+いては |quickrun-expand-option| を参照してください。
 
-type					*QuickRun-option-type*
+type					*quickrun-option-type*
 			設定の雛形を指定します。デフォルトで 'filetype' の値が
 			使用されます。詳細は |g:QuickRunConfig| を参照してくだ
 			さい。
 
-exec (*)				*QuickRun-option-exec*
+exec (*)				*quickrun-option-exec*
 			実行するコマンドの書式を指定します。詳細
-			は|QuickRun-exec-format| を参照してください。複数の値
+			は|quickrun-exec-format| を参照してください。複数の値
 			を指定することも可能です。
 
-command					*QuickRun-option-command*
+command					*quickrun-option-command*
 			exec 内の %c に展開される文字列です。指定されなかった
 			場合は、type と同じ値が使用されます。
 
-src					*QuickRun-option-src*
+src					*quickrun-option-src*
 			実行するプログラムのソースとなる文字列を指定します。デ
 			フォルトでは編集中のファイル全体ですが、指定することで
 			変更が可能です。
 
-args					*QuickRun-option-args*
+args					*quickrun-option-args*
 			exec の %a に展開される文字列です。
 
-input (*)				*QuickRun-option-input*
+input (*)				*quickrun-option-input*
 			標準入力に流し込むファイルを指定します。先頭が = で始
 			まっていた場合、それ以降の文字列を入力として扱います。
-			この場合のみ文字列は |QuickRun-expand-option| で展開さ
+			この場合のみ文字列は |quickrun-expand-option| で展開さ
 			れます。
 
-output					*QuickRun-option-output*
+output					*quickrun-option-output*
 			結果の出力方法を指定します。
 			- 何も指定しないか空文字列を指定すると、出力専用バッファ
 			  を開いてそこへ出力します。このバッファは同じものが再
@@ -144,11 +144,11 @@ output					*QuickRun-option-output*
 			  ン、環境変数へ出力します。
 			- それ以外の場合はファイルに出力します。
 
-append					*QuickRun-option-append*
+append					*quickrun-option-append*
 			0 以外が指定された場合、(可能ならば)出力先に対して追記
 			します。
 
-split (*)				*QuickRun-option-split*
+split (*)				*quickrun-option-split*
 			出力専用バッファを開く際の補助コマンドを指定します。バ
 			ッファを開く際に |:split| コマンドの前に挿入されます。
 			|:tab| も指定できますが、タブページ内に出力専用バッフ
@@ -157,7 +157,7 @@ split (*)				*QuickRun-option-split*
 			'{winwidth(0) * 2 < winheight(0) * 5 ? "" : "vertical"}'
 			です。
 
-mode					*QuickRun-option-mode*
+mode					*quickrun-option-mode*
 			実行モードです。n,v,o のいずれかを指定します。これは範
 			囲をどのように取得するかに影響します。ただし、多くの場
 			合は自動で設定されるので必要ありません。
@@ -167,24 +167,24 @@ mode					*QuickRun-option-mode*
 				nnoremap <silent> <F5> :QuickRun -mode n<CR>
 				vnoremap <silent> <F5> :QuickRun -mode v<CR>
 
-output_encode (*)			*QuickRun-option-output_encode*
+output_encode (*)			*quickrun-option-output_encode*
 			出力の文字コードを変換したい場合に、 "from:to" の形式
 			で指定します。
 			デフォルトは "&fenc:&enc" です。
 
-shebang					*QuickRun-option-shebang*
+shebang					*quickrun-option-shebang*
 			0 以外を指定すると、 src の最初の行が #! で始まってた
 			場合にその後続の文字列を command として扱います。
 			デフォルトは 1 です。
 
-tempfile (*)				*QuickRun-option-tempfile*
+tempfile (*)				*quickrun-option-tempfile*
 			ブログラムを実行する際、現在のバッファ全体を実行する以
 			外の場合は、ソースファイルを一時ファイルに書き出して実
 			行します。その際の一時ファイル名を指定します。
 			一時ファイルは実行する度に削除されます。
 			デフォルトは "{tempname()}" です。
 
-shellcmd				*QuickRun-option-shellcmd*
+shellcmd				*quickrun-option-shellcmd*
 			output が ! の時に実行する Vim コマンドのテンプレート
 			です。%s が exec オプションで生成されたコマンドに置換
 			されます。
@@ -193,7 +193,7 @@ shellcmd				*QuickRun-option-shellcmd*
 
 
 ------------------------------------------------------------------------------
-オプション値の展開				*QuickRun-expand-option*
+オプション値の展開				*quickrun-expand-option*
 
 いくつかの設定は、実行時に中身の一部が置換されます。(*) がついている設定は、
 @,&,$で始まる単語をそれぞれレジスタ、オプション、環境変数として展開します。曖
@@ -208,7 +208,7 @@ shellcmd				*QuickRun-option-shellcmd*
 
 
 ------------------------------------------------------------------------------
-exec オプションの書式				*QuickRun-exec-format*
+exec オプションの書式				*quickrun-exec-format*
 
 実際に実行するコマンドのフォーマットを指定します。フォーマットには以下のシンボ
 ルが使えます。同じシンボルを複数指定することも可能です。
@@ -241,9 +241,9 @@ exec を展開した結果先頭の文字が ":" だった場合、Vim のコマ
 
 
 ==============================================================================
-設定					*QuickRun-settings* *g:QuickRunConfig*
+設定					*quickrun-settings* *g:quickrun*
 
-type オプション(|QuickRun-option-type|)が指定された場合(指定されなかった場合は
+type オプション(|quickrun-option-type|)が指定された場合(指定されなかった場合は
 'filetype' が指定されたことにまります)、グローバル変数|g:QuickRunConfig| に設
 定してある値がオプションのデフォルトとして使用されます。この変数は辞書で、以下
 の形式になっています。
@@ -261,7 +261,7 @@ g:QuickRunConfig['*'] に、全てのタイプでのデフォルトを辞書形�
 
 
 ==============================================================================
-TODO						*QuickRun-TODO*
+TODO						*quickrun-TODO*
 
 9 エラー処理見直し
 6 直前の結果を出力する(消えてしまったものをもう一度見たいときのため)
@@ -273,17 +273,20 @@ TODO						*QuickRun-TODO*
 
 
 ==============================================================================
-更新履歴					*QuickRun-changelog*
+更新履歴					*quickrun-changelog*
+
+x.x.x   xxxx-xx-xx
+	- プラグイン名を小文字に変更。
 
 0.0.4	2009-07-30
 	- 引数なしで実行した場合、filetype が認識されないバグを修正。
-	- shellcmd オプション (QuickRun-option-shellcmd) を追加。
+	- shellcmd オプション (quickrun-option-shellcmd) を追加。
 	- ファイルに対して出力する機能を追加。
 
 0.0.3	2009-06-12
 	- |g:QuickRunConfig| の初期化がうまくいかないバグを修正。
-	- |QuickRun-option-split| の初期値を変更。
-	- コマンドから |QuickRun-option-exec| を複数指定できるようにした。
+	- |quickrun-option-split| の初期値を変更。
+	- コマンドから |quickrun-option-exec| を複数指定できるようにした。
 
 0.0.2	2009-06-10
 	- 引数の処理方法を変更。
