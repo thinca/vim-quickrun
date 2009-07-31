@@ -241,7 +241,7 @@ exec を展開した結果先頭の文字が ":" だった場合、Vim のコマ
 
 
 ==============================================================================
-設定					*quickrun-settings* *g:quickrun*
+設定					*quickrun-settings* *g:QuickRunConfig*
 
 type オプション(|quickrun-option-type|)が指定された場合(指定されなかった場合は
 'filetype' が指定されたことにまります)、グローバル変数|g:QuickRunConfig| に設
@@ -275,12 +275,12 @@ TODO						*quickrun-TODO*
 ==============================================================================
 更新履歴					*quickrun-changelog*
 
-x.x.x   xxxx-xx-xx
+x.x.x	xxxx-xx-xx
 	- プラグイン名を小文字に変更。
 
 0.0.4	2009-07-30
 	- 引数なしで実行した場合、filetype が認識されないバグを修正。
-	- shellcmd オプション (quickrun-option-shellcmd) を追加。
+	- shellcmd オプション (|quickrun-option-shellcmd|) を追加。
 	- ファイルに対して出力する機能を追加。
 
 0.0.3	2009-06-12
