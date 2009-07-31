@@ -191,6 +191,16 @@ shellcmd				*quickrun-option-shellcmd*
 			デフォルトは MS Windows の場合は
 			'silent !"%s" & pause' それ以外の場合は '!%s' です。
 
+eval					*quickrun-option-eval*
+			*** 実験的な機能 ***
+			0 以外が指定された場合、src を eval_template に埋め込
+			んで置き変えます。
+
+eval_template				*quickrun-option-eval_template*
+			*** 実験的な機能 ***
+			eval が指定された際に使用されるテンプレート文字列で
+			す。テンプレート内の %s が src に置き変えられます。
+
 
 ------------------------------------------------------------------------------
 オプション値の展開				*quickrun-expand-option*
@@ -266,7 +276,6 @@ TODO						*quickrun-TODO*
 9 エラー処理見直し
 6 直前の結果を出力する(消えてしまったものをもう一度見たいときのため)
 5 args 複数指定
-4 eval対応
 3 出力形式の追加(置換)
 1 標準エラー出力対応?
 1 非同期実行(可能ならば)
@@ -277,6 +286,9 @@ TODO						*quickrun-TODO*
 
 x.x.x	xxxx-xx-xx
 	- プラグイン名を小文字に変更。
+	- eval 機能を実験的に追加。
+	  - eval オプション (|quickrun-option-eval|) を追加。
+	  - eval_template オプション (|quickrun-option-eval_template|) を追加。
 
 0.0.4	2009-07-30
 	- 引数なしで実行した場合、filetype が認識されないバグを修正。

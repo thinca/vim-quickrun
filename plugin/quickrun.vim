@@ -125,6 +125,10 @@ function! s:Runner.normalize() " {{{2
       " Executes on the temporary file.
       let body = self.get_region()
 
+      if self.eval
+        let body = printf(self.eval_template, body)
+      endif
+
       let conv = iconv(body, &enc, &fenc)
       if conv != ''
         let body = conv
@@ -472,8 +476,9 @@ function! s:quickrun_complete(lead, cmd, pos) " {{{2
     end
   elseif head =~ '^-'
     let options = map(['type', 'src', 'input', 'output', 'append',
-      \ 'command', 'exec', 'args', 'tempfile', 'shebang',
-      \ 'mode', 'split', 'output_encode', 'shellcmd'], '"-".v:val')
+      \ 'command', 'exec', 'args', 'tempfile', 'shebang', 'eval',
+      \ 'mode', 'split', 'output_encode', 'shellcmd', 'eval_template'],
+      \ '"-".v:val')
     return filter(options, 'v:val =~ "^".head')
   end
   return filter(keys(g:QuickRunConfig), 'v:val != "*" && v:val =~ "^".a:lead')
@@ -493,6 +498,8 @@ function! s:init()
         \   'tempfile'  : '{tempname()}',
         \   'exec': '%c %s %a',
         \   'split': '{winwidth(0) * 2 < winheight(0) * 5 ? "" : "vertical"}',
+        \   'eval': 0,
+        \   'eval_template': '%s',
         \   'shellcmd': s:is_win() ? 'silent !"%s" & pause' : '!%s',
         \ },
         \ 'awk': {
@@ -533,6 +540,7 @@ function! s:init()
         \ 'haskell': {
         \   'command': 'runghc',
         \   'tempfile': '{tempname()}.hs',
+        \   'eval_template': 'main = print $ %s',
         \ },
         \ 'java': {
         \   'exec': ['javac %s', '%c %s:t:r', ':call delete("%S:t:r.class")'],
@@ -552,26 +560,28 @@ function! s:init()
         \ 'io': {},
         \ 'ocaml': {},
         \ 'perl': {
-        \   'eval': 'print eval{use Data::Dumper;$Data::Dumper::Terse = 1;$Data::Dumper::Indent = 0;Dumper %s}'
+        \   'eval_template':
+        \     'print eval{use Data::Dumper;$Data::Dumper::Terse = 1;$Data::Dumper::Indent = 0;Dumper %s}'
         \ },
-        \ 'python': {'eval': 'print(%s)'},
+        \ 'python': {'eval_template': 'print(%s)'},
         \ 'php': {},
         \ 'r': {
         \   'command': 'R',
         \   'exec': '%c --no-save --slave %a < %s',
         \ },
-        \ 'ruby': {'eval': " p proc {\n%s\n}.call"},
+        \ 'ruby': {'eval_template': " p proc {\n%s\n}.call"},
         \ 'scala': {},
         \ 'scheme': {
         \   'command': 'gosh',
         \   'exec': '%c %s:p %a',
-        \   'eval': '(display (begin %s))',
+        \   'eval_template': '(display (begin %s))',
         \ },
         \ 'sed': {},
         \ 'sh': {},
         \ 'vim': {
         \   'command': ':source',
         \   'exec': '%c %s',
+        \   'eval_template': "echo %s",
         \ },
         \ 'zsh': {},
         \}
