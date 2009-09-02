@@ -427,7 +427,11 @@ function! s:quickrun(args) " {{{2
     if !append
       silent % delete _
     endif
+
+    let cursor = getpos('$')
     call append(line('$') - 1, split(result, "\n", 1))
+    call setpos('.', cursor)
+    normal! zt
     wincmd p
   elseif out is '!'
     " Do nothing.
