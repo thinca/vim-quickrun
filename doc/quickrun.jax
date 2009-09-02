@@ -1,6 +1,6 @@
 *quickrun.txt* コマンドを素早く実行します。
 
-Version: 0.0.5
+Version: 0.0.6
 Author : thinca <http://d.hatena.ne.jp/thinca/>
 License: クリエイティブ・コモンズの表示 2.1 日本ライセンス
          <http://creativecommons.org/licenses/by/2.1/jp/>
@@ -284,7 +284,7 @@ TODO						*quickrun-TODO*
 ==============================================================================
 更新履歴					*quickrun-changelog*
 
-x.x.x	xxxx-xx-xx
+0.0.6	2009-09-02
 	- %s が複数回評価されるバグを修正。
 	- 無名レジスタのタイプが変更されるバグを修正。
 	- 出力専用バッファに出力する際、スクロールを調整するようにした。
