@@ -227,7 +227,7 @@ endfunction
 function! s:Runner.build_command(tmpl) " {{{2
   " TODO Add rules.
   let shebang = self.detect_shebang()
-  let src = string(self.get_source_file())
+  let src = string(self.get_source_name())
   let rule = [
         \ ['c', shebang != '' ? string(shebang) : 'self.command'],
         \ ['s', src], ['S', src],
@@ -267,13 +267,17 @@ endfunction
 " ----------------------------------------------------------------------------
 " Return the source file name.
 " Output to a temporary file if self.src is string.
-function! s:Runner.get_source_file() " {{{2
+function! s:Runner.get_source_name() " {{{2
   let fname = expand('%')
   if exists('self.src')
     if type(self.src) == type('')
-      let fname = self.expand(self.tempfile)
-      let self._temp = fname
-      call writefile(split(self.src, "\n", 'b'), fname)
+      if has_key(self, '_temp')
+        let fname = self._temp
+      else
+        let fname = self.expand(self.tempfile)
+        let self._temp = fname
+        call writefile(split(self.src, "\n", 'b'), fname)
+      endif
     elseif type(self.src) == type(0)
       let fname = expand('#'.self.src.':p')
     endif
