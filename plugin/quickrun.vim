@@ -310,7 +310,7 @@ function! s:Runner.get_region() " {{{2
     return ''
   end
 
-  let save_reg = @"
+  let [reg_save, reg_save_type] = [getreg(), getregtype()]
   let [pos_c, pos_s, pos_e] = [getpos('.'), getpos("'<"), getpos("'>")]
 
   execute 'silent normal! `' . sm . vm . '`' . em . 'y'
@@ -324,7 +324,8 @@ function! s:Runner.get_region() " {{{2
 
   let selected = @"
 
-  let @" = save_reg
+  call setreg(v:register, reg_save, reg_save_type)
+
   if self.mode == 'o'
     let &selection = save_sel
   endif
