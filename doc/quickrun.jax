@@ -347,6 +347,7 @@ TODO						*quickrun-TODO*
 x.x.x	xxxx-xx-xx
 	- デフォルトのキーマッピングを追加。
 	- quicklaunch.vim を追加。
+	- 引数のパース方法を変更。
 
 0.0.6	2009-09-02
 	- %s が複数回評価されるバグを修正。

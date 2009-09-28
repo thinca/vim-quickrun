@@ -24,32 +24,44 @@ endfunction
 
 " ----------------------------------------------------------------------------
 " Initialize of instance.
-function! s:Runner.initialize(args) " {{{2
-  call self.parse_args(a:args)
+function! s:Runner.initialize(argline) " {{{2
+  let arglist = self.parse_argline(a:argline)
+  call self.set_options_from_arglist(arglist)
   call self.normalize()
 endfunction
 
-" ----------------------------------------------------------------------------
-" Parse arguments.
-function! s:Runner.parse_args(args) " {{{2
+
+
+function! s:Runner.parse_argline(argline) " {{{2
   " foo 'bar buz' "hoge \"huga"
   " => ['foo', 'bar buz', 'hoge "huga']
-  let args = a:args
+  " TODO: More improve.
+  " ex:
+  " foo ba'r b'uz "hoge \nhuga"
+  " => ['foo, 'bar buz', "hoge \nhuga"]
+  let argline = a:argline
   let arglist = []
-  while args !~ '^\s*$'
-    let args = substitute(args, '^\s*', '', '')
-    if args[0] =~ '[''"]'
-      let arg = matchstr(args, '\v([''"])\zs.{-}\ze\\@<!\1')
-      let args = args[strlen(arg) + 2 :]
+  while argline !~ '^\s*$'
+    let argline = matchstr(argline, '^\s*\zs.*$')
+    if argline[0] =~ '[''"]'
+      let arg = matchstr(argline, '\v([''"])\zs.{-}\ze\\@<!\1')
+      let argline = argline[strlen(arg) + 2 :]
     else
-      let arg = matchstr(args, '\S\+')
-      let args = args[strlen(arg) :]
+      let arg = matchstr(argline, '\S\+')
+      let argline = argline[strlen(arg) :]
     endif
+    let arg = substitute(arg, '\\\(.\)', '\1', 'g')
     call add(arglist, arg)
   endwhile
 
+  return arglist
+endfunction
+
+
+
+function! s:Runner.set_options_from_arglist(arglist)
   let option = ''
-  for arg in arglist
+  for arg in a:arglist
     if option != ''
       if has_key(self, option)
         if type(self[option]) == type([])
