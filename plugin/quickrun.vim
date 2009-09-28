@@ -3,7 +3,6 @@
 " Author : thinca <http://d.hatena.ne.jp/thinca/>
 " License: Creative Commons Attribution 2.1 Japan License
 "          <http://creativecommons.org/licenses/by/2.1/jp/deed.en>
-scriptencoding utf-8
 
 if exists('g:loaded_quickrun') || v:version < 702
   finish
