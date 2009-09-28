@@ -1,6 +1,6 @@
 *quickrun.txt* コマンドを素早く実行します。
 
-Version: 0.0.6
+Version: 0.1.0
 Author : thinca <thinca@gmail.com>
 License: クリエイティブ・コモンズの表示 2.1 日本ライセンス
          <http://creativecommons.org/licenses/by/2.1/jp/>
@@ -344,7 +344,7 @@ TODO						*quickrun-TODO*
 ==============================================================================
 更新履歴					*quickrun-changelog*
 
-x.x.x	xxxx-xx-xx
+0.1.0	2009-09-28
 	- デフォルトのキーマッピングを追加。
 	- quicklaunch.vim を追加。
 	- 引数のパース方法を変更。
