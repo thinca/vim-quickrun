@@ -462,10 +462,6 @@ function! s:quickrun(args) " {{{2
   endif
 endfunction
 
-function! Eval(expr, ...) " {{{2
-  let runner = s:Runner.new('-input ')
-endfunction
-
 " Function for |g@|.
 function! QuickRun(mode) " {{{2
   execute 'QuickRun -mode o -visualmode' a:mode
