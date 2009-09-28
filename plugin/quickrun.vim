@@ -605,6 +605,14 @@ function! s:init()
   endif
   unlet! g:QuickRunConfig
   let g:QuickRunConfig = defaultConfig
+
+  " Default key mappings.
+  silent! nnoremap <silent> <Plug>(quickrun) :<C-u>QuickRun -mode n ><CR>
+  silent! vnoremap <silent> <Plug>(quickrun) :<C-u>QuickRun -mode v ><CR>
+  if !exists('g:quickrun_no_default_key_mappings')
+  \  || !g:quickrun_no_default_key_mappings
+    silent! map <unique> <Leader>r <Plug>(quickrun)
+  endif
 endfunction
 
 call s:init()
