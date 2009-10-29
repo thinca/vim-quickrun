@@ -1,6 +1,6 @@
 " Launch the registered command in quickly.
 " Version: 0.1.0
-" Author : thinca <thinca@gmail.com>
+" Author : thinca <thinca+vim@gmail.com>
 " License: Creative Commons Attribution 2.1 Japan License
 "          <http://creativecommons.org/licenses/by/2.1/jp/deed.en>
 
