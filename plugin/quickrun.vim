@@ -484,9 +484,11 @@ function! s:quickrun_complete(lead, cmd, pos) " {{{2
   let head = line[-1]
   if 2 <= len(line) && line[-2] =~ '^-'
     let opt = line[-2][1:]
-    if opt == 'type'
-    elseif opt == 'append' || opt == 'shebang'
+    if opt ==# 'type'
+    elseif opt ==# 'append' || opt ==# 'shebang'
       return ['0', '1']
+    elseif opt ==# 'mode'
+      return ['n', 'v', 'o']
     else
       return []
     end
