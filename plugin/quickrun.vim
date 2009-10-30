@@ -509,7 +509,7 @@ function! s:init()
     let g:quickrun_config = {}
   endif
 
-  let defaultConfig = {
+  let default_config = {
         \ '*': {
         \   'shebang': 1,
         \   'output_encode': '&fenc:&enc',
@@ -606,15 +606,15 @@ function! s:init()
 
   if type(g:quickrun_config) == type({})
     for [key, value] in items(g:quickrun_config)
-      if !has_key(defaultConfig, key)
-        let defaultConfig[key] = value
+      if !has_key(default_config, key)
+        let default_config[key] = value
       else
-        call extend(defaultConfig[key], value)
+        call extend(default_config[key], value)
       endif
     endfor
   endif
   unlet! g:quickrun_config
-  let g:quickrun_config = defaultConfig
+  let g:quickrun_config = default_config
 
   " Default key mappings.
   silent! nnoremap <silent> <Plug>(quickrun) :<C-u>QuickRun -mode n ><CR>
