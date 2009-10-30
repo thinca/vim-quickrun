@@ -102,6 +102,10 @@ function! s:Runner.normalize() " {{{2
     endif
   endif
 
+  if exists('b:quickrun_config')
+    call extend(self, b:quickrun_config, 'keep')
+  endif
+
   let self.type = get(self, 'type', &filetype)
 
   if has_key(g:quickrun_config, self.type)

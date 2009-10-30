@@ -337,6 +337,7 @@ TODO						*quickrun-TODO*
 更新履歴					*quickrun-changelog*
 
 x.x.x	xxxx.xx.xx
+	- バッファローカルな設定を行う機能 (|b:quickrun_config|) を追加。
 	- |quicklaunch| のヘルプを分離。
 
 0.1.0	2009-09-28
