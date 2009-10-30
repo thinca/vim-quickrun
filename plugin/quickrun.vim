@@ -104,10 +104,10 @@ function! s:Runner.normalize() " {{{2
 
   let self.type = get(self, 'type', &filetype)
 
-  if has_key(g:QuickRunConfig, self.type)
-    call extend(self, g:QuickRunConfig[self.type], 'keep')
+  if has_key(g:quickrun_config, self.type)
+    call extend(self, g:quickrun_config[self.type], 'keep')
   endif
-  call extend(self, g:QuickRunConfig['*'], 'keep')
+  call extend(self, g:quickrun_config['*'], 'keep')
 
   if has_key(self, 'input')
     let input = self.input
@@ -499,14 +499,14 @@ function! s:quickrun_complete(lead, cmd, pos) " {{{2
       \ '"-".v:val')
     return filter(options, 'v:val =~ "^".head')
   end
-  return filter(keys(g:QuickRunConfig), 'v:val != "*" && v:val =~ "^".a:lead')
+  return filter(keys(g:quickrun_config), 'v:val != "*" && v:val =~ "^".a:lead')
 endfunction
 
 " ----------------------------------------------------------------------------
 " Initialize. {{{1
 function! s:init()
-  if !exists('g:QuickRunConfig')
-    let g:QuickRunConfig = {}
+  if !exists('g:quickrun_config')
+    let g:quickrun_config = {}
   endif
 
   let defaultConfig = {
@@ -604,8 +604,8 @@ function! s:init()
         \ 'zsh': {},
         \}
 
-  if type(g:QuickRunConfig) == type({})
-    for [key, value] in items(g:QuickRunConfig)
+  if type(g:quickrun_config) == type({})
+    for [key, value] in items(g:quickrun_config)
       if !has_key(defaultConfig, key)
         let defaultConfig[key] = value
       else
@@ -613,8 +613,8 @@ function! s:init()
       endif
     endfor
   endif
-  unlet! g:QuickRunConfig
-  let g:QuickRunConfig = defaultConfig
+  unlet! g:quickrun_config
+  let g:quickrun_config = defaultConfig
 
   " Default key mappings.
   silent! nnoremap <silent> <Plug>(quickrun) :<C-u>QuickRun -mode n ><CR>

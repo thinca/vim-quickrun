@@ -42,9 +42,9 @@ TODO				|quickrun-TODO|
 
 
 	" (vimrc にて) haskell を実行するプログラムのデフォルトを hugs にする
-	if !exists('g:QuickRunConfig')
-		let g:QuickRunConfig = {}
-		let g:QuickRunConfig.haskell = {'command' : 'runhugs'}
+	if !exists('g:quickrun_config')
+		let g:quickrun_config = {}
+		let g:quickrun_config.haskell = {'command' : 'runhugs'}
 	endif
 
 	" ショートカットキーを設定する
@@ -130,12 +130,12 @@ g:quickrun_no_default_key_mappings に 1 が設定されていると定義され
 ==============================================================================
 オプション					*quickrun-options*
 コマンドラインで指定するオプションのリストです。省略したオプションは
-|g:QuickRunConfig| で設定しているものが使用されます。(*) が付いているものにつ
+|g:quickrun_config| で設定しているものが使用されます。(*) が付いているものにつ
 いては |quickrun-expand-option| を参照してください。
 
 type					*quickrun-option-type*
 			設定の雛形を指定します。デフォルトで 'filetype' の値が
-			使用されます。詳細は |g:QuickRunConfig| を参照してくだ
+			使用されます。詳細は |g:quickrun_config| を参照してくだ
 			さい。
 
 exec (*)				*quickrun-option-exec*
@@ -276,23 +276,23 @@ exec を展開した結果先頭の文字が ":" だった場合、Vim のコマ
 
 複数のコマンドを指定する
 ------------------------
-|:QuickRun| コマンドに exec オプションを複数回指定したり、 |g:QuickRunConfig|
+|:QuickRun| コマンドに exec オプションを複数回指定したり、 |g:quickrun_config|
 の exec にリストを指定した場合、先頭から順に実行します。コンパイルや後始末が必
 要な場合に便利です。
 
 
 
 ==============================================================================
-設定					*quickrun-settings* *g:QuickRunConfig*
+設定					*quickrun-settings* *g:quickrun_config*
 
 type オプション(|quickrun-option-type|)が指定された場合(指定されなかった場合は
-'filetype' が指定されたことにまります)、グローバル変数|g:QuickRunConfig| に設
+'filetype' が指定されたことにまります)、グローバル変数|g:quickrun_config| に設
 定してある値がオプションのデフォルトとして使用されます。この変数は辞書で、以下
 の形式になっています。
 
-g:QuickRunConfig[type] に、タイプ毎のオプションのデフォルト値を辞書形式で指定
+g:quickrun_config[type] に、タイプ毎のオプションのデフォルト値を辞書形式で指定
 します。
-g:QuickRunConfig['*'] に、全てのタイプでのデフォルトを辞書形式で指定します。
+g:quickrun_config['*'] に、全てのタイプでのデフォルトを辞書形式で指定します。
 
 全体共通の設定よりタイプ毎の設定が、タイプ毎の設定よりコマンドで指定された引数
 が優先されます。
@@ -343,7 +343,7 @@ x.x.x	xxxx.xx.xx
 	- ファイルに対して出力する機能を追加。
 
 0.0.3	2009-06-12
-	- |g:QuickRunConfig| の初期化がうまくいかないバグを修正。
+	- |g:quickrun_config| の初期化がうまくいかないバグを修正。
 	- |quickrun-option-split| の初期値を変更。
 	- コマンドから |quickrun-option-exec| を複数指定できるようにした。
 
@@ -352,7 +352,7 @@ x.x.x	xxxx.xx.xx
 	- <{input} が動かないバグを修正。
 	- オプションの展開処理を改善。
 	- 出力専用バッファの開き方を制御する "split" オプションを追加。
-	- "type" オプションの値が |g:QuickRunConfig| になくても動くように修正。
+	- "type" オプションの値が |g:quickrun_config| になくても動くように修正。
 
 0.0.1	2009-06-01
 	- 初版。
