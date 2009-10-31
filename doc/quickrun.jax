@@ -1,6 +1,6 @@
 *quickrun.txt*	コマンドを素早く実行します。
 
-Version: 0.1.0
+Version: 0.2.0
 Author : thinca <thinca+vim@gmail.com>
 License: クリエイティブ・コモンズの表示 2.1 日本ライセンス
          <http://creativecommons.org/licenses/by/2.1/jp/>
@@ -336,7 +336,7 @@ TODO						*quickrun-TODO*
 ==============================================================================
 更新履歴					*quickrun-changelog*
 
-x.x.x	xxxx.xx.xx
+0.2.0	2009-11-01
 	- バッファローカルな設定を行う機能 (|b:quickrun_config|) を追加。
 	- |quicklaunch| のヘルプを分離。
 
