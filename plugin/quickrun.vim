@@ -203,7 +203,7 @@ function! s:Runner.execute(cmd) " {{{2
   endif
 
   let cmd = a:cmd
-  if get(self, 'output') is '!'
+  if get(self, 'output') == '!'
     let in = get(self, 'input', '')
     if in != ''
       let inputfile = tempname()
@@ -449,7 +449,7 @@ function! s:quickrun(args) " {{{2
     return
   endtry
 
-  if out is ''
+  if out == ''
     " Output to the exclusive window.
     call runner.open_result_window()
     if running_mark != ''
@@ -464,9 +464,11 @@ function! s:quickrun(args) " {{{2
     call setpos('.', cursor)
     normal! zt
     wincmd p
-  elseif out is '!'
+
+  elseif out == '!'
     " Do nothing.
-  elseif out is ':'
+
+  elseif out == ':'
     if append
       for i in split(result, "\n")
         echomsg i
@@ -474,6 +476,7 @@ function! s:quickrun(args) " {{{2
     else
       echo result
     endif
+
   elseif out[0] == '='
     let out = out[1:]
     if out =~ '^\w[^:]'
@@ -484,6 +487,7 @@ function! s:quickrun(args) " {{{2
     else
       execute 'let' out '= result'
     endif
+
   else
     let size = strlen(result)
     if append && filereadable(out)
