@@ -672,14 +672,6 @@ function! s:init()
   endif
   unlet! g:quickrun_config
   let g:quickrun_config = default_config
-
-  " Default key mappings.
-  silent! nnoremap <silent> <Plug>(quickrun) :<C-u>QuickRun -mode n ><CR>
-  silent! vnoremap <silent> <Plug>(quickrun) :<C-u>QuickRun -mode v ><CR>
-  if !exists('g:quickrun_no_default_key_mappings')
-  \  || !g:quickrun_no_default_key_mappings
-    silent! map <unique> <Leader>r <Plug>(quickrun)
-  endif
 endfunction
 
 call s:init()
@@ -687,7 +679,16 @@ call s:init()
 command! -nargs=* -range=% -complete=customlist,s:quickrun_complete QuickRun
 \ call s:quickrun('-start <line1> -end <line2> ' . <q-args>)
 
+
 nnoremap <silent> <Plug>(quickrun-op) :<C-u>set operatorfunc=QuickRun<CR>g@
+
+silent! nnoremap <silent> <Plug>(quickrun) :<C-u>QuickRun -mode n ><CR>
+silent! vnoremap <silent> <Plug>(quickrun) :<C-u>QuickRun -mode v ><CR>
+" Default key mappings.
+if !exists('g:quickrun_no_default_key_mappings')
+\  || !g:quickrun_no_default_key_mappings
+  silent! map <unique> <Leader>r <Plug>(quickrun)
+endif
 
 let &cpo = s:save_cpo
 unlet s:save_cpo
