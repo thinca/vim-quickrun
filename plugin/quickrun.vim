@@ -14,6 +14,8 @@ set cpo&vim
 
 let s:Runner = {}
 
+
+
 " ----------------------------------------------------------------------------
 " Constructor.
 function! s:Runner.new(args) " {{{2
@@ -21,6 +23,8 @@ function! s:Runner.new(args) " {{{2
   call obj.initialize(a:args)
   return obj
 endfunction
+
+
 
 " ----------------------------------------------------------------------------
 " Initialize of instance.
@@ -90,6 +94,8 @@ function! s:Runner.set_options_from_arglist(arglist)
     endif
   endfor
 endfunction
+
+
 
 " ----------------------------------------------------------------------------
 " The option is appropriately set referring to default options.
@@ -163,6 +169,8 @@ function! s:Runner.normalize() " {{{2
   end
 endfunction
 
+
+
 " ----------------------------------------------------------------------------
 " Run commands. Return the stdout.
 function! s:Runner.run() " {{{2
@@ -185,6 +193,8 @@ function! s:Runner.run() " {{{2
   endtry
   return result
 endfunction
+
+
 
 " ----------------------------------------------------------------------------
 " Execute a single command.
@@ -237,6 +247,8 @@ function! s:Runner.execute(cmd) " {{{2
   endif
 endfunction
 
+
+
 " ----------------------------------------------------------------------------
 " Build a command to execute it from options.
 function! s:Runner.build_command(tmpl) " {{{2
@@ -265,6 +277,8 @@ function! s:Runner.build_command(tmpl) " {{{2
   return self.expand(cmd)
 endfunction
 
+
+
 " ----------------------------------------------------------------------------
 " Detect the shebang, and return the shebang command if it exists.
 function! s:Runner.detect_shebang()
@@ -278,6 +292,8 @@ function! s:Runner.detect_shebang()
   endif
   return ''
 endfunction
+
+
 
 " ----------------------------------------------------------------------------
 " Return the source file name.
@@ -299,6 +315,8 @@ function! s:Runner.get_source_name() " {{{2
   endif
   return fname
 endfunction
+
+
 
 " ----------------------------------------------------------------------------
 " Get the text of specified region.
@@ -346,6 +364,8 @@ function! s:Runner.get_region() " {{{2
   endif
   return selected
 endfunction
+
+
 
 " ----------------------------------------------------------------------------
 " Expand the keyword.
@@ -397,6 +417,8 @@ function! s:Runner.expand(str) " {{{2
   return result
 endfunction
 
+
+
 " ----------------------------------------------------------------------------
 " Open the output buffer, and return the buffer number.
 function! s:Runner.open_result_window() " {{{2
@@ -416,9 +438,13 @@ function! s:Runner.open_result_window() " {{{2
   endif
 endfunction
 
+
+
 function! s:is_win() " {{{2
   return has('win32') || has('win64')
 endfunction
+
+
 
 " MISC Functions. {{{1
 " ----------------------------------------------------------------------------
@@ -498,10 +524,14 @@ function! s:quickrun(args) " {{{2
   endif
 endfunction
 
+
+
 " Function for |g@|.
 function! QuickRun(mode) " {{{2
   execute 'QuickRun -mode o -visualmode' a:mode
 endfunction
+
+
 
 function! s:quickrun_complete(lead, cmd, pos) " {{{2
   let line = split(a:cmd[:a:pos], '', 1)
@@ -525,6 +555,8 @@ function! s:quickrun_complete(lead, cmd, pos) " {{{2
   end
   return filter(keys(g:quickrun_config), 'v:val != "*" && v:val =~ "^".a:lead')
 endfunction
+
+
 
 " ----------------------------------------------------------------------------
 " Initialize. {{{1
