@@ -17,7 +17,7 @@ let s:Runner = {}
 " ----------------------------------------------------------------------------
 " Constructor.
 function! s:Runner.new(args) " {{{2
-  let obj = extend({}, self)
+  let obj = copy(self)
   call obj.initialize(a:args)
   return obj
 endfunction
