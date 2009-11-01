@@ -426,6 +426,21 @@ endfunction
 function! s:quickrun(args) " {{{2
   try
     let runner = s:Runner.new(a:args)
+
+    let out = get(runner, 'output', '')
+    let append = get(runner, 'append', 0)
+    let running_mark = get(runner, 'running_mark', '')
+
+    if running_mark != '' && out == ''
+      call runner.open_result_window()
+      if !append
+        silent % delete _
+      endif
+      $-1put =running_mark
+      normal! zt
+      redraw!
+    endif
+
     " let g:runner = runner " for debug
     let result = runner.run()
     let runner.result = result
@@ -434,11 +449,12 @@ function! s:quickrun(args) " {{{2
     return
   endtry
 
-  let out = get(runner, 'output')
-  let append = get(runner, 'append')
   if out is ''
     " Output to the exclusive window.
     call runner.open_result_window()
+    if running_mark != ''
+      undo
+    endif
     if !append
       silent % delete _
     endif
