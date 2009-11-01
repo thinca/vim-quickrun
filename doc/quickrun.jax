@@ -232,6 +232,10 @@ eval_template				*quickrun-option-eval_template*
 			eval が指定された際に使用されるテンプレート文字列で
 			す。テンプレート内の %s が src に置き変えられます。
 
+running_mark				*quickrun-option-running_mark*
+			この値が空文字列でない場合、実行中にこの文字列が出力先
+			に表示されます。表示は実行完了後に削除されます。
+
 
 ------------------------------------------------------------------------------
 オプション値の展開				*quickrun-expand-option*
