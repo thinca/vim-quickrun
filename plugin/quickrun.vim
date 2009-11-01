@@ -30,7 +30,7 @@ endfunction
 " Initialize of instance.
 function! s:Runner.initialize(argline) " {{{2
   let arglist = self.parse_argline(a:argline)
-  call self.set_options_from_arglist(arglist)
+  let self.config = self.set_options_from_arglist(arglist)
   call self.normalize()
 endfunction
 
@@ -64,35 +64,37 @@ endfunction
 
 
 function! s:Runner.set_options_from_arglist(arglist)
+  let config = {}
   let option = ''
   for arg in a:arglist
     if option != ''
-      if has_key(self, option)
-        if type(self[option]) == type([])
-          call add(self[option], arg)
+      if has_key(config, option)
+        if type(config[option]) == type([])
+          call add(config[option], arg)
         else
-          let newarg = [self[option], arg]
-          unlet self[option]
-          let self[option] = newarg
+          let newarg = [config[option], arg]
+          unlet config[option]
+          let config[option] = newarg
         endif
       else
-        let self[option] = arg
+        let config[option] = arg
       endif
       let option = ''
     elseif arg[0] == '-'
       let option = arg[1:]
     elseif arg[0] == '>'
       if arg[1] == '>'
-        let self.append = 1
+        let config.append = 1
         let arg = arg[1:]
       endif
-      let self.output = arg[1:]
+      let config.output = arg[1:]
     elseif arg[0] == '<'
-      let self.input = arg[1:]
+      let config.input = arg[1:]
     else
-      let self.type = arg
+      let config.type = arg
     endif
   endfor
+  return config
 endfunction
 
 
@@ -100,54 +102,55 @@ endfunction
 " ----------------------------------------------------------------------------
 " The option is appropriately set referring to default options.
 function! s:Runner.normalize() " {{{2
-  if !has_key(self, 'mode')
+  let config = self.config
+  if !has_key(config, 'mode')
     if histget(':') =~ "^'<,'>\\s*Q\\%[uickRun]"
-      let self.mode = 'v'
+      let config.mode = 'v'
     else
-      let self.mode = 'n'
+      let config.mode = 'n'
     endif
   endif
 
   if exists('b:quickrun_config')
-    call extend(self, b:quickrun_config, 'keep')
+    call extend(config, b:quickrun_config, 'keep')
   endif
 
-  let self.type = get(self, 'type', &filetype)
+  let config.type = get(config, 'type', &filetype)
 
-  if has_key(g:quickrun_config, self.type)
-    call extend(self, g:quickrun_config[self.type], 'keep')
+  if has_key(g:quickrun_config, config.type)
+    call extend(config, g:quickrun_config[config.type], 'keep')
   endif
-  call extend(self, g:quickrun_config['*'], 'keep')
+  call extend(config, g:quickrun_config['*'], 'keep')
 
-  if has_key(self, 'input')
-    let input = self.input
+  if has_key(config, 'input')
+    let input = config.input
     try
       if input[0] == '='
-        let self.input = self.expand(input[1:])
+        let config.input = self.expand(input[1:])
       else
-        let self.input = join(readfile(input), "\n")
+        let config.input = join(readfile(input), "\n")
       endif
     catch
       throw 'quickrun:Can not treat input:' . v:exception
     endtry
   endif
 
-  let self.command = get(self, 'command', self.type)
-  let self.start = get(self, 'start', 1)
-  let self.end = get(self, 'end', line('$'))
-  let self.output = get(self, 'output', '')
+  let config.command = get(config, 'command', config.type)
+  let config.start = get(config, 'start', 1)
+  let config.end = get(config, 'end', line('$'))
+  let config.output = get(config, 'output', '')
 
-  if !exists('self.src')
-    if self.mode == 'n' && filereadable(expand('%:p'))
-          \ && self.start == 1 && self.end == line('$') && !&modified
+  if !exists('config.src')
+    if config.mode == 'n' && filereadable(expand('%:p'))
+          \ && config.start == 1 && config.end == line('$') && !&modified
       " Use file in direct.
-      let self.src = bufnr('%')
+      let config.src = bufnr('%')
     else
       " Executes on the temporary file.
       let body = self.get_region()
 
-      if self.eval
-        let body = printf(self.eval_template, body)
+      if config.eval
+        let body = printf(config.eval_template, body)
       endif
 
       let conv = iconv(body, &enc, &fenc)
@@ -164,7 +167,7 @@ function! s:Runner.normalize() " {{{2
         let body = substitute(body, "\n", "\r\n", 'g')
       endif
 
-      let self.src = body
+      let config.src = body
     endif
   end
 endfunction
@@ -174,7 +177,7 @@ endfunction
 " ----------------------------------------------------------------------------
 " Run commands. Return the stdout.
 function! s:Runner.run() " {{{2
-  let exec = get(self, 'exec', '')
+  let exec = get(self.config, 'exec', '')
   let result = ''
 
   try
@@ -213,28 +216,29 @@ function! s:Runner.execute(cmd) " {{{2
   endif
 
   let cmd = a:cmd
-  if get(self, 'output') == '!'
-    let in = get(self, 'input', '')
+  let config = self.config
+  if get(config, 'output') == '!'
+    let in = get(config, 'input', '')
     if in != ''
       let inputfile = tempname()
       call writefile(split(in, "\n"), inputfile)
       let cmd .= ' <' . shellescape(inputfile)
     endif
 
-    execute printf(self.shellcmd, cmd)
+    execute printf(config.shellcmd, cmd)
 
     if exists('inputfile') && filereadable(inputfile)
       call delete(inputfile)
     endif
     return 0
   else
-    if has_key(self, 'input') && self.input != ''
-      let result = system(cmd, self.input)
+    if has_key(config, 'input') && config.input != ''
+      let result = system(cmd, config.input)
     else
       let result = system(cmd)
     endif
-    if get(self, 'output_encode', '') != ''
-      let enc = split(self.expand(self.output_encode), '[^[:alnum:]-_]')
+    if get(config, 'output_encode', '') != ''
+      let enc = split(self.expand(config.output_encode), '[^[:alnum:]-_]')
       if len(enc) == 2
         let [from, to] = enc
         let trans = iconv(result, from, to)
@@ -253,12 +257,13 @@ endfunction
 " Build a command to execute it from options.
 function! s:Runner.build_command(tmpl) " {{{2
   " TODO Add rules.
+  let config = self.config
   let shebang = self.detect_shebang()
   let src = string(self.get_source_name())
   let rule = [
-        \ ['c', shebang != '' ? string(shebang) : 'self.command'],
+        \ ['c', shebang != '' ? string(shebang) : 'config.command'],
         \ ['s', src], ['S', src],
-        \ ['a', 'get(self, "args", "")'],
+        \ ['a', 'get(config, "args", "")'],
         \ ['\%', string('%')],
         \ ]
   let file = ['s', 'S']
@@ -267,7 +272,7 @@ function! s:Runner.build_command(tmpl) " {{{2
     if 0 <= index(file, key)
       let value = 'fnamemodify('.value.',submatch(1))'
       if key =~# '\U'
-        let value = printf(self.command =~ '^\s*:' ? 'fnameescape(%s)'
+        let value = printf(config.command =~ '^\s*:' ? 'fnameescape(%s)'
           \ : 'shellescape(%s)', value)
       endif
       let key .= '(%(\:[p8~.htre]|\:g?s(.).{-}\2.{-}\2)*)'
@@ -282,10 +287,11 @@ endfunction
 " ----------------------------------------------------------------------------
 " Detect the shebang, and return the shebang command if it exists.
 function! s:Runner.detect_shebang()
-  if type(self.src) == type('')
-    let line = matchstr(self.src, '^.\{-}\ze\(\n\|$\)')
-  elseif type(self.src) == type(0)
-    let line = getbufline(self.src, 1)[0]
+  let src = self.config.src
+  if type(src) == type('')
+    let line = matchstr(src, '^.\{-}\ze\(\n\|$\)')
+  elseif type(src) == type(0)
+    let line = getbufline(src, 1)[0]
   endif
   if line =~ '^#!' && executable(matchstr(line[2:], '^[^[:space:]]\+'))
     return line[2:]
@@ -297,20 +303,21 @@ endfunction
 
 " ----------------------------------------------------------------------------
 " Return the source file name.
-" Output to a temporary file if self.src is string.
+" Output to a temporary file if self.config.src is string.
 function! s:Runner.get_source_name() " {{{2
   let fname = expand('%')
-  if exists('self.src')
-    if type(self.src) == type('')
+  if exists('self.config.src')
+    let src = self.config.src
+    if type(src) == type('')
       if has_key(self, '_temp')
         let fname = self._temp
       else
-        let fname = self.expand(self.tempfile)
+        let fname = self.expand(self.config.tempfile)
         let self._temp = fname
-        call writefile(split(self.src, "\n", 'b'), fname)
+        call writefile(split(src, "\n", 'b'), fname)
       endif
-    elseif type(self.src) == type(0)
-      let fname = expand('#'.self.src.':p')
+    elseif type(src) == type(0)
+      let fname = expand('#'.src.':p')
     endif
   endif
   return fname
@@ -321,21 +328,22 @@ endfunction
 " ----------------------------------------------------------------------------
 " Get the text of specified region.
 function! s:Runner.get_region() " {{{2
-  if self.mode == 'n'
+  let mode = self.config.mode
+  if mode == 'n'
     " Normal mode
-    return join(getline(self.start, self.end), "\n")
+    return join(getline(self.config.start, self.config.end), "\n")
 
-  elseif self.mode == 'o'
+  elseif mode == 'o'
     " Operation mode
     let vm = {
         \ 'line': 'V',
         \ 'char': 'v',
-        \ 'block': "\<C-v>" }[self.visualmode]
+        \ 'block': "\<C-v>" }[self.config.visualmode]
     let [sm, em] = ['[', ']']
     let save_sel = &selection
     set selection=inclusive
 
-  elseif self.mode == 'v'
+  elseif mode == 'v'
     " Visual mode
     let [vm, sm, em] = [visualmode(), '<', '>']
 
@@ -359,7 +367,7 @@ function! s:Runner.get_region() " {{{2
 
   call setreg(v:register, reg_save, reg_save_type)
 
-  if self.mode == 'o'
+  if mode == 'o'
     let &selection = save_sel
   endif
   return selected
@@ -426,7 +434,7 @@ function! s:Runner.open_result_window() " {{{2
     let s:bufnr = -1 " A number that doesn't exist.
   endif
   if !bufexists(s:bufnr)
-    execute self.expand(self.split) 'split'
+    execute self.expand(self.config.split) 'split'
     edit `='[quickrun Output]'`
     let s:bufnr = bufnr('%')
     setlocal bufhidden=hide buftype=nofile noswapfile nobuflisted
@@ -452,10 +460,11 @@ endfunction
 function! s:quickrun(args) " {{{2
   try
     let runner = s:Runner.new(a:args)
+    let config = runner.config
 
-    let out = get(runner, 'output', '')
-    let append = get(runner, 'append', 0)
-    let running_mark = get(runner, 'running_mark', '')
+    let out = get(config, 'output', '')
+    let append = get(config, 'append', 0)
+    let running_mark = get(config, 'running_mark', '')
 
     if running_mark != '' && out == ''
       call runner.open_result_window()
