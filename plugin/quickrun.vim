@@ -523,6 +523,7 @@ function! s:init()
         \   'eval': 0,
         \   'eval_template': '%s',
         \   'shellcmd': s:is_win() ? 'silent !"%s" & pause' : '!%s',
+        \   'running_mark': ':-)',
         \ },
         \ 'awk': {
         \   'exec': '%c -f %s %a',
