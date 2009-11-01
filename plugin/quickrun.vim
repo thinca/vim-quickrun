@@ -517,9 +517,9 @@ function! s:quickrun_complete(lead, cmd, pos) " {{{2
       return []
     end
   elseif head =~ '^-'
-    let options = map(['type', 'src', 'input', 'output', 'append',
-      \ 'command', 'exec', 'args', 'tempfile', 'shebang', 'eval',
-      \ 'mode', 'split', 'output_encode', 'shellcmd', 'eval_template'],
+    let options = map(['type', 'src', 'input', 'output', 'append', 'command',
+      \ 'exec', 'args', 'tempfile', 'shebang', 'eval', 'mode', 'split',
+      \ 'output_encode', 'shellcmd', 'running_mark', 'eval_template'],
       \ '"-".v:val')
     return filter(options, 'v:val =~ "^".head')
   end
