@@ -436,7 +436,7 @@ function! s:quickrun(args) " {{{2
       if !append
         silent % delete _
       endif
-      $-1put =running_mark
+      silent $-1 put =running_mark
       normal! zt
       redraw!
     endif
@@ -453,16 +453,16 @@ function! s:quickrun(args) " {{{2
     " Output to the exclusive window.
     call runner.open_result_window()
     if running_mark != ''
-      undo
+      silent undo
     endif
     if !append
       silent % delete _
     endif
 
     let cursor = getpos('$')
-    call append(line('$') - 1, split(result, "\n", 1))
+    silent $-1 put =result
     call setpos('.', cursor)
-    normal! zt
+    silent normal! zt
     wincmd p
 
   elseif out == '!'
