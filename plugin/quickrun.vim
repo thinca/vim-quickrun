@@ -281,15 +281,10 @@ endfunction
 " Detect the shebang, and return the shebang command if it exists.
 function! s:Runner.detect_shebang()
   let src = self.config.src
-  if type(src) == type('')
-    let line = matchstr(src, '^.\{-}\ze\(\n\|$\)')
-  elseif type(src) == type(0)
-    let line = getbufline(src, 1)[0]
-  endif
-  if line =~ '^#!'
-    return line[2:]
-  endif
-  return ''
+  let line = type(src) == type('') ? matchstr(src, '^.\{-}\ze\(\n\|$\)'):
+  \          type(src) == type(0)  ? getbufline(src, 1)[0]:
+  \                                  ''
+  return line =~ '^#!' ? line[2:] : ''
 endfunction
 
 
