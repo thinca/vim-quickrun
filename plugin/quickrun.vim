@@ -286,7 +286,7 @@ function! s:Runner.detect_shebang()
   elseif type(src) == type(0)
     let line = getbufline(src, 1)[0]
   endif
-  if line =~ '^#!' && executable(matchstr(line[2:], '^[^[:space:]]\+'))
+  if line =~ '^#!'
     return line[2:]
   endif
   return ''
