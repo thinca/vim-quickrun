@@ -637,8 +637,11 @@ function! s:init()
         \ 'io': {},
         \ 'ocaml': {},
         \ 'perl': {
-        \   'eval_template':
-        \     'print eval{use Data::Dumper;$Data::Dumper::Terse = 1;$Data::Dumper::Indent = 0;Dumper %s}'
+        \   'eval_template': join([
+        \     'use Data::Dumper',
+        \     '$Data::Dumper::Terse = 1',
+        \     '$Data::Dumper::Indent = 0',
+        \     'print Dumper eval{%s}'], ';')
         \ },
         \ 'python': {'eval_template': 'print(%s)'},
         \ 'php': {},
