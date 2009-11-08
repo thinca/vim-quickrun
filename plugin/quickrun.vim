@@ -18,7 +18,7 @@ let s:Runner = {}
 
 " ----------------------------------------------------------------------------
 " Constructor.
-function! s:Runner.new(args) " {{{2
+function! s:Runner.new(args)  " {{{2
   let obj = copy(self)
   call obj.initialize(a:args)
   return obj
@@ -28,7 +28,7 @@ endfunction
 
 " ----------------------------------------------------------------------------
 " Initialize of instance.
-function! s:Runner.initialize(argline) " {{{2
+function! s:Runner.initialize(argline)  " {{{2
   let arglist = self.parse_argline(a:argline)
   let self.config = self.set_options_from_arglist(arglist)
   call self.normalize()
@@ -36,7 +36,7 @@ endfunction
 
 
 
-function! s:Runner.parse_argline(argline) " {{{2
+function! s:Runner.parse_argline(argline)  " {{{2
   " foo 'bar buz' "hoge \"huga"
   " => ['foo', 'bar buz', 'hoge "huga']
   " TODO: More improve.
@@ -101,14 +101,10 @@ endfunction
 
 " ----------------------------------------------------------------------------
 " The option is appropriately set referring to default options.
-function! s:Runner.normalize() " {{{2
+function! s:Runner.normalize()  " {{{2
   let config = self.config
   if !has_key(config, 'mode')
-    if histget(':') =~ "^'<,'>\\s*Q\\%[uickRun]"
-      let config.mode = 'v'
-    else
-      let config.mode = 'n'
-    endif
+    let config.mode = histget(':') =~# "^'<,'>\\s*Q\\%[uickRun]" ? 'v' : 'n'
   endif
 
   if exists('b:quickrun_config')
@@ -125,13 +121,10 @@ function! s:Runner.normalize() " {{{2
   if has_key(config, 'input')
     let input = config.input
     try
-      if input[0] == '='
-        let config.input = self.expand(input[1:])
-      else
-        let config.input = join(readfile(input), "\n")
-      endif
+      let config.input = input[0] == '=' ? self.expand(input[1:])
+      \                                  : join(readfile(input), "\n")
     catch
-      throw 'quickrun:Can not treat input:' . v:exception
+      throw 'quickrun: Can not treat input: ' . v:exception
     endtry
   endif
 
@@ -140,8 +133,8 @@ function! s:Runner.normalize() " {{{2
   let config.end = get(config, 'end', line('$'))
   let config.output = get(config, 'output', '')
 
-  if !exists('config.src')
-    if config.mode == 'n' && filereadable(expand('%:p'))
+  if !has_key(config, 'src')
+    if config.mode ==# 'n' && filereadable(expand('%:p'))
           \ && config.start == 1 && config.end == line('$') && !&modified
       " Use file in direct.
       let config.src = bufnr('%')
@@ -158,9 +151,9 @@ function! s:Runner.normalize() " {{{2
         let body = conv
       endif
 
-      if &l:ff == 'mac'
+      if &l:ff ==# 'mac'
         let body = substitute(body, "\n", "\r", 'g')
-      elseif &l:ff == 'dos'
+      elseif &l:ff ==# 'dos'
         if !&l:bin
           let body .= "\n"
         endif
@@ -169,14 +162,14 @@ function! s:Runner.normalize() " {{{2
 
       let config.src = body
     endif
-  end
+  endif
 endfunction
 
 
 
 " ----------------------------------------------------------------------------
 " Run commands. Return the stdout.
-function! s:Runner.run() " {{{2
+function! s:Runner.run()  " {{{2
   let exec = get(self.config, 'exec', '')
   let result = ''
 
@@ -194,6 +187,7 @@ function! s:Runner.run() " {{{2
       unlet self._temp
     endif
   endtry
+
   return result
 endfunction
 
@@ -201,13 +195,14 @@ endfunction
 
 " ----------------------------------------------------------------------------
 " Execute a single command.
-function! s:Runner.execute(cmd) " {{{2
+function! s:Runner.execute(cmd)  " {{{2
   if a:cmd == ''
     throw 'command build Failed'
     return
   endif
 
   if a:cmd =~ '^\s*:'
+    " A vim command.
     let result = ''
     redir => result
     silent execute a:cmd
@@ -231,41 +226,39 @@ function! s:Runner.execute(cmd) " {{{2
       call delete(inputfile)
     endif
     return 0
-  else
-    if has_key(config, 'input') && config.input != ''
-      let result = system(cmd, config.input)
-    else
-      let result = system(cmd)
-    endif
-    if get(config, 'output_encode', '') != ''
-      let enc = split(self.expand(config.output_encode), '[^[:alnum:]-_]')
-      if len(enc) == 2
-        let [from, to] = enc
-        let trans = iconv(result, from, to)
-        if trans != ''
-          let result = trans
-        endif
+  endif
+
+  let result = get(config, 'input', '') == '' ? system(cmd)
+  \                                           : system(cmd, config.input)
+
+  if get(config, 'output_encode', '') != ''
+    let enc = split(self.expand(config.output_encode), '[^[:alnum:]-_]')
+    if len(enc) == 2
+      let [from, to] = enc
+      let trans = iconv(result, from, to)
+      if trans != ''
+        let result = trans
       endif
     endif
-    return result
   endif
+  return result
 endfunction
 
 
 
 " ----------------------------------------------------------------------------
 " Build a command to execute it from options.
-function! s:Runner.build_command(tmpl) " {{{2
+function! s:Runner.build_command(tmpl)  " {{{2
   " TODO Add rules.
   let config = self.config
   let shebang = self.detect_shebang()
   let src = string(self.get_source_name())
   let rule = [
-        \ ['c', shebang != '' ? string(shebang) : 'config.command'],
-        \ ['s', src], ['S', src],
-        \ ['a', 'get(config, "args", "")'],
-        \ ['\%', string('%')],
-        \ ]
+  \  ['c', shebang != '' ? string(shebang) : 'config.command'],
+  \  ['s', src], ['S', src],
+  \  ['a', 'get(config, "args", "")'],
+  \  ['\%', string('%')],
+  \]
   let file = ['s', 'S']
   let cmd = a:tmpl
   for [key, value] in rule
@@ -304,7 +297,7 @@ endfunction
 " ----------------------------------------------------------------------------
 " Return the source file name.
 " Output to a temporary file if self.config.src is string.
-function! s:Runner.get_source_name() " {{{2
+function! s:Runner.get_source_name()  " {{{2
   let fname = expand('%')
   if exists('self.config.src')
     let src = self.config.src
@@ -327,13 +320,13 @@ endfunction
 
 " ----------------------------------------------------------------------------
 " Get the text of specified region.
-function! s:Runner.get_region() " {{{2
+function! s:Runner.get_region()  " {{{2
   let mode = self.config.mode
-  if mode == 'n'
+  if mode ==# 'n'
     " Normal mode
     return join(getline(self.config.start, self.config.end), "\n")
 
-  elseif mode == 'o'
+  elseif mode ==# 'o'
     " Operation mode
     let vm = {
         \ 'line': 'V',
@@ -343,7 +336,7 @@ function! s:Runner.get_region() " {{{2
     let save_sel = &selection
     set selection=inclusive
 
-  elseif mode == 'v'
+  elseif mode ==# 'v'
     " Visual mode
     let [vm, sm, em] = [visualmode(), '<', '>']
 
@@ -367,7 +360,7 @@ function! s:Runner.get_region() " {{{2
 
   call setreg(v:register, reg_save, reg_save_type)
 
-  if mode == 'o'
+  if mode ==# 'o'
     let &selection = save_sel
   endif
   return selected
@@ -382,7 +375,7 @@ endfunction
 " - $ENV_NAME ${ENV_NAME}
 " - {expr}
 " Escape by \ if you does not want to expand.
-function! s:Runner.expand(str) " {{{2
+function! s:Runner.expand(str)  " {{{2
   if type(a:str) != type('')
     return ''
   endif
@@ -429,9 +422,9 @@ endfunction
 
 " ----------------------------------------------------------------------------
 " Open the output buffer, and return the buffer number.
-function! s:Runner.open_result_window() " {{{2
+function! s:Runner.open_result_window()  " {{{2
   if !exists('s:bufnr')
-    let s:bufnr = -1 " A number that doesn't exist.
+    let s:bufnr = -1  " A number that doesn't exist.
   endif
   if !bufexists(s:bufnr)
     execute self.expand(self.config.split) 'split'
@@ -448,7 +441,7 @@ endfunction
 
 
 
-function! s:is_win() " {{{2
+function! s:is_win()  " {{{2
   return has('win32') || has('win64')
 endfunction
 
@@ -457,7 +450,7 @@ endfunction
 " MISC Functions. {{{1
 " ----------------------------------------------------------------------------
 " function for main command.
-function! s:quickrun(args) " {{{2
+function! s:quickrun(args)  " {{{2
   try
     let runner = s:Runner.new(a:args)
     let config = runner.config
@@ -476,7 +469,7 @@ function! s:quickrun(args) " {{{2
       redraw!
     endif
 
-    " let g:runner = runner " for debug
+    " let g:runner = runner  " for debug
     let result = runner.run()
     let runner.result = result
   catch
@@ -536,13 +529,13 @@ endfunction
 
 
 " Function for |g@|.
-function! QuickRun(mode) " {{{2
+function! QuickRun(mode)  " {{{2
   execute 'QuickRun -mode o -visualmode' a:mode
 endfunction
 
 
 
-function! s:quickrun_complete(lead, cmd, pos) " {{{2
+function! s:quickrun_complete(lead, cmd, pos)  " {{{2
   let line = split(a:cmd[:a:pos], '', 1)
   let head = line[-1]
   if 2 <= len(line) && line[-2] =~ '^-'
