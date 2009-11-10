@@ -464,7 +464,10 @@ function! s:quickrun(args)  " {{{2
       redraw!
     endif
 
-    " let g:runner = runner  " for debug
+    if has_key(config, 'debug') && config.debug
+      let g:runner = runner  " for debug
+    endif
+
     let result = runner.run()
     let runner.result = result
   catch
