@@ -613,6 +613,16 @@ function! s:init()
         \   'command': 'erb',
         \   'exec': '%c -T - %s %a',
         \ },
+        \ 'go':
+        \   $GOARCH ==# '386' ? {
+        \     'exec': ['8g %s', '8l -o %s:p:r %s:p:r.8', '%s:p:r %a', 'rm -f %s:p:r'],
+        \   } :
+        \   $GOARCH ==# 'amd64' ? {
+        \     'exec': ['6g %s', '6l -o %s:p:r %s:p:r.6', '%s:p:r %a', 'rm -f %s:p:r'],
+        \   } :
+        \   $GOARCH ==# 'arm' ? {
+        \     'exec': ['5g %s', '5l -o %s:p:r %s:p:r.5', '%s:p:r %a', 'rm -f %s:p:r'],
+        \   } : {},
         \ 'groovy': {
         \   'exec': '%c -c {&fenc==""?&enc:&fenc} %s %a',
         \ },
