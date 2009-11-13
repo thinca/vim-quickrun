@@ -1,6 +1,6 @@
 *quicklaunch.txt*	登録しておいたコマンドを素早く実行します。
 
-Version: 0.1.0
+Version: 0.1.0.1
 Author : thinca <thinca+vim@gmail.com>
 License: クリエイティブ・コモンズの表示 2.1 日本ライセンス
          <http://creativecommons.org/licenses/by/2.1/jp/>
@@ -59,6 +59,11 @@ g:quicklaunch_commands はリストか辞書で、0 - 9 に実行するコマン
 			としておくと、 <Plug>(quicklaunch-1) で `ls` を実行し
 			て結果を別ウィンドウで表示します。
 
+<Plug>(quicklaunch-list)			*<Plug>(quicklaunch-list)*
+			|g:quicklaunch_commands| に登録されているコマンドの一
+			覧を表示します。
+
+
 					*g:quicklaunch_no_default_key_mappings*
 以下のキーマッピングは、既に定義されていたり
 g:quicklaunch_no_default_key_mappings に 1 が設定されていると定義されません。
@@ -69,11 +74,15 @@ g:quicklaunch_no_default_key_mappings に 1 が設定されていると定義さ
 <Leader>1		<Plug>(quicklaunch-1)
     :
 <Leader>9		<Plug>(quicklaunch-9)
+<Leader>l		<Plug>(quicklaunch-list)
 
 
 
 ==============================================================================
 更新履歴					*quicklaunch-changelog*
+
+0.1.0.1	2009-11-13
+	- ヘルプから |<Plug>(quicklaunch-list)| の記述が漏れていたのを修正。
 
 0.1.0	2009-10-29
 	- ヘルプを |quickrun| から分離。
