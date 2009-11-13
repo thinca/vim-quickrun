@@ -623,6 +623,7 @@ function! s:init()
         \ },
         \ 'java': {
         \   'exec': ['javac %s', '%c %s:t:r', ':call delete("%S:t:r.class")'],
+        \   'output_encode': '&tenc:&enc',
         \ },
         \ 'javascript': {
         \   'command': executable('js') ? 'js':
@@ -652,7 +653,9 @@ function! s:init()
         \   'exec': '%c --no-save --slave %a < %s',
         \ },
         \ 'ruby': {'eval_template': " p proc {\n%s\n}.call"},
-        \ 'scala': {},
+        \ 'scala': {
+        \   'output_encode': '&tenc:&enc',
+        \ },
         \ 'scheme': {
         \   'command': 'gosh',
         \   'exec': '%c %s:p %a',
