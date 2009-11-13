@@ -163,6 +163,8 @@ function! s:Runner.normalize()  " {{{2
       let config.src = body
     endif
   endif
+
+  let self.source_name = self.get_source_name()
 endfunction
 
 
@@ -252,7 +254,7 @@ function! s:Runner.build_command(tmpl)  " {{{2
   " TODO Add rules.
   let config = self.config
   let shebang = self.detect_shebang()
-  let src = string(self.get_source_name())
+  let src = string(self.source_name)
   let rule = [
   \  ['c', shebang != '' ? string(shebang) : 'config.command'],
   \  ['s', src], ['S', src],
