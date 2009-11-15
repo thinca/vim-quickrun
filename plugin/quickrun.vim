@@ -126,6 +126,8 @@ function! s:Runner.normalize()  " {{{2
     catch
       throw 'quickrun: Can not treat input: ' . v:exception
     endtry
+  else
+    let config.input = ''
   endif
 
   let config.command = get(config, 'command', config.type)
@@ -215,7 +217,7 @@ function! s:Runner.execute(cmd)  " {{{2
   let cmd = a:cmd
   let config = self.config
   if get(config, 'output') == '!'
-    let in = get(config, 'input', '')
+    let in = config.input
     if in != ''
       let inputfile = tempname()
       call writefile(split(in, "\n"), inputfile)
@@ -230,8 +232,8 @@ function! s:Runner.execute(cmd)  " {{{2
     return 0
   endif
 
-  let result = get(config, 'input', '') == '' ? system(cmd)
-  \                                           : system(cmd, config.input)
+  let result = config.input == '' ? system(cmd)
+  \                               : system(cmd, config.input)
 
   if get(config, 'output_encode', '') != ''
     let enc = split(self.expand(config.output_encode), '[^[:alnum:]-_]')
