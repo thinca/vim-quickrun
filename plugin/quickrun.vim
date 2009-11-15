@@ -132,6 +132,7 @@ function! s:Runner.normalize()  " {{{2
   let config.start = get(config, 'start', 1)
   let config.end = get(config, 'end', line('$'))
   let config.output = get(config, 'output', '')
+  let config.append = get(config, 'append', 0)
 
   if !has_key(config, 'src')
     if config.mode ==# 'n' && filereadable(expand('%:p'))
