@@ -466,6 +466,7 @@ function! s:quickrun(args)  " {{{2
       endif
       silent $-1 put =running_mark
       normal! zt
+      wincmd p
       redraw!
     endif
 
