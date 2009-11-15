@@ -420,6 +420,65 @@ endfunction
 
 
 
+function! s:Runner.output()
+  let config = self.config
+  let out = get(config, 'output', '')
+  let append = get(config, 'append', 0)
+  let running_mark = get(config, 'running_mark', '')
+
+  let result = self.result
+  if out == ''
+    " Output to the exclusive window.
+    call self.open_result_window()
+    if running_mark != ''
+      silent undo
+    endif
+    if !append
+      silent % delete _
+    endif
+
+    let cursor = getpos('$')
+    silent $-1 put =result
+    call setpos('.', cursor)
+    silent normal! zt
+    wincmd p
+
+  elseif out == '!'
+    " Do nothing.
+
+  elseif out == ':'
+    if append
+      for i in split(result, "\n")
+        echomsg i
+      endfor
+    else
+      echo result
+    endif
+
+  elseif out[0] == '='
+    let out = out[1:]
+    if out =~ '^\w[^:]'
+      let out = 'g:' . out
+    endif
+    if append && (out[0] =~ '\W' || exists(out))
+      execute 'let' out '.= result'
+    else
+      execute 'let' out '= result'
+    endif
+
+  else
+    let size = strlen(result)
+    if append && filereadable(out)
+      let result = join(readfile(out, 'b'), "\n") . result
+    endif
+    call writefile(split(result, "\n"), out, 'b')
+    echo printf('Output to %s: %d bytes', out, size)
+  endif
+endfunction
+
+
+
+
 " ----------------------------------------------------------------------------
 " Open the output buffer, and return the buffer number.
 function! s:Runner.open_result_window()  " {{{2
@@ -474,60 +533,13 @@ function! s:quickrun(args)  " {{{2
       let g:runner = runner  " for debug
     endif
 
-    let result = runner.run()
-    let runner.result = result
+    let runner.result = runner.run()
+
+    call runner.output()
   catch
     echoerr v:exception v:throwpoint
     return
   endtry
-
-  if out == ''
-    " Output to the exclusive window.
-    call runner.open_result_window()
-    if running_mark != ''
-      silent undo
-    endif
-    if !append
-      silent % delete _
-    endif
-
-    let cursor = getpos('$')
-    silent $-1 put =result
-    call setpos('.', cursor)
-    silent normal! zt
-    wincmd p
-
-  elseif out == '!'
-    " Do nothing.
-
-  elseif out == ':'
-    if append
-      for i in split(result, "\n")
-        echomsg i
-      endfor
-    else
-      echo result
-    endif
-
-  elseif out[0] == '='
-    let out = out[1:]
-    if out =~ '^\w[^:]'
-      let out = 'g:' . out
-    endif
-    if append && (out[0] =~ '\W' || exists(out))
-      execute 'let' out '.= result'
-    else
-      execute 'let' out '= result'
-    endif
-
-  else
-    let size = strlen(result)
-    if append && filereadable(out)
-      let result = join(readfile(out, 'b'), "\n") . result
-    endif
-    call writefile(split(result, "\n"), out, 'b')
-    echo printf('Output to %s: %d bytes', out, size)
-  endif
 endfunction
 
 
