@@ -113,8 +113,8 @@ QuickRun({type})
 <Plug>(quickrun)				*<Plug>(quickrun)*
 			現在のバッファに適したコマンドを実行して結果を別ウィン
 			ドウに表示します。
-			これは単純に以下のコマンドと同じです。 >
-			:QuickRun >
+			これは単純に |:QuickRun| コマンドを引数なしで実行する
+			のと同じです。
 <
 
 					*g:quickrun_no_default_key_mappings*

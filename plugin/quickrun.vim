@@ -714,8 +714,8 @@ command! -nargs=* -range=% -complete=customlist,s:quickrun_complete QuickRun
 
 nnoremap <silent> <Plug>(quickrun-op) :<C-u>set operatorfunc=QuickRun<CR>g@
 
-silent! nnoremap <silent> <Plug>(quickrun) :<C-u>QuickRun -mode n ><CR>
-silent! vnoremap <silent> <Plug>(quickrun) :<C-u>QuickRun -mode v ><CR>
+silent! nnoremap <silent> <Plug>(quickrun) :<C-u>QuickRun -mode n<CR>
+silent! vnoremap <silent> <Plug>(quickrun) :<C-u>QuickRun -mode v<CR>
 " Default key mappings.
 if !exists('g:quickrun_no_default_key_mappings')
 \  || !g:quickrun_no_default_key_mappings
