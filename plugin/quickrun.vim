@@ -131,8 +131,6 @@ function! s:Runner.normalize()  " {{{2
   let config.command = get(config, 'command', config.type)
   let config.start = get(config, 'start', 1)
   let config.end = get(config, 'end', line('$'))
-  let config.output = get(config, 'output', '')
-  let config.append = get(config, 'append', 0)
 
   if !has_key(config, 'src')
     if config.mode ==# 'n' && filereadable(expand('%:p'))
@@ -261,7 +259,7 @@ function! s:Runner.build_command(tmpl)  " {{{2
   let rule = [
   \  ['c', shebang != '' ? string(shebang) : 'config.command'],
   \  ['s', src], ['S', src],
-  \  ['a', 'get(config, "args", "")'],
+  \  ['a', 'config.args'],
   \  ['\%', string('%')],
   \]
   let file = ['s', 'S']
@@ -581,6 +579,9 @@ function! s:init()
   let default_config = {
         \ '*': {
         \   'shebang': 1,
+        \   'output': '',
+        \   'append': 0,
+        \   'args': '',
         \   'output_encode': '&fenc:&enc',
         \   'tempfile'  : '{tempname()}',
         \   'exec': '%c %s %a',
