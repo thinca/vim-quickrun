@@ -1,6 +1,6 @@
 *quickrun.txt*	コマンドを素早く実行します。
 
-Version: 0.2.0
+Version: 0.3.1
 Author : thinca <thinca+vim@gmail.com>
 License: クリエイティブ・コモンズの表示 2.1 日本ライセンス
          <http://creativecommons.org/licenses/by/2.1/jp/>
@@ -113,8 +113,8 @@ QuickRun({type})
 <Plug>(quickrun)				*<Plug>(quickrun)*
 			現在のバッファに適したコマンドを実行して結果を別ウィン
 			ドウに表示します。
-			これは単純に以下のコマンドと同じです。 >
-			:QuickRun >
+			これは単純に |:QuickRun| コマンドを引数なしで実行する
+			のと同じです。
 <
 
 					*g:quickrun_no_default_key_mappings*
@@ -320,8 +320,7 @@ exec を展開した結果先頭の文字が ":" だった場合、Vim のコマ
 3. |g:quickrun_config| の {type}
 4. |g:quickrun_config| の '*'
 
-2 で {type} を設定しておくことで 3 で通常とは別の {type} を参照することも可能
-です。
+1 や 2 で {type} を設定しておくことで 3 で通常とは別の {type} を参照できます。
 
 
 
@@ -339,6 +338,15 @@ TODO						*quickrun-TODO*
 
 ==============================================================================
 更新履歴					*quickrun-changelog*
+
+0.3.1	2009-11-16
+	- |g:quickrun_config| のデフォルト値を変更。
+	  - '*' に output append args を含めた。
+	  - java, scala, perl を改善。
+	  - go を追加。
+	- shebang が利用できるかの判定で、コマンドが実行可能かのチェックをしな
+	  いようにした。
+	- 内部構造を若干変更。
 
 0.3.0	2009-11-01
 	- 実行中にバッファに一時的な文字列を表示する機能
