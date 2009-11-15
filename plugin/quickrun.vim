@@ -422,9 +422,9 @@ endfunction
 
 function! s:Runner.output()
   let config = self.config
-  let out = get(config, 'output', '')
-  let append = get(config, 'append', 0)
-  let running_mark = get(config, 'running_mark', '')
+  let [out, to] = [config.output[:0], config.output[1:]]
+  let append = config.append
+  let running_mark = config.running_mark
 
   let result = self.result
   if out == ''
@@ -447,6 +447,7 @@ function! s:Runner.output()
     " Do nothing.
 
   elseif out == ':'
+    " Output to messages.
     if append
       for i in split(result, "\n")
         echomsg i
@@ -455,18 +456,16 @@ function! s:Runner.output()
       echo result
     endif
 
-  elseif out[0] == '='
-    let out = out[1:]
-    if out =~ '^\w[^:]'
-      let out = 'g:' . out
+  elseif out == '='
+    " Output to variable.
+    if to =~ '^\w[^:]'
+      let to = 'g:' . to
     endif
-    if append && (out[0] =~ '\W' || exists(out))
-      execute 'let' out '.= result'
-    else
-      execute 'let' out '= result'
-    endif
+    let assign = append && (to[0] =~ '\W' || exists(to)) ? '.=' : '='
+    execute 'let' to assign 'result'
 
   else
+    " Output to file.
     let size = strlen(result)
     if append && filereadable(out)
       let result = join(readfile(out, 'b'), "\n") . result
@@ -514,16 +513,12 @@ function! s:quickrun(args)  " {{{2
     let runner = s:Runner.new(a:args)
     let config = runner.config
 
-    let out = get(config, 'output', '')
-    let append = get(config, 'append', 0)
-    let running_mark = get(config, 'running_mark', '')
-
-    if running_mark != '' && out == ''
+    if config.running_mark != '' && config.output == ''
       call runner.open_result_window()
-      if !append
+      if !config.append
         silent % delete _
       endif
-      silent $-1 put =running_mark
+      silent $-1 put =config.running_mark
       normal! zt
       wincmd p
       redraw!
