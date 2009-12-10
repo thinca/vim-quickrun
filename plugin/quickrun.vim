@@ -628,8 +628,8 @@ function! s:init()
         \ 'go':
         \   $GOARCH ==# '386' ? {
         \     'exec':
-        \       s:is_win() ? 
-        \         ['8g %s', '8l -o %s:p:r.exe %s:p:r.8', '%s:p:r.exe %a', 'rm -f %s:p:r.exe'] :
+        \       s:is_win() ?
+        \         ['8g %s', '8l -o %s:p:r.exe %s:p:r.8', '%s:p:r.exe %a', 'del /F %s:p:r.exe'] :
         \         ['8g %s', '8l -o %s:p:r %s:p:r.8', '%s:p:r %a', 'rm -f %s:p:r']
         \   } :
         \   $GOARCH ==# 'amd64' ? {
