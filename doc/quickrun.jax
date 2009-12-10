@@ -96,7 +96,7 @@ TODO				|quickrun-TODO|
 ------------------------------------------------------------------------------
 関数				*quickrun-functions* *quickrun-operator*
 
-QuickRun({type})
+QuickRun({type})				*QuickRun()*
 			'operatorfunc' に対して設定するための関数です。
 			例えば、 >
 		nnoremap <silent> <C-CR> :<C-u>set opfunc=QuickRun<CR>g@ip
