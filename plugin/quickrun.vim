@@ -151,10 +151,7 @@ function! s:Runner.normalize()  " {{{2
         let body = printf(config.eval_template, body)
       endif
 
-      let conv = iconv(body, &enc, &fenc)
-      if conv != ''
-        let body = conv
-      endif
+      let body = s:iconv(body, &enc, &fenc)
 
       if &l:ff ==# 'mac'
         let body = substitute(body, "\n", "\r", 'g')
@@ -243,10 +240,7 @@ function! s:Runner.execute(cmd)  " {{{2
     let enc = split(self.expand(config.output_encode), '[^[:alnum:]-_]')
     if len(enc) == 2
       let [from, to] = enc
-      let trans = iconv(result, from, to)
-      if trans != ''
-        let result = trans
-      endif
+      let result = s:iconv(result, from, to)
     endif
   endif
   return result
