@@ -225,7 +225,7 @@ function! s:Runner.execute(cmd)  " {{{2
       let cmd .= ' <' . shellescape(inputfile)
     endif
 
-    execute printf(config.shellcmd, cmd)
+    execute s:iconv(printf(config.shellcmd, cmd), &encoding, &termencoding)
 
     if exists('inputfile') && filereadable(inputfile)
       call delete(inputfile)
@@ -233,6 +233,7 @@ function! s:Runner.execute(cmd)  " {{{2
     return 0
   endif
 
+  let cmd = s:iconv(cmd, &encoding, &termencoding)
   let result = config.input == '' ? system(cmd)
   \                               : system(cmd, config.input)
 
