@@ -503,6 +503,17 @@ endfunction
 
 
 
+" iconv() wrapper for safety.
+function! s:iconv(expr, from, to)
+  if a:from ==# a:to
+    return a:expr
+  endif
+  let result = iconv(a:expr, a:from, a:to)
+  return result != '' ? result : a:expr
+endfunction
+
+
+
 function! s:is_win()  " {{{2
   return has('win32') || has('win64')
 endfunction
