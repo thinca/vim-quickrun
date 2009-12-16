@@ -1,6 +1,6 @@
 *quickrun.txt*	コマンドを素早く実行します。
 
-Version: 0.3.2
+Version: 0.3.3
 Author : thinca <thinca+vim@gmail.com>
 License: クリエイティブ・コモンズの表示 2.1 日本ライセンス
          <http://creativecommons.org/licenses/by/2.1/jp/>
@@ -339,6 +339,9 @@ TODO						*quickrun-TODO*
 
 ==============================================================================
 更新履歴					*quickrun-changelog*
+
+0.3.3	2009-12-16
+	- マルチバイト文字を含むコマンドの実行がうまくいかないバグを修正。
 
 0.3.2	2009-12-10
 	- eval がうまく動かないことがあるバグを修正。
