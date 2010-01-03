@@ -537,7 +537,7 @@ function! s:quickrun(args)  " {{{2
       silent $-1 put =config.running_mark
       normal! zt
       wincmd p
-      redraw!
+      redraw
     endif
 
     if has_key(config, 'debug') && config.debug
