@@ -291,8 +291,7 @@ exec を展開した結果先頭の文字が ":" だった場合、Vim のコマ
 設定					*quickrun-settings* *g:quickrun_config*
 
 グローバル変数 |g:quickrun_config| を使って各オプションのデフォルト値を設定で
-きます。|quickrun-options| に記載されているデフォルト値は実際にはこの変数のデ
-フォルト値です。
+きます。
 デフォルト値はオプション名をキーとした辞書で指定します。|g:quickrun_config| に
 は {type} をキー、デフォルト値を値にした辞書を指定します。つまり、この変数には
 二層構造の辞書を指定します。
@@ -307,6 +306,13 @@ exec を展開した結果先頭の文字が ":" だった場合、Vim のコマ
 す。その際に (.vimrc などで) すでに定義されていた場合は、デフォルト値に既存値
 を上書きする形で初期化されます。
 
+標準の設定					*g:quickrun_default_config*
+----------
+|g:quickrun_default_config| には標準的なデフォルトの設定が入っています。これ
+は |g:quickrun_config| と同じ構造になっています。
+|quickrun-options| に記載されているデフォルト値は実際にはこの変数のデフォルト
+値です。通常はユーザがこの値を操作する必要はありません。
+
 バッファローカルな設定				*b:quickrun_config*
 ----------------------
 |b:quickrun_config| を使ってバッファローカルな設定を追加できます。これには
@@ -319,7 +325,9 @@ exec を展開した結果先頭の文字が ":" だった場合、Vim のコマ
 1. コマンドラインで指定された値
 2. |b:quickrun_config|
 3. |g:quickrun_config| の {type}
-4. |g:quickrun_config| の '*'
+4. |g:quickrun_default_config| の {type}
+5. |g:quickrun_config| の '*'
+6. |g:quickrun_default_config| の '*'
 
 1 や 2 で {type} を設定しておくことで 3 で通常とは別の {type} を参照できます。
 
@@ -339,6 +347,9 @@ TODO						*quickrun-TODO*
 
 ==============================================================================
 更新履歴					*quickrun-changelog*
+
+x.x.x	xxxx-xx-xx
+	- |g:quickrun_default_config| を追加。
 
 0.3.3	2009-12-16
 	- マルチバイト文字を含むコマンドの実行がうまくいかないバグを修正。
