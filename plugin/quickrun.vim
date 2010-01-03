@@ -113,10 +113,16 @@ function! s:Runner.normalize()  " {{{2
 
   let config.type = get(config, 'type', &filetype)
 
-  if has_key(g:quickrun_config, config.type)
-    call extend(config, g:quickrun_config[config.type], 'keep')
-  endif
-  call extend(config, g:quickrun_config['*'], 'keep')
+  for c in [
+  \ 'g:quickrun_config[config.type]',
+  \ 'g:quickrun_default_config[config.type]',
+  \ 'g:quickrun_config["*"]',
+  \ 'g:quickrun_default_config["*"]'
+  \ ]
+    if exists(c)
+      call extend(config, eval(c), 'keep')
+    endif
+  endfor
 
   if has_key(config, 'input')
     let input = config.input
@@ -584,11 +590,7 @@ endfunction
 " ----------------------------------------------------------------------------
 " Initialize. {{{1
 function! s:init()
-  if !exists('g:quickrun_config')
-    let g:quickrun_config = {}
-  endif
-
-  let default_config = {
+  let g:quickrun_default_config = {
         \ '*': {
         \   'shebang': 1,
         \   'output': '',
@@ -705,18 +707,7 @@ function! s:init()
         \ },
         \ 'zsh': {},
         \}
-
-  if type(g:quickrun_config) == type({})
-    for [key, value] in items(g:quickrun_config)
-      if !has_key(default_config, key)
-        let default_config[key] = value
-      else
-        call extend(default_config[key], value)
-      endif
-    endfor
-  endif
-  unlet! g:quickrun_config
-  let g:quickrun_config = default_config
+  lockvar! g:quickrun_default_config
 endfunction
 
 call s:init()
