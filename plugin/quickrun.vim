@@ -670,6 +670,9 @@ function! s:init()
         \              executable('cscript') ? 'cscript': '',
         \   'tempfile': '{tempname()}.js',
         \ },
+        \ 'llvm': {
+        \   'command': 'llvm-as %s -o=- | lli - %a',
+        \ },
         \ 'lua': {},
         \ 'dosbatch': {
         \   'command': '',
