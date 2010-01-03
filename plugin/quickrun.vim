@@ -282,7 +282,7 @@ function! s:Runner.build_command(tmpl)  " {{{2
     endif
     let cmd = substitute(cmd, '\C\v[^%]?\zs\%' . key, '\=' . value, 'g')
   endfor
-  return self.expand(cmd)
+  return substitute(self.expand(cmd), '[\r\n]\+', ' ', 'g')
 endfunction
 
 
