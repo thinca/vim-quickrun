@@ -582,7 +582,9 @@ function! s:quickrun_complete(lead, cmd, pos)  " {{{2
       \ '"-".v:val')
     return filter(options, 'v:val =~ "^".head')
   end
-  return filter(keys(g:quickrun_config), 'v:val != "*" && v:val =~ "^".a:lead')
+  let types = keys(extend(exists('g:quickrun_config') ?
+  \                copy(g:quickrun_config) : {}, g:quickrun_default_config))
+  return filter(types, 'v:val != "*" && v:val =~ "^".a:lead')
 endfunction
 
 
