@@ -26,6 +26,9 @@ TODO				|quickrun-TODO|
 *quickrun* は編集中のファイルの全体もしくは一部を実行する Vim プラグインです。
 実行するためのコマンド |:QuickRun| が提供されます。
 
+要件:
+- Vim 7.2 以降
+
 						*quickrun-synopsis*
 >
 	" 現在のバッファを実行
