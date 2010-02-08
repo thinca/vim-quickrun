@@ -198,7 +198,8 @@ function! s:Runner.run()  " {{{2
     endif
   endtry
 
-  return result
+  let self.result = result
+  call self.output()
 endfunction
 
 
@@ -545,9 +546,7 @@ function! s:quickrun(args)  " {{{2
       let g:runner = runner  " for debug
     endif
 
-    let runner.result = runner.run()
-
-    call runner.output()
+    call runner.run()
   catch
     echoerr v:exception v:throwpoint
     return
