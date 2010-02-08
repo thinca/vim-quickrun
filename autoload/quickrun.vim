@@ -523,6 +523,33 @@ endfunction
 
 
 
+function! quickrun#complete(lead, cmd, pos)  " {{{2
+  let line = split(a:cmd[:a:pos], '', 1)
+  let head = line[-1]
+  if 2 <= len(line) && line[-2] =~ '^-'
+    let opt = line[-2][1:]
+    if opt ==# 'type'
+    elseif opt ==# 'append' || opt ==# 'shebang'
+      return ['0', '1']
+    elseif opt ==# 'mode'
+      return ['n', 'v', 'o']
+    else
+      return []
+    end
+  elseif head =~ '^-'
+    let options = map(['type', 'src', 'input', 'output', 'append', 'command',
+      \ 'exec', 'args', 'tempfile', 'shebang', 'eval', 'mode', 'split',
+      \ 'output_encode', 'shellcmd', 'running_mark', 'eval_template'],
+      \ '"-".v:val')
+    return filter(options, 'v:val =~ "^".head')
+  end
+  let types = keys(extend(exists('g:quickrun_config') ?
+  \                copy(g:quickrun_config) : {}, g:quickrun_default_config))
+  return filter(types, 'v:val != "*" && v:val =~ "^".a:lead')
+endfunction
+
+
+
 
 let &cpo = s:save_cpo
 unlet s:save_cpo
