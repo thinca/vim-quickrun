@@ -204,8 +204,7 @@ function! s:Runner.run_simple(commands)  " {{{2
     endif
   endtry
 
-  let self.result = result
-  call self.output()
+  call self.output(result)
 endfunction
 
 
@@ -432,13 +431,13 @@ endfunction
 
 
 
-function! s:Runner.output()  " {{{2
+function! s:Runner.output(result)  " {{{2
   let config = self.config
   let [out, to] = [config.output[:0], config.output[1:]]
   let append = config.append
   let running_mark = config.running_mark
 
-  let result = self.result
+  let result = a:result
   if out == ''
     " Output to the exclusive window.
     call self.open_result_window()
