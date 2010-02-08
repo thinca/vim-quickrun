@@ -179,8 +179,14 @@ function! s:Runner.run()  " {{{2
   let commands = type(exec) == type([]) ? exec : [exec]
   call map(commands, 'self.build_command(v:val)')
 
-  call self.run_simple(commands)
+  let [runmode; args] = split(self.config.runmode, ':')
+  if !has_key(self, 'run_' . runmode)
+    throw 'quickrun: Invalid runmode: ' . runmde
+  endif
+  call call(self['run_' . runmode], [commands] + args, self)
 endfunction
+
+
 
 function! s:Runner.run_simple(commands)  " {{{2
   let result = ''
