@@ -517,8 +517,32 @@ endfunction
 
 " ----------------------------------------------------------------------------
 " Interfaces.  {{{1
-function! quickrun#runner(args)  " {{{2
-  return s:Runner.new(a:args)
+" function for main command.
+function! quickrun#run(args)  " {{{2
+  try
+    let runner = s:Runner.new(a:args)
+    let config = runner.config
+
+    if config.running_mark != '' && config.output == ''
+      call runner.open_result_window()
+      if !config.append
+        silent % delete _
+      endif
+      silent $-1 put =config.running_mark
+      normal! zt
+      wincmd p
+      redraw
+    endif
+
+    if has_key(config, 'debug') && config.debug
+      let g:runner = runner  " for debug
+    endif
+
+    call runner.run()
+  catch
+    echoerr v:exception v:throwpoint
+    return
+  endtry
 endfunction
 
 

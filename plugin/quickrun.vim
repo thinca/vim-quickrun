@@ -14,36 +14,6 @@ set cpo&vim
 
 " MISC Functions. {{{1
 " ----------------------------------------------------------------------------
-" function for main command.
-function! s:quickrun(args)  " {{{2
-  try
-    let runner = quickrun#runner(a:args)
-    let config = runner.config
-
-    if config.running_mark != '' && config.output == ''
-      call runner.open_result_window()
-      if !config.append
-        silent % delete _
-      endif
-      silent $-1 put =config.running_mark
-      normal! zt
-      wincmd p
-      redraw
-    endif
-
-    if has_key(config, 'debug') && config.debug
-      let g:runner = runner  " for debug
-    endif
-
-    call runner.run()
-  catch
-    echoerr v:exception v:throwpoint
-    return
-  endtry
-endfunction
-
-
-
 " Function for |g@|.
 function! QuickRun(mode)  " {{{2
   execute 'QuickRun -mode o -visualmode' a:mode
@@ -186,7 +156,7 @@ endfunction
 call s:init()
 
 command! -nargs=* -range=% -complete=customlist,quickrun#complete QuickRun
-\ call s:quickrun('-start <line1> -end <line2> ' . <q-args>)
+\ call quickrun#run('-start <line1> -end <line2> ' . <q-args>)
 
 
 nnoremap <silent> <Plug>(quickrun-op) :<C-u>set operatorfunc=QuickRun<CR>g@
