@@ -35,6 +35,7 @@ function! s:init()
         \   'shebang': 1,
         \   'output': '',
         \   'append': 0,
+        \   'runmode': 'simple',
         \   'args': '',
         \   'output_encode': '&fenc:&enc',
         \   'tempfile'  : '{tempname()}',
