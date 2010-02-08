@@ -181,11 +181,17 @@ endfunction
 " Run commands. Return the stdout.
 function! s:Runner.run()  " {{{2
   let exec = get(self.config, 'exec', '')
+  let commands = type(exec) == type([]) ? exec : [exec]
+  call map(commands, 'self.build_command(v:val)')
+
+  call self.run_simple(commands)
+endfunction
+
+function! s:Runner.run_simple(commands)  " {{{2
   let result = ''
 
   try
-    for i in type(exec) == type([]) ? exec : [exec]
-      let cmd = self.build_command(i)
+    for cmd in a:commands
       let result .= self.execute(cmd)
       if v:shell_error != 0
         break
@@ -426,7 +432,7 @@ endfunction
 
 
 
-function! s:Runner.output()
+function! s:Runner.output()  " {{{2
   let config = self.config
   let [out, to] = [config.output[:0], config.output[1:]]
   let append = config.append
@@ -507,7 +513,7 @@ endfunction
 
 
 " iconv() wrapper for safety.
-function! s:iconv(expr, from, to)
+function! s:iconv(expr, from, to)  " {{{2
   if a:from ==# a:to
     return a:expr
   endif
