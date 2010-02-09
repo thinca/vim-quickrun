@@ -287,8 +287,16 @@ function! s:Runner.run_async_remote(commands, ...)
 
   let s:runners[key] = self
 
+  let in = self.config.input
+  if in != ''
+    let inputfile = tempname()
+    let self._temp_input = inputfile
+    call writefile(split(in, "\n"), inputfile)
+    let in = ' <' . shellescape(inputfile)
+  endif
+
   if s:is_win()
-    call map(cmds, 'v:val . " >> " . shellescape(outfile)')
+    call map(cmds, 'v:val . in . " >> " . shellescape(outfile)')
     call add(cmds, callback)
     let script = tempname() . '.bat'
     call writefile(cmds, script)
@@ -301,7 +309,7 @@ function! s:Runner.run_async_remote(commands, ...)
     let self._temp_script = script
     " Execute by script file to unify the environment.
     call writefile([
-    \   printf('(%s)> %s', join(cmds, ' && '), shellescape(outfile)),
+    \   printf('(%s)%s > %s', join(cmds, ' && '), in, shellescape(outfile)),
     \   callback,
     \ ], script)
     silent! execute '!sh' script '&'
