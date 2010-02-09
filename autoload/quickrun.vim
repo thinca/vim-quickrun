@@ -295,23 +295,23 @@ function! s:Runner.run_async_remote(commands, ...)
     let in = ' <' . shellescape(inputfile)
   endif
 
+  " Execute by script file to unify the environment.
+  let script = tempname()
+  let scriptfile = [
+  \   printf('(%s)%s >%s 2>&1', join(cmds, '&&'), in, shellescape(outfile)),
+  \   callback,
+  \ ]
   if s:is_win()
-    call map(cmds, 'v:val . in . " >> " . shellescape(outfile)')
-    call add(cmds, callback)
-    let script = tempname() . '.bat'
-    call writefile(cmds, script)
-    let self._temp_script = script
+    let script .= '.bat'
+    call insert(scriptfile, '@echo off')
+  endif
+  let self._temp_script = script
+  call writefile(scriptfile, script)
 
+  if s:is_win()
     silent! execute '!start /MIN' script '&'
 
   elseif executable('sh')  " Simpler shell.
-    let script = tempname()
-    let self._temp_script = script
-    " Execute by script file to unify the environment.
-    call writefile([
-    \   printf('(%s)%s > %s', join(cmds, ' && '), in, shellescape(outfile)),
-    \   callback,
-    \ ], script)
     silent! execute '!sh' script '&'
   endif
 endfunction
