@@ -127,7 +127,7 @@ function! s:Runner.normalize()  " {{{2
       let config.input = input[0] == '=' ? self.expand(input[1:])
       \                                  : join(readfile(input), "\n")
     catch
-      throw 'quickrun: Can not treat input: ' . v:exception
+      throw 'Can not treat input: ' . v:exception
     endtry
   else
     let config.input = ''
@@ -183,7 +183,7 @@ function! s:Runner.run()  " {{{2
 
   let [runmode; args] = split(self.config.runmode, ':')
   if !has_key(self, 'run_' . runmode)
-    throw 'quickrun: Invalid runmode: ' . runmde
+    throw 'Invalid runmode: ' . runmde
   endif
   call call(self['run_' . runmode], [commands] + args, self)
 endfunction
@@ -264,7 +264,7 @@ endfunction
 function! s:Runner.run_async(commands, ...)
   let [type; args] = a:000
   if !has_key(self, 'run_async_' . type)
-    throw 'quickrun: Unknown async type: ' . type
+    throw 'Unknown async type: ' . type
   endif
   call call(self['run_async_' . type], [a:commands] + args, self)
 endfunction
@@ -273,7 +273,7 @@ endfunction
 
 function! s:Runner.run_async_remote(commands, ...)
   if !has('clientserver') || v:servername == ''
-    throw 'quickrun: runmode = async:remote needs +clientserver feature.'
+    throw 'runmode = async:remote needs +clientserver feature.'
   endif
   let selfvim = s:is_win() ? split($PATH, ';')[-1] . '\' . v:progname :
   \             !empty($_) ? $_ : v:progname
@@ -623,7 +623,7 @@ function! quickrun#run(args)  " {{{2
 
     call runner.run()
   catch
-    echoerr v:exception v:throwpoint
+    echoerr 'quickrun:' v:exception v:throwpoint
     return
   endtry
 endfunction
