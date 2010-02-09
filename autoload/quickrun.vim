@@ -275,6 +275,9 @@ function! s:Runner.run_async_remote(commands, ...)
   if !has('clientserver') || v:servername == ''
     throw 'runmode = async:remote needs +clientserver feature.'
   endif
+  if !s:is_win() && !executable('sh')
+    throw 'Currently needs "sh" on other than MS Windows.  Sorry.'
+  endif
   let selfvim = s:is_win() ? split($PATH, ';')[-1] . '\' . v:progname :
   \             !empty($_) ? $_ : v:progname
   let key = has('reltime') ? reltimestr(reltime()) : string(localtime())
@@ -311,7 +314,7 @@ function! s:Runner.run_async_remote(commands, ...)
   if s:is_win()
     silent! execute '!start /MIN' script '&'
 
-  elseif executable('sh')  " Simpler shell.
+  else  "if executable('sh')  " Simpler shell.
     silent! execute '!sh' script '&'
   endif
 endfunction
