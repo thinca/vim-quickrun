@@ -288,6 +288,8 @@ function! s:Runner.run_async_remote(commands, ...)
   \        [selfvim, '--servername', v:servername, '--remote-expr', expr],
   \        'shellescape(v:val)'), ' ')
 
+  call map(cmds, 's:conv_vim2remote(selfvim, v:val)')
+
   let s:runners[key] = self
 
   let in = self.config.input
@@ -597,6 +599,18 @@ endfunction
 
 
 
+function! s:conv_vim2remote(selfvim, cmd)
+  if a:cmd !~ '^\s*:'
+    return a:cmd
+  endif
+  return join(map(
+  \      [a:selfvim, '--servername', v:servername, '--remote-expr',
+  \       printf('quickrun#execute(%s)', string(a:cmd))],
+  \      'shellescape(v:val)'), ' ')
+endfunction
+
+
+
 function! s:is_win()  " {{{2
   return has('win32') || has('win64')
 endfunction
@@ -670,6 +684,16 @@ function! quickrun#_result(key, resfile)
   call remove(s:runners, a:key)
   call runner.sweep()
   call runner.output(result)
+  return ''
+endfunction
+
+
+
+" Execute commands by expr.  This is used by remote_expr()
+function! quickrun#execute(...)
+  for cmd in a:000
+    execute cmd
+  endfor
   return ''
 endfunction
 
