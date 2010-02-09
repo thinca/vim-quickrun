@@ -201,10 +201,7 @@ function! s:Runner.run_simple(commands)  " {{{2
       endif
     endfor
   finally
-    if has_key(self, '_temp') && filereadable(self._temp)
-      call delete(self._temp)
-      unlet self._temp
-    endif
+    call self.sweep()
   endtry
 
   call self.output(result)
@@ -379,6 +376,20 @@ function! s:Runner.get_source_name()  " {{{2
   endif
   return fname
 endfunction
+
+
+
+" ----------------------------------------------------------------------------
+" Sweep the temporary files the keys starts with '_temp'.
+function! s:Runner.sweep()
+  for file in filter(keys(self), 'v:val =~# "^_temp"')
+    if filewritable(self[file])
+      call delete(self[file])
+    endif
+    call remove(self, file)
+  endfor
+endfunction
+
 
 
 
@@ -646,14 +657,7 @@ function! quickrun#_result(key, resfile)
   call delete(a:resfile)
   let runner = s:runners[a:key]
   call remove(s:runners, a:key)
-  if has_key(runner, '_temp') && filereadable(runner._temp)
-    call delete(runner._temp)
-    unlet self._temp
-  endif
-  if has_key(runner, '_temp_script') && filereadable(runner._temp_script)
-    call delete(runner._temp_script)
-    unlet runner._temp_script
-  endif
+  call runner.sweep()
   call runner.output(result)
   return ''
 endfunction
