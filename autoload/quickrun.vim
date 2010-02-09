@@ -7,6 +7,8 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
+let s:runners = {}  " Store for running runners.
+
 let s:Runner = {}
 
 
@@ -259,6 +261,56 @@ function! s:Runner.execute(cmd)  " {{{2
   endif
   return result
 endfunction
+
+
+
+function! s:Runner.run_async(commands, ...)
+  let [type; args] = a:000
+  if !has_key(self, 'run_async_' . type)
+    throw 'quickrun: Unknown async type: ' . type
+  endif
+  call call(self['run_async_' . type], [a:commands] + args, self)
+endfunction
+
+
+
+function! s:Runner.run_async_remote(commands, ...)
+  if !has('clientserver') || v:servername == ''
+    throw 'quickrun: runmode = async:remote needs +clientserver feature.'
+  endif
+  let selfvim = s:is_win() ? split($PATH, ';')[-1] . '\' . v:progname :
+  \             !empty($_) ? $_ : v:progname
+  let key = has('reltime') ? reltimestr(reltime()) : string(localtime())
+  let outfile = tempname()
+  let expr = printf('quickrun#_result(%s, %s)', string(key), string(outfile))
+  let cmds = a:commands
+  let callback = join(map(
+  \        [selfvim, '--servername', v:servername, '--remote-expr', expr],
+  \        'shellescape(v:val)'), ' ')
+
+  let s:runners[key] = self
+
+  if s:is_win()
+    call map(cmds, 'v:val . " >> " . shellescape(outfile)')
+    call add(cmds, callback)
+    let script = tempname() . '.bat'
+    call writefile(cmds, script)
+    let self._temp_script = script
+
+    silent! execute '!start /MIN' script '&'
+
+  elseif executable('sh')  " Simpler shell.
+    let script = tempname()
+    let self._temp_script = script
+    " Execute by script file to unify the environment.
+    call writefile([
+    \   printf('(%s)> %s', join(cmds, ' && '), shellescape(outfile)),
+    \   callback,
+    \ ], script)
+    silent! execute '!sh' script '&'
+  endif
+endfunction
+
 
 
 
@@ -521,6 +573,12 @@ function! s:iconv(expr, from, to)  " {{{2
   return result != '' ? result : a:expr
 endfunction
 
+
+
+function! s:is_win()  " {{{2
+  return has('win32') || has('win64')
+endfunction
+
 " ----------------------------------------------------------------------------
 " Interfaces.  {{{1
 " function for main command.
@@ -577,6 +635,29 @@ function! quickrun#complete(lead, cmd, pos)  " {{{2
   \                copy(g:quickrun_config) : {}, g:quickrun_default_config))
   return filter(types, 'v:val != "*" && v:val =~ "^".a:lead')
 endfunction
+
+
+
+function! quickrun#_result(key, resfile)
+  if !has_key(s:runners, a:key) || !filereadable(a:resfile)
+    return ''
+  endif
+  let result = join(readfile(a:resfile), "\n")
+  call delete(a:resfile)
+  let runner = s:runners[a:key]
+  call remove(s:runners, a:key)
+  if has_key(runner, '_temp') && filereadable(runner._temp)
+    call delete(runner._temp)
+    unlet self._temp
+  endif
+  if has_key(runner, '_temp_script') && filereadable(runner._temp_script)
+    call delete(runner._temp_script)
+    unlet runner._temp_script
+  endif
+  call runner.output(result)
+  return ''
+endfunction
+
 
 
 
