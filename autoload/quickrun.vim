@@ -176,7 +176,7 @@ endfunction
 " Run commands. Return the stdout.
 function! s:Runner.run()  " {{{2
   let exec = get(self.config, 'exec', '')
-  let commands = type(exec) == type([]) ? exec : [exec]
+  let commands = type(exec) == type([]) ? copy(exec) : [exec]
   call map(commands, 'self.build_command(v:val)')
 
   let [runmode; args] = split(self.config.runmode, ':')
