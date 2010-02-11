@@ -313,7 +313,7 @@ function! s:Runner.run_async_remote(commands, ...)
   call writefile(scriptfile, script)
 
   if s:is_win()
-    silent! execute '!start /MIN' script '&'
+    silent! execute '!start /MIN' script
 
   else  "if executable('sh')  " Simpler shell.
     silent! execute '!sh' script '&'
