@@ -234,7 +234,7 @@ function! s:Runner.execute(cmd)  " {{{2
     if in != ''
       let inputfile = tempname()
       call writefile(split(in, "\n"), inputfile)
-      let cmd .= ' <' . shellescape(inputfile)
+      let cmd .= ' <' . s:shellescape(inputfile)
     endif
 
     execute s:iconv(printf(config.shellcmd, cmd), &encoding, &termencoding)
@@ -284,9 +284,8 @@ function! s:Runner.run_async_remote(commands, ...)
   let outfile = tempname()
   let expr = printf('quickrun#_result(%s, %s)', string(key), string(outfile))
   let cmds = a:commands
-  let callback = join(map(
-  \        [selfvim, '--servername', v:servername, '--remote-expr', expr],
-  \        'shellescape(v:val)'), ' ')
+  let callback = s:make_command(
+  \        [selfvim, '--servername', v:servername, '--remote-expr', expr])
 
   call map(cmds, 's:conv_vim2remote(selfvim, v:val)')
 
@@ -297,13 +296,13 @@ function! s:Runner.run_async_remote(commands, ...)
     let inputfile = tempname()
     let self._temp_input = inputfile
     call writefile(split(in, "\n"), inputfile)
-    let in = ' <' . shellescape(inputfile)
+    let in = ' <' . s:shellescape(inputfile)
   endif
 
   " Execute by script file to unify the environment.
   let script = tempname()
   let scriptfile = [
-  \   printf('(%s)%s >%s 2>&1', join(cmds, '&&'), in, shellescape(outfile)),
+  \   printf('(%s)%s >%s 2>&1', join(cmds, '&&'), in, s:shellescape(outfile)),
   \   callback,
   \ ]
   if s:is_win()
@@ -345,7 +344,7 @@ function! s:Runner.build_command(tmpl)  " {{{2
       let value = 'fnamemodify('.value.',submatch(1))'
       if key =~# '\U'
         let value = printf(config.command =~ '^\s*:' ? 'fnameescape(%s)'
-          \ : 'shellescape(%s)', value)
+          \ : 's:shellescape(%s)', value)
       endif
       let key .= '(%(\:[p8~.htre]|\:g?s(.).{-}\2.{-}\2)*)'
     endif
@@ -603,11 +602,31 @@ function! s:conv_vim2remote(selfvim, cmd)
   if a:cmd !~ '^\s*:'
     return a:cmd
   endif
-  return join(map(
-  \      [a:selfvim, '--servername', v:servername, '--remote-expr',
-  \       printf('quickrun#execute(%s)', string(a:cmd))],
-  \      'shellescape(v:val)'), ' ')
+  return s:make_command([a:selfvim,
+  \       '--servername', v:servername, '--remote-expr',
+  \       printf('quickrun#execute(%s)', string(a:cmd))])
 endfunction
+
+
+
+function! s:make_command(args)
+  return join([shellescape(a:args[0])] +
+  \           map(a:args[1 :], 's:shellescape(v:val)'), ' ')
+endfunction
+
+
+
+
+function! s:shellescape(str)
+  if s:is_win()
+    let str = substitute(a:str, '[&|<>()^"%]', '^\0', 'g')
+    let str = substitute(str, '\\\+\ze"', '\=repeat(submatch(0), 2)', 'g')
+    let str = substitute(str, '\ze\^"', '\', 'g')
+    return '^"' . str . '^"'
+  endif
+  return shellescape(a:str)
+endfunction
+
 
 
 
