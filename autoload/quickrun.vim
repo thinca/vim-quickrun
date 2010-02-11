@@ -528,15 +528,11 @@ function! s:Runner.output(result)  " {{{2
   let config = self.config
   let [out, to] = [config.output[:0], config.output[1:]]
   let append = config.append
-  let running_mark = config.running_mark
 
   let result = a:result
   if out == ''
     " Output to the exclusive window.
     call self.open_result_window()
-    if running_mark != ''
-      silent undo
-    endif
     if !append
       silent % delete _
     endif
@@ -599,6 +595,10 @@ function! s:Runner.open_result_window()  " {{{2
     execute bufwinnr(s:bufnr) 'wincmd w'
   else
     execute 'sbuffer' s:bufnr
+  endif
+  if exists('b:quickrun_running_mark') && b:quickrun_running_mark
+    silent undo
+    unlet b:quickrun_running_mark
   endif
 endfunction
 
@@ -672,6 +672,7 @@ function! quickrun#run(args)  " {{{2
         silent % delete _
       endif
       silent $-1 put =config.running_mark
+      let b:quickrun_running_mark = 1
       normal! zt
       wincmd p
       redraw
