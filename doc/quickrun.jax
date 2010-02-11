@@ -195,6 +195,10 @@ runmode					*quickrun-option-runmode*
 			  バックグラウンドで実行するため、コマンドが無限ループ
 			  や入力待ち等で終了しない場合、Vim から制御することは
 			  できないので注意してください。
+			- "async:remote:vimproc"
+			  コマンドの実行に |vimproc| を使います。|vimproc| が
+			  インストールされていない場合は通常と同じように実行し
+			  ます。
 
 split (*)				*quickrun-option-split*
 			出力専用バッファを開く際の補助コマンドを指定します。バ

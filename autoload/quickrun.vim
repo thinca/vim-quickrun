@@ -7,6 +7,8 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
+let s:available_vimproc = exists('*vimproc#popen2')
+
 let s:runners = {}  " Store for running runners.
 
 let s:Runner = {}
@@ -312,11 +314,19 @@ function! s:Runner.run_async_remote(commands, ...)
   let self._temp_script = script
   call writefile(scriptfile, script)
 
-  if s:is_win()
-    silent! execute '!start /MIN' script
+  if a:0 && a:1 ==# 'vimproc' && s:available_vimproc
+    if s:is_win()
+      let self.vimproc= vimproc#popen2(['cmd.exe', '/C', script])
+    else
+      let self.vimproc= vimproc#popen2(['sh', script])
+    endif
+  else
+    if s:is_win()
+      silent! execute '!start /MIN' script
 
-  else  "if executable('sh')  " Simpler shell.
-    silent! execute '!sh' script '&'
+    else  "if executable('sh')  " Simpler shell.
+      silent! execute '!sh' script '&'
+    endif
   endif
 endfunction
 
@@ -400,6 +410,13 @@ function! s:Runner.sweep()
     endif
     call remove(self, file)
   endfor
+  if has_key(self, 'vimproc')
+    try
+      call self.vimproc.kill(15)
+      call remove(self, vimproc)
+    catch
+    endtry
+  endif
 endfunction
 
 
@@ -639,6 +656,13 @@ endfunction
 " function for main command.
 function! quickrun#run(args)  " {{{2
   try
+    " Sweep runners.
+    " The multi run is not supported yet.
+    for [k, r] in items(s:runners)
+      call r.sweep()
+      call remove(s:runners, k)
+    endfor
+
     let runner = s:Runner.new(a:args)
     let config = runner.config
 
