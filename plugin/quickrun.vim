@@ -41,6 +41,7 @@ function! s:init()
         \   'tempfile'  : '{tempname()}',
         \   'exec': '%c %s %a',
         \   'split': '{winwidth(0) * 2 < winheight(0) * 5 ? "" : "vertical"}',
+        \   'into': 0,
         \   'eval': 0,
         \   'eval_template': '%s',
         \   'shellcmd': s:is_win() ? 'silent !"%s" & pause' : '!%s',

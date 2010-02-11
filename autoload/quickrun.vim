@@ -542,7 +542,9 @@ function! s:Runner.output(result)  " {{{2
     silent $-1 put =result
     call setpos('.', cursor)
     silent normal! zt
-    wincmd p
+    if !config.into
+      wincmd p
+    endif
 
   elseif out == '!'
     " Do nothing.

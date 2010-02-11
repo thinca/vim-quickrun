@@ -209,6 +209,10 @@ split (*)				*quickrun-option-split*
 			'{winwidth(0) * 2 < winheight(0) * 5 ? "" : "vertical"}'
 			です。
 
+into					*quickrun-option-into*
+			0 以外を指定すると、結果が出た際に出力専用バッファへ
+			カーソルを移動します。
+
 mode					*quickrun-option-mode*
 			実行モードです。n,v,o のいずれかを指定します。これは範
 			囲をどのように取得するかに影響します。ただし、多くの場
@@ -376,6 +380,7 @@ x.x.x	xxxx-xx-xx
 	- コマンドに改行が含まれているとうまく実行できないバグを修正。
 	- 出力専用バッファをデフォルトで q で閉じるようにした。
 	- |quickrun-option-runmode| オプションを追加。
+	- |quickrun-option-into| オプションを追加。
 	- autoload 化。
 
 0.3.3	2009-12-16
