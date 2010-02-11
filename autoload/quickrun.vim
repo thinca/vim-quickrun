@@ -8,6 +8,7 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 let s:available_vimproc = exists('*vimproc#popen2')
+let s:is_win = has('win32') || has('win64')
 
 let s:runners = {}  " Store for running runners.
 
@@ -277,10 +278,10 @@ function! s:Runner.run_async_remote(commands, ...)
   if !has('clientserver') || v:servername == ''
     throw 'runmode = async:remote needs +clientserver feature.'
   endif
-  if !s:is_win() && !executable('sh')
+  if !s:is_win && !executable('sh')
     throw 'Currently needs "sh" on other than MS Windows.  Sorry.'
   endif
-  let selfvim = s:is_win() ? split($PATH, ';')[-1] . '\' . v:progname :
+  let selfvim = s:is_win ? split($PATH, ';')[-1] . '\' . v:progname :
   \             !empty($_) ? $_ : v:progname
   let key = has('reltime') ? reltimestr(reltime()) : string(localtime())
   let outfile = tempname()
@@ -307,7 +308,7 @@ function! s:Runner.run_async_remote(commands, ...)
   \   printf('(%s)%s >%s 2>&1', join(cmds, '&&'), in, s:shellescape(outfile)),
   \   callback,
   \ ]
-  if s:is_win()
+  if s:is_win
     let script .= '.bat'
     call insert(scriptfile, '@echo off')
   endif
@@ -315,13 +316,13 @@ function! s:Runner.run_async_remote(commands, ...)
   call writefile(scriptfile, script)
 
   if a:0 && a:1 ==# 'vimproc' && s:available_vimproc
-    if s:is_win()
+    if s:is_win
       let self.vimproc= vimproc#popen2(['cmd.exe', '/C', script])
     else
       let self.vimproc= vimproc#popen2(['sh', script])
     endif
   else
-    if s:is_win()
+    if s:is_win
       silent! execute '!start /MIN' script
 
     else  "if executable('sh')  " Simpler shell.
@@ -635,7 +636,7 @@ endfunction
 
 
 function! s:shellescape(str)
-  if s:is_win()
+  if s:is_win
     let str = substitute(a:str, '[&|<>()^"%]', '^\0', 'g')
     let str = substitute(str, '\\\+\ze"', '\=repeat(submatch(0), 2)', 'g')
     let str = substitute(str, '\ze\^"', '\', 'g')
@@ -645,11 +646,6 @@ function! s:shellescape(str)
 endfunction
 
 
-
-
-function! s:is_win()  " {{{2
-  return has('win32') || has('win64')
-endfunction
 
 " ----------------------------------------------------------------------------
 " Interfaces.  {{{1
