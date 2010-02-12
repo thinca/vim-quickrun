@@ -101,7 +101,7 @@ function! s:init()
         \   'eval_template': 'main = print $ %s',
         \ },
         \ 'java': {
-        \   'exec': ['javac %s', '%c %s:t:r', ':call delete("%S:t:r.class")'],
+        \   'exec': ['javac %s', '%c %s:t:r %a', ':call delete("%S:t:r.class")'],
         \   'output_encode': '&tenc:&enc',
         \ },
         \ 'javascript': {
