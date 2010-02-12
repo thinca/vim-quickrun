@@ -285,7 +285,8 @@ function! s:Runner.run_async_remote(commands, ...)
   \             !empty($_) ? $_ : v:progname
   let key = has('reltime') ? reltimestr(reltime()) : string(localtime())
   let outfile = tempname()
-  let expr = printf('quickrun#_result(%s, %s)', string(key), string(outfile))
+  let self._temp_result = outfile
+  let expr = printf('quickrun#_result(%s)', string(key))
   let cmds = a:commands
   let callback = s:make_command(
   \        [selfvim, '--servername', v:servername, '--remote-expr', expr])
@@ -717,13 +718,13 @@ endfunction
 
 
 
-function! quickrun#_result(key, resfile)
-  if !has_key(s:runners, a:key) || !filereadable(a:resfile)
+function! quickrun#_result(key)
+  if !has_key(s:runners, a:key)
     return ''
   endif
-  let result = join(readfile(a:resfile), "\n")
-  call delete(a:resfile)
   let runner = s:runners[a:key]
+  let resfile = runner._temp_result
+  let result = filereadable(resfile) ? join(readfile(resfile), "\n") : ''
   call remove(s:runners, a:key)
   call runner.sweep()
   call runner.output(result)
