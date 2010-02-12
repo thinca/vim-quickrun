@@ -569,6 +569,7 @@ function! s:Runner.output(result)  " {{{2
 
   else
     " Output to file.
+    let out = config.output
     let size = strlen(result)
     if append && filereadable(out)
       let result = join(readfile(out, 'b'), "\n") . result
