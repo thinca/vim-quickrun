@@ -586,7 +586,7 @@ function! s:Runner.open_result_window()  " {{{2
   endif
   if !bufexists(s:bufnr)
     execute self.expand(self.config.split) 'split'
-    edit `='[quickrun Output]'`
+    edit `='[quickrun output]'`
     let s:bufnr = bufnr('%')
     nnoremap <buffer> q <C-w>c
     setlocal bufhidden=hide buftype=nofile noswapfile nobuflisted
