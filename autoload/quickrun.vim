@@ -222,12 +222,7 @@ function! s:Runner.execute(cmd)  " {{{2
 
   if a:cmd =~ '^\s*:'
     " A vim command.
-    " XXX: Can't get a result if a:cmd contains :redir command.
-    let result = ''
-    redir => result
-    silent execute a:cmd
-    redir END
-    return result
+    return quickrun#execute(a:cmd)
   endif
 
   let cmd = a:cmd
@@ -638,7 +633,6 @@ endfunction
 
 
 
-
 function! s:shellescape(str)
   if s:is_win
     let str = substitute(a:str, '[&|<>()^"%]', '^\0', 'g')
@@ -738,10 +732,14 @@ endfunction
 
 " Execute commands by expr.  This is used by remote_expr()
 function! quickrun#execute(...)
+  " XXX: Can't get a result if a:cmd contains :redir command.
+  let result = ''
+  redir => result
   for cmd in a:000
-    execute cmd
+    silent execute cmd
   endfor
-  return ''
+  redir END
+  return result
 endfunction
 
 
