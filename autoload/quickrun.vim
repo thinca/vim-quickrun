@@ -375,11 +375,11 @@ function! s:Runner.get_source_name()  " {{{2
   if exists('self.config.src')
     let src = self.config.src
     if type(src) == type('')
-      if has_key(self, '_temp')
-        let fname = self._temp
+      if has_key(self, '_temp_source')
+        let fname = self._temp_source
       else
         let fname = self.expand(self.config.tempfile)
-        let self._temp = fname
+        let self._temp_source = fname
         call writefile(split(src, "\n", 'b'), fname)
       endif
     elseif type(src) == type(0)
