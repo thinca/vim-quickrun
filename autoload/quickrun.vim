@@ -183,6 +183,7 @@ function! s:Runner.run()  " {{{2
   let exec = get(self.config, 'exec', '')
   let commands = type(exec) == type([]) ? copy(exec) : [exec]
   call map(commands, 'self.build_command(v:val)')
+  call filter(commands, 'v:val =~ "\\S"')
 
   let [runmode; args] = split(self.config.runmode, ':')
   if !has_key(self, 'run_' . runmode)
@@ -215,11 +216,6 @@ endfunction
 " ----------------------------------------------------------------------------
 " Execute a single command.
 function! s:Runner.execute(cmd)  " {{{2
-  if a:cmd == ''
-    throw 'command build Failed'
-    return
-  endif
-
   if a:cmd =~ '^\s*:'
     " A vim command.
     return quickrun#execute(a:cmd)
