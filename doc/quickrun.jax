@@ -45,10 +45,8 @@ TODO				|quickrun-TODO|
 
 
 	" (vimrc にて) haskell を実行するプログラムのデフォルトを hugs にする
-	if !exists('g:quickrun_config')
-		let g:quickrun_config = {}
-		let g:quickrun_config.haskell = {'command' : 'runhugs'}
-	endif
+	let g:quickrun_config = {}
+	let g:quickrun_config.haskell = {'command' : 'runhugs'}
 
 	" ショートカットキーを設定する
 	for [key, com] in items({
@@ -142,9 +140,9 @@ type					*quickrun-option-type*
 			さい。
 
 exec (*)				*quickrun-option-exec*
-			実行するコマンドの書式を指定します。詳細
-			は|quickrun-exec-format| を参照してください。複数の値
-			を指定することも可能です。
+			実行するコマンドの書式を指定します。詳細は
+			|quickrun-exec-format| を参照してください。複数の値を
+			指定することも可能です。
 
 command					*quickrun-option-command*
 			exec 内の %c に展開される文字列です。指定されなかった
@@ -166,10 +164,10 @@ input (*)				*quickrun-option-input*
 
 output					*quickrun-option-output*
 			結果の出力方法を指定します。
-			- 何も指定しないか空文字列を指定すると、出力専用バッファ
-			  を開いてそこへ出力します。このバッファは同じものが再
-			  利用されます。また、このバッファにはカスタマイズのた
-			  めに 'filetype' に "quickrun" が設定されます。
+			- 空文字列を指定すると、出力専用バッファを開いてそこへ
+			  出力します。このバッファは同じものが再利用されます。
+			  また、このバッファにはカスタマイズのために
+			  'filetype' に "quickrun" が設定されます。
 			- ! を指定すると、シェルで直接実行します。
 			- : を指定すると、|hit-enter-prompt| に出力します。
 			  append を有効にした場合、|message-history| に記録し
@@ -192,13 +190,20 @@ runmode					*quickrun-option-runmode*
 			  {|+clientserver| が必要}
 			  コマンドをバックグラウンドで実行し、終了を
 			  |+clientserver| 機能を利用して通知し結果を表示します。
+			  |v:servername| が設定されている必要があります。ない
+			  場合は、|--servername| オプションを使って Vim を起動
+			  してください。
 			  バックグラウンドで実行するため、コマンドが無限ループ
 			  や入力待ち等で終了しない場合、Vim から制御することは
 			  できないので注意してください。
 			- "async:remote:vimproc"
-			  コマンドの実行に |vimproc| を使います。|vimproc| が
-			  インストールされていない場合は通常と同じように実行し
-			  ます。
+			  {|vimproc| が必要}
+			  コマンドの実行に |vimproc| を使います。すでにこの
+			  モードでコマンドが実行されている最中に新しくコマンド
+			  を実行しようとした場合、古いコマンドは強制的にキャン
+			  セルされます。
+			  |vimproc| がインストールされていない場合は通常と同じ
+			  ように実行します。
 
 split (*)				*quickrun-option-split*
 			出力専用バッファを開く際の補助コマンドを指定します。バ
