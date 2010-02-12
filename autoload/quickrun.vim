@@ -178,7 +178,7 @@ endfunction
 
 
 " ----------------------------------------------------------------------------
-" Run commands. Return the stdout.
+" Run commands.
 function! s:Runner.run()  " {{{2
   let exec = get(self.config, 'exec', '')
   let commands = type(exec) == type([]) ? copy(exec) : [exec]
@@ -244,17 +244,8 @@ function! s:Runner.execute(cmd)  " {{{2
   endif
 
   let cmd = s:iconv(cmd, &encoding, &termencoding)
-  let result = config.input == '' ? system(cmd)
-  \                               : system(cmd, config.input)
-
-  if get(config, 'output_encode', '') != ''
-    let enc = split(self.expand(config.output_encode), '[^[:alnum:]-_]')
-    if len(enc) == 2
-      let [from, to] = enc
-      let result = s:iconv(result, from, to)
-    endif
-  endif
-  return result
+  return config.input == '' ? system(cmd)
+  \                         : system(cmd, config.input)
 endfunction
 
 
@@ -300,16 +291,18 @@ function! s:Runner.run_async_remote(commands, ...)
 
   " Execute by script file to unify the environment.
   let script = tempname()
-  let scriptfile = [
+  let scriptbody = [
   \   printf('(%s)%s >%s 2>&1', join(cmds, '&&'), in, s:shellescape(outfile)),
   \   callback,
   \ ]
   if s:is_win
     let script .= '.bat'
-    call insert(scriptfile, '@echo off')
+    call insert(scriptbody, '@echo off')
+    call map(scriptbody, 'v:val . "\r"')
   endif
+  call map(scriptbody, 's:iconv(v:val, &encoding, &termencoding)')
   let self._temp_script = script
-  call writefile(scriptfile, script)
+  call writefile(scriptbody, script)
 
   if a:0 && a:1 ==# 'vimproc' && s:available_vimproc
     if s:is_win
@@ -527,6 +520,14 @@ function! s:Runner.output(result)  " {{{2
   let append = config.append
 
   let result = a:result
+  if get(config, 'output_encode', '') != ''
+    let enc = split(self.expand(config.output_encode), '[^[:alnum:]-_]')
+    if len(enc) == 2
+      let [from, to] = enc
+      let result = s:iconv(result, from, to)
+    endif
+  endif
+
   if out == ''
     " Output to the exclusive window.
     call self.open_result_window()
