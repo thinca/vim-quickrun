@@ -276,7 +276,7 @@ function! s:Runner.run_async_remote(commands, ...)
   if !s:is_win && !executable('sh')
     throw 'Currently needs "sh" on other than MS Windows.  Sorry.'
   endif
-  let selfvim = s:is_win ? split($PATH, ';')[-1] . '\' . v:progname :
+  let selfvim = s:is_win ? split($PATH, ';')[-1] . '\vim.exe' :
   \             !empty($_) ? $_ : v:progname
   let key = has('reltime') ? reltimestr(reltime()) : string(localtime())
   let outfile = tempname()
