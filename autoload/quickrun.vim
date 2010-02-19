@@ -543,7 +543,7 @@ function! s:Runner.output(result)  " {{{2
       wincmd p
     endif
 
-  elseif out == '!'
+  elseif out == '!' || out == '_'
     " Do nothing.
 
   elseif out == ':'

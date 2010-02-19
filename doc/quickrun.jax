@@ -174,6 +174,7 @@ output					*quickrun-option-output*
 			  ます。
 			- ={var} を指定すると、{var} に指定した変数、オプショ
 			  ン、環境変数へ出力します。
+			- _ を指定すると、出力をしません。
 			- それ以外の場合はファイルに出力します。
 
 append					*quickrun-option-append*
@@ -383,6 +384,7 @@ x.x.x	xxxx-xx-xx
 	- java のデフォルト値を改善。
 	- 結果取得用の一時ファイルが消えないことがあるバグを修正。
 	- コマンドラインの補完関数を改善。
+	- |quickrun-option-output| に指定できる値に _ を追加。
 
 0.4.0	2010-02-12
 	- |g:quickrun_default_config| を追加。
