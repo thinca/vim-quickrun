@@ -542,6 +542,7 @@ function! s:Runner.output(result)  " {{{2
     if !config.into
       wincmd p
     endif
+    redraw
 
   elseif out == '!' || out == '_'
     " Do nothing.
