@@ -663,11 +663,12 @@ function! quickrun#run(args)  " {{{2
     let config = runner.config
 
     if config.running_mark != '' && config.output == ''
+      let mark = runner.expand(config.running_mark)
       call runner.open_result_window()
       if !config.append
         silent % delete _
       endif
-      silent $-1 put =config.running_mark
+      silent $-1 put =mark
       let b:quickrun_running_mark = 1
       normal! zt
       wincmd p

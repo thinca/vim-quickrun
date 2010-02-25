@@ -263,7 +263,7 @@ eval_template				*quickrun-option-eval_template*
 			eval が指定された際に使用されるテンプレート文字列で
 			す。テンプレート内の %s が src に置き変えられます。
 
-running_mark				*quickrun-option-running_mark*
+running_mark (*)			*quickrun-option-running_mark*
 			この値が空文字列でない場合、実行中にこの文字列が出力先
 			に表示されます。表示は実行完了後に削除されます。
 			デフォルトは ":-)" です。
@@ -385,6 +385,8 @@ x.x.x	xxxx-xx-xx
 	- 結果取得用の一時ファイルが消えないことがあるバグを修正。
 	- コマンドラインの補完関数を改善。
 	- |quickrun-option-output| に指定できる値に _ を追加。
+	- |quickrun-option-running_mark| を |quickrun-expand-option| で展開す
+	  るようにした。
 
 0.4.0	2010-02-12
 	- |g:quickrun_default_config| を追加。
