@@ -1,6 +1,6 @@
 *quickrun.txt*	コマンドを素早く実行します。
 
-Version: 0.3.3
+Version: 0.4.1
 Author : thinca <thinca+vim@gmail.com>
 License: クリエイティブ・コモンズの表示 2.1 日本ライセンス
          <http://creativecommons.org/licenses/by/2.1/jp/>
@@ -379,7 +379,7 @@ TODO						*quickrun-TODO*
 ==============================================================================
 更新履歴					*quickrun-changelog*
 
-x.x.x	xxxx-xx-xx
+0.4.1	2010-02-25
 	- 結果のファイルへの書き出しのファイル名が 1 文字になるバグを修正。
 	- java のデフォルト値を改善。
 	- 結果取得用の一時ファイルが消えないことがあるバグを修正。
