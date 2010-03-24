@@ -11,13 +11,14 @@ License: クリエイティブ・コモンズの表示 2.1 日本ライセンス
 概要				|quickrun-introduction|
 インターフェース		|quickrun-interface|
   コマンド			  |quickrun-commands|
-  キーマッピング		  |quickrun-keymappings|
+  関数				  |quickrun-functions|
+  キーマッピング		  |quickrun-key-mappings|
 オプション			|quickrun-options|
   オプション値の展開		  |quickrun-expand-option|
   exec オプションの書式		  |quickrun-exec-format|
+設定				|quickrun-settings|
 TODO				|quickrun-TODO|
 更新履歴			|quickrun-changelog|
-
 
 
 ==============================================================================
@@ -95,7 +96,8 @@ TODO				|quickrun-TODO|
 
 
 ------------------------------------------------------------------------------
-関数				*quickrun-functions* *quickrun-operator*
+関数						*quickrun-functions*
+						*quickrun-operator*
 
 QuickRun({type})				*QuickRun()*
 			'operatorfunc' に対して設定するための関数です。
@@ -105,7 +107,7 @@ QuickRun({type})				*QuickRun()*
 
 
 ------------------------------------------------------------------------------
-キーマッピング					*quickrun-keymappings*
+キーマッピング					*quickrun-key-mappings*
 
 <Plug>(quickrun-op)				*<Plug>(quickrun-op)*
 			続くモーションの範囲を実行します。これは
@@ -116,7 +118,6 @@ QuickRun({type})				*QuickRun()*
 			ドウに表示します。
 			これは単純に |:QuickRun| コマンドを引数なしで実行する
 			のと同じです。
-<
 
 					*g:quickrun_no_default_key_mappings*
 以下のキーマッピングは、既に定義されていたり
@@ -321,7 +322,8 @@ exec を展開した結果先頭の文字が ":" だった場合、Vim のコマ
 
 
 ==============================================================================
-設定					*quickrun-settings* *g:quickrun_config*
+設定						*quickrun-settings*
+						*g:quickrun_config*
 
 グローバル変数 |g:quickrun_config| を使って各オプションのデフォルト値を設定で
 きます。
