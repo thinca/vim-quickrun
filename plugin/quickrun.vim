@@ -31,7 +31,7 @@ endfunction
 " Initialize. {{{1
 function! s:init()
   let g:quickrun_default_config = {
-        \ '*': {
+        \ '_': {
         \   'shebang': 1,
         \   'output': '',
         \   'append': 0,

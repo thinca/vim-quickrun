@@ -116,8 +116,9 @@ function! s:Runner.normalize()  " {{{2
   for c in [
   \ 'g:quickrun_config[config.type]',
   \ 'g:quickrun_default_config[config.type]',
+  \ 'g:quickrun_config["_"]',
   \ 'g:quickrun_config["*"]',
-  \ 'g:quickrun_default_config["*"]'
+  \ 'g:quickrun_default_config["_"]'
   \ ]
     if exists(c)
       call extend(config, eval(c), 'keep')
@@ -713,7 +714,7 @@ function! quickrun#complete(lead, cmd, pos)  " {{{2
   end
   let types = keys(extend(exists('g:quickrun_config') ?
   \                copy(g:quickrun_config) : {}, g:quickrun_default_config))
-  return filter(types, 'v:val != "*" && v:val =~ "^".a:lead')
+  return filter(types, 'v:val !~ "^[_*]$" && v:val =~ "^".a:lead')
 endfunction
 
 
