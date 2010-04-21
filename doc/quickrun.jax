@@ -162,7 +162,7 @@ input (*)				*quickrun-option-input*
 			この場合のみ文字列は |quickrun-expand-option| で展開さ
 			れます。
 
-output					*quickrun-option-output*
+output (*)				*quickrun-option-output*
 			結果の出力方法を指定します。
 			- 空文字列を指定すると、出力専用バッファを開いてそこへ
 			  出力します。このバッファは同じものが再利用されます。

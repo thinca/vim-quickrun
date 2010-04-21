@@ -141,7 +141,8 @@ function! s:Runner.normalize()  " {{{2
   let config.start = get(config, 'start', 1)
   let config.end = get(config, 'end', line('$'))
 
-  if self.config.output == '!'
+  let config.output = self.expand(config.output)
+  if config.output == '!'
     let config.runmode = 'simple'
   endif
 
