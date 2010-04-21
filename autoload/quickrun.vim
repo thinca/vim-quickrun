@@ -507,7 +507,10 @@ function! s:Runner.expand(str)  " {{{2
         let e = matchend(rest, '\\\@<!}')
         let expr = substitute(rest[1 : e - 2], '\\}', '}', 'g')
       endif
-      let result .= eval(expr)
+      try
+        let result .= eval(expr)
+      catch
+      endtry
       let rest = rest[e :]
     endif
   endwhile
