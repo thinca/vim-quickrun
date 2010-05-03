@@ -591,8 +591,9 @@ function! s:Runner.open_result_window()  " {{{2
   if !exists('s:bufnr')
     let s:bufnr = -1  " A number that doesn't exist.
   endif
+  let sp = self.expand(self.config.split)
   if !bufexists(s:bufnr)
-    execute self.expand(self.config.split) 'split'
+    execute sp 'split'
     edit `='[quickrun output]'`
     let s:bufnr = bufnr('%')
     nnoremap <buffer> q <C-w>c
@@ -601,7 +602,8 @@ function! s:Runner.open_result_window()  " {{{2
   elseif bufwinnr(s:bufnr) != -1
     execute bufwinnr(s:bufnr) 'wincmd w'
   else
-    execute 'sbuffer' s:bufnr
+    execute sp 'split'
+    execute 'buffer' s:bufnr
   endif
   if exists('b:quickrun_running_mark') && b:quickrun_running_mark
     silent undo
