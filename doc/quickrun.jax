@@ -341,9 +341,9 @@ exec を展開した結果先頭の文字が ":" だった場合、Vim のコマ
 す。その際に (.vimrc などで) すでに定義されていた場合は、デフォルト値に既存値
 を上書きする形で初期化されます。
 
-標準の設定					*g:quickrun_default_config*
+標準の設定					*g:quickrun#default_config*
 ----------
-|g:quickrun_default_config| には標準的なデフォルトの設定が入っています。これ
+|g:quickrun#default_config| には標準的なデフォルトの設定が入っています。これ
 は |g:quickrun_config| と同じ構造になっています。
 |quickrun-options| に記載されているデフォルト値は実際にはこの変数のデフォルト
 値です。通常はユーザがこの値を操作する必要はありません。
@@ -360,10 +360,10 @@ exec を展開した結果先頭の文字が ":" だった場合、Vim のコマ
 1. コマンドラインで指定された値
 2. |b:quickrun_config|
 3. |g:quickrun_config| の {type}
-4. |g:quickrun_default_config| の {type}
+4. |g:quickrun#default_config| の {type}
 5. |g:quickrun_config| の '_'
 6. |g:quickrun_config| の '*'
-7. |g:quickrun_default_config| の '_'
+7. |g:quickrun#default_config| の '_'
 
 1 や 2 で {type} を設定しておくことで 3 で通常とは別の {type} を参照できます。
 
@@ -387,6 +387,7 @@ x.x.x	xxxx-xx-xx
 	- デフォルトのタイプ名に "_" を追加。
 	  - "*" は互換性のために残してある。
 	- |quickrun-option-split| が 2 回目以降効かなくなるバグを修正。
+	- g:quickrun_default_config を |g:quickrun#default_config| に変更。
 
 0.4.1	2010-02-25
 	- 結果のファイルへの書き出しのファイル名が 1 文字になるバグを修正。
