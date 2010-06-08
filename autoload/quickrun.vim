@@ -452,6 +452,9 @@ endfunction
 
 
 function! s:Runner.run_async_python(commands, ...)
+  if !has('python')
+    throw 'runmode = async:python needs +python feature.'
+  endif
   let l:key = string(s:register(self))
   python <<EOM
 import vim, threading, subprocess
