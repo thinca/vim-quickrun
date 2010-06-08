@@ -210,6 +210,7 @@ runmode					*quickrun-option-runmode*
 			  {|+python| が必要}
 			  |python| のスレッドを利用してコマンドを非同期実行し
 			  ます。
+			  警告: これは非常に不安定です。
 
 split (*)				*quickrun-option-split*
 			出力専用バッファを開く際の補助コマンドを指定します。バ
