@@ -206,6 +206,10 @@ runmode					*quickrun-option-runmode*
 			  セルされます。
 			  |vimproc| がインストールされていない場合は通常と同じ
 			  ように実行します。
+			- "async:python"
+			  {|+python| が必要}
+			  |python| のスレッドを利用してコマンドを非同期実行し
+			  ます。
 
 split (*)				*quickrun-option-split*
 			出力専用バッファを開く際の補助コマンドを指定します。バ
@@ -388,6 +392,7 @@ x.x.x	xxxx-xx-xx
 	  - "*" は互換性のために残してある。
 	- |quickrun-option-split| が 2 回目以降効かなくなるバグを修正。
 	- g:quickrun_default_config を |g:quickrun#default_config| に変更。
+	- |quickrun-option-runmode| の値に "async:python" を追加。
 
 0.4.1	2010-02-25
 	- 結果のファイルへの書き出しのファイル名が 1 文字になるバグを修正。
