@@ -457,7 +457,7 @@ function! s:Runner.run_async_python(commands, ...)
   endif
   let l:key = string(s:register(self))
   python <<EOM
-import vim, threading, subprocess
+import vim, threading, subprocess, re
 
 class QuickRun(threading.Thread):
     def __init__(self, cmds, key, iswin):
@@ -476,14 +476,19 @@ class QuickRun(threading.Thread):
         finally:
             if self.iswin:
                 result = result.replace("\r\n", "\n")
-            vim.eval("quickrun#_result(%s, '%s')" %
-              (self.key, result.replace("'", "''")))
+            vim.eval("quickrun#_result(%s, %s)" %
+              (self.key, self.vimstr(result)))
 
     def execute(self, cmd):
+        if re.match('^\s*:', cmd):
+            return vim.eval("quickrun#execute(%s)" % self.vimstr(cmd))
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
         result = p.stdout.read()
         p.wait()
         return result
+
+    def vimstr(self, s):
+        return "'" + s.replace("'", "''") + "'"
 
 QuickRun(vim.eval('a:commands'),
          vim.eval('l:key'),
