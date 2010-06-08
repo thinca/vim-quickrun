@@ -398,17 +398,17 @@ function! s:Runner.run_async_remote(commands, ...)
   endif
   let selfvim = s:is_win ? split($PATH, ';')[-1] . '\vim.exe' :
   \             !empty($_) ? $_ : v:progname
-  let key = has('reltime') ? reltimestr(reltime()) : string(localtime())
+
+  let key = s:register(self)
+  let expr = printf('quickrun#_result(%s)', string(key))
+
   let outfile = tempname()
   let self._temp_result = outfile
-  let expr = printf('quickrun#_result(%s)', string(key))
   let cmds = a:commands
   let callback = s:make_command(
   \        [selfvim, '--servername', v:servername, '--remote-expr', expr])
 
   call map(cmds, 's:conv_vim2remote(selfvim, v:val)')
-
-  let s:runners[key] = self
 
   let in = self.config.input
   if in != ''
@@ -447,6 +447,53 @@ function! s:Runner.run_async_remote(commands, ...)
       silent! execute '!sh' script '&'
     endif
   endif
+endfunction
+
+
+
+function! s:Runner.run_async_python(commands, ...)
+  if !has('python')
+    throw 'runmode = async:python needs +python feature.'
+  endif
+  let l:key = string(s:register(self))
+  python <<EOM
+import vim, threading, subprocess, re
+
+class QuickRun(threading.Thread):
+    def __init__(self, cmds, key, iswin):
+        threading.Thread.__init__(self)
+        self.cmds = cmds
+        self.key = key
+        self.iswin = iswin
+
+    def run(self):
+        result = ''
+        try:
+            for cmd in self.cmds:
+                result += self.execute(cmd)
+        except:
+            pass
+        finally:
+            if self.iswin:
+                result = result.replace("\r\n", "\n")
+            vim.eval("quickrun#_result(%s, %s)" %
+              (self.key, self.vimstr(result)))
+
+    def execute(self, cmd):
+        if re.match('^\s*:', cmd):
+            return vim.eval("quickrun#execute(%s)" % self.vimstr(cmd))
+        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
+        result = p.stdout.read()
+        p.wait()
+        return result
+
+    def vimstr(self, s):
+        return "'" + s.replace("'", "''") + "'"
+
+QuickRun(vim.eval('a:commands'),
+         vim.eval('l:key'),
+         int(vim.eval('s:is_win'))).start()
+EOM
 endfunction
 
 
@@ -780,6 +827,13 @@ function! s:shellescape(str)
 endfunction
 
 
+function! s:register(runner)  " {{{2
+  let key = has('reltime') ? reltimestr(reltime()) : string(localtime())
+  let s:runners[key] = a:runner
+  return key
+endfunction
+
+
 
 " ----------------------------------------------------------------------------
 " Interfaces.  {{{1
@@ -834,7 +888,8 @@ function! quickrun#complete(lead, cmd, pos)  " {{{2
       elseif opt ==# 'mode'
         let list = ['n', 'v', 'o']
       elseif opt ==# 'runmode'
-        let list = ['simple', 'async:remote', 'async:remote:vimproc']
+        let list = ['simple', 'async:remote', 'async:remote:vimproc',
+        \           'async:python']
       end
       return filter(list, 'v:val =~ "^".a:lead')
     endif
@@ -852,13 +907,17 @@ endfunction
 
 
 
-function! quickrun#_result(key)
+function! quickrun#_result(key, ...)
   if !has_key(s:runners, a:key)
     return ''
   endif
   let runner = s:runners[a:key]
-  let resfile = runner._temp_result
-  let result = filereadable(resfile) ? join(readfile(resfile), "\n") : ''
+  if a:0
+    let result = a:1
+  else
+    let resfile = runner._temp_result
+    let result = filereadable(resfile) ? join(readfile(resfile), "\n") : ''
+  endif
   call remove(s:runners, a:key)
   call runner.sweep()
   call runner.output(result)
