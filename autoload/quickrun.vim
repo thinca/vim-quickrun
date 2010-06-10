@@ -130,6 +130,7 @@ let g:quickrun#default_config = {
 \   'command': ':source',
 \   'exec': '%c %s',
 \   'eval_template': "echo %s",
+\   'runmode': 'simple',
 \ },
 \ 'zsh': {},
 \}
