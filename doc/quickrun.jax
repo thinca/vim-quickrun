@@ -30,6 +30,10 @@ TODO				|quickrun-TODO|
 要件:
 - Vim 7.2 以降
 
+最新版:
+http://github.com/thinca/vim-quickrun
+
+
 						*quickrun-synopsis*
 >
 	" 現在のバッファを実行
