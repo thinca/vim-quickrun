@@ -235,18 +235,15 @@ function! s:Runner.normalize()  " {{{2
     let config.mode = histget(':') =~# "^'<,'>\\s*Q\\%[uickRun]" ? 'v' : 'n'
   endif
 
-  if exists('b:quickrun_config')
-    call extend(config, b:quickrun_config, 'keep')
-  endif
-
-  let config.type = get(config, 'type', &filetype)
-
+  let type = {"type": &filetype}
   for c in [
+  \ 'b:quickrun_config',
+  \ 'type',
   \ 'g:quickrun_config[config.type]',
   \ 'g:quickrun#default_config[config.type]',
   \ 'g:quickrun_config["_"]',
   \ 'g:quickrun_config["*"]',
-  \ 'g:quickrun#default_config["_"]'
+  \ 'g:quickrun#default_config["_"]',
   \ ]
     if exists(c)
       call extend(config, eval(c), 'keep')
