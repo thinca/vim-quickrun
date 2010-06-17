@@ -81,6 +81,10 @@ g:quicklaunch_no_default_key_mappings に 1 が設定されていると定義さ
 ==============================================================================
 更新履歴					*quicklaunch-changelog*
 
+x.x.x	xxxx-xx-xx
+	- <Leader> 系のマッピングを定義する前に |hasmapto()| をチェックするよ
+	  うにした。
+
 0.1.0.1	2009-11-13
 	- ヘルプから |<Plug>(quicklaunch-list)| の記述が漏れていたのを修正。
 

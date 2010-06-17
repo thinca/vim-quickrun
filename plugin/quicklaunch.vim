@@ -58,11 +58,15 @@ endfunction
 
 function! s:define_default_key_mappings()
   for i in range(10)
-    execute 'silent! nmap <unique> <Leader>' . i
-    \                        '<Plug>(quicklaunch-' . i . ')'
+    if !hasmapto('<Plug>(quicklaunch-' . i . ')', 'n')
+      execute 'silent! nmap <unique> <Leader>' . i
+      \                        '<Plug>(quicklaunch-' . i . ')'
+    endif
   endfor
 
-  silent! nmap <unique> <Leader>l <Plug>(quicklaunch-list)
+  if !hasmapto('<Plug>(quicklaunch-list)', 'n')
+    silent! nmap <unique> <Leader>l <Plug>(quicklaunch-list)
+  endif
 endfunction
 
 
