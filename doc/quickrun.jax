@@ -400,6 +400,7 @@ x.x.x	xxxx-xx-xx
 	- |quickrun-option-split| が 2 回目以降効かなくなるバグを修正。
 	- g:quickrun_default_config を |g:quickrun#default_config| に変更。
 	- |quickrun-option-runmode| の値に "async:python" を追加。
+	- <Leader>r を定義する前に |hasmapto()| をチェックするようにした。
 
 0.4.1	2010-02-25
 	- 結果のファイルへの書き出しのファイル名が 1 文字になるバグを修正。
