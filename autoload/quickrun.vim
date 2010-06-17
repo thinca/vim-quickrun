@@ -449,12 +449,8 @@ endfunction
 
 
 
-function! s:Runner.run_async_python(commands, ...)
-  if !has('python')
-    throw 'runmode = async:python needs +python feature.'
-  endif
-  let l:key = string(s:register(self))
-  python <<EOM
+if has('python')
+python <<EOM
 import vim, threading, subprocess, re
 
 class QuickRun(threading.Thread):
@@ -487,11 +483,17 @@ class QuickRun(threading.Thread):
 
     def vimstr(self, s):
         return "'" + s.replace("'", "''") + "'"
-
-QuickRun(vim.eval('a:commands'),
-         vim.eval('l:key'),
-         int(vim.eval('s:is_win'))).start()
 EOM
+endif
+
+function! s:Runner.run_async_python(commands, ...)
+  if !has('python')
+    throw 'runmode = async:python needs +python feature.'
+  endif
+  let l:key = string(s:register(self))
+  python QuickRun(vim.eval('a:commands'),
+  \               vim.eval('l:key'),
+  \               int(vim.eval('s:is_win'))).start()
 endfunction
 
 
