@@ -1,0 +1,390 @@
+*quickrun.txt*	Run a command and show its result quickly
+
+Version: 0.4.1
+Author : thinca <thinca+vim@gmail.com>
+License: Creative Commons 2.1 Japanese
+         <http://creativecommons.org/licenses/by/2.1/jp/>
+
+==============================================================================
+CONTENTS						*quickrun-contents*
+
+Introduction				|quickrun-introduction|
+Interface		|quickrun-interface|
+  Commands			|quickrun-commands|
+  Key mappings		|quickrun-keymappings|
+Options			|quickrun-options|
+  Option syntax				|quickrun-syntax-option|
+  Format of exec option		|quickrun-exec-format|
+Settings					|quickrun-settings|
+TODO				|quickrun-TODO|
+Changelog			|quickrun-changelog|
+
+
+
+==============================================================================
+INTRODUCTION						*quickrun-introduction*
+
+*quickrun* is Vim plugin to execute whole/part of editing file.
+It provides |:QuickRun| for it.
+
+Requirement:
+- Vim 7.2 or later
+
+						*quickrun-synopsis*
+>
+	" Execute current buffer.
+	:QuickRun
+
+	" Execute current buffer from line 3 to line 6.
+	:3,6QuickRun
+
+	" Execute current buffer as perl program.
+	:QuickRun perl
+
+	" Execute one-liner program given from command-line.
+	:QuickRun ruby -src 'puts "Hello, world!"'
+
+
+	" (In .vimrc) Set default program to execute haskell program to hugs.
+	let g:quickrun_config = {}
+	let g:quickrun_config.haskell = {'command' : 'runhugs'}
+
+	" Set shortcut keys.
+	for [key, com] in items({
+	\   '<Leader>x' : '>:',
+	\   '<Leader>p' : '>!',
+	\   '<Leader>w' : '>',
+	\   '<Leader>q' : '>>',
+	\ })
+		execute 'nnoremap <silent>' key ':QuickRun' com '-mode n<CR>'
+		execute 'vnoremap <silent>' key ':QuickRun' com '-mode v<CR>'
+	endfor
+<
+
+
+==============================================================================
+INTERFACE				*quickrun-interface*
+
+------------------------------------------------------------------------------
+COMMANDS					*quickrun-commands*
+
+						*:QuickRun*
+:[range]QuickRun [{type}] [<{input}] [>[>][{output}]] [-option value]...
+	Execute program with misc. options.
+	See |quickrun-options| for supported options.
+	Options are pairs of names, values like:
+>
+	-name value
+<
+	You can specify as you need it.
+	All options are insensitive to the order.
+	If value contains whitespaces,
+	you must quote with single quote or double quote.
+	And you want to specify single quotes or double quotes
+	inside it, you must escape with backslashes.
+
+	{type} is abbreviation to {type}
+	<{input} is abbreviation to -input {input}
+	>{output} is abbreviation to -output {output}
+	>>{output} is abbreviation to -append 1 -output {output}
+
+	Command can take |:range|.
+	if not, it treats whole lines.
+	If you specify '<,'> and do not specify -mode (|quickrun-option-mode|),
+	target is selected text in visual mode. |blockwise-visual| also works.
+	But when it is executed from key mapping, you need to specify -mode
+	because |:QuickRun| can't detect current mode.
+
+
+------------------------------------------------------------------------------
+FUNCTIONS				*quickrun-functions* *quickrun-operator*
+
+QuickRun({type})				*QuickRun()*
+			Function for 'operatorfunc'.
+			e.g.: >
+		nnoremap <silent> <C-CR> :<C-u>set opfunc=QuickRun<CR>g@ip
+<			<C-CR> will execute current paragraph (|ip|).
+
+
+------------------------------------------------------------------------------
+KEY MAPPINGS					*quickrun-keymappings*
+
+<Plug>(quickrun-op)				*<Plug>(quickrun-op)*
+			Execute next motion's range.
+			This sets 'operatorfunc' to "QuickRun".
+
+<Plug>(quickrun)				*<Plug>(quickrun)*
+			Execute and display the result for current buffer.
+			This is normally same as |:QuickRun|
+			without arguments.
+<
+
+					*g:quickrun_no_default_key_mappings*
+Following key mapings will NOT be defined if it's already mapped,
+or |g:quickrun_no_default_key_mappings| has been set to 1.
+
+{lhs}			{rhs}
+--------		-----------------------------
+<Leader>r		<Plug>(quickrun)
+
+
+
+==============================================================================
+OPTIONS					*quickrun-options*
+
+Here are the list of options you can specify at command-line.
+|g:quickrun_config| is used for options which are not specified.
+See |quickrun-expand-option| for options with (*).
+
+type					*quickrun-option-type*
+			Template for current setting.
+			Default value is 'filetype',
+			See |g:quickrun_config| for more details.
+
+exec (*)				*quickrun-option-exec*
+			Format of executed commands.
+			You can specify multiple values.
+			See |g:quickrun_config| for more details.
+
+command					*quickrun-option-command*
+			String expanded to %c in exec,
+			If not specified, same value as type is used.
+
+src					*quickrun-option-src*
+			Executed program.
+			Default value is whole lines of editing file.
+
+args					*quickrun-option-args*
+			String expanded to %a in exec.
+
+input (*)				*quickrun-option-input*
+			Filename to be stdin of program.
+			If first character starts with =,
+			quickrun treats continued string as input.
+			In this case, continued string is expanded
+			by |quickrun-expand-option|
+
+output					*quickrun-option-output*
+			Output format.
+			- If you specify empty string, quickrun opens output
+			  buffer and displays to the output buffer.
+			  If output buffer already exists, quickrun uses it.
+			  And for customize, quickrun sets "quickrun" to 'filetype'
+			  of this buffer.
+			- If you specify !, quickrun executes at shell directly.
+			- If you specify :, quickrun outputs to |hit-enter-prompt|.
+			  append is not 0, output is stored in |message-history|.
+			- If you specify ={var}, quickrun outputs to {var}'s variable,
+			  option, environment variable.
+			- If you specify _, quickrun does not output.
+			- Otherwise, quickrun outputs to file.
+
+append					*quickrun-option-append*
+			If this value is not 0,
+			(If possile) Append to the output.
+
+runmode					*quickrun-option-runmode*
+			This value is one of the followings:
+			- "simple"
+			  Use |system()| or (when output is ":") |:!|
+			  for execute. This is default value.
+			- "async:remote"
+			  {You need Vim compiled with |+clientserver|}
+			  Execute commands in background.
+			  Notify the end of process using |+clientserver|
+			  and display the result.
+			  |v:servername| must be set.
+			  Or not, you need to restart Vim with |--servername| option.
+			  Note that quickrun can't handle infinite loop or input block
+			  because this works in background.
+			- "async:remote:vimproc"
+			  {You need |vimproc|}
+			  Use |vimproc| for execute.
+			  If you tried to execute
+			  when you have already executed,
+			  old command will be canceled.
+			  If you have not installed |vimproc|,
+			  behave like "simple".
+
+split (*)				*quickrun-option-split*
+			Helper command to open output buffer.
+			This command is invoked before |:split|.
+			You can also specify the command using |:tab|,
+			but it is not recommended.
+			Because if there is no buffer in opened tabpage,
+			quickrun opens new output buffer.
+			Default value is '{winwidth(0) * 2 < winheight(0) * 5 ? "" : "vertical"}'.
+
+into					*quickrun-option-into*
+			If this value is not 0, Move cursor to output buffer
+			when the result is displayed.
+
+mode					*quickrun-option-mode*
+			This value is one of n, v, o .
+			This changes behavior of getting the range text.
+			Normally this is automatically set by quickrun.
+			But you need to care this value
+			when you invoke |:QuickRun| from own key mappings.
+			e.g.: >
+				nnoremap <silent> <F5> :QuickRun -mode n<CR>
+				vnoremap <silent> <F5> :QuickRun -mode v<CR>
+
+output_encode (*)			*quickrun-option-output_encode*
+			Encoding conversion filter like "from:to".
+			Default value is "&fenc:&enc".
+
+shebang					*quickrun-option-shebang*
+			If this value is not 0, and if src 's first line started
+			with #! , quickrun ignores first line.
+			Default value is 1.
+
+tempfile (*)				*quickrun-option-tempfile*
+			quickrun makes temporary file to execute part of lines.
+			This value is template for its filename.
+			Temporary file will be removed after execute.
+			Default value is "{tempname()}".
+
+shellcmd				*quickrun-option-shellcmd*
+			Template of Vim's command which is executed
+			if output is ! .
+			quickrun substitutes %s with commands generated
+			by exec option.
+			On MS Windows, Default value is 'silent !"%s" & pause'.
+			Otherwise '!%s'.
+
+eval					*quickrun-option-eval*
+			*** EXPERIMENTAL ***
+			If this value is not 0, quickrun substitutes src
+			embedding to eval_template.
+
+eval_template				*quickrun-option-eval_template*
+			*** EXPERIMENTAL ***
+			Template for eval.
+			quickrun substitutes %s with src.
+
+running_mark (*)			*quickrun-option-running_mark*
+			If this value is not empty string,
+			quickrun displays this string to output buffer.
+			Default value is ":-)".
+
+
+------------------------------------------------------------------------------
+OPTION SYNTAX				*quickrun-syntax-option*
+
+Specific options which have (*) have special syntax.
+Words which start with @, &, $ are evaluated as register, (Vim's) option,
+environment variable, respectively.
+You can wrap {} around each word explicitly to clarify its boundary.
+e.g.: >
+	@a
+	&{fileencoding}
+	$PATH
+	{expr}
+{expr} is evaluated using |eval()|.
+If you want to avoid evaluation, you need to escape with \ .
+
+
+------------------------------------------------------------------------------
+FORMAT OF EXEC				*quickrun-exec-format*
+
+This value is format of executed commands.
+You can use symbols like the followings.
+You can also use same symbols altogether.
+
+
+
+Symbol			Result ~
+--------        ------
+%%		%
+%c		Command
+%s		Source
+%S		Source (not escaped)
+%a		Script's arguments
+
+You can use |filename-modifiers| for the symbols to specify file.
+>
+	java %S:r:gs?[/\\]?.?
+<
+Symbols to specify file are escaped by |shellescape()|.
+And newline(s) are replaced by whitespace(s).
+
+Execute Vim ex command
+------------------------
+If first character of result of exec is ":",
+It is executed as Vim's ex command.
+And in this case, symbols to specify file are escaped by |fnameescape()|.
+
+Specify multiple command
+------------------------
+If you specify multiple exec options to |:QuickRun|,
+or specify |List| to exec in |g:quickrun_config|.
+quickrun executes them in order.
+It is useful when you need to do compile, clean up something.
+
+
+
+==============================================================================
+SETTINGS					*quickrun-settings* *g:quickrun_config*
+
+You can define default values using |g:quickrun_config|.
+"Default Value" is |Dictionary| whose key is |quickrun-options| names.
+And |g:quickrun_config| is |Dictionary| whose key is {type},
+and its value is "Default Value".
+{type} is option value given as |quickrun-option-type| from command-line.
+If it is not specified, current 'filetype' is used instead.
+Special {type} '*' has default values for all unspecified keys by each "Default value".
+
+Options given by command-line has higher priority than {type} specific
+settings.
+And {type} specific settings has higher priority than {type} '*' settings,
+
+|g:quickrun_config|'s default value (it is |g:quickrun_default_config|)
+is initialized when quickrun is loaded.
+At that time, (for e.g., in  your .vimrc) If it is defined,
+quickrun overwrites default value with your value.
+
+
+Default settings					*g:quickrun_default_config*
+----------
+|g:quickrun_default_config| has default settings
+which has same structure as |g:quickrun_config|.
+Default values on |quickrun-options| are actually this value.
+Usually you don't have to care this variable.
+
+Buffer-local settings				*b:quickrun_config*
+----------------------
+You can specify buffer-local settings using |b:quickrun_config|.
+You need to specify "Default Value" different from |g:quickrun_config|.
+This has higher priority any other settings
+without options given by command-line.
+
+
+Here is the order to have higher priorities.
+
+1. Options given by command-line
+2. |b:quickrun_config|
+3. |g:quickrun_config|'s {type}
+4. |g:quickrun_default_config|'s {type}
+5. |g:quickrun_config|'s '*'
+6. |g:quickrun_default_config|'s '*'
+
+
+
+==============================================================================
+TODO						*quickrun-TODO*
+
+9 Improve error handling
+6 Display previous result (to see closed, disappeared buffer of quickrun)
+5 Support to specify args multiple times
+3 Add output format option (Substitution)
+1 Handle stderr?
+
+
+
+==============================================================================
+CHANGELOG					*quickrun-changelog*
+
+See Japanese help or git-log.
+
+==============================================================================
+vim:tw=78:fo=tcq2mM:ts=8:ft=help:norl
