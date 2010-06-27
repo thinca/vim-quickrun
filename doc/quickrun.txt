@@ -76,23 +76,23 @@ COMMANDS					*quickrun-commands*
 >
 	-name value
 <
-	You can specify as you need it.
+	You can specify options as possible.
 	All options are insensitive to the order.
 	If value contains whitespaces,
 	you must quote with single quote or double quote.
-	And you want to specify single quotes or double quotes
-	inside it, you must escape with backslashes.
+	And you want to specify single quote(s) or double quote(s)
+	inside it, you must escape with backslash(es).
 
 	{type} is abbreviation to {type}
 	<{input} is abbreviation to -input {input}
 	>{output} is abbreviation to -output {output}
 	>>{output} is abbreviation to -append 1 -output {output}
 
-	Command can take |:range|.
-	if not, it treats whole lines.
+	|:Quickrun| can take |:range|.
+	if it was not given, |:QuickRun| treats whole lines.
 	If you specify '<,'> and do not specify -mode (|quickrun-option-mode|),
-	target is selected text in visual mode. |blockwise-visual| also works.
-	But when it is executed from key mapping, you need to specify -mode
+	target is selected text in visual mode. And |blockwise-visual| also works.
+	But when |:QuickRun| is executed from key mapping, you need to specify -mode
 	because |:QuickRun| can't detect current mode.
 
 
