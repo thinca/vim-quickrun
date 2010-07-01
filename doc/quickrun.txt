@@ -2,6 +2,7 @@
 
 Version: 0.4.1
 Author : thinca <thinca+vim@gmail.com>
+Eng[rl]ish document by: tyru <tyru.exe@gmail.com>
 License: Creative Commons 2.1 Japanese
          <http://creativecommons.org/licenses/by/2.1/jp/>
 
