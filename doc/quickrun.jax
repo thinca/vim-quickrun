@@ -133,7 +133,7 @@ g:quickrun_no_default_key_mappings に 1 が設定されていると定義され
 オプション					*quickrun-options*
 コマンドラインで指定するオプションのリストです。省略したオプションは
 |g:quickrun_config| で設定しているものが使用されます。(*) が付いているものにつ
-いては |quickrun-expand-option| を参照してください。
+いては |quickrun-syntax-option| を参照してください。
 
 type					*quickrun-option-type*
 			設定の雛形を指定します。デフォルトで 'filetype' の値が
@@ -160,7 +160,7 @@ args					*quickrun-option-args*
 input (*)				*quickrun-option-input*
 			標準入力に流し込むファイルを指定します。先頭が = で始
 			まっていた場合、それ以降の文字列を入力として扱います。
-			この場合のみ文字列は |quickrun-expand-option| で展開さ
+			この場合のみ文字列は |quickrun-syntax-option| で展開さ
 			れます。
 
 output					*quickrun-option-output*
@@ -271,7 +271,7 @@ running_mark (*)			*quickrun-option-running_mark*
 
 
 ------------------------------------------------------------------------------
-オプション値の展開				*quickrun-expand-option*
+オプション値の構文				*quickrun-syntax-option*
 
 いくつかの設定は、実行時に中身の一部が置換されます。(*) がついている設定は、
 @,&,$で始まる単語をそれぞれレジスタ、オプション、環境変数として展開します。曖

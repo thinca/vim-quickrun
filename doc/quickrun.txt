@@ -134,7 +134,7 @@ OPTIONS					*quickrun-options*
 
 Here are the list of options you can specify at command-line.
 |g:quickrun_config| is used for options which are not specified.
-See |quickrun-expand-option| for options with (*).
+See |quickrun-syntax-option| for options with (*).
 
 type					*quickrun-option-type*
 			Template for current setting.
@@ -162,7 +162,7 @@ input (*)				*quickrun-option-input*
 			If first character starts with =,
 			quickrun treats continued string as input.
 			In this case, continued string is expanded
-			by |quickrun-expand-option|
+			by |quickrun-syntax-option|
 
 output					*quickrun-option-output*
 			Output format.
