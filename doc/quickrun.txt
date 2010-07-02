@@ -9,17 +9,15 @@ License: Creative Commons 2.1 Japanese
 ==============================================================================
 CONTENTS						*quickrun-contents*
 
-Introduction				|quickrun-introduction|
-Interface		|quickrun-interface|
-  Commands			|quickrun-commands|
-  Key mappings		|quickrun-keymappings|
-Options			|quickrun-options|
-  Option syntax				|quickrun-syntax-option|
-  Format of exec option		|quickrun-exec-format|
-Settings					|quickrun-settings|
+INTRODUCTION			|quickrun-introduction|
+INTERFACE			|quickrun-interface|
+  COMMANDS			  |quickrun-commands|
+  KEY MAPPINGS			  |quickrun-keymappings|
+OPTIONS				|quickrun-options|
+  OPTION SYNTAX			  |quickrun-syntax-option|
+  FORMAT OF EXEC		  |quickrun-exec-format|
 TODO				|quickrun-TODO|
-Changelog			|quickrun-changelog|
-
+CHANGELOG			|quickrun-changelog|
 
 
 ==============================================================================
@@ -31,7 +29,7 @@ It provides |:QuickRun| for it.
 Requirement:
 - Vim 7.2 or later
 
-						*quickrun-synopsis*
+							*quickrun-synopsis*
 >
 	" Execute current buffer.
 	:QuickRun
@@ -64,7 +62,7 @@ Requirement:
 
 
 ==============================================================================
-INTERFACE				*quickrun-interface*
+INTERFACE					*quickrun-interface*
 
 ------------------------------------------------------------------------------
 COMMANDS					*quickrun-commands*
@@ -98,7 +96,8 @@ COMMANDS					*quickrun-commands*
 
 
 ------------------------------------------------------------------------------
-FUNCTIONS				*quickrun-functions* *quickrun-operator*
+FUNCTIONS					*quickrun-functions*
+						*quickrun-operator*
 
 QuickRun({type})				*QuickRun()*
 			Function for 'operatorfunc'.
@@ -170,13 +169,15 @@ output					*quickrun-option-output*
 			- If you specify empty string, quickrun opens output
 			  buffer and displays to the output buffer.
 			  If output buffer already exists, quickrun uses it.
-			  And for customize, quickrun sets "quickrun" to 'filetype'
-			  of this buffer.
-			- If you specify !, quickrun executes at shell directly.
-			- If you specify :, quickrun outputs to |hit-enter-prompt|.
-			  append is not 0, output is stored in |message-history|.
-			- If you specify ={var}, quickrun outputs to {var}'s variable,
-			  option, environment variable.
+			  And for customize, quickrun sets "quickrun" to
+			  'filetype' of this buffer.
+			- If you specify !, quickrun executes at shell
+			  directly.
+			- If you specify :, quickrun outputs to
+			  |hit-enter-prompt|.  append is not 0, output is
+			  stored in |message-history|.
+			- If you specify ={var}, quickrun outputs to {var}'s
+			  variable, option, environment variable.
 			- If you specify _, quickrun does not output.
 			- Otherwise, quickrun outputs to file.
 
@@ -195,9 +196,10 @@ runmode					*quickrun-option-runmode*
 			  Notify the end of process using |+clientserver|
 			  and display the result.
 			  |v:servername| must be set.
-			  Or not, you need to restart Vim with |--servername| option.
-			  Note that quickrun can't handle infinite loop or input block
-			  because this works in background.
+			  Or not, you need to restart Vim with |--servername|
+			  option.  Note that quickrun can't handle infinite
+			  loop or input block because this works in
+			  background.
 			- "async:remote:vimproc"
 			  {You need |vimproc|}
 			  Use |vimproc| for execute.
@@ -210,11 +212,12 @@ runmode					*quickrun-option-runmode*
 split (*)				*quickrun-option-split*
 			Helper command to open output buffer.
 			This command is invoked before |:split|.
-			You can also specify the command using |:tab|,
-			but it is not recommended.
+			You can also specify the command using |:tab|, but it
+			is not recommended.
 			Because if there is no buffer in opened tabpage,
 			quickrun opens new output buffer.
-			Default value is '{winwidth(0) * 2 < winheight(0) * 5 ? "" : "vertical"}'.
+			Default value is
+			'{winwidth(0) * 2 < winheight(0) * 5 ? "" : "vertical"}'.
 
 into					*quickrun-option-into*
 			If this value is not 0, Move cursor to output buffer
@@ -235,12 +238,13 @@ output_encode (*)			*quickrun-option-output_encode*
 			Default value is "&fenc:&enc".
 
 shebang					*quickrun-option-shebang*
-			If this value is not 0, and if src 's first line started
-			with #! , quickrun ignores first line.
+			If this value is not 0, and if src 's first line
+			started with #! , quickrun ignores first line.
 			Default value is 1.
 
 tempfile (*)				*quickrun-option-tempfile*
-			quickrun makes temporary file to execute part of lines.
+			quickrun makes temporary file to execute part of
+			lines.
 			This value is template for its filename.
 			Temporary file will be removed after execute.
 			Default value is "{tempname()}".
@@ -325,7 +329,8 @@ It is useful when you need to do compile, clean up something.
 
 
 ==============================================================================
-SETTINGS					*quickrun-settings* *g:quickrun_config*
+SETTINGS					*quickrun-settings*
+						*g:quickrun_config*
 
 You can define default values using |g:quickrun_config|.
 "Default Value" is |Dictionary| whose key is |quickrun-options| names.
@@ -333,7 +338,8 @@ And |g:quickrun_config| is |Dictionary| whose key is {type},
 and its value is "Default Value".
 {type} is option value given as |quickrun-option-type| from command-line.
 If it is not specified, current 'filetype' is used instead.
-Special {type} '*' has default values for all unspecified keys by each "Default value".
+Special {type} '*' has default values for all unspecified keys by each
+"Default value".
 
 Options given by command-line has higher priority than {type} specific
 settings.
@@ -345,7 +351,7 @@ At that time, (for e.g., in  your .vimrc) If it is defined,
 quickrun overwrites default value with your value.
 
 
-Default settings					*g:quickrun_default_config*
+Default settings				*g:quickrun_default_config*
 ----------
 |g:quickrun_default_config| has default settings
 which has same structure as |g:quickrun_config|.
