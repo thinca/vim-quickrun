@@ -82,7 +82,7 @@ COMMANDS					*quickrun-commands*
 	And you want to specify single quote(s) or double quote(s)
 	inside it, you must escape with backslash(es).
 
-	{type} is abbreviation to {type}
+	{type} is abbreviation to -type {type}
 	<{input} is abbreviation to -input {input}
 	>{output} is abbreviation to -output {output}
 	>>{output} is abbreviation to -append 1 -output {output}
