@@ -7,7 +7,7 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-let s:available_vimproc = exists('*vimproc#popen2')
+let s:available_vimproc = globpath(&runtimepath, 'autoload/vimproc.vim') != ''
 let s:is_win = has('win32') || has('win64')
 
 unlet! g:quickrun#default_config
