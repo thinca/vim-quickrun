@@ -109,6 +109,7 @@ let g:quickrun#default_config = {
 \     '$Data::Dumper::Indent = 0',
 \     'print Dumper eval{%s}'], ';')
 \ },
+\ 'perl6': {'eval_template': '{%s}().perl.print'},
 \ 'python': {'eval_template': 'print(%s)'},
 \ 'php': {},
 \ 'r': {
