@@ -10,7 +10,7 @@ set cpo&vim
 let s:available_vimproc = globpath(&runtimepath, 'autoload/vimproc.vim') != ''
 let s:is_win = has('win32') || has('win64')
 
-unlet! g:quickrun#default_config
+unlet! g:quickrun#default_config  " {{{1
 let g:quickrun#default_config = {
 \ '_': {
 \   'shebang': 1,
@@ -141,7 +141,7 @@ lockvar! g:quickrun#default_config
 
 let s:runners = {}  " Store for running runners.
 
-let s:Runner = {}
+let s:Runner = {}  " {{{1
 
 
 
@@ -192,7 +192,7 @@ endfunction
 
 
 
-function! s:Runner.set_options_from_arglist(arglist)
+function! s:Runner.set_options_from_arglist(arglist)  " {{{2
   let config = {}
   let option = ''
   for arg in a:arglist
@@ -378,7 +378,7 @@ endfunction
 
 
 
-function! s:Runner.run_async(commands, ...)
+function! s:Runner.run_async(commands, ...)  " {{{2
   let [type; args] = a:000
   if !has_key(self, 'run_async_' . type)
     throw 'Unknown async type: ' . type
@@ -388,7 +388,7 @@ endfunction
 
 
 
-function! s:Runner.run_async_remote(commands, ...)
+function! s:Runner.run_async_remote(commands, ...)  " {{{2
   if !has('clientserver') || v:servername == ''
     throw 'runmode = async:remote needs +clientserver feature.'
   endif
@@ -487,7 +487,7 @@ class QuickRun(threading.Thread):
 EOM
 endif
 
-function! s:Runner.run_async_python(commands, ...)
+function! s:Runner.run_async_python(commands, ...)  " {{{2
   if !has('python')
     throw 'runmode = async:python needs +python feature.'
   endif
@@ -534,7 +534,7 @@ endfunction
 
 " ----------------------------------------------------------------------------
 " Detect the shebang, and return the shebang command if it exists.
-function! s:Runner.detect_shebang()
+function! s:Runner.detect_shebang()  " {{{2
   let src = self.config.src
   let line = type(src) == type('') ? matchstr(src, '^.\{-}\ze\(\n\|$\)'):
   \          type(src) == type(0)  ? getbufline(src, 1)[0]:
@@ -570,7 +570,7 @@ endfunction
 
 " ----------------------------------------------------------------------------
 " Sweep the temporary files the keys starts with '_temp'.
-function! s:Runner.sweep()
+function! s:Runner.sweep()  " {{{2
   for file in filter(keys(self), 'v:val =~# "^_temp"')
     if filewritable(self[file])
       call delete(self[file])
@@ -799,7 +799,7 @@ endfunction
 
 
 
-function! s:conv_vim2remote(selfvim, cmd)
+function! s:conv_vim2remote(selfvim, cmd)  " {{{2
   if a:cmd !~ '^\s*:'
     return a:cmd
   endif
@@ -810,14 +810,14 @@ endfunction
 
 
 
-function! s:make_command(args)
+function! s:make_command(args)  " {{{2
   return join([shellescape(a:args[0])] +
   \           map(a:args[1 :], 's:shellescape(v:val)'), ' ')
 endfunction
 
 
 
-function! s:shellescape(str)
+function! s:shellescape(str)  " {{{2
   if s:is_win
     let str = substitute(a:str, '[&|<>()^"%]', '^\0', 'g')
     let str = substitute(str, '\\\+\ze"', '\=repeat(submatch(0), 2)', 'g')
@@ -908,7 +908,7 @@ endfunction
 
 
 
-function! quickrun#_result(key, ...)
+function! quickrun#_result(key, ...)  " {{{2
   if !has_key(s:runners, a:key)
     return ''
   endif
@@ -928,7 +928,7 @@ endfunction
 
 
 " Execute commands by expr.  This is used by remote_expr()
-function! quickrun#execute(...)
+function! quickrun#execute(...)  " {{{2
   " XXX: Can't get a result if a:cmd contains :redir command.
   let result = ''
   redir => result
