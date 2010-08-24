@@ -191,6 +191,12 @@ runmode					*quickrun-option-runmode*
 			- "simple"
 			  単純に |system()| や |:!|(output が ":" の場合) を
 			  使って実行します。デフォルトではこのモードです。
+			- "async:vimproc[:{updatetime}]"
+			  {|vimproc| と |vimshell| が必要}
+			  |vimproc| を使ってコマンドをバックグラウンドで実行し
+			  ます。実行の完了を 'updatetime' 毎に検査します。オプ
+			  ションの値の {updatetime} を指定すると一時的に
+			  'updatetime' を変更します。
 			- "async:remote"
 			  {|+clientserver| が必要}
 			  コマンドをバックグラウンドで実行し、終了を
