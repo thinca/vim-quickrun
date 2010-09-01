@@ -963,8 +963,8 @@ function! quickrun#complete(lead, cmd, pos)  " {{{2
       elseif opt ==# 'mode'
         let list = ['n', 'v', 'o']
       elseif opt ==# 'runmode'
-        let list = ['simple', 'async:remote', 'async:remote:vimproc',
-        \           'async:python']
+        let list = ['simple', 'async:vimproc', 'async:remote',
+        \           'async:remote:vimproc', 'async:python']
       end
       return filter(list, 'v:val =~ "^".a:lead')
     endif
