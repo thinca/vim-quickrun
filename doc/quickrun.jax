@@ -194,13 +194,16 @@ runmode					*quickrun-option-runmode*
 			- "async:vimproc[:{updatetime}]"
 			  {|vimproc| と |vimshell| が必要}
 			  |vimproc| を使ってコマンドをバックグラウンドで実行し
-			  ます。実行の完了を 'updatetime' 毎に検査します。オプ
-			  ションの値の {updatetime} を指定すると一時的に
-			  'updatetime' を変更します。
+			  ます。実行の完了を |CursorHold| と |CursorHoldI| イ
+			  ベントを使って検査します。オプションの値として
+			  {updatetime} を指定すると一時的に 'updatetime' を変
+			  更します。50 ミリ秒以内に実行が終了 した場合は、即座
+			  に結果を表示します。
 			- "async:remote"
 			  {|+clientserver| が必要}
 			  コマンドをバックグラウンドで実行し、終了を
-			  |+clientserver| 機能を利用して通知し結果を表示します。
+			  |+clientserver| 機能を利用して通知し結果を表示しま
+			  す。
 			  |v:servername| が設定されている必要があります。ない
 			  場合は、|--servername| オプションを使って Vim を起動
 			  してください。
