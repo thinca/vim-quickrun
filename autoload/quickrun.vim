@@ -388,6 +388,68 @@ endfunction
 
 
 
+function! s:Runner.run_async_vimproc(commands, ...)  " {{{2
+  if !s:available_vimproc
+    throw 'runmode = async:vimproc needs vimproc.'
+  endif
+
+  let vimproc = vimproc#pgroup_open(join(a:commands, ' && '))
+  call vimproc.stdin.write(self.config.input)
+  call vimproc.stdin.close()
+
+  let self.result = ''
+  let self.vimproc = vimproc
+  let key = s:register(self)
+
+  " Create augroup.
+  augroup plugin-quickrun-vimproc
+  augroup END
+
+  " Wait a little because execution might end immediately.
+  sleep 50m
+  if s:recieve_vimproc_result(key)
+    return
+  endif
+  " Execution is continuing.
+  augroup plugin-quickrun-vimproc
+    execute 'autocmd! CursorHold,CursorHoldI * call'
+    \       's:recieve_vimproc_result(' . string(key) . ')'
+  augroup END
+  if a:0 && a:1 =~ '^\d\+$'
+    let self._option_updatetime = &updatetime
+    let &updatetime = a:1
+  endif
+endfunction
+
+
+
+function! s:recieve_vimproc_result(key)  " {{{2
+  let runner = get(s:runners, a:key)
+
+  let vimproc = runner.vimproc
+
+  if !vimproc.stdout.eof
+    let runner.result .= vimproc.stdout.read()
+  endif
+  if !vimproc.stderr.eof
+    let runner.result .= vimproc.stderr.read()
+  endif
+
+  if !(vimproc.stdout.eof && vimproc.stdout.eof)
+    call feedkeys(mode() ==# 'i' ? "\<C-g>\<ESC>" : "g\<ESC>", 'n')
+    return 0
+  endif
+
+  autocmd! plugin-quickrun-vimproc
+
+  call vimproc.waitpid()
+
+  call quickrun#_result(a:key, runner.result)
+  return 1
+endfunction
+
+
+
 function! s:Runner.run_async_remote(commands, ...)  " {{{2
   if !has('clientserver') || v:servername == ''
     throw 'runmode = async:remote needs +clientserver feature.'
@@ -569,14 +631,26 @@ endfunction
 
 
 " ----------------------------------------------------------------------------
-" Sweep the temporary files the keys starts with '_temp'.
+" Sweep the session.
 function! s:Runner.sweep()  " {{{2
+  " Remove temporary files.
   for file in filter(keys(self), 'v:val =~# "^_temp"')
     if filewritable(self[file])
       call delete(self[file])
     endif
     call remove(self, file)
   endfor
+
+  " Restore options.
+  for opt in filter(keys(self), 'v:val =~# "^_option_"')
+    let optname = matchstr(opt, '^_option_\zs.*')
+    if exists('+' . optname)
+      execute 'let'  '&' . optname '= self[opt]'
+    endif
+    call remove(self, opt)
+  endfor
+
+  " Sweep the execution of vimproc.
   if has_key(self, 'vimproc')
     try
       call self.vimproc.kill(15)
@@ -889,8 +963,8 @@ function! quickrun#complete(lead, cmd, pos)  " {{{2
       elseif opt ==# 'mode'
         let list = ['n', 'v', 'o']
       elseif opt ==# 'runmode'
-        let list = ['simple', 'async:remote', 'async:remote:vimproc',
-        \           'async:python']
+        let list = ['simple', 'async:vimproc', 'async:remote',
+        \           'async:remote:vimproc', 'async:python']
       end
       return filter(list, 'v:val =~ "^".a:lead')
     endif
