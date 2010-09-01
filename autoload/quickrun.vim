@@ -569,14 +569,26 @@ endfunction
 
 
 " ----------------------------------------------------------------------------
-" Sweep the temporary files the keys starts with '_temp'.
+" Sweep the session.
 function! s:Runner.sweep()  " {{{2
+  " Remove temporary files.
   for file in filter(keys(self), 'v:val =~# "^_temp"')
     if filewritable(self[file])
       call delete(self[file])
     endif
     call remove(self, file)
   endfor
+
+  " Restore options.
+  for opt in filter(keys(self), 'v:val =~# "^_option_"')
+    let optname = matchstr(opt, '^_option_\zs.*')
+    if exists('+' . optname)
+      execute 'let'  '&' . optname '= self[opt]'
+    endif
+    call remove(self, opt)
+  endfor
+
+  " Sweep the execution of vimproc.
   if has_key(self, 'vimproc')
     try
       call self.vimproc.kill(15)
