@@ -255,7 +255,7 @@ function! s:Runner.normalize()  " {{{2
     let input = config.input
     try
       let config.input = input[0] == '=' ? self.expand(input[1:])
-      \                                  : join(readfile(input), "\n")
+      \                                  : join(readfile(input, 'b'), "\n")
     catch
       throw 'Can not treat input: ' . v:exception
     endtry
@@ -359,7 +359,7 @@ function! s:Runner.execute(cmd)  " {{{2
     let in = config.input
     if in != ''
       let inputfile = tempname()
-      call writefile(split(in, "\n"), inputfile)
+      call writefile(split(in, "\n", 1), inputfile, 'b')
       let cmd .= ' <' . s:shellescape(inputfile)
     endif
 
@@ -475,7 +475,7 @@ function! s:Runner.run_async_remote(commands, ...)  " {{{2
   if in != ''
     let inputfile = tempname()
     let self._temp_input = inputfile
-    call writefile(split(in, "\n"), inputfile)
+    call writefile(split(in, "\n", 1), inputfile, 'b')
     let in = ' <' . s:shellescape(inputfile)
   endif
 
@@ -492,7 +492,7 @@ function! s:Runner.run_async_remote(commands, ...)  " {{{2
   endif
   call map(scriptbody, 's:iconv(v:val, &encoding, &termencoding)')
   let self._temp_script = script
-  call writefile(scriptbody, script)
+  call writefile(scriptbody, script, 'b')
 
   if a:0 && a:1 ==# 'vimproc' && s:available_vimproc
     if s:is_win
@@ -619,7 +619,7 @@ function! s:Runner.get_source_name()  " {{{2
       else
         let fname = self.expand(self.config.tempfile)
         let self._temp_source = fname
-        call writefile(split(src, "\n", 'b'), fname)
+        call writefile(split(src, "\n", 1), fname, 'b')
       endif
     elseif type(src) == type(0)
       let fname = expand('#'.src.':p')
@@ -826,7 +826,7 @@ function! s:Runner.output(result)  " {{{2
     if append && filereadable(out)
       let result = join(readfile(out, 'b'), "\n") . result
     endif
-    call writefile(split(result, "\n"), out, 'b')
+    call writefile(split(result, "\n", 1), out, 'b')
     echo printf('Output to %s: %d bytes', out, size)
   endif
 endfunction
@@ -991,7 +991,8 @@ function! quickrun#_result(key, ...)  " {{{2
     let result = a:1
   else
     let resfile = runner._temp_result
-    let result = filereadable(resfile) ? join(readfile(resfile), "\n") : ''
+    let result = filereadable(resfile) ? join(readfile(resfile, 'b'), "\n")
+    \                                  : ''
   endif
   call remove(s:runners, a:key)
   call runner.sweep()
