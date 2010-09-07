@@ -7,12 +7,141 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-let s:available_vimproc = exists('*vimproc#popen2')
+let s:available_vimproc = globpath(&runtimepath, 'autoload/vimproc.vim') != ''
 let s:is_win = has('win32') || has('win64')
+
+unlet! g:quickrun#default_config  " {{{1
+let g:quickrun#default_config = {
+\ '_': {
+\   'shebang': 1,
+\   'output': '',
+\   'append': 0,
+\   'runmode': 'simple',
+\   'args': '',
+\   'output_encode': '&fenc:&enc',
+\   'tempfile'  : '{tempname()}',
+\   'exec': '%c %s %a',
+\   'split': '{winwidth(0) * 2 < winheight(0) * 5 ? "" : "vertical"}',
+\   'into': 0,
+\   'eval': 0,
+\   'eval_template': '%s',
+\   'shellcmd': s:is_win ? 'silent !"%s" & pause' : '!%s',
+\   'running_mark': ':-)',
+\ },
+\ 'awk': {
+\   'exec': '%c -f %s %a',
+\ },
+\ 'bash': {},
+\ 'c':
+\   s:is_win && executable('cl') ? {
+\     'command': 'cl',
+\     'exec': ['%c %s /nologo /Fo%s:p:r.obj /Fe%s:p:r.exe > nul',
+\               '%s:p:r.exe %a', 'del %s:p:r.exe %s:p:r.obj'],
+\     'tempfile': '{tempname()}.c',
+\   } :
+\   executable('gcc') ? {
+\     'command': 'gcc',
+\     'exec': ['%c %s -o %s:p:r', '%s:p:r %a', 'rm -f %s:p:r'],
+\     'tempfile': '{tempname()}.c',
+\   } : {},
+\ 'cpp':
+\   s:is_win && executable('cl') ? {
+\     'command': 'cl',
+\     'exec': ['%c %s /nologo /Fo%s:p:r.obj /Fe%s:p:r.exe > nul',
+\               '%s:p:r.exe %a', 'del %s:p:r.exe %s:p:r.obj'],
+\     'tempfile': '{tempname()}.cpp',
+\   } :
+\   executable('g++') ? {
+\     'command': 'g++',
+\     'exec': ['%c %s -o %s:p:r', '%s:p:r %a', 'rm -f %s:p:r'],
+\     'tempfile': '{tempname()}.cpp',
+\   } : {},
+\ 'eruby': {
+\   'command': 'erb',
+\   'exec': '%c -T - %s %a',
+\ },
+\ 'go':
+\   $GOARCH ==# '386' ? {
+\     'exec':
+\       s:is_win ?
+\         ['8g %s', '8l -o %s:p:r.exe %s:p:r.8', '%s:p:r.exe %a', 'del /F %s:p:r.exe'] :
+\         ['8g %s', '8l -o %s:p:r %s:p:r.8', '%s:p:r %a', 'rm -f %s:p:r']
+\   } :
+\   $GOARCH ==# 'amd64' ? {
+\     'exec': ['6g %s', '6l -o %s:p:r %s:p:r.6', '%s:p:r %a', 'rm -f %s:p:r'],
+\   } :
+\   $GOARCH ==# 'arm' ? {
+\     'exec': ['5g %s', '5l -o %s:p:r %s:p:r.5', '%s:p:r %a', 'rm -f %s:p:r'],
+\   } : {},
+\ 'groovy': {
+\   'exec': '%c -c {&fenc==""?&enc:&fenc} %s %a',
+\ },
+\ 'haskell': {
+\   'command': 'runghc',
+\   'tempfile': '{tempname()}.hs',
+\   'eval_template': 'main = print $ %s',
+\ },
+\ 'java': {
+\   'exec': ['javac %s', '%c %s:t:r %a', ':call delete("%S:t:r.class")'],
+\   'output_encode': '&tenc:&enc',
+\ },
+\ 'javascript': {
+\   'command': executable('js') ? 'js':
+\              executable('jrunscript') ? 'jrunscript':
+\              executable('cscript') ? 'cscript': '',
+\   'tempfile': '{tempname()}.js',
+\ },
+\ 'llvm': {
+\   'command': 'llvm-as %s -o=- | lli - %a',
+\ },
+\ 'lua': {},
+\ 'dosbatch': {
+\   'command': '',
+\   'exec': 'call %s %a',
+\   'tempfile': '{tempname()}.bat',
+\ },
+\ 'io': {},
+\ 'ocaml': {},
+\ 'perl': {
+\   'eval_template': join([
+\     'use Data::Dumper',
+\     '$Data::Dumper::Terse = 1',
+\     '$Data::Dumper::Indent = 0',
+\     'print Dumper eval{%s}'], ';')
+\ },
+\ 'perl6': {'eval_template': '{%s}().perl.print'},
+\ 'python': {'eval_template': 'print(%s)'},
+\ 'php': {},
+\ 'r': {
+\   'command': 'R',
+\   'exec': '%c --no-save --slave %a < %s',
+\ },
+\ 'ruby': {'eval_template': " p proc {\n%s\n}.call"},
+\ 'scala': {
+\   'output_encode': '&tenc:&enc',
+\ },
+\ 'scheme': {
+\   'command': 'gosh',
+\   'exec': '%c %s:p %a',
+\   'eval_template': '(display (begin %s))',
+\ },
+\ 'sed': {},
+\ 'sh': {},
+\ 'vim': {
+\   'command': ':source',
+\   'exec': '%c %s',
+\   'eval_template': "echo %s",
+\   'runmode': 'simple',
+\ },
+\ 'zsh': {},
+\}
+lockvar! g:quickrun#default_config
+
+
 
 let s:runners = {}  " Store for running runners.
 
-let s:Runner = {}
+let s:Runner = {}  " {{{1
 
 
 
@@ -63,7 +192,7 @@ endfunction
 
 
 
-function! s:Runner.set_options_from_arglist(arglist)
+function! s:Runner.set_options_from_arglist(arglist)  " {{{2
   let config = {}
   let option = ''
   for arg in a:arglist
@@ -107,17 +236,15 @@ function! s:Runner.normalize()  " {{{2
     let config.mode = histget(':') =~# "^'<,'>\\s*Q\\%[uickRun]" ? 'v' : 'n'
   endif
 
-  if exists('b:quickrun_config')
-    call extend(config, b:quickrun_config, 'keep')
-  endif
-
-  let config.type = get(config, 'type', &filetype)
-
+  let type = {"type": &filetype}
   for c in [
+  \ 'b:quickrun_config',
+  \ 'type',
   \ 'g:quickrun_config[config.type]',
-  \ 'g:quickrun_default_config[config.type]',
+  \ 'g:quickrun#default_config[config.type]',
+  \ 'g:quickrun_config["_"]',
   \ 'g:quickrun_config["*"]',
-  \ 'g:quickrun_default_config["*"]'
+  \ 'g:quickrun#default_config["_"]',
   \ ]
     if exists(c)
       call extend(config, eval(c), 'keep')
@@ -128,7 +255,7 @@ function! s:Runner.normalize()  " {{{2
     let input = config.input
     try
       let config.input = input[0] == '=' ? self.expand(input[1:])
-      \                                  : join(readfile(input), "\n")
+      \                                  : join(readfile(input, 'b'), "\n")
     catch
       throw 'Can not treat input: ' . v:exception
     endtry
@@ -140,7 +267,8 @@ function! s:Runner.normalize()  " {{{2
   let config.start = get(config, 'start', 1)
   let config.end = get(config, 'end', line('$'))
 
-  if self.config.output == '!'
+  let config.output = self.expand(config.output)
+  if config.output == '!'
     let config.runmode = 'simple'
   endif
 
@@ -231,7 +359,7 @@ function! s:Runner.execute(cmd)  " {{{2
     let in = config.input
     if in != ''
       let inputfile = tempname()
-      call writefile(split(in, "\n"), inputfile)
+      call writefile(split(in, "\n", 1), inputfile, 'b')
       let cmd .= ' <' . s:shellescape(inputfile)
     endif
 
@@ -250,7 +378,7 @@ endfunction
 
 
 
-function! s:Runner.run_async(commands, ...)
+function! s:Runner.run_async(commands, ...)  " {{{2
   let [type; args] = a:000
   if !has_key(self, 'run_async_' . type)
     throw 'Unknown async type: ' . type
@@ -260,7 +388,69 @@ endfunction
 
 
 
-function! s:Runner.run_async_remote(commands, ...)
+function! s:Runner.run_async_vimproc(commands, ...)  " {{{2
+  if !s:available_vimproc
+    throw 'runmode = async:vimproc needs vimproc.'
+  endif
+
+  let vimproc = vimproc#pgroup_open(join(a:commands, ' && '))
+  call vimproc.stdin.write(self.config.input)
+  call vimproc.stdin.close()
+
+  let self.result = ''
+  let self.vimproc = vimproc
+  let key = s:register(self)
+
+  " Create augroup.
+  augroup plugin-quickrun-vimproc
+  augroup END
+
+  " Wait a little because execution might end immediately.
+  sleep 50m
+  if s:recieve_vimproc_result(key)
+    return
+  endif
+  " Execution is continuing.
+  augroup plugin-quickrun-vimproc
+    execute 'autocmd! CursorHold,CursorHoldI * call'
+    \       's:recieve_vimproc_result(' . string(key) . ')'
+  augroup END
+  if a:0 && a:1 =~ '^\d\+$'
+    let self._option_updatetime = &updatetime
+    let &updatetime = a:1
+  endif
+endfunction
+
+
+
+function! s:recieve_vimproc_result(key)  " {{{2
+  let runner = get(s:runners, a:key)
+
+  let vimproc = runner.vimproc
+
+  if !vimproc.stdout.eof
+    let runner.result .= vimproc.stdout.read()
+  endif
+  if !vimproc.stderr.eof
+    let runner.result .= vimproc.stderr.read()
+  endif
+
+  if !(vimproc.stdout.eof && vimproc.stdout.eof)
+    call feedkeys(mode() ==# 'i' ? "\<C-g>\<ESC>" : "g\<ESC>", 'n')
+    return 0
+  endif
+
+  autocmd! plugin-quickrun-vimproc
+
+  call vimproc.waitpid()
+
+  call quickrun#_result(a:key, runner.result)
+  return 1
+endfunction
+
+
+
+function! s:Runner.run_async_remote(commands, ...)  " {{{2
   if !has('clientserver') || v:servername == ''
     throw 'runmode = async:remote needs +clientserver feature.'
   endif
@@ -269,23 +459,23 @@ function! s:Runner.run_async_remote(commands, ...)
   endif
   let selfvim = s:is_win ? split($PATH, ';')[-1] . '\vim.exe' :
   \             !empty($_) ? $_ : v:progname
-  let key = has('reltime') ? reltimestr(reltime()) : string(localtime())
+
+  let key = s:register(self)
+  let expr = printf('quickrun#_result(%s)', string(key))
+
   let outfile = tempname()
   let self._temp_result = outfile
-  let expr = printf('quickrun#_result(%s)', string(key))
   let cmds = a:commands
   let callback = s:make_command(
   \        [selfvim, '--servername', v:servername, '--remote-expr', expr])
 
   call map(cmds, 's:conv_vim2remote(selfvim, v:val)')
 
-  let s:runners[key] = self
-
   let in = self.config.input
   if in != ''
     let inputfile = tempname()
     let self._temp_input = inputfile
-    call writefile(split(in, "\n"), inputfile)
+    call writefile(split(in, "\n", 1), inputfile, 'b')
     let in = ' <' . s:shellescape(inputfile)
   endif
 
@@ -302,7 +492,7 @@ function! s:Runner.run_async_remote(commands, ...)
   endif
   call map(scriptbody, 's:iconv(v:val, &encoding, &termencoding)')
   let self._temp_script = script
-  call writefile(scriptbody, script)
+  call writefile(scriptbody, script, 'b')
 
   if a:0 && a:1 ==# 'vimproc' && s:available_vimproc
     if s:is_win
@@ -318,6 +508,55 @@ function! s:Runner.run_async_remote(commands, ...)
       silent! execute '!sh' script '&'
     endif
   endif
+endfunction
+
+
+
+if has('python')
+python <<EOM
+import vim, threading, subprocess, re
+
+class QuickRun(threading.Thread):
+    def __init__(self, cmds, key, iswin):
+        threading.Thread.__init__(self)
+        self.cmds = cmds
+        self.key = key
+        self.iswin = iswin
+
+    def run(self):
+        result = ''
+        try:
+            for cmd in self.cmds:
+                result += self.execute(cmd)
+        except:
+            pass
+        finally:
+            if self.iswin:
+                result = result.replace("\r\n", "\n")
+            vim.eval("quickrun#_result(%s, %s)" %
+              (self.key, self.vimstr(result)))
+
+    def execute(self, cmd):
+        if re.match('^\s*:', cmd):
+            return vim.eval("quickrun#execute(%s)" % self.vimstr(cmd))
+        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
+        result = p.stdout.read()
+        p.wait()
+        return result
+
+    def vimstr(self, s):
+        return "'" + s.replace("'", "''") + "'"
+EOM
+endif
+
+function! s:Runner.run_async_python(commands, ...)  " {{{2
+  if !has('python')
+    throw 'runmode = async:python needs +python feature.'
+  endif
+  let l:key = string(s:register(self))
+  python QuickRun(vim.eval('a:commands'),
+  \               vim.eval('l:key'),
+  \               int(vim.eval('s:is_win'))).start()
 endfunction
 
 
@@ -357,7 +596,7 @@ endfunction
 
 " ----------------------------------------------------------------------------
 " Detect the shebang, and return the shebang command if it exists.
-function! s:Runner.detect_shebang()
+function! s:Runner.detect_shebang()  " {{{2
   let src = self.config.src
   let line = type(src) == type('') ? matchstr(src, '^.\{-}\ze\(\n\|$\)'):
   \          type(src) == type(0)  ? getbufline(src, 1)[0]:
@@ -380,7 +619,7 @@ function! s:Runner.get_source_name()  " {{{2
       else
         let fname = self.expand(self.config.tempfile)
         let self._temp_source = fname
-        call writefile(split(src, "\n", 'b'), fname)
+        call writefile(split(src, "\n", 1), fname, 'b')
       endif
     elseif type(src) == type(0)
       let fname = expand('#'.src.':p')
@@ -392,14 +631,26 @@ endfunction
 
 
 " ----------------------------------------------------------------------------
-" Sweep the temporary files the keys starts with '_temp'.
-function! s:Runner.sweep()
+" Sweep the session.
+function! s:Runner.sweep()  " {{{2
+  " Remove temporary files.
   for file in filter(keys(self), 'v:val =~# "^_temp"')
     if filewritable(self[file])
       call delete(self[file])
     endif
     call remove(self, file)
   endfor
+
+  " Restore options.
+  for opt in filter(keys(self), 'v:val =~# "^_option_"')
+    let optname = matchstr(opt, '^_option_\zs.*')
+    if exists('+' . optname)
+      execute 'let'  '&' . optname '= self[opt]'
+    endif
+    call remove(self, opt)
+  endfor
+
+  " Sweep the execution of vimproc.
   if has_key(self, 'vimproc')
     try
       call self.vimproc.kill(15)
@@ -505,7 +756,10 @@ function! s:Runner.expand(str)  " {{{2
         let e = matchend(rest, '\\\@<!}')
         let expr = substitute(rest[1 : e - 2], '\\}', '}', 'g')
       endif
-      let result .= eval(expr)
+      try
+        let result .= eval(expr)
+      catch
+      endtry
       let rest = rest[e :]
     endif
   endwhile
@@ -572,7 +826,7 @@ function! s:Runner.output(result)  " {{{2
     if append && filereadable(out)
       let result = join(readfile(out, 'b'), "\n") . result
     endif
-    call writefile(split(result, "\n"), out, 'b')
+    call writefile(split(result, "\n", 1), out, 'b')
     echo printf('Output to %s: %d bytes', out, size)
   endif
 endfunction
@@ -586,8 +840,9 @@ function! s:Runner.open_result_window()  " {{{2
   if !exists('s:bufnr')
     let s:bufnr = -1  " A number that doesn't exist.
   endif
+  let sp = self.expand(self.config.split)
   if !bufexists(s:bufnr)
-    execute self.expand(self.config.split) 'split'
+    execute sp 'split'
     edit `='[quickrun output]'`
     let s:bufnr = bufnr('%')
     nnoremap <buffer> q <C-w>c
@@ -596,7 +851,8 @@ function! s:Runner.open_result_window()  " {{{2
   elseif bufwinnr(s:bufnr) != -1
     execute bufwinnr(s:bufnr) 'wincmd w'
   else
-    execute 'sbuffer' s:bufnr
+    execute sp 'split'
+    execute 'buffer' s:bufnr
   endif
   if exists('b:quickrun_running_mark') && b:quickrun_running_mark
     silent undo
@@ -617,7 +873,7 @@ endfunction
 
 
 
-function! s:conv_vim2remote(selfvim, cmd)
+function! s:conv_vim2remote(selfvim, cmd)  " {{{2
   if a:cmd !~ '^\s*:'
     return a:cmd
   endif
@@ -628,14 +884,14 @@ endfunction
 
 
 
-function! s:make_command(args)
+function! s:make_command(args)  " {{{2
   return join([shellescape(a:args[0])] +
   \           map(a:args[1 :], 's:shellescape(v:val)'), ' ')
 endfunction
 
 
 
-function! s:shellescape(str)
+function! s:shellescape(str)  " {{{2
   if s:is_win
     let str = substitute(a:str, '[&|<>()^"%]', '^\0', 'g')
     let str = substitute(str, '\\\+\ze"', '\=repeat(submatch(0), 2)', 'g')
@@ -643,6 +899,13 @@ function! s:shellescape(str)
     return '^"' . str . '^"'
   endif
   return shellescape(a:str)
+endfunction
+
+
+function! s:register(runner)  " {{{2
+  let key = has('reltime') ? reltimestr(reltime()) : string(localtime())
+  let s:runners[key] = a:runner
+  return key
 endfunction
 
 
@@ -700,7 +963,8 @@ function! quickrun#complete(lead, cmd, pos)  " {{{2
       elseif opt ==# 'mode'
         let list = ['n', 'v', 'o']
       elseif opt ==# 'runmode'
-        let list = ['simple', 'async:remote', 'async:remote:vimproc']
+        let list = ['simple', 'async:vimproc', 'async:remote',
+        \           'async:remote:vimproc', 'async:python']
       end
       return filter(list, 'v:val =~ "^".a:lead')
     endif
@@ -712,19 +976,24 @@ function! quickrun#complete(lead, cmd, pos)  " {{{2
     return filter(options, 'v:val =~ "^".head')
   end
   let types = keys(extend(exists('g:quickrun_config') ?
-  \                copy(g:quickrun_config) : {}, g:quickrun_default_config))
-  return filter(types, 'v:val != "*" && v:val =~ "^".a:lead')
+  \                copy(g:quickrun_config) : {}, g:quickrun#default_config))
+  return filter(types, 'v:val !~ "^[_*]$" && v:val =~ "^".a:lead')
 endfunction
 
 
 
-function! quickrun#_result(key)
+function! quickrun#_result(key, ...)  " {{{2
   if !has_key(s:runners, a:key)
     return ''
   endif
   let runner = s:runners[a:key]
-  let resfile = runner._temp_result
-  let result = filereadable(resfile) ? join(readfile(resfile), "\n") : ''
+  if a:0
+    let result = a:1
+  else
+    let resfile = runner._temp_result
+    let result = filereadable(resfile) ? join(readfile(resfile, 'b'), "\n")
+    \                                  : ''
+  endif
   call remove(s:runners, a:key)
   call runner.sweep()
   call runner.output(result)
@@ -734,7 +1003,7 @@ endfunction
 
 
 " Execute commands by expr.  This is used by remote_expr()
-function! quickrun#execute(...)
+function! quickrun#execute(...)  " {{{2
   " XXX: Can't get a result if a:cmd contains :redir command.
   let result = ''
   redir => result

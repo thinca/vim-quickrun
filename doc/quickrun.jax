@@ -166,7 +166,7 @@ input (*)				*quickrun-option-input*
 			この場合のみ文字列は |quickrun-syntax-option| で展開さ
 			れます。
 
-output					*quickrun-option-output*
+output (*)				*quickrun-option-output*
 			結果の出力方法を指定します。
 			- 空文字列を指定すると、出力専用バッファを開いてそこへ
 			  出力します。このバッファは同じものが再利用されます。
@@ -191,10 +191,19 @@ runmode					*quickrun-option-runmode*
 			- "simple"
 			  単純に |system()| や |:!|(output が ":" の場合) を
 			  使って実行します。デフォルトではこのモードです。
+			- "async:vimproc[:{updatetime}]"
+			  {|vimproc| と |vimshell| が必要}
+			  |vimproc| を使ってコマンドをバックグラウンドで実行し
+			  ます。実行の完了を |CursorHold| と |CursorHoldI| イ
+			  ベントを使って検査します。オプションの値として
+			  {updatetime} を指定すると一時的に 'updatetime' を変
+			  更します。50 ミリ秒以内に実行が終了 した場合は、即座
+			  に結果を表示します。
 			- "async:remote"
 			  {|+clientserver| が必要}
 			  コマンドをバックグラウンドで実行し、終了を
-			  |+clientserver| 機能を利用して通知し結果を表示します。
+			  |+clientserver| 機能を利用して通知し結果を表示しま
+			  す。
 			  |v:servername| が設定されている必要があります。ない
 			  場合は、|--servername| オプションを使って Vim を起動
 			  してください。
@@ -209,6 +218,13 @@ runmode					*quickrun-option-runmode*
 			  セルされます。
 			  |vimproc| がインストールされていない場合は通常と同じ
 			  ように実行します。
+			- "async:python"
+			  {|+python| が必要}
+			  |python| のスレッドを利用してコマンドを非同期実行し
+			  ます。
+			  警告: これは非常に不安定です。
+			  警告: X11 環境では使用しないでください。Vim がクラッ
+			  シュします。
 
 split (*)				*quickrun-option-split*
 			出力専用バッファを開く際の補助コマンドを指定します。バ
@@ -284,8 +300,9 @@ running_mark (*)			*quickrun-option-running_mark*
 	&{fileencoding}
 	$PATH
 	{expr}
-{}を使用すると中身は |eval()| によって評価されます。展開を避けたい場合は、展開
-される部分を \ でエスケープしてください。
+{}を使用すると中身は |eval()| によって評価されます。評価中にエラーが発生した場
+合は空文字列に置き換えられます。展開を避けたい場合は、展開される部分を \ でエ
+スケープしてください。
 
 
 ------------------------------------------------------------------------------
@@ -334,7 +351,7 @@ exec を展開した結果先頭の文字が ":" だった場合、Vim のコマ
 二層構造の辞書を指定します。
 {type} はコマンドラインから |quickrun-option-type| で指定される値です。未指定の
 場合は 'filetype' が使用されます。
-特殊なタイプ名 '*' には全ての {type} のデフォルト値を指定できます。
+特殊なタイプ名 "_" と "*" には全ての {type} のデフォルト値を指定できます。
 
 全体共通の設定よりタイプ毎の設定が、タイプ毎の設定よりコマンドで指定された引数
 が優先されます。
@@ -343,9 +360,9 @@ exec を展開した結果先頭の文字が ":" だった場合、Vim のコマ
 す。その際に (.vimrc などで) すでに定義されていた場合は、デフォルト値に既存値
 を上書きする形で初期化されます。
 
-標準の設定					*g:quickrun_default_config*
+標準の設定					*g:quickrun#default_config*
 ----------
-|g:quickrun_default_config| には標準的なデフォルトの設定が入っています。これ
+|g:quickrun#default_config| には標準的なデフォルトの設定が入っています。これ
 は |g:quickrun_config| と同じ構造になっています。
 |quickrun-options| に記載されているデフォルト値は実際にはこの変数のデフォルト
 値です。通常はユーザがこの値を操作する必要はありません。
@@ -362,9 +379,10 @@ exec を展開した結果先頭の文字が ":" だった場合、Vim のコマ
 1. コマンドラインで指定された値
 2. |b:quickrun_config|
 3. |g:quickrun_config| の {type}
-4. |g:quickrun_default_config| の {type}
-5. |g:quickrun_config| の '*'
-6. |g:quickrun_default_config| の '*'
+4. |g:quickrun#default_config| の {type}
+5. |g:quickrun_config| の '_'
+6. |g:quickrun_config| の '*'
+7. |g:quickrun#default_config| の '_'
 
 1 や 2 で {type} を設定しておくことで 3 で通常とは別の {type} を参照できます。
 
@@ -372,6 +390,14 @@ exec を展開した結果先頭の文字が ":" だった場合、Vim のコマ
 
 ==============================================================================
 更新履歴					*quickrun-changelog*
+
+x.x.x	xxxx-xx-xx
+	- デフォルトのタイプ名に "_" を追加。
+	  - "*" は互換性のために残してある。
+	- |quickrun-option-split| が 2 回目以降効かなくなるバグを修正。
+	- g:quickrun_default_config を |g:quickrun#default_config| に変更。
+	- |quickrun-option-runmode| の値に "async:python" を追加。
+	- <Leader>r を定義する前に |hasmapto()| をチェックするようにした。
 
 0.4.1	2010-02-25
 	- 結果のファイルへの書き出しのファイル名が 1 文字になるバグを修正。
