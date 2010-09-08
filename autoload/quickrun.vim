@@ -442,6 +442,8 @@ function! s:recieve_vimproc_result(key)  " {{{2
 
   autocmd! plugin-quickrun-vimproc
 
+  call vimproc.stdout.close()
+  call vimproc.stderr.close()
   call vimproc.waitpid()
 
   call quickrun#_result(a:key, runner.result)
