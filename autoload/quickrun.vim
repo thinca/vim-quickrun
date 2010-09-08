@@ -435,7 +435,7 @@ function! s:recieve_vimproc_result(key)  " {{{2
     let runner.result .= vimproc.stderr.read()
   endif
 
-  if !(vimproc.stdout.eof && vimproc.stdout.eof)
+  if !(vimproc.stdout.eof && vimproc.stderr.eof)
     call feedkeys(mode() ==# 'i' ? "\<C-g>\<ESC>" : "g\<ESC>", 'n')
     return 0
   endif
