@@ -416,6 +416,7 @@ function! s:Runner.run_async_vimproc(commands, ...)  " {{{2
     execute 'autocmd! CursorHold,CursorHoldI * call'
     \       's:recieve_vimproc_result(' . string(key) . ')'
   augroup END
+  let self._autocmd_vimproc = 'vimproc'
   if a:0 && a:1 =~ '^\d\+$'
     let self._option_updatetime = &updatetime
     let &updatetime = a:1
@@ -440,8 +441,6 @@ function! s:recieve_vimproc_result(key)  " {{{2
     call feedkeys(mode() ==# 'i' ? "\<C-g>\<ESC>" : "g\<ESC>", 'n')
     return 0
   endif
-
-  autocmd! plugin-quickrun-vimproc
 
   call vimproc.stdout.close()
   call vimproc.stderr.close()
@@ -651,6 +650,12 @@ function! s:Runner.sweep()  " {{{2
       execute 'let'  '&' . optname '= self[opt]'
     endif
     call remove(self, opt)
+  endfor
+
+  " Delete autocmds.
+  for cmd in filter(keys(self), 'v:val =~# "^_autocmd_"')
+    execute 'autocmd!' 'plugin-quickrun-' . self[cmd]
+    call remove(self, cmd)
   endfor
 
   " Sweep the execution of vimproc.
