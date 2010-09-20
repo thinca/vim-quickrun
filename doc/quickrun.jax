@@ -396,7 +396,9 @@ x.x.x	xxxx-xx-xx
 	  - "*" は互換性のために残してある。
 	- |quickrun-option-split| が 2 回目以降効かなくなるバグを修正。
 	- g:quickrun_default_config を |g:quickrun#default_config| に変更。
-	- |quickrun-option-runmode| の値に "async:python" を追加。
+	- |quickrun-option-runmode| に以下の値を追加。
+	  - "async:vimproc"
+	  - "async:python"
 	- <Leader>r を定義する前に |hasmapto()| をチェックするようにした。
 
 0.4.1	2010-02-25
