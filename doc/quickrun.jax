@@ -188,6 +188,7 @@ append					*quickrun-option-append*
 runmode					*quickrun-option-runmode*
 			実行モードを指定します。以下のうちのいずれかを指定しま
 			す。
+			NOTE: "simple" 以外は不安定な場合があります。
 			- "simple"
 			  単純に |system()| や |:!|(output が ":" の場合) を
 			  使って実行します。デフォルトではこのモードです。
@@ -274,12 +275,10 @@ shellcmd				*quickrun-option-shellcmd*
 			'silent !"%s" & pause' それ以外の場合は '!%s' です。
 
 eval					*quickrun-option-eval*
-			*** 実験的な機能 ***
 			0 以外が指定された場合、src を eval_template に埋め込
 			んで置き変えます。
 
 eval_template				*quickrun-option-eval_template*
-			*** 実験的な機能 ***
 			eval が指定された際に使用されるテンプレート文字列で
 			す。テンプレート内の %s が src に置き変えられます。
 
