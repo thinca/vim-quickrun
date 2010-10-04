@@ -541,7 +541,10 @@ class QuickRun(threading.Thread):
     def execute(self, cmd):
         if re.match('^\s*:', cmd):
             return vim.eval("quickrun#execute(%s)" % self.vimstr(cmd))
-        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
+        p = subprocess.Popen(cmd,
+                             stdout=subprocess.PIPE,
+                             stderr=subprocess.STDOUT,
+                             shell=True)
         result = p.stdout.read()
         p.wait()
         return result
