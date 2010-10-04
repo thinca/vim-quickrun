@@ -519,10 +519,11 @@ python <<EOM
 import vim, threading, subprocess, re
 
 class QuickRun(threading.Thread):
-    def __init__(self, cmds, key, iswin):
+    def __init__(self, cmds, key, input, iswin):
         threading.Thread.__init__(self)
         self.cmds = cmds
         self.key = key
+        self.input = input
         self.iswin = iswin
 
     def run(self):
@@ -542,9 +543,12 @@ class QuickRun(threading.Thread):
         if re.match('^\s*:', cmd):
             return vim.eval("quickrun#execute(%s)" % self.vimstr(cmd))
         p = subprocess.Popen(cmd,
+                             stdin=subprocess.PIPE,
                              stdout=subprocess.PIPE,
                              stderr=subprocess.STDOUT,
                              shell=True)
+        p.stdin.write(self.input)
+        p.stdin.close()
         result = p.stdout.read()
         p.wait()
         return result
@@ -559,8 +563,10 @@ function! s:Runner.run_async_python(commands, ...)  " {{{2
     throw 'runmode = async:python needs +python feature.'
   endif
   let l:key = string(s:register(self))
+  let l:input = self.config.input
   python QuickRun(vim.eval('a:commands'),
   \               vim.eval('l:key'),
+  \               vim.eval('l:input'),
   \               int(vim.eval('s:is_win'))).start()
 endfunction
 
