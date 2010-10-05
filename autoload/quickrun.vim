@@ -896,7 +896,7 @@ endfunction
 
 
 function! s:Runner.shellescape(str)  " {{{2
-  if self.config.runmode ==# 'async:vimproc'
+  if self.config.runmode =~# '^async:vimproc\%(:\d\+\)\?$'
     return "'" . substitute(a:str, '\\', '/', 'g') . "'"
   elseif s:is_win
     return '^"' . substitute(substitute(substitute(a:str,
