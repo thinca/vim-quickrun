@@ -534,8 +534,6 @@ class QuickRun(threading.Thread):
         except:
             pass
         finally:
-            if self.iswin:
-                result = result.replace("\r\n", "\n")
             vim.eval("quickrun#_result(%s, %s)" %
               (self.key, self.vimstr(result)))
 
@@ -1014,6 +1012,13 @@ function! quickrun#_result(key, ...)  " {{{2
     let result = filereadable(resfile) ? join(readfile(resfile, 'b'), "\n")
     \                                  : ''
   endif
+
+  if has('mac')
+    let result = substitute(result, '\r', '\n', 'g')
+  elseif s:is_win
+    let result = substitute(result, '\r\n', '\n', 'g')
+  endif
+
   call remove(s:runners, a:key)
   call runner.sweep()
   call runner.output(result)
