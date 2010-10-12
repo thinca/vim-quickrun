@@ -1,5 +1,5 @@
 " Launch the registered command in quickly.
-" Version: 0.1.0.1
+" Version: 0.1.1
 " Author : thinca <thinca+vim@gmail.com>
 " License: Creative Commons Attribution 2.1 Japan License
 "          <http://creativecommons.org/licenses/by/2.1/jp/deed.en>
@@ -58,11 +58,15 @@ endfunction
 
 function! s:define_default_key_mappings()
   for i in range(10)
-    execute 'silent! nmap <unique> <Leader>' . i
-    \                        '<Plug>(quicklaunch-' . i . ')'
+    if !hasmapto('<Plug>(quicklaunch-' . i . ')', 'n')
+      execute 'silent! nmap <unique> <Leader>' . i
+      \                        '<Plug>(quicklaunch-' . i . ')'
+    endif
   endfor
 
-  silent! nmap <unique> <Leader>l <Plug>(quicklaunch-list)
+  if !hasmapto('<Plug>(quicklaunch-list)', 'n')
+    silent! nmap <unique> <Leader>l <Plug>(quicklaunch-list)
+  endif
 endfunction
 
 
