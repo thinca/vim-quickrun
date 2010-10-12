@@ -1,6 +1,6 @@
 *quicklaunch.txt*	登録しておいたコマンドを素早く実行します。
 
-Version: 0.1.0.1
+Version: 0.1.1
 Author : thinca <thinca+vim@gmail.com>
 License: クリエイティブ・コモンズの表示 2.1 日本ライセンス
          <http://creativecommons.org/licenses/by/2.1/jp/>
@@ -81,7 +81,7 @@ g:quicklaunch_no_default_key_mappings に 1 が設定されていると定義さ
 ==============================================================================
 更新履歴					*quicklaunch-changelog*
 
-x.x.x	xxxx-xx-xx
+0.1.1	2010-10-12
 	- <Leader> 系のマッピングを定義する前に |hasmapto()| をチェックするよ
 	  うにした。
 
