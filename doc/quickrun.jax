@@ -393,12 +393,15 @@ exec を展開した結果先頭の文字が ":" だった場合、Vim のコマ
 x.x.x	xxxx-xx-xx
 	- デフォルトのタイプ名に "_" を追加。
 	  - "*" は互換性のために残してある。
+	- デフォルトの設定に perl6 を追加。
+	- |quickrun-option-output| を展開するようにした。
 	- |quickrun-option-split| が 2 回目以降効かなくなるバグを修正。
 	- g:quickrun_default_config を |g:quickrun#default_config| に変更。
 	- |quickrun-option-runmode| に以下の値を追加。
 	  - "async:vimproc"
 	  - "async:python"
 	- <Leader>r を定義する前に |hasmapto()| をチェックするようにした。
+	- ファイルの読み書きを改善。
 
 0.4.1	2010-02-25
 	- 結果のファイルへの書き出しのファイル名が 1 文字になるバグを修正。
