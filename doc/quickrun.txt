@@ -169,7 +169,7 @@ input (*)				*quickrun-option-input*
 			In this case, continued string is expanded
 			by |quickrun-syntax-option|
 
-output					*quickrun-option-output*
+output (*)					*quickrun-option-output*
 			Output format.
 			- If you specify empty string, quickrun opens output
 			  buffer and displays to the output buffer.
@@ -192,9 +192,18 @@ append					*quickrun-option-append*
 
 runmode					*quickrun-option-runmode*
 			This value is one of the followings:
+			NOTE: other choices except "simple" may be unstable.
 			- "simple"
 			  Use |system()| or (when output is ":") |:!|
 			  for execute. This is default value.
+			- "async:vimproc[:{updatetime}]"
+			  {You need |vimproc| and |vimshell|}
+			  Run command asynchronously using |vimproc|.
+			  Polling the process exit with |CursorHold| and |CursorHoldI|.
+			  If optional argument {updatetime} is given,
+			  change 'updatetime' value while the process lives.
+			  If the process exits within 50 milliseconds,
+			  shows the result instantly.
 			- "async:remote"
 			  {You need Vim compiled with |+clientserver|}
 			  Execute commands in background.
@@ -213,6 +222,12 @@ runmode					*quickrun-option-runmode*
 			  old command will be canceled.
 			  If you have not installed |vimproc|,
 			  behave like "simple".
+			- "async:python"
+			  {You need |+python|}
+			  Run command asynchronously using Python's thread.
+			  NOTE: this is unstable.
+			  NOTE: Do not use under X11 environment.
+			  Vim probably segfaults.
 
 split (*)				*quickrun-option-split*
 			Helper command to open output buffer.
@@ -263,12 +278,10 @@ shellcmd				*quickrun-option-shellcmd*
 			Otherwise '!%s'.
 
 eval					*quickrun-option-eval*
-			*** EXPERIMENTAL ***
 			If this value is not 0, quickrun substitutes src
 			embedding to eval_template.
 
 eval_template				*quickrun-option-eval_template*
-			*** EXPERIMENTAL ***
 			Template for eval.
 			quickrun substitutes %s with src.
 
@@ -291,6 +304,7 @@ e.g.: >
 	$PATH
 	{expr}
 {expr} is evaluated using |eval()|.
+If an error occurred, it is replaced by empty string.
 If you want to avoid evaluation, you need to escape with \ .
 
 
@@ -343,22 +357,22 @@ And |g:quickrun_config| is |Dictionary| whose key is {type},
 and its value is "Default Value".
 {type} is option value given as |quickrun-option-type| from command-line.
 If it is not specified, current 'filetype' is used instead.
-Special {type} '*' has default values for all unspecified keys by each
+Special {type} '_' and '*' has default values for all unspecified keys by each
 "Default value".
 
 Options given by command-line has higher priority than {type} specific
 settings.
 And {type} specific settings has higher priority than {type} '*' settings,
 
-|g:quickrun_config|'s default value (it is |g:quickrun_default_config|)
+|g:quickrun_config|'s default value (it is |g:quickrun#default_config|)
 is initialized when quickrun is loaded.
 At that time, (for e.g., in  your .vimrc) If it is defined,
 quickrun overwrites default value with your value.
 
 
-Default settings				*g:quickrun_default_config*
+Default settings				*g:quickrun#default_config*
 ----------
-|g:quickrun_default_config| has default settings
+|g:quickrun#default_config| has default settings
 which has same structure as |g:quickrun_config|.
 Default values on |quickrun-options| are actually this value.
 Usually you don't have to care this variable.
@@ -376,9 +390,10 @@ Here is the order to have higher priorities.
 1. Options given by command-line
 2. |b:quickrun_config|
 3. |g:quickrun_config|'s {type}
-4. |g:quickrun_default_config|'s {type}
+4. |g:quickrun#default_config|'s {type}
+5. |g:quickrun_config|'s '_'
 5. |g:quickrun_config|'s '*'
-6. |g:quickrun_default_config|'s '*'
+6. |g:quickrun#default_config|'s '*'
 
 
 
