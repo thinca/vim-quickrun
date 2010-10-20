@@ -13,7 +13,7 @@ INTRODUCTION			|quickrun-introduction|
 INTERFACE			|quickrun-interface|
   COMMANDS			  |quickrun-commands|
   FUNCTIONS			  |quickrun-functions|
-  KEY MAPPINGS			  |quickrun-keymappings|
+  KEY MAPPINGS			  |quickrun-key-mappings|
 OPTIONS				|quickrun-options|
   OPTION SYNTAX			  |quickrun-syntax-option|
   FORMAT OF EXEC		  |quickrun-exec-format|
@@ -112,7 +112,7 @@ QuickRun({type})				*QuickRun()*
 
 
 ------------------------------------------------------------------------------
-KEY MAPPINGS					*quickrun-keymappings*
+KEY MAPPINGS					*quickrun-key-mappings*
 
 <Plug>(quickrun-op)				*<Plug>(quickrun-op)*
 			Execute next motion's range.
