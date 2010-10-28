@@ -970,7 +970,7 @@ endfunction
 
 
 function! quickrun#complete(lead, cmd, pos)  " {{{2
-  let line = split(a:cmd[:a:pos], '', 1)
+  let line = split(a:cmd[:a:pos - 1], '', 1)
   let head = line[-1]
   if 2 <= len(line) && line[-2] =~ '^-'
     let opt = line[-2][1:]
