@@ -251,8 +251,9 @@ mode					*quickrun-option-mode*
 				vnoremap <silent> <F5> :QuickRun -mode v<CR>
 
 output_encode (*)			*quickrun-option-output_encode*
-			出力の文字コードを変換したい場合に、 "from:to" の形式
-			で指定します。
+			出力の文字コードを変換したい場合に、"from:to" の形式
+			で指定します。":to" は省略できます。その場合、
+			"from:&enc" と解釈されます。
 			デフォルトは "&fenc:&enc" です。
 
 shebang					*quickrun-option-shebang*
@@ -392,6 +393,7 @@ exec を展開した結果先頭の文字が ":" だった場合、Vim のコマ
 
 x.x.x	xxxx-xx-xx
 	- コマンドラインの補完を改善。
+	- |quickrun-option-output_encode| の ":to" を省略できるようにした。
 
 0.4.2	2010-10-12
 	- デフォルトのタイプ名に "_" を追加。

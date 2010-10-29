@@ -791,6 +791,9 @@ function! s:Runner.output(result)  " {{{2
   let result = a:result
   if get(config, 'output_encode', '') != ''
     let enc = split(self.expand(config.output_encode), '[^[:alnum:]-_]')
+    if len(enc) == 1
+      let enc += [&encoding]
+    endif
     if len(enc) == 2
       let [from, to] = enc
       let result = s:iconv(result, from, to)
