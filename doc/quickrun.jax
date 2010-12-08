@@ -392,6 +392,7 @@ exec を展開した結果先頭の文字が ":" だった場合、Vim のコマ
 更新履歴					*quickrun-changelog*
 
 x.x.x	xxxx-xx-xx
+	- デフォルトの設定に erlang を追加。
 	- コマンドラインの補完を改善。
 	- |quickrun-option-output_encode| の ":to" を省略できるようにした。
 

@@ -56,6 +56,9 @@ let g:quickrun#default_config = {
 \     'exec': ['%c %s -o %s:p:r', '%s:p:r %a', 'rm -f %s:p:r'],
 \     'tempfile': '{tempname()}.cpp',
 \   } : {},
+\ 'erlang': {
+\   'command': 'escript',
+\ },
 \ 'eruby': {
 \   'command': 'erb',
 \   'exec': '%c -T - %s %a',
