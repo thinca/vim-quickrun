@@ -157,7 +157,7 @@ src					*quickrun-option-src*
 			フォルトでは編集中のファイル全体ですが、指定することで
 			変更が可能です。
 
-args					*quickrun-option-args*
+args (*)				*quickrun-option-args*
 			exec の %a に展開される文字列です。
 
 input (*)				*quickrun-option-input*
@@ -393,6 +393,7 @@ exec を展開した結果先頭の文字が ":" だった場合、Vim のコマ
 
 x.x.x	xxxx-xx-xx
 	- デフォルトの設定に erlang を追加。
+	- |quickrun-option-args| を展開するようにした。
 	- コマンドラインの補完を改善。
 	- |quickrun-option-output_encode| の ":to" を省略できるようにした。
 	- |quickrun-syntax-option| が適用されるオプションの末尾が "$" や "&"

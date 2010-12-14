@@ -308,6 +308,7 @@ function! s:Runner.normalize()  " {{{2
   endif
 
   let self.source_name = self.get_source_name()
+  let config.args = self.expand(config.args)
 endfunction
 
 
