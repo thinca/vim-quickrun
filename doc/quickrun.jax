@@ -152,6 +152,9 @@ command					*quickrun-option-command*
 			exec 内の %c に展開される文字列です。指定されなかった
 			場合は、type と同じ値が使用されます。
 
+cmdopt (*)				*quickrun-option-cmdopt*
+			exec 内の %o に展開される文字列です。
+
 src					*quickrun-option-src*
 			実行するプログラムのソースとなる文字列を指定します。デ
 			フォルトでは編集中のファイル全体ですが、指定することで
@@ -315,6 +318,7 @@ exec オプションの書式				*quickrun-exec-format*
 --------        ------
 %%		%自身
 %c		コマンド (|quickrun-option-command|)
+%o		コマンドラインオプション (|quickrun-option-cmdopt|)
 %s		ソースファイル (|quickrun-option-src|)
 %S		ソースファイル(エスケープなし)
 %a		スクリプトの引数 (|quickrun-option-args|)
@@ -393,6 +397,7 @@ exec を展開した結果先頭の文字が ":" だった場合、Vim のコマ
 
 x.x.x	xxxx-xx-xx
 	- デフォルトの設定に erlang を追加。
+	- |quickrun-option-cmdopt| オプションを追加。
 	- |quickrun-option-args| を展開するようにした。
 	- コマンドラインの補完を改善。
 	- |quickrun-option-output_encode| の ":to" を省略できるようにした。
