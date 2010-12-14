@@ -314,10 +314,10 @@ exec オプションの書式				*quickrun-exec-format*
 シンボル	展開値 ~
 --------        ------
 %%		%自身
-%c		コマンド
-%s		ソースファイル
+%c		コマンド (|quickrun-option-command|)
+%s		ソースファイル (|quickrun-option-src|)
 %S		ソースファイル(エスケープなし)
-%a		スクリプトの引数
+%a		スクリプトの引数 (|quickrun-option-args|)
 
 ファイルを指定するシンボルには、|filename-modifiers| が使えます。
 >
