@@ -1040,11 +1040,14 @@ endfunction
 function! quickrun#execute(...)  " {{{2
   " XXX: Can't get a result if a:cmd contains :redir command.
   let result = ''
-  redir => result
-  for cmd in a:000
-    silent execute cmd
-  endfor
-  redir END
+  try
+    redir => result
+    for cmd in a:000
+      silent execute cmd
+    endfor
+  finally
+    redir END
+  endtry
   return result
 endfunction
 
