@@ -1,6 +1,6 @@
 *quickrun.txt*	Run a command and show its result quickly.
 
-Version: 0.4.2
+Version: 0.4.3
 Author : thinca <thinca+vim@gmail.com>
 Eng[rl]ish document by: tyru <tyru.exe@gmail.com>
 License: Creative Commons 2.1 Japanese
@@ -152,14 +152,17 @@ exec (*)				*quickrun-option-exec*
 			See |g:quickrun_config| for more details.
 
 command					*quickrun-option-command*
-			String expanded to %c in exec,
+			String expanded to %c in exec.
 			If not specified, same value as type is used.
+
+cmdopt (*)				*quickrun-option-cmdopt*
+			String expanded to %o in exec.
 
 src					*quickrun-option-src*
 			Executed program.
 			Default value is whole lines of editing file.
 
-args					*quickrun-option-args*
+args (*)				*quickrun-option-args*
 			String expanded to %a in exec.
 
 input (*)				*quickrun-option-input*
@@ -254,7 +257,9 @@ mode					*quickrun-option-mode*
 				vnoremap <silent> <F5> :QuickRun -mode v<CR>
 
 output_encode (*)			*quickrun-option-output_encode*
-			Encoding conversion filter like "from:to".
+			Encoding conversion filter like "from:to".  ":to" is
+			omitable.  In that case, it is interpreted like
+			"from:&enc".
 			Default value is "&fenc:&enc".
 
 shebang					*quickrun-option-shebang*
@@ -320,10 +325,11 @@ You can also use same symbols altogether.
 Symbol			Result ~
 --------        ------
 %%		%
-%c		Command
-%s		Source
+%c		Command (|quickrun-option-command|)
+%o		Command line option (|quickrun-option-cmdopt|)
+%s		Source (|quickrun-option-src|)
 %S		Source (not escaped)
-%a		Script's arguments
+%a		Script's arguments (|quickrun-option-args|)
 
 You can use |filename-modifiers| for the symbols to specify file.
 >
