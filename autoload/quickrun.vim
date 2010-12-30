@@ -326,7 +326,7 @@ function! s:Runner.run()  " {{{2
 
   let [runmode; args] = split(self.config.runmode, ':')
   if !has_key(self, 'run_' . runmode)
-    throw 'Invalid runmode: ' . runmde
+    throw 'quickrun: Invalid runmode: ' . runmde
   endif
   call call(self['run_' . runmode], [commands] + args, self)
 endfunction
@@ -388,7 +388,7 @@ endfunction
 function! s:Runner.run_async(commands, ...)  " {{{2
   let [type; args] = a:000
   if !has_key(self, 'run_async_' . type)
-    throw 'Unknown async type: ' . type
+    throw 'quickrun: Unknown async type: ' . type
   endif
   call call(self['run_async_' . type], [a:commands] + args, self)
 endfunction
@@ -397,7 +397,7 @@ endfunction
 
 function! s:Runner.run_async_vimproc(commands, ...)  " {{{2
   if !s:available_vimproc
-    throw 'runmode = async:vimproc needs vimproc.'
+    throw 'quickrun: runmode = async:vimproc needs vimproc.'
   endif
 
   let vimproc = vimproc#pgroup_open(join(a:commands, ' && '))
@@ -460,10 +460,10 @@ endfunction
 
 function! s:Runner.run_async_remote(commands, ...)  " {{{2
   if !has('clientserver') || v:servername == ''
-    throw 'runmode = async:remote needs +clientserver feature.'
+    throw 'quickrun: runmode = async:remote needs +clientserver feature.'
   endif
   if !s:is_win && !executable('sh')
-    throw 'Currently needs "sh" on other than MS Windows.  Sorry.'
+    throw 'quickrun: Currently needs "sh" on other than MS Windows.  Sorry.'
   endif
   let selfvim = s:is_win ? split($PATH, ';')[-1] . '\vim.exe' :
   \             !empty($_) ? $_ : v:progname
@@ -564,7 +564,7 @@ endif
 
 function! s:Runner.run_async_python(commands, ...)  " {{{2
   if !has('python')
-    throw 'runmode = async:python needs +python feature.'
+    throw 'quickrun: runmode = async:python needs +python feature.'
   endif
   let l:key = string(s:register(self))
   let l:input = self.config.input
