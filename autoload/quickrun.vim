@@ -261,7 +261,7 @@ function! s:Runner.normalize()  " {{{2
       let config.input = input[0] == '=' ? input[1:]
       \                                  : join(readfile(input, 'b'), "\n")
     catch
-      throw 'Can not treat input: ' . v:exception
+      throw 'quickrun: Can not treat input: ' . v:exception
     endtry
   else
     let config.input = ''
