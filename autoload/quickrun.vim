@@ -256,9 +256,9 @@ function! s:Runner.normalize()  " {{{2
   endfor
 
   if has_key(config, 'input')
-    let input = config.input
+    let input = self.expand(config.input)
     try
-      let config.input = input[0] == '=' ? self.expand(input[1:])
+      let config.input = input[0] == '=' ? input[1:]
       \                                  : join(readfile(input, 'b'), "\n")
     catch
       throw 'Can not treat input: ' . v:exception

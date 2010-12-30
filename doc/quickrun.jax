@@ -166,8 +166,6 @@ args (*)				*quickrun-option-args*
 input (*)				*quickrun-option-input*
 			標準入力に流し込むファイルを指定します。先頭が = で始
 			まっていた場合、それ以降の文字列を入力として扱います。
-			この場合のみ文字列は |quickrun-syntax-option| で展開さ
-			れます。
 
 output (*)				*quickrun-option-output*
 			結果の出力方法を指定します。
@@ -394,6 +392,9 @@ exec を展開した結果先頭の文字が ":" だった場合、Vim のコマ
 
 ==============================================================================
 更新履歴					*quickrun-changelog*
+
+0.4.4	xxxx-xx-xx
+	- |quickrun-option-input| を常に展開するように変更。
 
 0.4.3	2010-12-14
 	- デフォルトの設定に erlang を追加。
