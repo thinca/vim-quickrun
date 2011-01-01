@@ -353,7 +353,7 @@ exec を展開した結果先頭の文字が ":" だった場合、Vim のコマ
 二層構造の辞書を指定します。
 {type} はコマンドラインから |quickrun-option-type| で指定される値です。未指定の
 場合は 'filetype' が使用されます。
-特殊なタイプ名 "_" と "*" には全ての {type} のデフォルト値を指定できます。
+特殊なタイプ名 "_" には全ての {type} のデフォルト値を指定できます。
 
 全体共通の設定よりタイプ毎の設定が、タイプ毎の設定よりコマンドで指定された引数
 が優先されます。
@@ -383,8 +383,7 @@ exec を展開した結果先頭の文字が ":" だった場合、Vim のコマ
 3. |g:quickrun_config| の {type}
 4. |g:quickrun#default_config| の {type}
 5. |g:quickrun_config| の '_'
-6. |g:quickrun_config| の '*'
-7. |g:quickrun#default_config| の '_'
+6. |g:quickrun#default_config| の '_'
 
 1 や 2 で {type} を設定しておくことで 3 で通常とは別の {type} を参照できます。
 
