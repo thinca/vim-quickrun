@@ -525,12 +525,11 @@ python <<EOM
 import vim, threading, subprocess, re
 
 class QuickRun(threading.Thread):
-    def __init__(self, cmds, key, input, iswin):
+    def __init__(self, cmds, key, input):
         threading.Thread.__init__(self)
         self.cmds = cmds
         self.key = key
         self.input = input
-        self.iswin = iswin
 
     def run(self):
         result = ''
@@ -570,8 +569,7 @@ function! s:Runner.run_async_python(commands, ...)  " {{{2
   let l:input = self.config.input
   python QuickRun(vim.eval('a:commands'),
   \               vim.eval('l:key'),
-  \               vim.eval('l:input'),
-  \               int(vim.eval('s:is_win'))).start()
+  \               vim.eval('l:input')).start()
 endfunction
 
 
