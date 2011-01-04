@@ -529,6 +529,8 @@ class QuickRun(threading.Thread):
         threading.Thread.__init__(self)
         self.cmds = cmds
         self.key = key
+        if not input:
+          input = ''
         self.input = input
 
     def run(self):
