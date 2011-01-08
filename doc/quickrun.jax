@@ -396,6 +396,7 @@ exec を展開した結果先頭の文字が ":" だった場合、Vim のコマ
 	- |quickrun-option-input| を常に展開するように変更。
 	- |quickrun-option-runmode| が "async:python" の時に結果が出ないことが
 	  あるのを修正。
+	- Windows で 'shell' が "cmd.exe" 以外だった場合の挙動を改善。
 
 0.4.3	2010-12-14
 	- デフォルトの設定に erlang を追加。

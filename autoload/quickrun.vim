@@ -10,6 +10,10 @@ set cpo&vim
 let s:available_vimproc = globpath(&runtimepath, 'autoload/vimproc.vim') != ''
 let s:is_win = has('win32') || has('win64')
 
+function! s:is_cmd_exe()  " {{{2
+  return &shell =~? 'cmd\.exe'
+endfunction
+
 unlet! g:quickrun#default_config  " {{{1
 let g:quickrun#default_config = {
 \ '_': {
@@ -26,7 +30,7 @@ let g:quickrun#default_config = {
 \   'into': 0,
 \   'eval': 0,
 \   'eval_template': '%s',
-\   'shellcmd': s:is_win ? 'silent !"%s" & pause' : '!%s',
+\   'shellcmd': s:is_cmd_exe() ? 'silent !%s & pause' : '!%s',
 \   'running_mark': ':-)',
 \ },
 \ 'awk': {
@@ -910,7 +914,7 @@ endfunction
 function! s:Runner.shellescape(str)  " {{{2
   if self.config.runmode =~# '^async:vimproc\%(:\d\+\)\?$'
     return "'" . substitute(a:str, '\\', '/', 'g') . "'"
-  elseif s:is_win
+  elseif s:is_cmd_exe()
     return '^"' . substitute(substitute(substitute(a:str,
     \             '[&|<>()^"%]', '^\0', 'g'),
     \             '\\\+\ze"', '\=repeat(submatch(0), 2)', 'g'),
