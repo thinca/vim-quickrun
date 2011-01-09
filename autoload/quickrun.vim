@@ -330,7 +330,7 @@ function! s:Runner.run()  " {{{2
 
   let [runmode; args] = split(self.config.runmode, ':')
   if !has_key(self, 'run_' . runmode)
-    throw 'quickrun: Invalid runmode: ' . runmde
+    throw 'quickrun: Invalid runmode: ' . runmode
   endif
   call call(self['run_' . runmode], [commands] + args, self)
 endfunction
