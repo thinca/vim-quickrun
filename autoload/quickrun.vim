@@ -987,9 +987,12 @@ function! quickrun#run(args)  " {{{2
     endif
 
     call runner.run()
-  catch
-    echoerr 'quickrun:' v:exception v:throwpoint
-    return
+  catch /^quickrun:/
+    echohl ErrorMsg
+    for line in split(v:exception, "\n")
+      echomsg line
+    endfor
+    echohl None
   endtry
 endfunction
 
