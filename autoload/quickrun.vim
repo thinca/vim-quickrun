@@ -30,7 +30,7 @@ let g:quickrun#default_config = {
 \   'into': 0,
 \   'eval': 0,
 \   'eval_template': '%s',
-\   'shellcmd': s:is_cmd_exe() ? 'silent !%s & pause' : '!%s',
+\   'shellcmd': s:is_cmd_exe() ? 'silent !%s & pause ' : '!%s',
 \   'running_mark': ':-)',
 \ },
 \ 'awk': {
@@ -364,27 +364,37 @@ function! s:Runner.execute(cmd)  " {{{2
     return quickrun#execute(a:cmd)
   endif
 
-  let cmd = a:cmd
-  let config = self.config
-  if get(config, 'output') == '!'
-    let in = config.input
-    if in != ''
-      let inputfile = tempname()
-      call writefile(split(in, "\n", 1), inputfile, 'b')
-      let cmd .= ' <' . self.shellescape(inputfile)
+  try
+    if s:is_cmd_exe()
+      let sxq = &shellxquote
+      let &shellxquote = '"'
+    endif
+    let cmd = a:cmd
+    let config = self.config
+    if get(config, 'output') == '!'
+      let in = config.input
+      if in != ''
+        let inputfile = tempname()
+        call writefile(split(in, "\n", 1), inputfile, 'b')
+        let cmd .= ' <' . self.shellescape(inputfile)
+      endif
+
+      execute s:iconv(printf(config.shellcmd, cmd), &encoding, &termencoding)
+
+      if exists('inputfile') && filereadable(inputfile)
+        call delete(inputfile)
+      endif
+      return 0
     endif
 
-    execute s:iconv(printf(config.shellcmd, cmd), &encoding, &termencoding)
-
-    if exists('inputfile') && filereadable(inputfile)
-      call delete(inputfile)
+    let cmd = s:iconv(cmd, &encoding, &termencoding)
+    return config.input == '' ? system(cmd)
+    \                         : system(cmd, config.input)
+  finally
+    if s:is_cmd_exe()
+      let &shellxquote = sxq
     endif
-    return 0
-  endif
-
-  let cmd = s:iconv(cmd, &encoding, &termencoding)
-  return config.input == '' ? system(cmd)
-  \                         : system(cmd, config.input)
+  endtry
 endfunction
 
 
