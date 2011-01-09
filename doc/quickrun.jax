@@ -321,11 +321,12 @@ exec オプションの書式				*quickrun-exec-format*
 %S		ソースファイル(エスケープなし)
 %a		スクリプトの引数 (|quickrun-option-args|)
 
-ファイルを指定するシンボルには、|filename-modifiers| が使えます。
+%c と %s はファイルを指定するシンボルです。これらは |shellescape()| でエスケー
+プされます。シンボルに大文字(%C %S)を使うことでこれを回避できます。
+また、これらには |filename-modifiers| が使えます。
 >
 	java %S:r:gs?[/\\]?.?
 <
-また、ファイルを指定するシンボルは |shellescape()| でエスケープされます。
 コマンドに改行文字が含まれている場合は空白文字に置き換えられます。
 
 Vim のコマンドを実行する
@@ -397,6 +398,7 @@ exec を展開した結果先頭の文字が ":" だった場合、Vim のコマ
 	- |quickrun-option-runmode| が "async:python" の時に結果が出ないことが
 	  あるのを修正。
 	- Windows で 'shell' が "cmd.exe" 以外だった場合の挙動を改善。
+	- "%c" をファイルを指定するシンボルに変更。
 
 0.4.3	2010-12-14
 	- デフォルトの設定に erlang を追加。

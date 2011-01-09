@@ -598,17 +598,17 @@ function! s:Runner.build_command(tmpl)  " {{{2
   let config = self.config
   let shebang = self.detect_shebang()
   let src = string(self.source_name)
+  let command = shebang != '' ? string(shebang) : 'config.command'
   let rule = [
-  \  ['c', shebang != '' ? string(shebang) : 'config.command'],
+  \  ['c', command], ['C', command],
   \  ['s', src], ['S', src],
   \  ['o', 'config.cmdopt'],
   \  ['a', 'config.args'],
   \  ['\%', string('%')],
   \]
-  let file = ['s', 'S']
   let cmd = a:tmpl
   for [key, value] in rule
-    if 0 <= index(file, key)
+    if key =~? '[cs]'
       let value = 'fnamemodify('.value.',submatch(1))'
       if key =~# '\U'
         let value = printf(config.command =~ '^\s*:' ? 'fnameescape(%s)'
