@@ -169,8 +169,6 @@ input (*)				*quickrun-option-input*
 			Filename to be stdin of program.
 			If first character starts with =,
 			quickrun treats continued string as input.
-			In this case, continued string is expanded
-			by |quickrun-syntax-option|
 
 output (*)					*quickrun-option-output*
 			Output format.
@@ -328,15 +326,16 @@ Symbol			Result ~
 %c		Command (|quickrun-option-command|)
 %o		Command line option (|quickrun-option-cmdopt|)
 %s		Source (|quickrun-option-src|)
-%S		Source (not escaped)
 %a		Script's arguments (|quickrun-option-args|)
 
-You can use |filename-modifiers| for the symbols to specify file.
+%c and %s are symbols that specifies file.  These are escaped by
+|shellescape()|.  This can be evaded by using capital letter(%C %S) for the
+symbol.
+You can use |filename-modifiers| for the symbols.
 >
 	java %S:r:gs?[/\\]?.?
 <
-Symbols to specify file are escaped by |shellescape()|.
-And newline(s) are replaced by whitespace(s).
+And newline(s) are replaced by a whitespace.
 
 Execute Vim ex command
 ------------------------
@@ -363,7 +362,7 @@ And |g:quickrun_config| is |Dictionary| whose key is {type},
 and its value is "Default Value".
 {type} is option value given as |quickrun-option-type| from command-line.
 If it is not specified, current 'filetype' is used instead.
-Special {type} '_' and '*' has default values for all unspecified keys by each
+Special {type} '_' has default values for all unspecified keys by each
 "Default value".
 
 Options given by command-line has higher priority than {type} specific
@@ -377,14 +376,14 @@ quickrun overwrites default value with your value.
 
 
 Default settings				*g:quickrun#default_config*
-----------
+----------------
 |g:quickrun#default_config| has default settings
 which has same structure as |g:quickrun_config|.
 Default values on |quickrun-options| are actually this value.
 Usually you don't have to care this variable.
 
 Buffer-local settings				*b:quickrun_config*
-----------------------
+---------------------
 You can specify buffer-local settings using |b:quickrun_config|.
 You need to specify "Default Value" different from |g:quickrun_config|.
 This has higher priority any other settings
@@ -398,8 +397,7 @@ Here is the order to have higher priorities.
 3. |g:quickrun_config|'s {type}
 4. |g:quickrun#default_config|'s {type}
 5. |g:quickrun_config|'s '_'
-5. |g:quickrun_config|'s '*'
-6. |g:quickrun#default_config|'s '*'
+6. |g:quickrun#default_config|'s '_'
 
 
 
