@@ -1,6 +1,6 @@
 *quickrun.txt*	コマンドを素早く実行します。
 
-Version: 0.4.3
+Version: 0.4.4
 Author : thinca <thinca+vim@gmail.com>
 License: クリエイティブ・コモンズの表示 2.1 日本ライセンス
          <http://creativecommons.org/licenses/by/2.1/jp/>
@@ -392,7 +392,7 @@ exec を展開した結果先頭の文字が ":" だった場合、Vim のコマ
 ==============================================================================
 更新履歴					*quickrun-changelog*
 
-0.4.4	xxxx-xx-xx
+0.4.4	2011-01-11
 	- |quickrun-option-input| を常に展開するように変更。
 	- |quickrun-option-runmode| が "async:python" の時に結果が出ないことが
 	  あるのを修正。
