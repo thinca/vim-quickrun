@@ -318,7 +318,6 @@ exec オプションの書式				*quickrun-exec-format*
 %c		コマンド (|quickrun-option-command|)
 %o		コマンドラインオプション (|quickrun-option-cmdopt|)
 %s		ソースファイル (|quickrun-option-src|)
-%S		ソースファイル(エスケープなし)
 %a		スクリプトの引数 (|quickrun-option-args|)
 
 %c と %s はファイルを指定するシンボルです。これらは |shellescape()| でエスケー
