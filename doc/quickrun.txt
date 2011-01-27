@@ -257,8 +257,8 @@ mode					*quickrun-option-mode*
 output_encode (*)			*quickrun-option-output_encode*
 			Encoding conversion filter like "from:to".  ":to" is
 			omitable.  In that case, it is interpreted like
-			"from:&enc".
-			Default value is "&fenc:&enc".
+			"from:&encoding".
+			Default value is "&fileencoding".
 
 shebang					*quickrun-option-shebang*
 			If this value is not 0, and if src 's first line

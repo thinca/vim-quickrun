@@ -23,7 +23,7 @@ let g:quickrun#default_config = {
 \   'runmode': 'simple',
 \   'cmdopt': '',
 \   'args': '',
-\   'output_encode': '&fenc:&enc',
+\   'output_encode': '&fileencoding',
 \   'tempfile'  : '{tempname()}',
 \   'exec': '%c %o %s %a',
 \   'split': '{winwidth(0) * 2 < winheight(0) * 5 ? "" : "vertical"}',
@@ -90,7 +90,7 @@ let g:quickrun#default_config = {
 \ },
 \ 'java': {
 \   'exec': ['javac %o %s', '%c %s:t:r %a', ':call delete("%S:t:r.class")'],
-\   'output_encode': '&tenc:&enc',
+\   'output_encode': '&termencoding',
 \ },
 \ 'javascript': {
 \   'command': executable('js') ? 'js':
@@ -125,7 +125,7 @@ let g:quickrun#default_config = {
 \ },
 \ 'ruby': {'eval_template': " p proc {\n%s\n}.call"},
 \ 'scala': {
-\   'output_encode': '&tenc:&enc',
+\   'output_encode': '&termencoding',
 \ },
 \ 'scheme': {
 \   'command': 'gosh',

@@ -254,8 +254,8 @@ mode					*quickrun-option-mode*
 output_encode (*)			*quickrun-option-output_encode*
 			出力の文字コードを変換したい場合に、"from:to" の形式
 			で指定します。":to" は省略できます。その場合、
-			"from:&enc" と解釈されます。
-			デフォルトは "&fenc:&enc" です。
+			"from:&encoding" と解釈されます。
+			デフォルトは "&fileencoding" です。
 
 shebang					*quickrun-option-shebang*
 			0 以外を指定すると、 src の最初の行が #! で始まってた
