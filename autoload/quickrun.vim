@@ -68,19 +68,18 @@ let g:quickrun#default_config = {
 \   'command': 'erb',
 \   'exec': '%c %o -T - %s %a',
 \ },
-\ 'go':
-\   $GOARCH ==# '386' ? {
-\     'exec':
-\       s:is_win ?
-\         ['8g %o %s', '8l -o %s:p:r.exe %s:p:r.8', '%s:p:r.exe %a', 'del /F %s:p:r.exe'] :
-\         ['8g %o %s', '8l -o %s:p:r %s:p:r.8', '%s:p:r %a', 'rm -f %s:p:r']
-\   } :
-\   $GOARCH ==# 'amd64' ? {
-\     'exec': ['6g %o %s', '6l -o %s:p:r %s:p:r.6', '%s:p:r %a', 'rm -f %s:p:r'],
-\   } :
-\   $GOARCH ==# 'arm' ? {
-\     'exec': ['5g %o %s', '5l -o %s:p:r %s:p:r.5', '%s:p:r %a', 'rm -f %s:p:r'],
-\   } : {},
+\ 'go': {
+\   'exec':
+\     $GOARCH ==# '386' ? (s:is_win ?
+\       ['8g %o %s', '8l -o %s:p:r.exe %s:p:r.8', '%s:p:r.exe %a', 'del /F %s:p:r.exe'] :
+\       ['8g %o %s', '8l -o %s:p:r %s:p:r.8', '%s:p:r %a', 'rm -f %s:p:r']) :
+\     $GOARCH ==# 'amd64' ?
+\       ['6g %o %s', '6l -o %s:p:r %s:p:r.6', '%s:p:r %a', 'rm -f %s:p:r'] :
+\     $GOARCH ==# 'arm' ?
+\       ['5g %o %s', '5l -o %s:p:r %s:p:r.5', '%s:p:r %a', 'rm -f %s:p:r']
+\       : '',
+\   'output_encode': 'utf-8',
+\ },
 \ 'groovy': {
 \   'cmdopt': '-c {&fenc==""?&enc:&fenc}'
 \ },

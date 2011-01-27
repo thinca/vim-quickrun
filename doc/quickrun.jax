@@ -392,6 +392,9 @@ exec を展開した結果先頭の文字が ":" だった場合、Vim のコマ
 ==============================================================================
 更新履歴					*quickrun-changelog*
 
+x.x.x	xxxx-xx-xx
+	- |g:quickrun#default_config| の go の値を改善。
+
 0.4.4	2011-01-11
 	- |quickrun-option-input| を常に展開するように変更。
 	- |quickrun-option-runmode| が "async:python" の時に結果が出ないことが
