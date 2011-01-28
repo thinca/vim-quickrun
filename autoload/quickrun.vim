@@ -536,7 +536,9 @@ endfunction
 
 
 
+let s:python_loaded = 0
 if has('python')
+  try
 python <<EOM
 import vim, threading, subprocess, re
 
@@ -577,11 +579,17 @@ class QuickRun(threading.Thread):
     def vimstr(self, s):
         return "'" + s.replace("'", "''") + "'"
 EOM
+  let s:python_loaded = 1
+  catch
+    " XXX: This method make debugging to difficult.
+  endtry
 endif
 
 function! s:Runner.run_async_python(commands, ...)  " {{{2
   if !has('python')
     throw 'quickrun: runmode = async:python needs +python feature.'
+  elseif !s:python_loaded
+    throw 'quickrun: Loading python code failed.'
   endif
   let l:key = string(s:register(self))
   let l:input = self.config.input
