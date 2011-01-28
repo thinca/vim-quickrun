@@ -142,6 +142,9 @@ let g:quickrun#default_config = {
 \ },
 \ 'zsh': {},
 \}
+if g:quickrun#default_config.javascript.command ==# 'cscript'
+  let g:quickrun#default_config.javascript.cmdopt = '//Nologo'
+endif
 lockvar! g:quickrun#default_config
 
 
