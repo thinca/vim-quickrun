@@ -606,7 +606,7 @@ endfunction
 function! s:Runner.build_command(tmpl)  " {{{2
   " FIXME: Possibility to be multiple expanded.
   let config = self.config
-  let shebang = self.detect_shebang()
+  let shebang = config.shebang ? self.detect_shebang() : ''
   let src = string(self.source_name)
   let command = shebang != '' ? string(shebang) : 'config.command'
   let rule = [
