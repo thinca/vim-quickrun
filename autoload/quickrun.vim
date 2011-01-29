@@ -616,9 +616,10 @@ function! s:Runner.build_command(tmpl)  " {{{2
   \  ['a', 'config.args'],
   \  ['\%', string('%')],
   \]
+  let is_file = '[' . (shebang != '' ? 's' : 'cs') . ']'
   let cmd = a:tmpl
   for [key, value] in rule
-    if key =~? '[cs]'
+    if key =~? is_file
       let value = 'fnamemodify('.value.',submatch(1))'
       if key =~# '\U'
         let value = printf(config.command =~ '^\s*:' ? 'fnameescape(%s)'

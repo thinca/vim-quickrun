@@ -259,7 +259,9 @@ output_encode (*)			*quickrun-option-output_encode*
 
 shebang					*quickrun-option-shebang*
 			0 以外を指定すると、 src の最初の行が #! で始まってた
-			場合にその後続の文字列を command として扱います。
+			場合にその後続の文字列を command として扱います。この
+			場合、%c はエスケープ処理(|quickrun-exec-format|)され
+			ません。
 			デフォルトは 1 です。
 
 tempfile (*)				*quickrun-option-tempfile*
@@ -395,6 +397,8 @@ exec を展開した結果先頭の文字が ":" だった場合、Vim のコマ
 x.x.x	xxxx-xx-xx
 	- |g:quickrun#default_config| の go の値を改善。
 	- |g:quickrun#default_config| の javascript の値を改善。
+	- |quickrun-option-shebang| によるコマンドはエスケープを行わないように
+	  した。
 	- |quickrun-option-shebang| が常に有効になっていたのを修正。
 
 0.4.4	2011-01-11
