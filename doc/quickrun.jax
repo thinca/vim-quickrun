@@ -1,6 +1,6 @@
 *quickrun.txt*	コマンドを素早く実行します。
 
-Version: 0.4.4
+Version: 0.4.5
 Author : thinca <thinca+vim@gmail.com>
 License: クリエイティブ・コモンズの表示 2.1 日本ライセンス
          <http://creativecommons.org/licenses/by/2.1/jp/>
@@ -394,7 +394,7 @@ exec を展開した結果先頭の文字が ":" だった場合、Vim のコマ
 ==============================================================================
 更新履歴					*quickrun-changelog*
 
-x.x.x	xxxx-xx-xx
+0.4.5	2011-02-03
 	- |g:quickrun#default_config| の go の値を改善。
 	- |g:quickrun#default_config| の javascript の値を改善。
 	- |quickrun-option-shebang| によるコマンドはエスケープを行わないように
