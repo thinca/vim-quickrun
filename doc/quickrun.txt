@@ -261,8 +261,10 @@ output_encode (*)			*quickrun-option-output_encode*
 			Default value is "&fileencoding".
 
 shebang					*quickrun-option-shebang*
-			If this value is not 0, and if src 's first line
-			started with #! , quickrun ignores first line.
+			If this value is not 0, and if "src"'s first line
+			started with "#!", the following string is treated as
+			"command".  In this case, "%c" is not escaped.
+			See |quickrun-exec-format| about escaping.
 			Default value is 1.
 
 tempfile (*)				*quickrun-option-tempfile*
