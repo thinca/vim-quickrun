@@ -1029,9 +1029,9 @@ function! quickrun#complete(lead, cmd, pos)  " {{{2
     endif
   elseif head =~ '^-'
     let options = map(['type', 'src', 'input', 'output', 'append', 'command',
-      \ 'exec', 'args', 'tempfile', 'shebang', 'eval', 'mode', 'runmode',
-      \ 'split', 'into', 'output_encode', 'shellcmd', 'running_mark',
-      \ 'eval_template'], '"-".v:val')
+      \ 'exec', 'cmdopt', 'args', 'tempfile', 'shebang', 'eval', 'mode',
+      \ 'runmode', 'split', 'into', 'output_encode', 'shellcmd',
+      \ 'running_mark', 'eval_template'], '"-".v:val')
     return filter(options, 'v:val =~ "^".head')
   end
   let types = keys(extend(exists('g:quickrun_config') ?
