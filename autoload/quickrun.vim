@@ -430,13 +430,13 @@ function! s:Runner.run_async_vimproc(commands, ...)  " {{{2
 
   " Wait a little because execution might end immediately.
   sleep 50m
-  if s:recieve_vimproc_result(key)
+  if s:receive_vimproc_result(key)
     return
   endif
   " Execution is continuing.
   augroup plugin-quickrun-vimproc
     execute 'autocmd! CursorHold,CursorHoldI * call'
-    \       's:recieve_vimproc_result(' . string(key) . ')'
+    \       's:receive_vimproc_result(' . string(key) . ')'
   augroup END
   let self._autocmd_vimproc = 'vimproc'
   if a:0 && a:1 =~ '^\d\+$'
@@ -447,7 +447,7 @@ endfunction
 
 
 
-function! s:recieve_vimproc_result(key)  " {{{2
+function! s:receive_vimproc_result(key)  " {{{2
   let runner = get(s:runners, a:key)
 
   let vimproc = runner.vimproc
