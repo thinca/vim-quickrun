@@ -37,30 +37,36 @@ let g:quickrun#default_config = {
 \   'exec': '%c %o -f %s %a',
 \ },
 \ 'bash': {},
-\ 'c':
-\   s:is_win && executable('cl') ? {
-\     'command': 'cl',
-\     'exec': ['%c %o %s /nologo /Fo%s:p:r.obj /Fe%s:p:r.exe > nul',
-\               '%s:p:r.exe %a', 'del %s:p:r.exe %s:p:r.obj'],
-\     'tempfile': '{tempname()}.c',
-\   } :
-\   executable('gcc') ? {
-\     'command': 'gcc',
-\     'exec': ['%c %o %s -o %s:p:r', '%s:p:r %a', 'rm -f %s:p:r'],
-\     'tempfile': '{tempname()}.c',
-\   } : {},
-\ 'cpp':
-\   s:is_win && executable('cl') ? {
-\     'command': 'cl',
-\     'exec': ['%c %o %s /nologo /Fo%s:p:r.obj /Fe%s:p:r.exe > nul',
-\               '%s:p:r.exe %a', 'del %s:p:r.exe %s:p:r.obj'],
-\     'tempfile': '{tempname()}.cpp',
-\   } :
-\   executable('g++') ? {
-\     'command': 'g++',
-\     'exec': ['%c %o %s -o %s:p:r', '%s:p:r %a', 'rm -f %s:p:r'],
-\     'tempfile': '{tempname()}.cpp',
-\   } : {},
+\ 'c': {
+\   'type':
+\     s:is_win && executable('cl') ? 'c/vc'  :
+\     executable('gcc')            ? 'c/gcc' : '',
+\   'tempfile': '{tempname()}.c',
+\ },
+\ 'c/vc': {
+\   'command': 'cl',
+\   'exec': ['%c %o %s /nologo /Fo%s:p:r.obj /Fe%s:p:r.exe > nul',
+\             '%s:p:r.exe %a', 'del %s:p:r.exe %s:p:r.obj'],
+\ },
+\ 'c/gcc': {
+\   'command': 'gcc',
+\   'exec': ['%c %o %s -o %s:p:r', '%s:p:r %a', 'rm -f %s:p:r'],
+\ },
+\ 'cpp': {
+\   'type':
+\     s:is_win && executable('cl') ? 'cpp/vc'  :
+\     executable('g++')            ? 'cpp/g++' : '',
+\   'tempfile': '{tempname()}.cpp',
+\ },
+\ 'cpp/vc': {
+\   'command': 'cl',
+\   'exec': ['%c %o %s /nologo /Fo%s:p:r.obj /Fe%s:p:r.exe > nul',
+\             '%s:p:r.exe %a', 'del %s:p:r.exe %s:p:r.obj'],
+\ },
+\ 'cpp/g++': {
+\   'command': 'g++',
+\   'exec': ['%c %o %s -o %s:p:r', '%s:p:r %a', 'rm -f %s:p:r'],
+\ },
 \ 'erlang': {
 \   'command': 'escript',
 \ },
@@ -70,15 +76,26 @@ let g:quickrun#default_config = {
 \ },
 \ 'go': {
 \   'exec':
-\     $GOARCH ==# '386' ? (s:is_win ?
-\       ['8g %o %s', '8l -o %s:p:r.exe %s:p:r.8', '%s:p:r.exe %a', 'del /F %s:p:r.exe'] :
-\       ['8g %o %s', '8l -o %s:p:r %s:p:r.8', '%s:p:r %a', 'rm -f %s:p:r']) :
-\     $GOARCH ==# 'amd64' ?
-\       ['6g %o %s', '6l -o %s:p:r %s:p:r.6', '%s:p:r %a', 'rm -f %s:p:r'] :
-\     $GOARCH ==# 'arm' ?
-\       ['5g %o %s', '5l -o %s:p:r %s:p:r.5', '%s:p:r %a', 'rm -f %s:p:r']
-\       : '',
+\     $GOARCH ==# '386'   ? (s:is_win ? 'go/386/win' : 'go/386'):
+\     $GOARCH ==# 'amd64' ? 'go/amd64':
+\     $GOARCH ==# 'arm'   ? 'go/arm': '',
 \   'output_encode': 'utf-8',
+\ },
+\ 'go/386/win': {
+\   'exec': ['8g %o %s', '8l -o %s:p:r.exe %s:p:r.8',
+\            '%s:p:r.exe %a', 'del /F %s:p:r.exe'],
+\ },
+\ 'go/386': {
+\   'exec': ['8g %o %s', '8l -o %s:p:r %s:p:r.8',
+\            '%s:p:r %a', 'rm -f %s:p:r'],
+\ },
+\ 'go/amd64': {
+\   'exec': ['6g %o %s', '6l -o %s:p:r %s:p:r.6',
+\            '%s:p:r %a', 'rm -f %s:p:r'],
+\ },
+\ 'go/arm': {
+\   'exec': ['5g %o %s', '5l -o %s:p:r %s:p:r.5',
+\            '%s:p:r %a', 'rm -f %s:p:r'],
 \ },
 \ 'groovy': {
 \   'cmdopt': '-c {&fenc==""?&enc:&fenc}'
@@ -93,10 +110,20 @@ let g:quickrun#default_config = {
 \   'output_encode': '&termencoding',
 \ },
 \ 'javascript': {
-\   'command': executable('js') ? 'js':
-\              executable('jrunscript') ? 'jrunscript':
-\              executable('cscript') ? 'cscript': '',
+\   'type': executable('js') ? 'javascript/spidermonkey':
+\           executable('jrunscript') ? 'javascript/rhino':
+\           executable('cscript') ? 'javascript/cscript': '',
 \   'tempfile': '{tempname()}.js',
+\ },
+\ 'javascript/spidermonkey': {
+\   'command': 'js',
+\ },
+\ 'javascript/rhino': {
+\   'command': 'jrunscript',
+\ },
+\ 'javascript/cscript': {
+\   'command': 'cscript',
+\   'cmdopt': '//Nologo',
 \ },
 \ 'llvm': {
 \   'command': 'llvm-as %s -o=- | lli - %a',
@@ -142,9 +169,6 @@ let g:quickrun#default_config = {
 \ },
 \ 'zsh': {},
 \}
-if g:quickrun#default_config.javascript.command ==# 'cscript'
-  let g:quickrun#default_config.javascript.cmdopt = '//Nologo'
-endif
 lockvar! g:quickrun#default_config
 
 
