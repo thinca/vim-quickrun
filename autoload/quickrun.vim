@@ -257,6 +257,20 @@ function! s:Runner.normalize()  " {{{2
   \ 'g:quickrun#default_config["_"]',
   \ ]
     if exists(c)
+      if 0 <= stridx(c, 'config.type')
+        let config_type = ''
+        while has_key(config, 'type')
+        \   && config.type !=# ''
+        \   && config.type !=# config_type
+          let new_config = eval(c)
+          let config_type = config.type
+          call remove(config, 'type')
+          call extend(config, new_config, 'keep')
+        endwhile
+        if config_type != ''
+          let config.type = config_type
+        endif
+      endif
       call extend(config, eval(c), 'keep')
     endif
   endfor
