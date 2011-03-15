@@ -369,7 +369,7 @@ Special {type} '_' has default values for all unspecified keys by each
 
 Options given by command-line has higher priority than {type} specific
 settings.
-And {type} specific settings has higher priority than {type} '*' settings,
+And {type} specific settings has higher priority than {type} '_' settings.
 
 Default settings				*g:quickrun#default_config*
 ----------------
