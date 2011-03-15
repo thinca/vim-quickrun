@@ -140,8 +140,8 @@ g:quickrun_no_default_key_mappings に 1 が設定されていると定義され
 
 type					*quickrun-option-type*
 			設定の雛形を指定します。デフォルトで 'filetype' の値が
-			使用されます。詳細は |g:quickrun_config| を参照してくだ
-			さい。
+			使用されます。詳細は |g:quickrun_config| を参照してく
+			ださい。
 
 exec (*)				*quickrun-option-exec*
 			実行するコマンドの書式を指定します。詳細は
@@ -234,7 +234,7 @@ split (*)				*quickrun-option-split*
 			|:tab| も指定できますが、タブページ内に出力専用バッフ
 			ァが存在しない場合常に新しく開くのでおすすめしません。
 			デフォルトは
-			'{winwidth(0) * 2 < winheight(0) * 5 ? "" : "vertical"}'
+		'{winwidth(0) * 2 < winheight(0) * 5 ? "" : "vertical"}'
 			です。
 
 into					*quickrun-option-into*
@@ -353,8 +353,8 @@ exec を展開した結果先頭の文字が ":" だった場合、Vim のコマ
 デフォルト値はオプション名をキーとした辞書で指定します。|g:quickrun_config| に
 は {type} をキー、デフォルト値を値にした辞書を指定します。つまり、この変数には
 二層構造の辞書を指定します。
-{type} はコマンドラインから |quickrun-option-type| で指定される値です。未指定の
-場合は 'filetype' が使用されます。
+{type} はコマンドラインから |quickrun-option-type| で指定される値です。未指定
+の場合は 'filetype' が使用されます。
 特殊なタイプ名 "_" には全ての {type} のデフォルト値を指定できます。
 
 全体共通の設定よりタイプ毎の設定が、タイプ毎の設定よりコマンドで指定された引数
@@ -483,7 +483,8 @@ exec を展開した結果先頭の文字が ":" だった場合、Vim のコマ
 	- プラグイン名を小文字に変更。
 	- eval 機能を実験的に追加。
 	  - eval オプション (|quickrun-option-eval|) を追加。
-	  - eval_template オプション (|quickrun-option-eval_template|) を追加。
+	  - eval_template オプション (|quickrun-option-eval_template|) を追
+	    加。
 
 0.0.4	2009-07-30
 	- 引数なしで実行した場合、filetype が認識されないバグを修正。
@@ -500,7 +501,8 @@ exec を展開した結果先頭の文字が ":" だった場合、Vim のコマ
 	- <{input} が動かないバグを修正。
 	- オプションの展開処理を改善。
 	- 出力専用バッファの開き方を制御する "split" オプションを追加。
-	- "type" オプションの値が |g:quickrun_config| になくても動くように修正。
+	- "type" オプションの値が |g:quickrun_config| になくても動くように修
+	  正。
 
 0.0.1	2009-06-01
 	- 初版。
