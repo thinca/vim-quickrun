@@ -40,7 +40,8 @@ let g:quickrun#default_config = {
 \ 'c': {
 \   'type':
 \     s:is_win && executable('cl') ? 'c/vc'  :
-\     executable('gcc')            ? 'c/gcc' : '',
+\     executable('gcc')            ? 'c/gcc' :
+\     executable('clang')          ? 'c/clang' : '',
 \   'tempfile': '{tempname()}.c',
 \ },
 \ 'c/vc': {
@@ -50,6 +51,10 @@ let g:quickrun#default_config = {
 \ },
 \ 'c/gcc': {
 \   'command': 'gcc',
+\   'exec': ['%c %o %s -o %s:p:r', '%s:p:r %a', 'rm -f %s:p:r'],
+\ },
+\ 'c/clang': {
+\   'command': 'clang',
 \   'exec': ['%c %o %s -o %s:p:r', '%s:p:r %a', 'rm -f %s:p:r'],
 \ },
 \ 'cpp': {
