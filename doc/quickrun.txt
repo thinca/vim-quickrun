@@ -371,12 +371,6 @@ Options given by command-line has higher priority than {type} specific
 settings.
 And {type} specific settings has higher priority than {type} '*' settings,
 
-|g:quickrun_config|'s default value (it is |g:quickrun#default_config|)
-is initialized when quickrun is loaded.
-At that time, (for e.g., in  your .vimrc) If it is defined,
-quickrun overwrites default value with your value.
-
-
 Default settings				*g:quickrun#default_config*
 ----------------
 |g:quickrun#default_config| has default settings
