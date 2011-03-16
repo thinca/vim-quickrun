@@ -57,6 +57,10 @@ let g:quickrun#default_config = {
 \   'command': 'clang',
 \   'exec': ['%c %o %s -o %s:p:r', '%s:p:r %a', 'rm -f %s:p:r'],
 \ },
+\ 'c/C': {
+\   'command': 'C',
+\   'exec': '%c %o -m %s',
+\ },
 \ 'cpp': {
 \   'type':
 \     s:is_win && executable('cl') ? 'cpp/vc'  :
@@ -71,6 +75,10 @@ let g:quickrun#default_config = {
 \ 'cpp/g++': {
 \   'command': 'g++',
 \   'exec': ['%c %o %s -o %s:p:r', '%s:p:r %a', 'rm -f %s:p:r'],
+\ },
+\ 'cpp/C': {
+\   'command': 'C',
+\   'exec': '%c %o -p %s',
 \ },
 \ 'erlang': {
 \   'command': 'escript',
