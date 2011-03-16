@@ -743,7 +743,7 @@ function! s:Runner.sweep()  " {{{2
     try
       call self.vimproc.kill(15)
       call self.vimproc.waitpid()
-      call remove(self, vimproc)
+      call remove(self, 'vimproc')
     catch
     endtry
   endif
