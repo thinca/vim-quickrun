@@ -138,6 +138,9 @@ let g:quickrun#default_config = {
 \   'command': 'cscript',
 \   'cmdopt': '//Nologo',
 \ },
+\ 'lisp': {
+\   'command': 'clisp',
+\ },
 \ 'llvm': {
 \   'command': 'llvm-as %s -o=- | lli - %a',
 \ },
