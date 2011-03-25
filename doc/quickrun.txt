@@ -7,7 +7,7 @@ License: Creative Commons 2.1 Japanese
          <http://creativecommons.org/licenses/by/2.1/jp/>
 
 ==============================================================================
-CONTENTS						*quickrun-contents*
+CONTENTS					*quickrun-contents*
 
 INTRODUCTION			|quickrun-introduction|
 INTERFACE			|quickrun-interface|
@@ -22,7 +22,7 @@ CHANGELOG			|quickrun-changelog|
 
 
 ==============================================================================
-INTRODUCTION						*quickrun-introduction*
+INTRODUCTION					*quickrun-introduction*
 
 *quickrun* is Vim plugin to execute whole/part of editing file.
 It provides |:QuickRun| for it.
@@ -34,7 +34,7 @@ Latest Version:
 http://github.com/thinca/vim-quickrun
 
 
-							*quickrun-synopsis*
+						*quickrun-synopsis*
 >
 	" Execute current buffer.
 	:QuickRun
