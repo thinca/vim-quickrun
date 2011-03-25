@@ -1,6 +1,6 @@
 *quickrun.txt*	Run a command and show its result quickly.
 
-Version: 0.4.5
+Version: 0.4.6
 Author : thinca <thinca+vim@gmail.com>
 Eng[rl]ish document by: tyru <tyru.exe@gmail.com>
 License: Creative Commons 2.1 Japanese
