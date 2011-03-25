@@ -395,6 +395,10 @@ Here is the order to have higher priorities.
 5. |g:quickrun_config|'s '_'
 6. |g:quickrun#default_config|'s '_'
 
+If you set {type} with 1 or 2, it will be loaded by 3 and 4.
+In addition, if you set {type} with 3 or 4, {type} is overwrote and reload the
+current (3 or 4) config.  Note infinite loop.
+
 
 
 ==============================================================================
