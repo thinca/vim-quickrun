@@ -88,26 +88,27 @@ let g:quickrun#default_config = {
 \   'exec': '%c %o -T - %s %a',
 \ },
 \ 'go': {
-\   'exec':
+\   'type':
 \     $GOARCH ==# '386'   ? (s:is_win ? 'go/386/win' : 'go/386'):
 \     $GOARCH ==# 'amd64' ? 'go/amd64':
 \     $GOARCH ==# 'arm'   ? 'go/arm': '',
+\   'tempfile': '{tempname()}.go',
 \   'output_encode': 'utf-8',
 \ },
 \ 'go/386/win': {
-\   'exec': ['8g %o %s', '8l -o %s:p:r.exe %s:p:r.8',
+\   'exec': ['8g %o -o %s:p:r.8 %s', '8l -o %s:p:r.exe %s:p:r.8',
 \            '%s:p:r.exe %a', 'del /F %s:p:r.exe'],
 \ },
 \ 'go/386': {
-\   'exec': ['8g %o %s', '8l -o %s:p:r %s:p:r.8',
+\   'exec': ['8g %o -o %s:p:r.8 %s', '8l -o %s:p:r %s:p:r.8',
 \            '%s:p:r %a', 'rm -f %s:p:r'],
 \ },
 \ 'go/amd64': {
-\   'exec': ['6g %o %s', '6l -o %s:p:r %s:p:r.6',
+\   'exec': ['6g %o -o %s:p:r.6 %s', '6l -o %s:p:r %s:p:r.6',
 \            '%s:p:r %a', 'rm -f %s:p:r'],
 \ },
 \ 'go/arm': {
-\   'exec': ['5g %o %s', '5l -o %s:p:r %s:p:r.5',
+\   'exec': ['5g %o -o %s:p:r.5 %s', '5l -o %s:p:r %s:p:r.5',
 \            '%s:p:r %a', 'rm -f %s:p:r'],
 \ },
 \ 'groovy': {
