@@ -94,10 +94,11 @@ COMMANDS					*quickrun-commands*
 
 	|:Quickrun| can take |:range|.
 	if it was not given, |:QuickRun| treats whole lines.
-	If you specify '<,'> and do not specify -mode (|quickrun-option-mode|),
-	target is selected text in visual mode. And |blockwise-visual| also works.
-	But when |:QuickRun| is executed from key mapping, you need to specify -mode
-	because |:QuickRun| can't detect current mode.
+	If you specify '<,'> and do not specify -mode
+	(|quickrun-option-mode|), target is selected text in visual mode. And
+	|blockwise-visual| also works.  But when |:QuickRun| is executed from
+	key mapping, you need to specify -mode because |:QuickRun| can't
+	detect current mode.
 
 
 ------------------------------------------------------------------------------
@@ -200,10 +201,10 @@ runmode					*quickrun-option-runmode*
 			- "async:vimproc[:{updatetime}]"
 			  {You need |vimproc| and |vimshell|}
 			  Run command asynchronously using |vimproc|.
-			  Polling the process exit with |CursorHold| and |CursorHoldI|.
-			  If optional argument {updatetime} is given,
-			  change 'updatetime' value while the process lives.
-			  If the process exits within 50 milliseconds,
+			  Polling the process exit with |CursorHold| and
+			  |CursorHoldI|.  If optional argument {updatetime} is
+			  given, change 'updatetime' value while the process
+			  lives.  If the process exits within 50 milliseconds,
 			  shows the result instantly.
 			- "async:remote"
 			  {You need Vim compiled with |+clientserver|}
@@ -238,7 +239,7 @@ split (*)				*quickrun-option-split*
 			Because if there is no buffer in opened tabpage,
 			quickrun opens new output buffer.
 			Default value is
-			'{winwidth(0) * 2 < winheight(0) * 5 ? "" : "vertical"}'.
+		'{winwidth(0) * 2 < winheight(0) * 5 ? "" : "vertical"}'.
 
 into					*quickrun-option-into*
 			If this value is not 0, Move cursor to output buffer
@@ -279,8 +280,8 @@ shellcmd				*quickrun-option-shellcmd*
 			if output is ! .
 			quickrun substitutes %s with commands generated
 			by exec option.
-			On MS Windows, Default value is 'silent !"%s" & pause'.
-			Otherwise '!%s'.
+			On MS Windows, default value is
+			'silent !"%s" & pause'.  Otherwise '!%s'.
 
 eval					*quickrun-option-eval*
 			If this value is not 0, quickrun substitutes src
