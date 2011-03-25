@@ -124,12 +124,16 @@ let g:quickrun#default_config = {
 \ },
 \ 'javascript': {
 \   'type': executable('js') ? 'javascript/spidermonkey':
+\           executable('d8') ? 'javascript/v8':
 \           executable('jrunscript') ? 'javascript/rhino':
 \           executable('cscript') ? 'javascript/cscript': '',
 \   'tempfile': '{tempname()}.js',
 \ },
 \ 'javascript/spidermonkey': {
 \   'command': 'js',
+\ },
+\ 'javascript/v8': {
+\   'command': 'd8',
 \ },
 \ 'javascript/rhino': {
 \   'command': 'jrunscript',
