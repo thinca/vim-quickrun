@@ -196,9 +196,17 @@ let g:quickrun#default_config = {
 \   'output_encode': '&termencoding',
 \ },
 \ 'scheme': {
+\   'type': executable('gosh')     ? 'scheme/gauche':
+\           executable('mzscheme') ? 'scheme/mzscheme': '',
+\ },
+\ 'scheme/gauche': {
 \   'command': 'gosh',
 \   'exec': '%c %o %s:p %a',
 \   'eval_template': '(display (begin %s))',
+\ },
+\ 'scheme/mzscheme': {
+\   'command': 'mzscheme',
+\   'exec': '%c %o -f %s %a',
 \ },
 \ 'sed': {},
 \ 'sh': {},
