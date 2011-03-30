@@ -44,22 +44,22 @@ let g:quickrun#default_config = {
 \     executable('clang')          ? 'c/clang' : '',
 \   'tempfile': '{tempname()}.c',
 \ },
-\ 'c/vc': {
-\   'command': 'cl',
-\   'exec': ['%c %o %s /nologo /Fo%s:p:r.obj /Fe%s:p:r.exe > nul',
-\             '%s:p:r.exe %a', 'del %s:p:r.exe %s:p:r.obj'],
-\ },
-\ 'c/gcc': {
-\   'command': 'gcc',
-\   'exec': ['%c %o %s -o %s:p:r', '%s:p:r %a', 'rm -f %s:p:r'],
+\ 'c/C': {
+\   'command': 'C',
+\   'exec': '%c %o -m %s',
 \ },
 \ 'c/clang': {
 \   'command': 'clang',
 \   'exec': ['%c %o %s -o %s:p:r', '%s:p:r %a', 'rm -f %s:p:r'],
 \ },
-\ 'c/C': {
-\   'command': 'C',
-\   'exec': '%c %o -m %s',
+\ 'c/gcc': {
+\   'command': 'gcc',
+\   'exec': ['%c %o %s -o %s:p:r', '%s:p:r %a', 'rm -f %s:p:r'],
+\ },
+\ 'c/vc': {
+\   'command': 'cl',
+\   'exec': ['%c %o %s /nologo /Fo%s:p:r.obj /Fe%s:p:r.exe > nul',
+\             '%s:p:r.exe %a', 'del %s:p:r.exe %s:p:r.obj'],
 \ },
 \ 'cpp': {
 \   'type':
@@ -67,18 +67,23 @@ let g:quickrun#default_config = {
 \     executable('g++')            ? 'cpp/g++' : '',
 \   'tempfile': '{tempname()}.cpp',
 \ },
-\ 'cpp/vc': {
-\   'command': 'cl',
-\   'exec': ['%c %o %s /nologo /Fo%s:p:r.obj /Fe%s:p:r.exe > nul',
-\             '%s:p:r.exe %a', 'del %s:p:r.exe %s:p:r.obj'],
+\ 'cpp/C': {
+\   'command': 'C',
+\   'exec': '%c %o -p %s',
 \ },
 \ 'cpp/g++': {
 \   'command': 'g++',
 \   'exec': ['%c %o %s -o %s:p:r', '%s:p:r %a', 'rm -f %s:p:r'],
 \ },
-\ 'cpp/C': {
-\   'command': 'C',
-\   'exec': '%c %o -p %s',
+\ 'cpp/vc': {
+\   'command': 'cl',
+\   'exec': ['%c %o %s /nologo /Fo%s:p:r.obj /Fe%s:p:r.exe > nul',
+\             '%s:p:r.exe %a', 'del %s:p:r.exe %s:p:r.obj'],
+\ },
+\ 'dosbatch': {
+\   'command': '',
+\   'exec': 'call %s %a',
+\   'tempfile': '{tempname()}.bat',
 \ },
 \ 'erlang': {
 \   'command': 'escript',
@@ -95,13 +100,13 @@ let g:quickrun#default_config = {
 \   'tempfile': '{tempname()}.go',
 \   'output_encode': 'utf-8',
 \ },
-\ 'go/386/win': {
-\   'exec': ['8g %o -o %s:p:r.8 %s', '8l -o %s:p:r.exe %s:p:r.8',
-\            '%s:p:r.exe %a', 'del /F %s:p:r.exe'],
-\ },
 \ 'go/386': {
 \   'exec': ['8g %o -o %s:p:r.8 %s', '8l -o %s:p:r %s:p:r.8',
 \            '%s:p:r %a', 'rm -f %s:p:r'],
+\ },
+\ 'go/386/win': {
+\   'exec': ['8g %o -o %s:p:r.8 %s', '8l -o %s:p:r.exe %s:p:r.8',
+\            '%s:p:r.exe %a', 'del /F %s:p:r.exe'],
 \ },
 \ 'go/amd64': {
 \   'exec': ['6g %o -o %s:p:r.6 %s', '6l -o %s:p:r %s:p:r.6',
@@ -119,6 +124,7 @@ let g:quickrun#default_config = {
 \   'tempfile': '{tempname()}.hs',
 \   'eval_template': 'main = print $ %s',
 \ },
+\ 'io': {},
 \ 'java': {
 \   'exec': ['javac %o %s', '%c %s:t:r %a', ':call delete("%S:t:r.class")'],
 \   'output_encode': '&termencoding',
@@ -130,18 +136,18 @@ let g:quickrun#default_config = {
 \           executable('cscript') ? 'javascript/cscript': '',
 \   'tempfile': '{tempname()}.js',
 \ },
+\ 'javascript/cscript': {
+\   'command': 'cscript',
+\   'cmdopt': '//Nologo',
+\ },
+\ 'javascript/rhino': {
+\   'command': 'jrunscript',
+\ },
 \ 'javascript/spidermonkey': {
 \   'command': 'js',
 \ },
 \ 'javascript/v8': {
 \   'command': 'd8',
-\ },
-\ 'javascript/rhino': {
-\   'command': 'jrunscript',
-\ },
-\ 'javascript/cscript': {
-\   'command': 'cscript',
-\   'cmdopt': '//Nologo',
 \ },
 \ 'lisp': {
 \   'command': 'clisp',
@@ -150,12 +156,6 @@ let g:quickrun#default_config = {
 \   'command': 'llvm-as %s -o=- | lli - %a',
 \ },
 \ 'lua': {},
-\ 'dosbatch': {
-\   'command': '',
-\   'exec': 'call %s %a',
-\   'tempfile': '{tempname()}.bat',
-\ },
-\ 'io': {},
 \ 'ocaml': {},
 \ 'perl': {
 \   'eval_template': join([
