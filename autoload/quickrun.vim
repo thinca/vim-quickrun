@@ -156,6 +156,26 @@ let g:quickrun#default_config = {
 \   'command': 'llvm-as %s -o=- | lli - %a',
 \ },
 \ 'lua': {},
+\ 'markdown': {
+\   'type': executable('Markdown.pl') ? 'markdown/Markdown.pl':
+\           executable('kramdown') ? 'markdown/kramdown':
+\           executable('bluecloth') ? 'markdown/bluecloth':
+\           executable('pandoc') ? 'markdown/pandoc': '',
+\ },
+\ 'markdown/Markdown.pl': {
+\   'command': 'Markdown.pl',
+\ },
+\ 'markdown/bluecloth': {
+\   'command': 'bluecloth',
+\   'cmdopt': '-f',
+\ },
+\ 'markdown/kramdown': {
+\   'command': 'kramdown',
+\ },
+\ 'markdown/pandoc': {
+\   'command': 'pandoc',
+\   'cmdopt': '--from=markdown --to=html',
+\ },
 \ 'ocaml': {},
 \ 'perl': {
 \   'eval_template': join([
