@@ -21,7 +21,7 @@ endfunction
 
 
 command! -nargs=* -range=% -complete=customlist,quickrun#complete QuickRun
-\ call quickrun#run('-start <line1> -end <line2> ' . <q-args>)
+\ call quickrun#command('-start <line1> -end <line2> ' . <q-args>)
 
 
 nnoremap <silent> <Plug>(quickrun-op) :<C-u>set operatorfunc=QuickRun<CR>g@

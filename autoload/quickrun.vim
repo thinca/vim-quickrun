@@ -1055,7 +1055,7 @@ endfunction
 " ----------------------------------------------------------------------------
 " Interfaces.  {{{1
 " function for main command.
-function! quickrun#run(args)  " {{{2
+function! quickrun#command(args)  " {{{2
   try
     " Sweep runners.
     " The multi run is not supported yet.
