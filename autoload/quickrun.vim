@@ -241,14 +241,14 @@ endfunction
 " ----------------------------------------------------------------------------
 " Initialize of instance.
 function! s:Runner.initialize(argline)  " {{{2
-  let arglist = self.parse_argline(a:argline)
-  let self.config = self.set_options_from_arglist(arglist)
+  let arglist = s:parse_argline(a:argline)
+  let self.config = s:set_options_from_arglist(arglist)
   call self.normalize()
 endfunction
 
 
 
-function! s:Runner.parse_argline(argline)  " {{{2
+function! s:parse_argline(argline)  " {{{2
   " foo 'bar buz' "hoge \"huga"
   " => ['foo', 'bar buz', 'hoge "huga']
   " TODO: More improve.
@@ -275,7 +275,7 @@ endfunction
 
 
 
-function! s:Runner.set_options_from_arglist(arglist)  " {{{2
+function! s:set_options_from_arglist(arglist)  " {{{2
   let config = {}
   let option = ''
   for arg in a:arglist
