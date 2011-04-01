@@ -240,9 +240,8 @@ endfunction
 
 " ----------------------------------------------------------------------------
 " Initialize of instance.
-function! s:Runner.initialize(argline)  " {{{2
-  let arglist = s:parse_argline(a:argline)
-  let self.config = s:set_options_from_arglist(arglist)
+function! s:Runner.initialize(config)  " {{{2
+  let self.config = a:config
   call self.normalize()
 endfunction
 
@@ -1055,36 +1054,45 @@ endfunction
 " ----------------------------------------------------------------------------
 " Interfaces.  {{{1
 " function for main command.
-function! quickrun#command(args)  " {{{2
+function! quickrun#run(config)  " {{{2
+  " Sweep runners.
+  " The multi run is not supported yet.
+  for [k, r] in items(s:runners)
+    call r.sweep()
+    call remove(s:runners, k)
+  endfor
+
+  let runner = s:Runner.new(a:config)
+  let config = runner.config
+
+  if config.running_mark != '' && config.output == ''
+    let mark = runner.expand(config.running_mark)
+    call runner.open_result_window()
+    if !config.append
+      silent % delete _
+    endif
+    silent $-1 put =mark
+    let b:quickrun_running_mark = 1
+    normal! zt
+    wincmd p
+    redraw
+  endif
+
+  if has_key(config, 'debug') && config.debug
+    let g:runner = runner  " for debug
+  endif
+
+  call runner.run()
+endfunction
+
+
+
+" function for main command.
+function! quickrun#command(argline)  " {{{2
   try
-    " Sweep runners.
-    " The multi run is not supported yet.
-    for [k, r] in items(s:runners)
-      call r.sweep()
-      call remove(s:runners, k)
-    endfor
-
-    let runner = s:Runner.new(a:args)
-    let config = runner.config
-
-    if config.running_mark != '' && config.output == ''
-      let mark = runner.expand(config.running_mark)
-      call runner.open_result_window()
-      if !config.append
-        silent % delete _
-      endif
-      silent $-1 put =mark
-      let b:quickrun_running_mark = 1
-      normal! zt
-      wincmd p
-      redraw
-    endif
-
-    if has_key(config, 'debug') && config.debug
-      let g:runner = runner  " for debug
-    endif
-
-    call runner.run()
+    let arglist = s:parse_argline(a:argline)
+    let config = s:set_options_from_arglist(arglist)
+    call quickrun#run(config)
   catch /^quickrun:/
     echohl ErrorMsg
     for line in split(v:exception, "\n")
