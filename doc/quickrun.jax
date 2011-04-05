@@ -86,8 +86,8 @@ http://github.com/thinca/vim-quickrun
 
 	{type} は、-type {type} の省略形です。
 	<{input} は、-input {input} の省略形です。
-	>{output} は、-output {output} の省略形です。
-	>>{output} は、-append 1 -output {output} の省略形です。
+	>{output} は、-outputter {output} の省略形です。
+	>>{output} は、-append 1 -outputter {output} の省略形です。
 
 	range に実行する範囲を指定します。指定しなかった場合はファイル全体を指
 	定したことになります。'<,'>を指定して mode オプション
@@ -167,7 +167,7 @@ input (*)				*quickrun-option-input*
 			標準入力に流し込むファイルを指定します。先頭が = で始
 			まっていた場合、それ以降の文字列を入力として扱います。
 
-output (*)				*quickrun-option-output*
+outputter (*)				*quickrun-option-outputter*
 			outputter を指定します。詳細は |quickrun-outputter| を
 			参照してください。
 
