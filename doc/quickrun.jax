@@ -103,24 +103,23 @@ http://github.com/thinca/vim-quickrun
 						*quickrun-operator*
 
 QuickRun({type})				*QuickRun()*
-			'operatorfunc' に対して設定するための関数です。
-			例えば、 >
-		nnoremap <silent> <C-CR> :<C-u>set opfunc=QuickRun<CR>g@ip
-<			これは、<C-CR> で現在の段落(|ip|)を実行します。
+	'operatorfunc' に対して設定するための関数です。
+	例えば、 >
+	nnoremap <silent> <C-CR> :<C-u>set opfunc=QuickRun<CR>g@ip
+<	これは、<C-CR> で現在の段落(|ip|)を実行します。
 
 
 ------------------------------------------------------------------------------
 キーマッピング					*quickrun-key-mappings*
 
 <Plug>(quickrun-op)				*<Plug>(quickrun-op)*
-			続くモーションの範囲を実行します。これは
-			'operatorfunc' の値を "QuickRun" に変更します。
+	続くモーションの範囲を実行します。これは
+	'operatorfunc' の値を "QuickRun" に変更します。
 
 <Plug>(quickrun)				*<Plug>(quickrun)*
-			現在のバッファに適したコマンドを実行して結果を別ウィン
-			ドウに表示します。
-			これは単純に |:QuickRun| コマンドを引数なしで実行する
-			のと同じです。
+	現在のバッファに適したコマンドを実行して結果を別ウィンドウに表示しま
+	す。
+	これは単純に |:QuickRun| コマンドを引数なしで実行するのと同じです。
 
 					*g:quickrun_no_default_key_mappings*
 以下のキーマッピングは、既に定義されていたり
@@ -139,108 +138,99 @@ g:quickrun_no_default_key_mappings に 1 が設定されていると定義され
 いては |quickrun-syntax-option| を参照してください。
 
 type					*quickrun-option-type*
-			設定の雛形を指定します。デフォルトで 'filetype' の値が
-			使用されます。詳細は |g:quickrun_config| を参照してく
-			ださい。
+	設定の雛形を指定します。デフォルトで 'filetype' の値が使用されます。詳
+	細は |g:quickrun_config| を参照してください。
 
 exec (*)				*quickrun-option-exec*
-			実行するコマンドの書式を指定します。詳細は
-			|quickrun-exec-format| を参照してください。複数の値を
-			指定することも可能です。
+	実行するコマンドの書式を指定します。詳細は |quickrun-exec-format| を参
+	照してください。複数の値を指定することも可能です。
 
 command					*quickrun-option-command*
-			exec 内の %c に展開される文字列です。指定されなかった
-			場合は、type と同じ値が使用されます。
+	exec 内の %c に展開される文字列です。指定されなかった場合は、type と同
+	じ値が使用されます。
 
 cmdopt (*)				*quickrun-option-cmdopt*
-			exec 内の %o に展開される文字列です。
+	exec 内の %o に展開される文字列です。
 
 src					*quickrun-option-src*
-			実行するプログラムのソースとなる文字列を指定します。デ
-			フォルトでは編集中のファイル全体ですが、指定することで
-			変更が可能です。
+	実行するプログラムのソースとなる文字列を指定します。デフォルトでは編集
+	中のファイル全体ですが、指定することで変更が可能です。
 
 args (*)				*quickrun-option-args*
-			exec の %a に展開される文字列です。
+	exec の %a に展開される文字列です。
 
 input (*)				*quickrun-option-input*
-			標準入力に流し込むファイルを指定します。先頭が = で始
-			まっていた場合、それ以降の文字列を入力として扱います。
+	標準入力に流し込むファイルを指定します。先頭が = で始まっていた場合、
+	それ以降の文字列を入力として扱います。
 
 outputter (*)				*quickrun-option-outputter*
-			outputter を指定します。詳細は |quickrun-outputter| を
-			参照してください。
+	outputter を指定します。詳細は |quickrun-outputter| を参照してくださ
+	い。
 
 append					*quickrun-option-append*
-			0 以外が指定された場合、(可能ならば)出力先に対して追記
-			します。
+	0 以外が指定された場合、(可能ならば)出力先に対して追記します。
 
 runner					*quickrun-option-runner*
-			runner を指定します。詳細は |quickrun-runner| を参照し
-			てください。
+	runner を指定します。詳細は |quickrun-runner| を参照してください。
 
 split (*)				*quickrun-option-split*
-			出力専用バッファを開く際の補助コマンドを指定します。バ
-			ッファを開く際に |:split| コマンドの前に挿入されます。
-			|:tab| も指定できますが、タブページ内に出力専用バッフ
-			ァが存在しない場合常に新しく開くのでおすすめしません。
-			デフォルトは
-		'{winwidth(0) * 2 < winheight(0) * 5 ? "" : "vertical"}'
-			です。
+	出力専用バッファを開く際の補助コマンドを指定します。バッファを開く際に
+	|:split| コマンドの前に挿入されます。|:tab| も指定できますが、タブペー
+	ジ内に出力専用バッファが存在しない場合常に新しく開くのでおすすめしませ
+	ん。
+	デフォルトは
+	'{winwidth(0) * 2 < winheight(0) * 5 ? "" : "vertical"}'
+	です。
 
 into					*quickrun-option-into*
-			0 以外を指定すると、結果が出た際に出力専用バッファへ
-			カーソルを移動します。
+	0 以外を指定すると、結果が出た際に出力専用バッファへカーソルを移動しま
+	す。
 
 mode					*quickrun-option-mode*
-			実行モードです。n,v,o のいずれかを指定します。これは範
-			囲をどのように取得するかに影響します。ただし、多くの場
-			合は自動で設定されるので必要ありません。
-			キーマッピングからコマンド全体を入力する場合に指定が必
-			要です。
-			例: >
-				nnoremap <silent> <F5> :QuickRun -mode n<CR>
-				vnoremap <silent> <F5> :QuickRun -mode v<CR>
+	実行モードです。n,v,o のいずれかを指定します。これは範囲をどのように取
+	得するかに影響します。ただし、多くの場合は自動で設定されるので必要あり
+	ません。
+	キーマッピングからコマンド全体を入力する場合に指定が必要です。
+	例: >
+		nnoremap <silent> <F5> :QuickRun -mode n<CR>
+		vnoremap <silent> <F5> :QuickRun -mode v<CR>
 
 output_encode (*)			*quickrun-option-output_encode*
-			出力の文字コードを変換したい場合に、"from:to" の形式
-			で指定します。":to" は省略できます。その場合、
-			"from:&encoding" と解釈されます。
-			デフォルトは "&fileencoding" です。
+	出力の文字コードを変換したい場合に、"from:to" の形式で指定しま
+	す。":to" は省略できます。その場合、"from:&encoding" と解釈されます。
+	デフォルトは "&fileencoding" です。
 
 shebang					*quickrun-option-shebang*
-			0 以外を指定すると、 src の最初の行が #! で始まってた
-			場合にその後続の文字列を command として扱います。この
-			場合、%c はエスケープ処理(|quickrun-exec-format|)され
-			ません。
-			デフォルトは 1 です。
+	0 以外を指定すると、 src の最初の行が #! で始まってた場合にその後続の
+	文字列を command として扱います。この場合、%c はエスケープ処理
+	(|quickrun-exec-format|)されません。
+	デフォルトは 1 です。
 
 tempfile (*)				*quickrun-option-tempfile*
-			ブログラムを実行する際、現在のバッファ全体を実行する以
-			外の場合は、ソースファイルを一時ファイルに書き出して実
-			行します。その際の一時ファイル名を指定します。
-			一時ファイルは実行する度に削除されます。
-			デフォルトは "{tempname()}" です。
+	ブログラムを実行する際、現在のバッファ全体を実行する以外の場合は、ソー
+	スファイルを一時ファイルに書き出して実行します。その際の一時ファイル名
+	を指定します。
+	一時ファイルは実行する度に削除されます。
+	デフォルトは "{tempname()}" です。
 
 shellcmd				*quickrun-option-shellcmd*
-			runner が "shell" の時に実行する Vim コマンドのテンプ
-			レートです。%s が exec オプションで生成されたコマンド
-			に置換されます。
-			デフォルトは MS Windows の場合は
-			'silent !"%s" & pause' それ以外の場合は '!%s' です。
+	runner が "shell" の時に実行する Vim コマンドのテンプレートです。%s が
+	exec オプションで生成されたコマンドに置換されます。
+	デフォルトは MS Windows の場合は
+	'silent !"%s" & pause' それ以外の場合は '!%s' です。
 
 eval					*quickrun-option-eval*
-			0 以外が指定された場合、src を eval_template に埋め込
-			んで置き変えます。
+	0 以外が指定された場合、src を eval_template に埋め込んで置き変えま
+	す。
 
 eval_template				*quickrun-option-eval_template*
-			eval が指定された際に使用されるテンプレート文字列で
-			す。テンプレート内の %s が src に置き変えられます。
+	eval が指定された際に使用されるテンプレート文字列です。テンプレート内
+	の %s が src に置き変えられます。
 
 running_mark (*)			*quickrun-option-running_mark*
-			この値が空文字列でない場合、実行中にこの文字列が出力先
-			に表示されます。表示は実行完了後に削除されます。
-			デフォルトは ":-)" です。
+	この値が空文字列でない場合、実行中にこの文字列が出力先に表示されます。
+	表示は実行完了後に削除されます。
+	デフォルトは ":-)" です。
 
 
 ------------------------------------------------------------------------------
