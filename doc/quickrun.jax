@@ -223,9 +223,9 @@ tempfile (*)				*quickrun-option-tempfile*
 			デフォルトは "{tempname()}" です。
 
 shellcmd				*quickrun-option-shellcmd*
-			output が ! の時に実行する Vim コマンドのテンプレート
-			です。%s が exec オプションで生成されたコマンドに置換
-			されます。
+			runner が "shell" の時に実行する Vim コマンドのテンプ
+			レートです。%s が exec オプションで生成されたコマンド
+			に置換されます。
 			デフォルトは MS Windows の場合は
 			'silent !"%s" & pause' それ以外の場合は '!%s' です。
 
