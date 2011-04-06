@@ -866,64 +866,6 @@ endfunction
 
 
 
-" ----------------------------------------------------------------------------
-" Expand the keyword.
-" - @register @{register}
-" - &option &{option}
-" - $ENV_NAME ${ENV_NAME}
-" - {expr}
-" Escape by \ if you does not want to expand.
-function! quickrun#expand(str)  " {{{2
-  if type(a:str) != type('')
-    return ''
-  endif
-  let i = 0
-  let rest = a:str
-  let result = ''
-  while 1
-    let f = match(rest, '\\\?[@&${]')
-    if f < 0
-      let result .= rest
-      break
-    endif
-
-    if f != 0
-      let result .= rest[: f - 1]
-      let rest = rest[f :]
-    endif
-
-    if rest[0] == '\'
-      let result .= rest[1]
-      let rest = rest[2 :]
-    else
-      if rest =~ '^[@&$]{'
-        let rest = rest[1] . rest[0] . rest[2 :]
-      endif
-      if rest[0] == '@'
-        let e = 2
-        let expr = rest[0 : 1]
-      elseif rest =~ '^[&$]'
-        let e = matchend(rest, '.\w\+')
-        let expr = rest[: e - 1]
-      else  " rest =~ '^{'
-        let e = matchend(rest, '\\\@<!}')
-        let expr = substitute(rest[1 : e - 2], '\\}', '}', 'g')
-      endif
-      if e < 0
-        break
-      endif
-      try
-        let result .= eval(expr)
-      catch
-      endtry
-      let rest = rest[e :]
-    endif
-  endwhile
-  return result
-endfunction
-
-
-
 function! s:Runner.output(result)  " {{{2
   let config = self.config
   let [out, to] = [config.output[:0], config.output[1:]]
@@ -1152,6 +1094,63 @@ function! quickrun#complete(lead, cmd, pos)  " {{{2
   let types = keys(extend(exists('g:quickrun_config') ?
   \                copy(g:quickrun_config) : {}, g:quickrun#default_config))
   return filter(types, 'v:val !~ "^[_*]$" && v:val =~ "^".a:lead')
+endfunction
+
+
+
+" Expand the keyword.
+" - @register @{register}
+" - &option &{option}
+" - $ENV_NAME ${ENV_NAME}
+" - {expr}
+" Escape by \ if you does not want to expand.
+function! quickrun#expand(str)  " {{{2
+  if type(a:str) != type('')
+    return ''
+  endif
+  let i = 0
+  let rest = a:str
+  let result = ''
+  while 1
+    let f = match(rest, '\\\?[@&${]')
+    if f < 0
+      let result .= rest
+      break
+    endif
+
+    if f != 0
+      let result .= rest[: f - 1]
+      let rest = rest[f :]
+    endif
+
+    if rest[0] == '\'
+      let result .= rest[1]
+      let rest = rest[2 :]
+    else
+      if rest =~ '^[@&$]{'
+        let rest = rest[1] . rest[0] . rest[2 :]
+      endif
+      if rest[0] == '@'
+        let e = 2
+        let expr = rest[0 : 1]
+      elseif rest =~ '^[&$]'
+        let e = matchend(rest, '.\w\+')
+        let expr = rest[: e - 1]
+      else  " rest =~ '^{'
+        let e = matchend(rest, '\\\@<!}')
+        let expr = substitute(rest[1 : e - 2], '\\}', '}', 'g')
+      endif
+      if e < 0
+        break
+      endif
+      try
+        let result .= eval(expr)
+      catch
+      endtry
+      let rest = rest[e :]
+    endif
+  endwhile
+  return result
 endfunction
 
 
