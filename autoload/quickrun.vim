@@ -368,7 +368,7 @@ function! s:Runner.normalize()  " {{{2
   endfor
 
   if has_key(config, 'input')
-    let input = self.expand(config.input)
+    let input = quickrun#expand(config.input)
     try
       let config.input = input[0] == '=' ? input[1:]
       \                                  : join(readfile(input, 'b'), "\n")
@@ -383,7 +383,7 @@ function! s:Runner.normalize()  " {{{2
   let config.start = get(config, 'start', 1)
   let config.end = get(config, 'end', line('$'))
 
-  let config.output = self.expand(config.output)
+  let config.output = quickrun#expand(config.output)
   if config.output == '!'
     let config.runmode = 'simple'
   endif
@@ -421,8 +421,8 @@ function! s:Runner.normalize()  " {{{2
   endif
 
   let self.source_name = self.get_source_name()
-  let config.cmdopt = self.expand(config.cmdopt)
-  let config.args = self.expand(config.args)
+  let config.cmdopt = quickrun#expand(config.cmdopt)
+  let config.args = quickrun#expand(config.args)
 endfunction
 
 
@@ -735,7 +735,7 @@ function! s:Runner.build_command(tmpl)  " {{{2
     endif
     let cmd = substitute(cmd, '\C\v[^%]?\zs\%' . key, '\=' . value, 'g')
   endfor
-  return substitute(self.expand(cmd), '[\r\n]\+', ' ', 'g')
+  return substitute(quickrun#expand(cmd), '[\r\n]\+', ' ', 'g')
 endfunction
 
 
@@ -763,7 +763,7 @@ function! s:Runner.get_source_name()  " {{{2
       if has_key(self, '_temp_source')
         let fname = self._temp_source
       else
-        let fname = self.expand(self.config.tempfile)
+        let fname = quickrun#expand(self.config.tempfile)
         let self._temp_source = fname
         call writefile(split(src, "\n", 1), fname, 'b')
       endif
@@ -873,7 +873,7 @@ endfunction
 " - $ENV_NAME ${ENV_NAME}
 " - {expr}
 " Escape by \ if you does not want to expand.
-function! s:Runner.expand(str)  " {{{2
+function! quickrun#expand(str)  " {{{2
   if type(a:str) != type('')
     return ''
   endif
@@ -931,7 +931,7 @@ function! s:Runner.output(result)  " {{{2
 
   let result = a:result
   if get(config, 'output_encode', '') != ''
-    let enc = split(self.expand(config.output_encode), '[^[:alnum:]-_]')
+    let enc = split(quickrun#expand(config.output_encode), '[^[:alnum:]-_]')
     if len(enc) == 1
       let enc += [&encoding]
     endif
@@ -999,7 +999,7 @@ function! s:Runner.open_result_window()  " {{{2
   if !exists('s:bufnr')
     let s:bufnr = -1  " A number that doesn't exist.
   endif
-  let sp = self.expand(self.config.split)
+  let sp = quickrun#expand(self.config.split)
   if !bufexists(s:bufnr)
     execute sp 'split'
     edit `='[quickrun output]'`
@@ -1087,7 +1087,7 @@ function! quickrun#run(config)  " {{{2
   let config = runner.config
 
   if config.running_mark != '' && config.output == ''
-    let mark = runner.expand(config.running_mark)
+    let mark = quickrun#expand(config.running_mark)
     call runner.open_result_window()
     if !config.append
       silent % delete _
