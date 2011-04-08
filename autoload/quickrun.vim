@@ -228,6 +228,10 @@ let g:quickrun#default_config = {
 \   'eval_template': "echo %s",
 \   'runmode': 'simple',
 \ },
+\ 'wsh': {
+\   'command': 'cscript',
+\   'cmdopt': '//Nologo',
+\ },
 \ 'zsh': {},
 \}
 lockvar! g:quickrun#default_config
