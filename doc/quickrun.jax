@@ -296,16 +296,19 @@ runner は引数を取る場合があります。その場合、runner 名に続
 
 NOTE: "system" 以外は不安定な場合があります。
 - "system"
-  単純に |system()| を使って実行します。デフォルトではこのモードです。
+  |system()| を使って実行します。これが既定値です。
+
 - "shell"
-  単純に |:!| を使って実行します。この runner は outputter を無視します。
-- "async/vimproc[:{updatetime}]"
-  {|vimproc| と |vimshell| が必要}
+  |:!| を使って実行します。この runner は outputter を無視します。
+
+- "vimproc[:{updatetime}]"
+  {|vimproc| が必要}
   |vimproc| を使ってコマンドをバックグラウンドで実行します。実行の完了
   を |CursorHold| と |CursorHoldI| イベントを使って検査します。オプションの値
   として {updatetime} を指定すると一時的に 'updatetime' を変更します。50 ミリ
   秒以内に実行が終了した場合は、即座に結果を表示します。
-- "async/remote"
+
+- "remote"
   {|+clientserver| が必要}
   コマンドをバックグラウンドで実行し、終了を |+clientserver| 機能を利用して通
   知し結果を表示します。
@@ -313,14 +316,13 @@ NOTE: "system" 以外は不安定な場合があります。
   プションを使って Vim を起動してください。
   バックグラウンドで実行するため、コマンドが無限ループや入力待ち等で終了しな
   い場合、Vim から制御することはできないので注意してください。
-- "async/remote/vimproc"
-  {|vimproc| が必要}
-  コマンドの実行に |vimproc| を使います。すでにこのモードでコマンドが実行され
-  ている最中に新しくコマンドを実行しようとした場合、古いコマンドは強制的にキャ
-  ンセルされます。
-  |vimproc| がインストールされていない場合は通常と同じ
-  ように実行します。
-- "async/python"
+
+- "remote/vimproc"
+  {|+clientserver| と |vimproc| が必要}
+  "remote" と似ていますが、コマンドを |vimproc| で実行します。これにより、実行
+  のキャンセルが可能になります。
+
+- "python"
   {|+python| が必要}
   |python| のスレッドを利用してコマンドを非同期実行します。
   警告: これは非常に不安定です。
@@ -340,15 +342,19 @@ outputter は引数を取る場合があります。その場合、outputter 名
 - "buffer"
   出力専用バッファを開いてそこへ出力します。このバッファは同じものが再利用され
   ます。このバッファにはカスタマイズのために 'filetype' に "quickrun" が設定さ
-  れます。
+  れます。これが既定値です。
+
 - "echo"
   |hit-enter-prompt| に出力します。 append を有効にした場合、|message-history|
   に記録します。
+
 - "variable"
   変数に対して出力します。引数として変数名を受け取ります。環境変数やオプション
   に対しても出力可能です。
+
 - "null"
   出力を行いません。
+
 - "file"
   ファイルに対して出力します。引数としてファイル名を受け取ります。
 
