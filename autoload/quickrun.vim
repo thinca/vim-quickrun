@@ -421,11 +421,9 @@ function! s:Runner.normalize()  " {{{2
   endif
 
   let self.source_name = self.get_source_name()
-  let config.cmdopt = quickrun#expand(config.cmdopt)
-  let config.args = quickrun#expand(config.args)
-  let config.split = quickrun#expand(config.split)
-  let config.running_mark = quickrun#expand(config.running_mark)
-  let config.output_encode = quickrun#expand(config.output_encode)
+  for opt in ['cmdopt', 'args', 'split', 'running_mark', 'output_encode']
+    let config[opt] = quickrun#expand(config[opt])
+  endfor
 endfunction
 
 
