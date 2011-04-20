@@ -423,6 +423,9 @@ function! s:Runner.normalize()  " {{{2
   let self.source_name = self.get_source_name()
   let config.cmdopt = quickrun#expand(config.cmdopt)
   let config.args = quickrun#expand(config.args)
+  let config.split = quickrun#expand(config.split)
+  let config.running_mark = quickrun#expand(config.running_mark)
+  let config.output_encode = quickrun#expand(config.output_encode)
 endfunction
 
 
@@ -873,7 +876,7 @@ function! s:Runner.output(result)  " {{{2
 
   let result = a:result
   if get(config, 'output_encode', '') != ''
-    let enc = split(quickrun#expand(config.output_encode), '[^[:alnum:]-_]')
+    let enc = split(config.output_encode, '[^[:alnum:]-_]')
     if len(enc) == 1
       let enc += [&encoding]
     endif
@@ -941,7 +944,7 @@ function! s:Runner.open_result_window()  " {{{2
   if !exists('s:bufnr')
     let s:bufnr = -1  " A number that doesn't exist.
   endif
-  let sp = quickrun#expand(self.config.split)
+  let sp = self.config.split
   if !bufexists(s:bufnr)
     execute sp 'split'
     edit `='[quickrun output]'`
@@ -1029,7 +1032,7 @@ function! quickrun#run(config)  " {{{2
   let config = runner.config
 
   if config.running_mark != '' && config.output == ''
-    let mark = quickrun#expand(config.running_mark)
+    let mark = config.running_mark
     call runner.open_result_window()
     if !config.append
       silent % delete _
