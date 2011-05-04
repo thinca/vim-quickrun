@@ -445,7 +445,7 @@ function! s:Runner.run_simple(commands)  " {{{2
       endif
     endfor
   finally
-    call self.sweep()
+    call quickrun#sweep(self)
   endtry
 
   call self.output(result)
@@ -746,43 +746,6 @@ function! s:Runner.get_source_name()  " {{{2
 endfunction
 
 " ----------------------------------------------------------------------------
-" Sweep the session.
-function! s:Runner.sweep()  " {{{2
-  " Remove temporary files.
-  for file in filter(keys(self), 'v:val =~# "^_temp"')
-    if filewritable(self[file])
-      call delete(self[file])
-    endif
-    call remove(self, file)
-  endfor
-
-  " Restore options.
-  for opt in filter(keys(self), 'v:val =~# "^_option_"')
-    let optname = matchstr(opt, '^_option_\zs.*')
-    if exists('+' . optname)
-      execute 'let'  '&' . optname '= self[opt]'
-    endif
-    call remove(self, opt)
-  endfor
-
-  " Delete autocmds.
-  for cmd in filter(keys(self), 'v:val =~# "^_autocmd_"')
-    execute 'autocmd!' 'plugin-quickrun-' . self[cmd]
-    call remove(self, cmd)
-  endfor
-
-  " Sweep the execution of vimproc.
-  if has_key(self, 'vimproc')
-    try
-      call self.vimproc.kill(15)
-      call self.vimproc.waitpid()
-    catch
-    endtry
-    call remove(self, 'vimproc')
-  endif
-endfunction
-
-" ----------------------------------------------------------------------------
 " Get the text of specified region.
 function! s:Runner.get_region()  " {{{2
   let mode = self.config.mode
@@ -970,7 +933,7 @@ function! quickrun#run(config)  " {{{2
   " Sweep runners.
   " The multi run is not supported yet.
   for [k, r] in items(s:runners)
-    call r.sweep()
+    call quickrun#sweep(r)
     call remove(s:runners, k)
   endfor
 
@@ -1096,6 +1059,42 @@ function! quickrun#expand(str)  " {{{2
   return result
 endfunction
 
+" Sweep the runner.
+function! quickrun#sweep(runner)  " {{{2
+  " Remove temporary files.
+  for file in filter(keys(a:runner), 'v:val =~# "^_temp"')
+    if filewritable(a:runner[file])
+      call delete(a:runner[file])
+    endif
+    call remove(a:runner, file)
+  endfor
+
+  " Restore options.
+  for opt in filter(keys(a:runner), 'v:val =~# "^_option_"')
+    let optname = matchstr(opt, '^_option_\zs.*')
+    if exists('+' . optname)
+      execute 'let'  '&' . optname '= a:runner[opt]'
+    endif
+    call remove(a:runner, opt)
+  endfor
+
+  " Delete autocmds.
+  for cmd in filter(keys(a:runner), 'v:val =~# "^_autocmd_"')
+    execute 'autocmd!' 'plugin-quickrun-' . a:runner[cmd]
+    call remove(a:runner, cmd)
+  endfor
+
+  " Sweep the execution of vimproc.
+  if has_key(a:runner, 'vimproc')
+    try
+      call a:runner.vimproc.kill(15)
+      call a:runner.vimproc.waitpid()
+    catch
+    endtry
+    call remove(a:runner, 'vimproc')
+  endif
+endfunction
+
 function! quickrun#_result(key, ...)  " {{{2
   if !has_key(s:runners, a:key)
     return ''
@@ -1116,7 +1115,7 @@ function! quickrun#_result(key, ...)  " {{{2
   endif
 
   call remove(s:runners, a:key)
-  call runner.sweep()
+  call quickrun#sweep(runner)
   call runner.output(result)
   return ''
 endfunction
