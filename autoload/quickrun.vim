@@ -10,7 +10,7 @@ set cpo&vim
 let s:available_vimproc = globpath(&runtimepath, 'autoload/vimproc.vim') != ''
 let s:is_win = has('win32') || has('win64')
 
-function! s:is_cmd_exe()  " {{{2
+function! s:is_cmd_exe()
   return &shell =~? 'cmd\.exe'
 endfunction
 
@@ -251,7 +251,7 @@ let s:Runner = {}  " {{{1
 
 " ----------------------------------------------------------------------------
 " Constructor.
-function! s:Runner.new(args)  " {{{2
+function! s:Runner.new(args)
   let obj = copy(self)
   call obj.initialize(a:args)
   return obj
@@ -259,12 +259,12 @@ endfunction
 
 " ----------------------------------------------------------------------------
 " Initialize of instance.
-function! s:Runner.initialize(config)  " {{{2
+function! s:Runner.initialize(config)
   let self.config = a:config
   call self.normalize()
 endfunction
 
-function! s:parse_argline(argline)  " {{{2
+function! s:parse_argline(argline)
   " foo 'bar buz' "hoge \"huga"
   " => ['foo', 'bar buz', 'hoge "huga']
   " TODO: More improve.
@@ -289,7 +289,7 @@ function! s:parse_argline(argline)  " {{{2
   return arglist
 endfunction
 
-function! s:set_options_from_arglist(arglist)  " {{{2
+function! s:set_options_from_arglist(arglist)
   let config = {}
   let option = ''
   for arg in a:arglist
@@ -325,7 +325,7 @@ endfunction
 
 " ----------------------------------------------------------------------------
 " The option is appropriately set referring to default options.
-function! s:Runner.normalize()  " {{{2
+function! s:Runner.normalize()
   let config = self.config
   if !has_key(config, 'mode')
     let config.mode = histget(':') =~# "^'<,'>\\s*Q\\%[uickRun]" ? 'v' : 'n'
@@ -420,7 +420,7 @@ endfunction
 
 " ----------------------------------------------------------------------------
 " Run commands.
-function! s:Runner.run()  " {{{2
+function! s:Runner.run()
   let exec = get(self.config, 'exec', '')
   let commands = type(exec) == type([]) ? copy(exec) : [exec]
   call map(commands, 'self.build_command(v:val)')
@@ -434,7 +434,7 @@ function! s:Runner.run()  " {{{2
   call call(self['run_' . runmode], [commands] + args, self)
 endfunction
 
-function! s:Runner.run_simple(commands)  " {{{2
+function! s:Runner.run_simple(commands)
   let result = ''
 
   try
@@ -453,7 +453,7 @@ endfunction
 
 " ----------------------------------------------------------------------------
 " Execute a single command.
-function! s:Runner.execute(cmd)  " {{{2
+function! s:Runner.execute(cmd)
   if a:cmd =~ '^\s*:'
     " A vim command.
     return quickrun#execute(a:cmd)
@@ -492,7 +492,7 @@ function! s:Runner.execute(cmd)  " {{{2
   endtry
 endfunction
 
-function! s:Runner.run_async(commands, ...)  " {{{2
+function! s:Runner.run_async(commands, ...)
   let [type; args] = a:000
   if !has_key(self, 'run_async_' . type)
     throw 'quickrun: Unknown async type: ' . type
@@ -500,7 +500,7 @@ function! s:Runner.run_async(commands, ...)  " {{{2
   call call(self['run_async_' . type], [a:commands] + args, self)
 endfunction
 
-function! s:Runner.run_async_vimproc(commands, ...)  " {{{2
+function! s:Runner.run_async_vimproc(commands, ...)
   if !s:available_vimproc
     throw 'quickrun: runmode = async:vimproc needs vimproc.'
   endif
@@ -534,7 +534,7 @@ function! s:Runner.run_async_vimproc(commands, ...)  " {{{2
   endif
 endfunction
 
-function! s:receive_vimproc_result(key)  " {{{2
+function! s:receive_vimproc_result(key)
   let runner = get(s:runners, a:key)
 
   let vimproc = runner.vimproc
@@ -559,7 +559,7 @@ function! s:receive_vimproc_result(key)  " {{{2
   return 1
 endfunction
 
-function! s:Runner.run_async_remote(commands, ...)  " {{{2
+function! s:Runner.run_async_remote(commands, ...)
   if !has('clientserver') || v:servername == ''
     throw 'quickrun: runmode = async:remote needs +clientserver feature.'
   endif
@@ -668,7 +668,7 @@ EOM
   endtry
 endif
 
-function! s:Runner.run_async_python(commands, ...)  " {{{2
+function! s:Runner.run_async_python(commands, ...)
   if !has('python')
     throw 'quickrun: runmode = async:python needs +python feature.'
   elseif !s:python_loaded
@@ -684,7 +684,7 @@ endfunction
 
 " ----------------------------------------------------------------------------
 " Build a command to execute it from options.
-function! s:Runner.build_command(tmpl)  " {{{2
+function! s:Runner.build_command(tmpl)
   " FIXME: Possibility to be multiple expanded.
   let config = self.config
   let shebang = config.shebang ? self.detect_shebang() : ''
@@ -715,7 +715,7 @@ endfunction
 
 " ----------------------------------------------------------------------------
 " Detect the shebang, and return the shebang command if it exists.
-function! s:Runner.detect_shebang()  " {{{2
+function! s:Runner.detect_shebang()
   let src = self.config.src
   let line = type(src) == type('') ? matchstr(src, '^.\{-}\ze\(\n\|$\)'):
   \          type(src) == type(0)  ? getbufline(src, 1)[0]:
@@ -726,7 +726,7 @@ endfunction
 " ----------------------------------------------------------------------------
 " Return the source file name.
 " Output to a temporary file if self.config.src is string.
-function! s:Runner.get_source_name()  " {{{2
+function! s:Runner.get_source_name()
   let fname = expand('%')
   if exists('self.config.src')
     let src = self.config.src
@@ -747,7 +747,7 @@ endfunction
 
 " ----------------------------------------------------------------------------
 " Get the text of specified region.
-function! s:Runner.get_region()  " {{{2
+function! s:Runner.get_region()
   let mode = self.config.mode
   if mode ==# 'n'
     " Normal mode
@@ -793,7 +793,7 @@ function! s:Runner.get_region()  " {{{2
   return selected
 endfunction
 
-function! s:Runner.output(result)  " {{{2
+function! s:Runner.output(result)
   let config = self.config
   let [out, to] = [config.output[:0], config.output[1:]]
   let append = config.append
@@ -861,7 +861,7 @@ endfunction
 
 " ----------------------------------------------------------------------------
 " Open the output buffer, and return the buffer number.
-function! s:Runner.open_result_window()  " {{{2
+function! s:Runner.open_result_window()
   if !exists('s:bufnr')
     let s:bufnr = -1  " A number that doesn't exist.
   endif
@@ -885,7 +885,7 @@ function! s:Runner.open_result_window()  " {{{2
   endif
 endfunction
 
-function! s:Runner.conv_vim2remote(selfvim, cmd)  " {{{2
+function! s:Runner.conv_vim2remote(selfvim, cmd)
   if a:cmd !~ '^\s*:'
     return a:cmd
   endif
@@ -894,12 +894,12 @@ function! s:Runner.conv_vim2remote(selfvim, cmd)  " {{{2
   \       printf('quickrun#execute(%s)', string(a:cmd))])
 endfunction
 
-function! s:Runner.make_command(args)  " {{{2
+function! s:Runner.make_command(args)
   return join([shellescape(a:args[0])] +
   \           map(a:args[1 :], 'self.shellescape(v:val)'), ' ')
 endfunction
 
-function! s:Runner.shellescape(str)  " {{{2
+function! s:Runner.shellescape(str)
   if self.config.runmode =~# '^async:vimproc\%(:\d\+\)\?$'
     return "'" . substitute(a:str, '\\', '/', 'g') . "'"
   elseif s:is_cmd_exe()
@@ -912,7 +912,7 @@ function! s:Runner.shellescape(str)  " {{{2
 endfunction
 
 " iconv() wrapper for safety.
-function! s:iconv(expr, from, to)  " {{{2
+function! s:iconv(expr, from, to)
   if a:from ==# a:to
     return a:expr
   endif
@@ -920,7 +920,7 @@ function! s:iconv(expr, from, to)  " {{{2
   return result != '' ? result : a:expr
 endfunction
 
-function! s:register(runner)  " {{{2
+function! s:register(runner)
   let key = has('reltime') ? reltimestr(reltime()) : string(localtime())
   let s:runners[key] = a:runner
   return key
@@ -929,7 +929,7 @@ endfunction
 " ----------------------------------------------------------------------------
 " Interfaces.  {{{1
 " function for main command.
-function! quickrun#run(config)  " {{{2
+function! quickrun#run(config)
   " Sweep runners.
   " The multi run is not supported yet.
   for [k, r] in items(s:runners)
@@ -961,7 +961,7 @@ function! quickrun#run(config)  " {{{2
 endfunction
 
 " function for main command.
-function! quickrun#command(argline)  " {{{2
+function! quickrun#command(argline)
   try
     let arglist = s:parse_argline(a:argline)
     let config = s:set_options_from_arglist(arglist)
@@ -975,7 +975,7 @@ function! quickrun#command(argline)  " {{{2
   endtry
 endfunction
 
-function! quickrun#complete(lead, cmd, pos)  " {{{2
+function! quickrun#complete(lead, cmd, pos)
   let line = split(a:cmd[:a:pos - 1], '', 1)
   let head = line[-1]
   if 2 <= len(line) && line[-2] =~ '^-'
@@ -1010,7 +1010,7 @@ endfunction
 " - $ENV_NAME ${ENV_NAME}
 " - {expr}
 " Escape by \ if you does not want to expand.
-function! quickrun#expand(str)  " {{{2
+function! quickrun#expand(str)
   if type(a:str) != type('')
     return ''
   endif
@@ -1060,7 +1060,7 @@ function! quickrun#expand(str)  " {{{2
 endfunction
 
 " Sweep the runner.
-function! quickrun#sweep(runner)  " {{{2
+function! quickrun#sweep(runner)
   " Remove temporary files.
   for file in filter(keys(a:runner), 'v:val =~# "^_temp"')
     if filewritable(a:runner[file])
@@ -1095,7 +1095,7 @@ function! quickrun#sweep(runner)  " {{{2
   endif
 endfunction
 
-function! quickrun#_result(key, ...)  " {{{2
+function! quickrun#_result(key, ...)
   if !has_key(s:runners, a:key)
     return ''
   endif
@@ -1121,7 +1121,7 @@ function! quickrun#_result(key, ...)  " {{{2
 endfunction
 
 " Execute commands by expr.  This is used by remote_expr()
-function! quickrun#execute(...)  " {{{2
+function! quickrun#execute(...)
   " XXX: Can't get a result if a:cmd contains :redir command.
   let result = ''
   try
