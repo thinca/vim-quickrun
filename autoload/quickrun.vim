@@ -243,15 +243,15 @@ lockvar! g:quickrun#default_config
 
 
 
-let s:runners = {}  " Store for running runners.
+let s:sessions = {}  " Store for sessions.
 
-let s:Runner = {}  " {{{1
+let s:Session = {}  " {{{1
 
 
 
 " ----------------------------------------------------------------------------
 " Constructor.
-function! s:Runner.new(args)
+function! s:Session.new(args)
   let obj = copy(self)
   call obj.initialize(a:args)
   return obj
@@ -259,7 +259,7 @@ endfunction
 
 " ----------------------------------------------------------------------------
 " Initialize of instance.
-function! s:Runner.initialize(config)
+function! s:Session.initialize(config)
   let self.config = a:config
   call self.normalize()
 endfunction
@@ -325,7 +325,7 @@ endfunction
 
 " ----------------------------------------------------------------------------
 " The option is appropriately set referring to default options.
-function! s:Runner.normalize()
+function! s:Session.normalize()
   let config = self.config
   if !has_key(config, 'mode')
     let config.mode = histget(':') =~# "^'<,'>\\s*Q\\%[uickRun]" ? 'v' : 'n'
@@ -420,7 +420,7 @@ endfunction
 
 " ----------------------------------------------------------------------------
 " Run commands.
-function! s:Runner.run()
+function! s:Session.run()
   let exec = get(self.config, 'exec', '')
   let commands = type(exec) == type([]) ? copy(exec) : [exec]
   call map(commands, 'self.build_command(v:val)')
@@ -434,7 +434,7 @@ function! s:Runner.run()
   call call(self['run_' . runmode], [commands] + args, self)
 endfunction
 
-function! s:Runner.run_simple(commands)
+function! s:Session.run_simple(commands)
   let result = ''
 
   try
@@ -453,7 +453,7 @@ endfunction
 
 " ----------------------------------------------------------------------------
 " Execute a single command.
-function! s:Runner.execute(cmd)
+function! s:Session.execute(cmd)
   if a:cmd =~ '^\s*:'
     " A vim command.
     return quickrun#execute(a:cmd)
@@ -492,7 +492,7 @@ function! s:Runner.execute(cmd)
   endtry
 endfunction
 
-function! s:Runner.run_async(commands, ...)
+function! s:Session.run_async(commands, ...)
   let [type; args] = a:000
   if !has_key(self, 'run_async_' . type)
     throw 'quickrun: Unknown async type: ' . type
@@ -500,7 +500,7 @@ function! s:Runner.run_async(commands, ...)
   call call(self['run_async_' . type], [a:commands] + args, self)
 endfunction
 
-function! s:Runner.run_async_vimproc(commands, ...)
+function! s:Session.run_async_vimproc(commands, ...)
   if !s:available_vimproc
     throw 'quickrun: runmode = async:vimproc needs vimproc.'
   endif
@@ -535,15 +535,15 @@ function! s:Runner.run_async_vimproc(commands, ...)
 endfunction
 
 function! s:receive_vimproc_result(key)
-  let runner = get(s:runners, a:key)
+  let session = get(s:sessions, a:key)
 
-  let vimproc = runner.vimproc
+  let vimproc = session.vimproc
 
   if !vimproc.stdout.eof
-    let runner.result .= vimproc.stdout.read()
+    let session.result .= vimproc.stdout.read()
   endif
   if !vimproc.stderr.eof
-    let runner.result .= vimproc.stderr.read()
+    let session.result .= vimproc.stderr.read()
   endif
 
   if !(vimproc.stdout.eof && vimproc.stderr.eof)
@@ -555,11 +555,11 @@ function! s:receive_vimproc_result(key)
   call vimproc.stderr.close()
   call vimproc.waitpid()
 
-  call quickrun#_result(a:key, runner.result)
+  call quickrun#_result(a:key, session.result)
   return 1
 endfunction
 
-function! s:Runner.run_async_remote(commands, ...)
+function! s:Session.run_async_remote(commands, ...)
   if !has('clientserver') || v:servername == ''
     throw 'quickrun: runmode = async:remote needs +clientserver feature.'
   endif
@@ -668,7 +668,7 @@ EOM
   endtry
 endif
 
-function! s:Runner.run_async_python(commands, ...)
+function! s:Session.run_async_python(commands, ...)
   if !has('python')
     throw 'quickrun: runmode = async:python needs +python feature.'
   elseif !s:python_loaded
@@ -684,7 +684,7 @@ endfunction
 
 " ----------------------------------------------------------------------------
 " Build a command to execute it from options.
-function! s:Runner.build_command(tmpl)
+function! s:Session.build_command(tmpl)
   " FIXME: Possibility to be multiple expanded.
   let config = self.config
   let shebang = config.shebang ? self.detect_shebang() : ''
@@ -715,7 +715,7 @@ endfunction
 
 " ----------------------------------------------------------------------------
 " Detect the shebang, and return the shebang command if it exists.
-function! s:Runner.detect_shebang()
+function! s:Session.detect_shebang()
   let src = self.config.src
   let line = type(src) == type('') ? matchstr(src, '^.\{-}\ze\(\n\|$\)'):
   \          type(src) == type(0)  ? getbufline(src, 1)[0]:
@@ -726,7 +726,7 @@ endfunction
 " ----------------------------------------------------------------------------
 " Return the source file name.
 " Output to a temporary file if self.config.src is string.
-function! s:Runner.get_source_name()
+function! s:Session.get_source_name()
   let fname = expand('%')
   if exists('self.config.src')
     let src = self.config.src
@@ -747,7 +747,7 @@ endfunction
 
 " ----------------------------------------------------------------------------
 " Get the text of specified region.
-function! s:Runner.get_region()
+function! s:Session.get_region()
   let mode = self.config.mode
   if mode ==# 'n'
     " Normal mode
@@ -793,7 +793,7 @@ function! s:Runner.get_region()
   return selected
 endfunction
 
-function! s:Runner.output(result)
+function! s:Session.output(result)
   let config = self.config
   let [out, to] = [config.output[:0], config.output[1:]]
   let append = config.append
@@ -861,7 +861,7 @@ endfunction
 
 " ----------------------------------------------------------------------------
 " Open the output buffer, and return the buffer number.
-function! s:Runner.open_result_window()
+function! s:Session.open_result_window()
   if !exists('s:bufnr')
     let s:bufnr = -1  " A number that doesn't exist.
   endif
@@ -885,7 +885,7 @@ function! s:Runner.open_result_window()
   endif
 endfunction
 
-function! s:Runner.conv_vim2remote(selfvim, cmd)
+function! s:Session.conv_vim2remote(selfvim, cmd)
   if a:cmd !~ '^\s*:'
     return a:cmd
   endif
@@ -894,12 +894,12 @@ function! s:Runner.conv_vim2remote(selfvim, cmd)
   \       printf('quickrun#execute(%s)', string(a:cmd))])
 endfunction
 
-function! s:Runner.make_command(args)
+function! s:Session.make_command(args)
   return join([shellescape(a:args[0])] +
   \           map(a:args[1 :], 'self.shellescape(v:val)'), ' ')
 endfunction
 
-function! s:Runner.shellescape(str)
+function! s:Session.shellescape(str)
   if self.config.runmode =~# '^async:vimproc\%(:\d\+\)\?$'
     return "'" . substitute(a:str, '\\', '/', 'g') . "'"
   elseif s:is_cmd_exe()
@@ -920,9 +920,9 @@ function! s:iconv(expr, from, to)
   return result != '' ? result : a:expr
 endfunction
 
-function! s:register(runner)
+function! s:register(session)
   let key = has('reltime') ? reltimestr(reltime()) : string(localtime())
-  let s:runners[key] = a:runner
+  let s:sessions[key] = a:session
   return key
 endfunction
 
@@ -930,19 +930,18 @@ endfunction
 " Interfaces.  {{{1
 " function for main command.
 function! quickrun#run(config)
-  " Sweep runners.
-  " The multi run is not supported yet.
-  for [k, r] in items(s:runners)
+  " Sweep sessions.
+  for [k, r] in items(s:sessions)
     call quickrun#sweep(r)
-    call remove(s:runners, k)
+    call remove(s:sessions, k)
   endfor
 
-  let runner = s:Runner.new(a:config)
-  let config = runner.config
+  let session = s:Session.new(a:config)
+  let config = session.config
 
   if config.running_mark != '' && config.output == ''
     let mark = config.running_mark
-    call runner.open_result_window()
+    call session.open_result_window()
     if !config.append
       silent % delete _
     endif
@@ -954,10 +953,10 @@ function! quickrun#run(config)
   endif
 
   if has_key(config, 'debug') && config.debug
-    let g:runner = runner  " for debug
+    let g:runner = session  " for debug
   endif
 
-  call runner.run()
+  call session.run()
 endfunction
 
 " function for main command.
@@ -1059,51 +1058,51 @@ function! quickrun#expand(str)
   return result
 endfunction
 
-" Sweep the runner.
-function! quickrun#sweep(runner)
+" Sweep the session.
+function! quickrun#sweep(session)
   " Remove temporary files.
-  for file in filter(keys(a:runner), 'v:val =~# "^_temp"')
-    if filewritable(a:runner[file])
-      call delete(a:runner[file])
+  for file in filter(keys(a:session), 'v:val =~# "^_temp"')
+    if filewritable(a:session[file])
+      call delete(a:session[file])
     endif
-    call remove(a:runner, file)
+    call remove(a:session, file)
   endfor
 
   " Restore options.
-  for opt in filter(keys(a:runner), 'v:val =~# "^_option_"')
+  for opt in filter(keys(a:session), 'v:val =~# "^_option_"')
     let optname = matchstr(opt, '^_option_\zs.*')
     if exists('+' . optname)
-      execute 'let'  '&' . optname '= a:runner[opt]'
+      execute 'let'  '&' . optname '= a:session[opt]'
     endif
-    call remove(a:runner, opt)
+    call remove(a:session, opt)
   endfor
 
   " Delete autocmds.
-  for cmd in filter(keys(a:runner), 'v:val =~# "^_autocmd_"')
-    execute 'autocmd!' 'plugin-quickrun-' . a:runner[cmd]
-    call remove(a:runner, cmd)
+  for cmd in filter(keys(a:session), 'v:val =~# "^_autocmd_"')
+    execute 'autocmd!' 'plugin-quickrun-' . a:session[cmd]
+    call remove(a:session, cmd)
   endfor
 
   " Sweep the execution of vimproc.
-  if has_key(a:runner, 'vimproc')
+  if has_key(a:session, 'vimproc')
     try
-      call a:runner.vimproc.kill(15)
-      call a:runner.vimproc.waitpid()
+      call a:session.vimproc.kill(15)
+      call a:session.vimproc.waitpid()
     catch
     endtry
-    call remove(a:runner, 'vimproc')
+    call remove(a:session, 'vimproc')
   endif
 endfunction
 
 function! quickrun#_result(key, ...)
-  if !has_key(s:runners, a:key)
+  if !has_key(s:sessions, a:key)
     return ''
   endif
-  let runner = s:runners[a:key]
+  let session = s:sessions[a:key]
   if a:0
     let result = a:1
   else
-    let resfile = runner._temp_result
+    let resfile = session._temp_result
     let result = filereadable(resfile) ? join(readfile(resfile, 'b'), "\n")
     \                                  : ''
   endif
@@ -1114,9 +1113,9 @@ function! quickrun#_result(key, ...)
     let result = substitute(result, '\r\n', '\n', 'g')
   endif
 
-  call remove(s:runners, a:key)
-  call quickrun#sweep(runner)
-  call runner.output(result)
+  call remove(s:sessions, a:key)
+  call quickrun#sweep(session)
+  call session.output(result)
   return ''
 endfunction
 
