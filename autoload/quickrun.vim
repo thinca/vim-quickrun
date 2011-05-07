@@ -243,8 +243,6 @@ lockvar! g:quickrun#default_config
 
 
 
-let s:sessions = {}  " Store for sessions.
-
 let s:Session = {}  " {{{1
 
 
@@ -511,7 +509,7 @@ function! s:Session.run_async_vimproc(commands, ...)
 
   let self.result = ''
   let self.vimproc = vimproc
-  let key = s:register(self)
+  let key = s:save_session(self)
 
   " Create augroup.
   augroup plugin-quickrun-vimproc
@@ -535,7 +533,7 @@ function! s:Session.run_async_vimproc(commands, ...)
 endfunction
 
 function! s:receive_vimproc_result(key)
-  let session = get(s:sessions, a:key)
+  let session = s:load_session(a:key)
 
   let vimproc = session.vimproc
 
@@ -569,7 +567,7 @@ function! s:Session.run_async_remote(commands, ...)
   let selfvim = s:is_win ? split($PATH, ';')[-1] . '\vim.exe' :
   \             !empty($_) ? $_ : v:progname
 
-  let key = s:register(self)
+  let key = s:save_session(self)
   let expr = printf('quickrun#_result(%s)', string(key))
 
   let outfile = tempname()
@@ -674,7 +672,7 @@ function! s:Session.run_async_python(commands, ...)
   elseif !s:python_loaded
     throw 'quickrun: Loading python code failed.'
   endif
-  let l:key = string(s:register(self))
+  let l:key = string(s:save_session(self))
   let l:input = self.config.input
   python QuickRun(vim.eval('a:commands'),
   \               vim.eval('l:key'),
@@ -920,21 +918,11 @@ function! s:iconv(expr, from, to)
   return result != '' ? result : a:expr
 endfunction
 
-function! s:register(session)
-  let key = has('reltime') ? reltimestr(reltime()) : string(localtime())
-  let s:sessions[key] = a:session
-  return key
-endfunction
-
 " ----------------------------------------------------------------------------
 " Interfaces.  {{{1
 " function for main command.
 function! quickrun#run(config)
-  " Sweep sessions.
-  for [k, r] in items(s:sessions)
-    call quickrun#sweep(r)
-    call remove(s:sessions, k)
-  endfor
+  call s:sweep_sessions()
 
   let session = s:Session.new(a:config)
   let config = session.config
@@ -1002,6 +990,30 @@ function! quickrun#complete(lead, cmd, pos)
   \                copy(g:quickrun_config) : {}, g:quickrun#default_config))
   return filter(types, 'v:val !~ "^[_*]$" && v:val =~ "^".a:lead')
 endfunction
+
+
+let s:sessions = {}  " Store for sessions.
+
+function! s:save_session(session)
+  let key = has('reltime') ? reltimestr(reltime()) : string(localtime())
+  let s:sessions[key] = a:session
+  return key
+endfunction
+
+function! s:load_session(key)
+  return get(s:sessions, a:key, {})
+endfunction
+
+function! s:dispose_session(key)
+  if has_key(s:sessions, a:key)
+    call quickrun#sweep(remove(s:sessions, a:key))
+  endif
+endfunction
+
+function! s:sweep_sessions()
+  call map(keys(s:sessions), 's:dispose_session(v:val)')
+endfunction
+
 
 " Expand the keyword.
 " - @register @{register}
@@ -1095,10 +1107,10 @@ function! quickrun#sweep(session)
 endfunction
 
 function! quickrun#_result(key, ...)
-  if !has_key(s:sessions, a:key)
+  let session = s:load_session(a:key)
+  if empty(session)
     return ''
   endif
-  let session = s:sessions[a:key]
   if a:0
     let result = a:1
   else
@@ -1113,8 +1125,7 @@ function! quickrun#_result(key, ...)
     let result = substitute(result, '\r\n', '\n', 'g')
   endif
 
-  call remove(s:sessions, a:key)
-  call quickrun#sweep(session)
+  call s:dispose_session(a:key)
   call session.output(result)
   return ''
 endfunction
