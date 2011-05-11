@@ -414,22 +414,21 @@ function! s:Session.normalize()
   for opt in ['cmdopt', 'args', 'split', 'running_mark', 'output_encode']
     let config[opt] = quickrun#expand(config[opt])
   endfor
+
+  let exec = get(config, 'exec', '')
+  let commands = type(exec) == type([]) ? copy(exec) : [exec]
+  call filter(map(commands, 'self.build_command(v:val)'), 'v:val =~ "\\S"')
+  let self.commands = commands
 endfunction
 
 " ----------------------------------------------------------------------------
 " Run commands.
 function! s:Session.run()
-  let exec = get(self.config, 'exec', '')
-  let commands = type(exec) == type([]) ? copy(exec) : [exec]
-  call map(commands, 'self.build_command(v:val)')
-  call filter(commands, 'v:val =~ "\\S"')
-  let self.commands = commands  " for debug.
-
   let [runmode; args] = split(self.config.runmode, ':')
   if !has_key(self, 'run_' . runmode)
     throw 'quickrun: Invalid runmode: ' . runmode
   endif
-  call call(self['run_' . runmode], [commands] + args, self)
+  call call(self['run_' . runmode], [self.commands] + args, self)
 endfunction
 
 function! s:Session.run_simple(commands)
