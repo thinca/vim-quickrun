@@ -410,14 +410,15 @@ function! s:Session.normalize()
     endif
   endif
 
-  let self.source_name = self.get_source_name()
   for opt in ['cmdopt', 'args', 'split', 'running_mark', 'output_encode']
     let config[opt] = quickrun#expand(config[opt])
   endfor
 
+  let source_name = self.get_source_name()
   let exec = get(config, 'exec', '')
   let commands = type(exec) == type([]) ? copy(exec) : [exec]
-  call filter(map(commands, 'self.build_command(v:val)'), 'v:val =~ "\\S"')
+  call filter(map(commands, 'self.build_command(source_name, v:val)'),
+  \           'v:val =~ "\\S"')
   let self.commands = commands
 endfunction
 
@@ -681,11 +682,11 @@ endfunction
 
 " ----------------------------------------------------------------------------
 " Build a command to execute it from options.
-function! s:Session.build_command(tmpl)
+function! s:Session.build_command(source_name, tmpl)
   " FIXME: Possibility to be multiple expanded.
   let config = self.config
   let shebang = config.shebang ? self.detect_shebang() : ''
-  let src = string(self.source_name)
+  let src = string(a:source_name)
   let command = shebang != '' ? string(shebang) : 'config.command'
   let rule = [
   \  ['c', command], ['C', command],
