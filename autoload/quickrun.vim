@@ -1163,5 +1163,19 @@ function! quickrun#execute(...)
   return result
 endfunction
 
+function! s:register_defaults(kind)
+  let pat = 'autoload/quickrun/' . a:kind . '/*.vim'
+  for name in map(split(globpath(&runtimepath, pat), "\n"),
+  \               'fnamemodify(v:val, ":t:r")')
+    try
+      call s:register_module(a:kind, quickrun#{a:kind}#{name}#new())
+    catch /:E\%(117\|716\):/
+    endtry
+  endfor
+endfunction
+
+call s:register_defaults('runner')
+call s:register_defaults('outputter')
+
 
 let &cpo = s:save_cpo
