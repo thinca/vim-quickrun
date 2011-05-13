@@ -508,7 +508,7 @@ function! s:Session.run_async_vimproc(commands, ...)
   call vimproc.stdin.close()
 
   let self.result = ''
-  let self.vimproc = vimproc
+  let self._vimproc = vimproc
   let key = s:save_session(self)
 
   " Create augroup.
@@ -535,7 +535,7 @@ endfunction
 function! s:receive_vimproc_result(key)
   let session = s:load_session(a:key)
 
-  let vimproc = session.vimproc
+  let vimproc = session._vimproc
 
   if !vimproc.stdout.eof
     let session.result .= vimproc.stdout.read()
@@ -603,9 +603,9 @@ function! s:Session.run_async_remote(commands, ...)
 
   if a:0 && a:1 ==# 'vimproc' && s:available_vimproc
     if s:is_win
-      let self.vimproc= vimproc#popen2(['cmd.exe', '/C', script])
+      let self._vimproc = vimproc#popen2(['cmd.exe', '/C', script])
     else
-      let self.vimproc= vimproc#popen2(['sh', script])
+      let self._vimproc = vimproc#popen2(['sh', script])
     endif
   else
     if s:is_win
@@ -1114,13 +1114,13 @@ function! quickrun#sweep(session)
   endfor
 
   " Sweep the execution of vimproc.
-  if has_key(a:session, 'vimproc')
+  if has_key(a:session, '_vimproc')
     try
-      call a:session.vimproc.kill(15)
-      call a:session.vimproc.waitpid()
+      call a:session._vimproc.kill(15)
+      call a:session._vimproc.waitpid()
     catch
     endtry
-    call remove(a:session, 'vimproc')
+    call remove(a:session, '_vimproc')
   endif
 endfunction
 
