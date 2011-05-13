@@ -533,7 +533,7 @@ function! s:Session.run_async_vimproc(commands, ...)
 endfunction
 
 function! s:receive_vimproc_result(key)
-  let session = s:load_session(a:key)
+  let session = quickrun#get_session(a:key)
 
   let vimproc = session._vimproc
 
@@ -1018,7 +1018,7 @@ function! s:save_session(session)
   return key
 endfunction
 
-function! s:load_session(key)
+function! quickrun#get_session(key)
   return get(s:sessions, a:key, {})
 endfunction
 
@@ -1125,7 +1125,7 @@ function! quickrun#sweep(session)
 endfunction
 
 function! quickrun#_result(key, ...)
-  let session = s:load_session(a:key)
+  let session = quickrun#get_session(a:key)
   if empty(session)
     return ''
   endif
