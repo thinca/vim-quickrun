@@ -446,7 +446,7 @@ function! s:Session.run_simple(commands)
     call quickrun#sweep(self)
   endtry
 
-  call self.output(result)
+  call self.output_result(result)
 endfunction
 
 " ----------------------------------------------------------------------------
@@ -791,7 +791,7 @@ function! s:Session.get_region()
   return selected
 endfunction
 
-function! s:Session.output(result)
+function! s:Session.output_result(result)
   let config = self.config
   let [out, to] = [config.output[:0], config.output[1:]]
   let append = config.append
@@ -1144,7 +1144,7 @@ function! quickrun#_result(key, ...)
   endif
 
   call s:dispose_session(a:key)
-  call session.output(result)
+  call session.output_result(result)
   return ''
 endfunction
 
