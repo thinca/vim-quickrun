@@ -919,6 +919,24 @@ function! s:iconv(expr, from, to)
 endfunction
 
 " ----------------------------------------------------------------------------
+let s:registered_runners = {}
+let s:registered_outputters = {}
+
+function! quickrun#register_runner(runner)
+  return s:register_module('runner', a:runner)
+endfunction
+
+function! quickrun#register_outputter(outputter)
+  return s:register_module('outputter', a:outputter)
+endfunction
+
+function! s:register_module(kind, module)
+  " TODO: validate
+  let name = a:module.name
+  let s:registered_{a:kind}s[name] = a:module
+endfunction
+
+" ----------------------------------------------------------------------------
 " Interfaces.  {{{1
 " function for main command.
 function! quickrun#run(config)
