@@ -457,6 +457,22 @@ function! s:Session.normalize()
   let self.commands = commands
 endfunction
 
+function! s:Session.make_module(kind, line)
+  let [name; args] = split(a:line, ':', 1)
+  if !has_key(s:registered_{a:kind}s, name)
+    throw printf('quickrun: Specified %s is not registered: %s',
+    \            a:kind, name)
+  endif
+  let module = extend(deepcopy(s:{a:kind}), s:registered_{a:kind}s[name])
+  if !module.available()
+    throw printf('quickrun: Specified %s is not available: %s',
+    \            a:kind, name)
+  endif
+  call module.init(args, self)
+  return module
+endfunction
+
+
 " ----------------------------------------------------------------------------
 " Run commands.
 function! s:Session.run()
