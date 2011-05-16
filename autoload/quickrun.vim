@@ -248,7 +248,14 @@ lockvar! g:quickrun#default_config
 " Template of module.
 let s:module = {}
 function! s:module.available()
+  try
+    call self.validate()
+  catch
+    return 0
+  endtry
   return 1
+endfunction
+function! s:module.validate()
 endfunction
 function! s:module.init(args, session)
 endfunction
