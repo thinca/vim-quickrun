@@ -1193,6 +1193,13 @@ function! quickrun#sweep(session)
     endtry
     call remove(a:session, '_vimproc')
   endif
+
+  if has_key(a:session, '_continue_key')
+    if has_key(s:sessions, a:session._continue_key)
+      call remove(s:sessions, a:session._continue_key)
+    endif
+    call remove(a:session, '_continue_key')
+  endif
 endfunction
 
 function! quickrun#_result(key, ...)
