@@ -19,8 +19,10 @@ let g:quickrun#default_config = {
 \ '_': {
 \   'shebang': 1,
 \   'output': '',
+\   'outputter': 'echo',
 \   'append': 0,
 \   'runmode': 'simple',
+\   'runner': 'system',
 \   'cmdopt': '',
 \   'args': '',
 \   'output_encode': '&fileencoding',
@@ -232,6 +234,7 @@ let g:quickrun#default_config = {
 \   'exec': '%c %s',
 \   'eval_template': "echo %s",
 \   'runmode': 'simple',
+\   'runner': 'system',
 \ },
 \ 'wsh': {
 \   'command': 'cscript',
