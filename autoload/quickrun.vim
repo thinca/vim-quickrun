@@ -489,6 +489,20 @@ function! s:Session.run()
   call call(self['run_' . runmode], [self.commands] + args, self)
 endfunction
 
+function! s:Session.continue()
+  let self._continue_key = s:save_session(self)
+  return self._continue_key
+endfunction
+
+function! s:Session.output(data)
+  call self.outputter.output(a:data, self)
+endfunction
+
+function! s:Session.finish()
+  call self.outputter.finish(self)
+  call quickrun#sweep(self)
+endfunction
+
 function! s:Session.run_simple(commands)
   let result = ''
 
