@@ -245,13 +245,15 @@ let g:quickrun#default_config = {
 lockvar! g:quickrun#default_config
 
 
-" Template of runner.
-let s:runner = {}
-function! s:runner.available()
+" Template of module.
+let s:module = {}
+function! s:module.available()
   return 1
 endfunction
-function! s:runner.init(args, session)
+function! s:module.init(args, session)
 endfunction
+" Template of runner.
+let s:runner = copy(s:module)
 function! s:runner.run(commands, session)
   throw 'quickrun: A runner should implements run()'
 endfunction
@@ -268,12 +270,7 @@ function! s:runner.shellescape(str)
 endfunction
 
 " Template of outputter.
-let s:outputter = {}
-function! s:outputter.available()
-  return 1
-endfunction
-function! s:outputter.init(args, session)
-endfunction
+let s:outputter = copy(s:module)
 function! s:outputter.output(data, session)
   throw 'quickrun: An outputter should implements output()'
 endfunction
@@ -282,9 +279,6 @@ endfunction
 
 
 let s:Session = {}  " {{{1
-
-
-
 " ----------------------------------------------------------------------------
 " Constructor.
 function! s:Session.new(args)
