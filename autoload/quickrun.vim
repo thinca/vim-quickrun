@@ -482,11 +482,10 @@ endfunction
 " ----------------------------------------------------------------------------
 " Run commands.
 function! s:Session.run()
-  let [runmode; args] = split(self.config.runmode, ':')
-  if !has_key(self, 'run_' . runmode)
-    throw 'quickrun: Invalid runmode: ' . runmode
+  call self.runner.run(self.commands, self)
+  if !has_key(self, '_continue_key')
+    call self.finish()
   endif
-  call call(self['run_' . runmode], [self.commands] + args, self)
 endfunction
 
 function! s:Session.continue()
@@ -1015,19 +1014,6 @@ function! quickrun#run(config)
 
   let session = s:Session.new(a:config)
   let config = session.config
-
-  if config.running_mark != '' && config.output == ''
-    let mark = config.running_mark
-    call session.open_result_window()
-    if !config.append
-      silent % delete _
-    endif
-    silent $-1 put =mark
-    let b:quickrun_running_mark = 1
-    normal! zt
-    wincmd p
-    redraw
-  endif
 
   if has_key(config, 'debug') && config.debug
     let g:runner = session  " for debug
