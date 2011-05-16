@@ -471,10 +471,12 @@ function! s:Session.make_module(kind, line)
     \            a:kind, name)
   endif
   let module = extend(deepcopy(s:{a:kind}), s:registered_{a:kind}s[name])
-  if !module.available()
-    throw printf('quickrun: Specified %s is not available: %s',
-    \            a:kind, name)
-  endif
+  try
+    call module.validate()
+  catch
+    throw printf("quickrun: Specified %s is not available: %s: %s",
+    \            a:kind, name, v:exception)
+  endtry
   call module.init(args, self)
   return module
 endfunction
