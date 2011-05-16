@@ -1189,6 +1189,8 @@ function! quickrun#sweep(session)
     endif
     call remove(a:session, '_continue_key')
   endif
+
+  call a:session.runner.sweep()
 endfunction
 
 function! quickrun#_result(key, ...)
