@@ -242,6 +242,41 @@ let g:quickrun#default_config = {
 lockvar! g:quickrun#default_config
 
 
+" Template of runner.
+let s:runner = {}
+function! s:runner.available()
+  return 1
+endfunction
+function! s:runner.init(args, session)
+endfunction
+function! s:runner.run(commands, session)
+  throw 'quickrun: A runner should implements run()'
+endfunction
+function! s:runner.sweep()
+endfunction
+function! s:runner.shellescape(str)
+  if s:is_cmd_exe()
+    return '^"' . substitute(substitute(substitute(a:str,
+    \             '[&|<>()^"%]', '^\0', 'g'),
+    \             '\\\+\ze"', '\=repeat(submatch(0), 2)', 'g'),
+    \             '\ze\^"', '\', 'g') . '^"'
+  endif
+  return shellescape(a:str)
+endfunction
+
+" Template of outputter.
+let s:outputter = {}
+function! s:outputter.available()
+  return 1
+endfunction
+function! s:outputter.init(args, session)
+endfunction
+function! s:outputter.output(data, session)
+  throw 'quickrun: An outputter should implements output()'
+endfunction
+function! s:outputter.finish(session)
+endfunction
+
 
 let s:Session = {}  " {{{1
 
