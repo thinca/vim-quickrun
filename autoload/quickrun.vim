@@ -452,6 +452,9 @@ function! s:Session.normalize()
     let config[opt] = quickrun#expand(config[opt])
   endfor
 
+  let self.runner = self.make_module('runner', config.runner)
+  let self.outputter = self.make_module('outputter', config.outputter)
+
   let source_name = self.get_source_name()
   let exec = get(config, 'exec', '')
   let commands = type(exec) == type([]) ? copy(exec) : [exec]
