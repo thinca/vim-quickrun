@@ -497,7 +497,9 @@ function! s:Session.continue()
 endfunction
 
 function! s:Session.output(data)
-  call self.outputter.output(a:data, self)
+  if a:data != ''
+    call self.outputter.output(a:data, self)
+  endif
 endfunction
 
 function! s:Session.finish()
