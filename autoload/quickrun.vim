@@ -1064,16 +1064,17 @@ function! quickrun#complete(lead, cmd, pos)
         let list = ['0', '1']
       elseif opt ==# 'mode'
         let list = ['n', 'v', 'o']
-      elseif opt ==# 'runmode'
-        let list = ['simple', 'async:vimproc', 'async:remote',
-        \           'async:remote:vimproc', 'async:python']
+      elseif opt ==# 'runner'
+        let list = keys(s:registered_runners)
+      elseif opt ==# 'outputter'
+        let list = keys(s:registered_outputters)
       end
       return filter(list, 'v:val =~ "^".a:lead')
     endif
   elseif head =~ '^-'
-    let options = map(['type', 'src', 'input', 'output', 'append', 'command',
+    let options = map(['type', 'src', 'input', 'outputter', 'append', 'command',
       \ 'exec', 'cmdopt', 'args', 'tempfile', 'shebang', 'eval', 'mode',
-      \ 'runmode', 'split', 'into', 'output_encode', 'shellcmd',
+      \ 'runner', 'split', 'into', 'output_encode', 'shellcmd',
       \ 'running_mark', 'eval_template'], '"-".v:val')
     return filter(options, 'v:val =~ "^".head')
   end
