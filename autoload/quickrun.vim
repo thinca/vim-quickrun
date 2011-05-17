@@ -498,7 +498,18 @@ endfunction
 
 function! s:Session.output(data)
   if a:data != ''
-    call self.outputter.output(a:data, self)
+    let data = a:data
+    if get(self.config, 'output_encode', '') != ''
+      let enc = split(self.config.output_encode, '[^[:alnum:]-_]')
+      if len(enc) == 1
+        let enc += [&encoding]
+      endif
+      if len(enc) == 2
+        let [from, to] = enc
+        let data = s:iconv(data, from, to)
+      endif
+    endif
+    call self.outputter.output(data, self)
   endif
 endfunction
 
