@@ -19,7 +19,7 @@ let g:quickrun#default_config = {
 \ '_': {
 \   'shebang': 1,
 \   'output': '',
-\   'outputter': 'echo',
+\   'outputter': 'buffer',
 \   'append': 0,
 \   'runmode': 'simple',
 \   'runner': 'system',
