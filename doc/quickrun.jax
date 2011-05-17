@@ -341,7 +341,7 @@ outputter は引数を取る場合があります。その場合、outputter 名
   ます。このバッファにはカスタマイズのために 'filetype' に "quickrun" が設定さ
   れます。これが既定値です。
 
-- "echo"
+- "message"
   |hit-enter-prompt| に出力します。 append を有効にした場合、|message-history|
   に記録します。
 

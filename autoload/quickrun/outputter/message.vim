@@ -7,7 +7,7 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 let s:outputter = {
-\   'name': 'echo',
+\   'name': 'message',
 \ }
 
 function! s:outputter.output(data, session)
@@ -15,7 +15,7 @@ function! s:outputter.output(data, session)
 endfunction
 
 
-function! quickrun#outputter#echo#new()
+function! quickrun#outputter#message#new()
   return copy(s:outputter)
 endfunction
 
