@@ -514,7 +514,7 @@ endfunction
 
 function! s:Session.finish()
   call self.outputter.finish(self)
-  call quickrun#sweep(self)
+  call self.sweep()
 endfunction
 
 " Build a command to execute it from options.
@@ -575,6 +575,51 @@ function! s:Session.get_source_name()
     endif
   endif
   return fname
+endfunction
+
+" Sweep the session.
+function! s:Session.sweep()
+  " Remove temporary files.
+  for file in filter(keys(self), 'v:val =~# "^_temp"')
+    if filewritable(self[file])
+      call delete(self[file])
+    endif
+    call remove(self, file)
+  endfor
+
+  " Restore options.
+  for opt in filter(keys(self), 'v:val =~# "^_option_"')
+    let optname = matchstr(opt, '^_option_\zs.*')
+    if exists('+' . optname)
+      execute 'let'  '&' . optname '= self[opt]'
+    endif
+    call remove(self, opt)
+  endfor
+
+  " Delete autocmds.
+  for cmd in filter(keys(self), 'v:val =~# "^_autocmd_"')
+    execute 'autocmd!' 'plugin-quickrun-' . self[cmd]
+    call remove(self, cmd)
+  endfor
+
+  " Sweep the execution of vimproc.
+  if has_key(self, '_vimproc')
+    try
+      call self._vimproc.kill(15)
+      call self._vimproc.waitpid()
+    catch
+    endtry
+    call remove(self, '_vimproc')
+  endif
+
+  if has_key(self, '_continue_key')
+    if has_key(s:sessions, self._continue_key)
+      call remove(s:sessions, self._continue_key)
+    endif
+    call remove(self, '_continue_key')
+  endif
+
+  call self.runner.sweep()
 endfunction
 
 " Get the text of specified region.
@@ -728,7 +773,8 @@ endfunction
 
 function! s:dispose_session(key)
   if has_key(s:sessions, a:key)
-    call quickrun#sweep(remove(s:sessions, a:key))
+    let session = remove(s:sessions, a:key)
+    call session.sweep()
   endif
 endfunction
 
@@ -790,51 +836,6 @@ function! quickrun#expand(str)
     endif
   endwhile
   return result
-endfunction
-
-" Sweep the session.
-function! quickrun#sweep(session)
-  " Remove temporary files.
-  for file in filter(keys(a:session), 'v:val =~# "^_temp"')
-    if filewritable(a:session[file])
-      call delete(a:session[file])
-    endif
-    call remove(a:session, file)
-  endfor
-
-  " Restore options.
-  for opt in filter(keys(a:session), 'v:val =~# "^_option_"')
-    let optname = matchstr(opt, '^_option_\zs.*')
-    if exists('+' . optname)
-      execute 'let'  '&' . optname '= a:session[opt]'
-    endif
-    call remove(a:session, opt)
-  endfor
-
-  " Delete autocmds.
-  for cmd in filter(keys(a:session), 'v:val =~# "^_autocmd_"')
-    execute 'autocmd!' 'plugin-quickrun-' . a:session[cmd]
-    call remove(a:session, cmd)
-  endfor
-
-  " Sweep the execution of vimproc.
-  if has_key(a:session, '_vimproc')
-    try
-      call a:session._vimproc.kill(15)
-      call a:session._vimproc.waitpid()
-    catch
-    endtry
-    call remove(a:session, '_vimproc')
-  endif
-
-  if has_key(a:session, '_continue_key')
-    if has_key(s:sessions, a:session._continue_key)
-      call remove(s:sessions, a:session._continue_key)
-    endif
-    call remove(a:session, '_continue_key')
-  endif
-
-  call a:session.runner.sweep()
 endfunction
 
 " Execute commands by expr.  This is used by remote_expr()
