@@ -6,9 +6,7 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-let s:runner = {
-\   'name': 'system',
-\ }
+let s:runner = {}
 
 function! s:runner.run(commands, session)
   let config = a:session.config

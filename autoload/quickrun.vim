@@ -473,7 +473,7 @@ function! s:Session.make_module(kind, line)
     throw printf('quickrun: Specified %s is not registered: %s',
     \            a:kind, name)
   endif
-  let module = extend(deepcopy(s:{a:kind}), s:registered_{a:kind}s[name])
+  let module = deepcopy(s:registered_{a:kind}s[name])
   try
     call module.validate()
   catch
@@ -1011,18 +1011,19 @@ endfunction
 let s:registered_runners = {}
 let s:registered_outputters = {}
 
-function! quickrun#register_runner(runner)
-  return s:register_module('runner', a:runner)
+function! quickrun#register_runner(name, runner)
+  return s:register_module(a:name, 'runner', a:runner)
 endfunction
 
-function! quickrun#register_outputter(outputter)
-  return s:register_module('outputter', a:outputter)
+function! quickrun#register_outputter(name, outputter)
+  return s:register_module(a:name, 'outputter', a:outputter)
 endfunction
 
-function! s:register_module(kind, module)
+function! s:register_module(name, kind, module)
   " TODO: validate
-  let name = a:module.name
-  let s:registered_{a:kind}s[name] = a:module
+  let module = extend(deepcopy(s:{a:kind}), a:module)
+  let module.name = a:name
+  let s:registered_{a:kind}s[a:name] = module
 endfunction
 
 " ----------------------------------------------------------------------------
@@ -1254,7 +1255,7 @@ function! s:register_defaults(kind)
   for name in map(split(globpath(&runtimepath, pat), "\n"),
   \               'fnamemodify(v:val, ":t:r")')
     try
-      call s:register_module(a:kind, quickrun#{a:kind}#{name}#new())
+      call s:register_module(name, a:kind, quickrun#{a:kind}#{name}#new())
     catch /:E\%(117\|716\):/
     endtry
   endfor

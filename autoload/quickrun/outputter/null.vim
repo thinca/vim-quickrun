@@ -6,9 +6,7 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-let s:outputter = {
-\   'name': 'null',
-\ }
+let s:outputter = {}
 
 function! s:outputter.output(data, session)
 endfunction

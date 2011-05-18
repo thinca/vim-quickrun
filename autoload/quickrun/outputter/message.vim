@@ -6,9 +6,7 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-let s:outputter = {
-\   'name': 'message',
-\ }
+let s:outputter = {}
 
 function! s:outputter.init(args, session)
   let self._log = a:session.config.append
