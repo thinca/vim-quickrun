@@ -285,8 +285,8 @@ function! s:outputter.finish(session)
 endfunction
 
 
-let s:Session = {}  " {{{1
 " ----------------------------------------------------------------------------
+let s:Session = {}  " {{{1
 " Constructor.
 function! s:Session.new(args)
   let obj = copy(self)
@@ -294,7 +294,6 @@ function! s:Session.new(args)
   return obj
 endfunction
 
-" ----------------------------------------------------------------------------
 " Initialize of instance.
 function! s:Session.initialize(config)
   let self.config = s:normalize(a:config)
@@ -360,7 +359,6 @@ function! s:set_options_from_arglist(arglist)
   return config
 endfunction
 
-" ----------------------------------------------------------------------------
 " The option is appropriately set referring to default options.
 function! s:normalize(config)
   let config = a:config
@@ -484,8 +482,6 @@ function! s:Session.make_module(kind, line)
   return module
 endfunction
 
-
-" ----------------------------------------------------------------------------
 " Run commands.
 function! s:Session.run()
   call self.runner.run(self.commands, self)
@@ -521,255 +517,6 @@ function! s:Session.finish()
   call quickrun#sweep(self)
 endfunction
 
-function! s:Session.run_simple(commands)
-  let result = ''
-
-  try
-    for cmd in a:commands
-      let result .= self.execute(cmd)
-      if v:shell_error != 0
-        break
-      endif
-    endfor
-  finally
-    call quickrun#sweep(self)
-  endtry
-
-  call self.output_result(result)
-endfunction
-
-" ----------------------------------------------------------------------------
-" Execute a single command.
-function! s:Session.execute(cmd)
-  if a:cmd =~ '^\s*:'
-    " A vim command.
-    return quickrun#execute(a:cmd)
-  endif
-
-  try
-    if s:is_cmd_exe()
-      let sxq = &shellxquote
-      let &shellxquote = '"'
-    endif
-    let cmd = a:cmd
-    let config = self.config
-    if get(config, 'output') == '!'
-      let in = config.input
-      if in != ''
-        let inputfile = tempname()
-        call writefile(split(in, "\n", 1), inputfile, 'b')
-        let cmd .= ' <' . self.shellescape(inputfile)
-      endif
-
-      execute s:iconv(printf(config.shellcmd, cmd), &encoding, &termencoding)
-
-      if exists('inputfile') && filereadable(inputfile)
-        call delete(inputfile)
-      endif
-      return 0
-    endif
-
-    let cmd = s:iconv(cmd, &encoding, &termencoding)
-    return config.input == '' ? system(cmd)
-    \                         : system(cmd, config.input)
-  finally
-    if s:is_cmd_exe()
-      let &shellxquote = sxq
-    endif
-  endtry
-endfunction
-
-function! s:Session.run_async(commands, ...)
-  let [type; args] = a:000
-  if !has_key(self, 'run_async_' . type)
-    throw 'quickrun: Unknown async type: ' . type
-  endif
-  call call(self['run_async_' . type], [a:commands] + args, self)
-endfunction
-
-function! s:Session.run_async_vimproc(commands, ...)
-  if !s:available_vimproc
-    throw 'quickrun: runmode = async:vimproc needs vimproc.'
-  endif
-
-  let vimproc = vimproc#pgroup_open(join(a:commands, ' && '))
-  call vimproc.stdin.write(self.config.input)
-  call vimproc.stdin.close()
-
-  let self.result = ''
-  let self._vimproc = vimproc
-  let key = s:save_session(self)
-
-  " Create augroup.
-  augroup plugin-quickrun-vimproc
-  augroup END
-
-  " Wait a little because execution might end immediately.
-  sleep 50m
-  if s:receive_vimproc_result(key)
-    return
-  endif
-  " Execution is continuing.
-  augroup plugin-quickrun-vimproc
-    execute 'autocmd! CursorHold,CursorHoldI * call'
-    \       's:receive_vimproc_result(' . string(key) . ')'
-  augroup END
-  let self._autocmd_vimproc = 'vimproc'
-  if a:0 && a:1 =~ '^\d\+$'
-    let self._option_updatetime = &updatetime
-    let &updatetime = a:1
-  endif
-endfunction
-
-function! s:receive_vimproc_result(key)
-  let session = quickrun#get_session(a:key)
-
-  let vimproc = session._vimproc
-
-  if !vimproc.stdout.eof
-    let session.result .= vimproc.stdout.read()
-  endif
-  if !vimproc.stderr.eof
-    let session.result .= vimproc.stderr.read()
-  endif
-
-  if !(vimproc.stdout.eof && vimproc.stderr.eof)
-    call feedkeys(mode() ==# 'i' ? "\<C-g>\<ESC>" : "g\<ESC>", 'n')
-    return 0
-  endif
-
-  call vimproc.stdout.close()
-  call vimproc.stderr.close()
-  call vimproc.waitpid()
-
-  call quickrun#_result(a:key, session.result)
-  return 1
-endfunction
-
-function! s:Session.run_async_remote(commands, ...)
-  if !has('clientserver') || v:servername == ''
-    throw 'quickrun: runmode = async:remote needs +clientserver feature.'
-  endif
-  if !s:is_win && !executable('sh')
-    throw 'quickrun: Currently needs "sh" on other than MS Windows.  Sorry.'
-  endif
-  let selfvim = s:is_win ? split($PATH, ';')[-1] . '\vim.exe' :
-  \             !empty($_) ? $_ : v:progname
-
-  let key = s:save_session(self)
-  let expr = printf('quickrun#_result(%s)', string(key))
-
-  let outfile = tempname()
-  let self._temp_result = outfile
-  let cmds = a:commands
-  let callback = self.make_command(
-  \        [selfvim, '--servername', v:servername, '--remote-expr', expr])
-
-  call map(cmds, 'self.conv_vim2remote(selfvim, v:val)')
-
-  let in = self.config.input
-  if in != ''
-    let inputfile = tempname()
-    let self._temp_input = inputfile
-    call writefile(split(in, "\n", 1), inputfile, 'b')
-    let in = ' <' . self.shellescape(inputfile)
-  endif
-
-  " Execute by script file to unify the environment.
-  let script = tempname()
-  let scriptbody = [
-  \   printf('(%s)%s >%s 2>&1', join(cmds, '&&'), in, self.shellescape(outfile)),
-  \   callback,
-  \ ]
-  if s:is_win
-    let script .= '.bat'
-    call insert(scriptbody, '@echo off')
-    call map(scriptbody, 'v:val . "\r"')
-  endif
-  call map(scriptbody, 's:iconv(v:val, &encoding, &termencoding)')
-  let self._temp_script = script
-  call writefile(scriptbody, script, 'b')
-
-  if a:0 && a:1 ==# 'vimproc' && s:available_vimproc
-    if s:is_win
-      let self._vimproc = vimproc#popen2(['cmd.exe', '/C', script])
-    else
-      let self._vimproc = vimproc#popen2(['sh', script])
-    endif
-  else
-    if s:is_win
-      silent! execute '!start /MIN' script
-
-    else  "if executable('sh')  " Simpler shell.
-      silent! execute '!sh' script '&'
-    endif
-  endif
-endfunction
-
-let s:python_loaded = 0
-if has('python')
-  try
-python <<EOM
-import vim, threading, subprocess, re
-
-class QuickRun(threading.Thread):
-    def __init__(self, cmds, key, input):
-        threading.Thread.__init__(self)
-        self.cmds = cmds
-        self.key = key
-        if not input:
-          input = ''
-        self.input = input
-
-    def run(self):
-        result = ''
-        try:
-            for cmd in self.cmds:
-                result += self.execute(cmd)
-        except:
-            pass
-        finally:
-            vim.eval("quickrun#_result(%s, %s)" %
-              (self.key, self.vimstr(result)))
-
-    def execute(self, cmd):
-        if re.match('^\s*:', cmd):
-            return vim.eval("quickrun#execute(%s)" % self.vimstr(cmd))
-        p = subprocess.Popen(cmd,
-                             stdin=subprocess.PIPE,
-                             stdout=subprocess.PIPE,
-                             stderr=subprocess.STDOUT,
-                             shell=True)
-        p.stdin.write(self.input)
-        p.stdin.close()
-        result = p.stdout.read()
-        p.wait()
-        return result
-
-    def vimstr(self, s):
-        return "'" + s.replace("'", "''") + "'"
-EOM
-  let s:python_loaded = 1
-  catch
-    " XXX: This method make debugging to difficult.
-  endtry
-endif
-
-function! s:Session.run_async_python(commands, ...)
-  if !has('python')
-    throw 'quickrun: runmode = async:python needs +python feature.'
-  elseif !s:python_loaded
-    throw 'quickrun: Loading python code failed.'
-  endif
-  let l:key = string(s:save_session(self))
-  let l:input = self.config.input
-  python QuickRun(vim.eval('a:commands'),
-  \               vim.eval('l:key'),
-  \               vim.eval('l:input')).start()
-endfunction
-
-
-" ----------------------------------------------------------------------------
 " Build a command to execute it from options.
 function! s:Session.build_command(source_name, tmpl)
   " FIXME: Possibility to be multiple expanded.
@@ -800,7 +547,6 @@ function! s:Session.build_command(source_name, tmpl)
   return substitute(quickrun#expand(cmd), '[\r\n]\+', ' ', 'g')
 endfunction
 
-" ----------------------------------------------------------------------------
 " Detect the shebang, and return the shebang command if it exists.
 function! s:Session.detect_shebang()
   let src = self.config.src
@@ -810,7 +556,6 @@ function! s:Session.detect_shebang()
   return line =~ '^#!' ? line[2:] : ''
 endfunction
 
-" ----------------------------------------------------------------------------
 " Return the source file name.
 " Output to a temporary file if self.config.src is string.
 function! s:Session.get_source_name()
@@ -832,7 +577,6 @@ function! s:Session.get_source_name()
   return fname
 endfunction
 
-" ----------------------------------------------------------------------------
 " Get the text of specified region.
 function! s:get_region(config)
   let mode = a:config.mode
@@ -878,124 +622,6 @@ function! s:get_region(config)
     let &selection = save_sel
   endif
   return selected
-endfunction
-
-function! s:Session.output_result(result)
-  let config = self.config
-  let [out, to] = [config.output[:0], config.output[1:]]
-  let append = config.append
-
-  let result = a:result
-  if get(config, 'output_encode', '') != ''
-    let enc = split(config.output_encode, '[^[:alnum:]-_]')
-    if len(enc) == 1
-      let enc += [&encoding]
-    endif
-    if len(enc) == 2
-      let [from, to] = enc
-      let result = s:iconv(result, from, to)
-    endif
-  endif
-
-  if out == ''
-    " Output to the exclusive window.
-    call self.open_result_window()
-    if !append
-      silent % delete _
-    endif
-
-    let cursor = getpos('$')
-    silent $-1 put =result
-    call setpos('.', cursor)
-    silent normal! zt
-    if !config.into
-      wincmd p
-    endif
-    redraw
-
-  elseif out == '!' || out == '_'
-    " Do nothing.
-
-  elseif out == ':'
-    " Output to messages.
-    if append
-      for i in split(result, "\n")
-        echomsg i
-      endfor
-    else
-      echo result
-    endif
-
-  elseif out == '='
-    " Output to variable.
-    if to =~ '^\w[^:]'
-      let to = 'g:' . to
-    endif
-    let assign = append && (to[0] =~ '\W' || exists(to)) ? '.=' : '='
-    execute 'let' to assign 'result'
-
-  else
-    " Output to file.
-    let out = config.output
-    let size = strlen(result)
-    if append && filereadable(out)
-      let result = join(readfile(out, 'b'), "\n") . result
-    endif
-    call writefile(split(result, "\n", 1), out, 'b')
-    echo printf('Output to %s: %d bytes', out, size)
-  endif
-endfunction
-
-" ----------------------------------------------------------------------------
-" Open the output buffer, and return the buffer number.
-function! s:Session.open_result_window()
-  if !exists('s:bufnr')
-    let s:bufnr = -1  " A number that doesn't exist.
-  endif
-  let sp = self.config.split
-  if !bufexists(s:bufnr)
-    execute sp 'split'
-    edit `='[quickrun output]'`
-    let s:bufnr = bufnr('%')
-    nnoremap <buffer> q <C-w>c
-    setlocal bufhidden=hide buftype=nofile noswapfile nobuflisted
-    setlocal filetype=quickrun
-  elseif bufwinnr(s:bufnr) != -1
-    execute bufwinnr(s:bufnr) 'wincmd w'
-  else
-    execute sp 'split'
-    execute 'buffer' s:bufnr
-  endif
-  if exists('b:quickrun_running_mark') && b:quickrun_running_mark
-    silent undo
-    unlet b:quickrun_running_mark
-  endif
-endfunction
-
-function! s:Session.conv_vim2remote(selfvim, cmd)
-  if a:cmd !~ '^\s*:'
-    return a:cmd
-  endif
-  return self.make_command([a:selfvim,
-  \       '--servername', v:servername, '--remote-expr',
-  \       printf('quickrun#execute(%s)', string(a:cmd))])
-endfunction
-
-function! s:Session.make_command(args)
-  return join([shellescape(a:args[0])] +
-  \           map(a:args[1 :], 'self.shellescape(v:val)'), ' ')
-endfunction
-
-function! s:Session.shellescape(str)
-  if self.config.runmode =~# '^async:vimproc\%(:\d\+\)\?$'
-    return "'" . substitute(a:str, '\\', '/', 'g') . "'"
-  elseif s:is_cmd_exe()
-    return '^"' . substitute(substitute(substitute(a:str,
-    \             '[&|<>()^"%]', '^\0', 'g'),
-    \             '\\\+\ze"', '\=repeat(submatch(0), 2)', 'g'),
-    \             '\ze\^"', '\', 'g') . '^"'
-  endif
-  return shellescape(a:str)
 endfunction
 
 " iconv() wrapper for safety.
@@ -1209,30 +835,6 @@ function! quickrun#sweep(session)
   endif
 
   call a:session.runner.sweep()
-endfunction
-
-function! quickrun#_result(key, ...)
-  let session = quickrun#get_session(a:key)
-  if empty(session)
-    return ''
-  endif
-  if a:0
-    let result = a:1
-  else
-    let resfile = session._temp_result
-    let result = filereadable(resfile) ? join(readfile(resfile, 'b'), "\n")
-    \                                  : ''
-  endif
-
-  if has('mac')
-    let result = substitute(result, '\r', '\n', 'g')
-  elseif s:is_win
-    let result = substitute(result, '\r\n', '\n', 'g')
-  endif
-
-  call s:dispose_session(a:key)
-  call session.output_result(result)
-  return ''
 endfunction
 
 " Execute commands by expr.  This is used by remote_expr()
