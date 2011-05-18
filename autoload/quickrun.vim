@@ -428,7 +428,7 @@ function! s:Session.normalize()
       let config.src = bufnr('%')
     else
       " Executes on the temporary file.
-      let body = self.get_region()
+      let body = s:get_region(config)
 
       if config.eval
         let body = printf(config.eval_template, body)
@@ -831,18 +831,18 @@ endfunction
 
 " ----------------------------------------------------------------------------
 " Get the text of specified region.
-function! s:Session.get_region()
-  let mode = self.config.mode
+function! s:get_region(config)
+  let mode = a:config.mode
   if mode ==# 'n'
     " Normal mode
-    return join(getline(self.config.start, self.config.end), "\n")
+    return join(getline(a:config.start, a:config.end), "\n")
 
   elseif mode ==# 'o'
     " Operation mode
     let vm = {
         \ 'line': 'V',
         \ 'char': 'v',
-        \ 'block': "\<C-v>" }[self.config.visualmode]
+        \ 'block': "\<C-v>" }[a:config.visualmode]
     let [sm, em] = ['[', ']']
     let save_sel = &selection
     set selection=inclusive
