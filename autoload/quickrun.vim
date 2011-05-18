@@ -297,8 +297,8 @@ endfunction
 " ----------------------------------------------------------------------------
 " Initialize of instance.
 function! s:Session.initialize(config)
-  let self.config = a:config
-  call self.normalize()
+  let self.config = s:normalize(a:config)
+  call self.setup()
 endfunction
 
 function! s:parse_argline(argline)
@@ -362,8 +362,8 @@ endfunction
 
 " ----------------------------------------------------------------------------
 " The option is appropriately set referring to default options.
-function! s:Session.normalize()
-  let config = self.config
+function! s:normalize(config)
+  let config = a:config
   if !has_key(config, 'mode')
     let config.mode = histget(':') =~# "^'<,'>\\s*Q\\%[uickRun]" ? 'v' : 'n'
   endif
@@ -452,12 +452,15 @@ function! s:Session.normalize()
   for opt in ['cmdopt', 'args', 'split', 'running_mark', 'output_encode']
     let config[opt] = quickrun#expand(config[opt])
   endfor
+  return config
+endfunction
 
-  let self.runner = self.make_module('runner', config.runner)
-  let self.outputter = self.make_module('outputter', config.outputter)
+function! s:Session.setup()
+  let self.runner = self.make_module('runner', self.config.runner)
+  let self.outputter = self.make_module('outputter', self.config.outputter)
 
   let source_name = self.get_source_name()
-  let exec = get(config, 'exec', '')
+  let exec = get(self.config, 'exec', '')
   let commands = type(exec) == type([]) ? copy(exec) : [exec]
   call filter(map(commands, 'self.build_command(source_name, v:val)'),
   \           'v:val =~ "\\S"')
