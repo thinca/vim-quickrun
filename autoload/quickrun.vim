@@ -784,12 +784,12 @@ endfunction
 " - $ENV_NAME ${ENV_NAME}
 " - {expr}
 " Escape by \ if you does not want to expand.
-function! quickrun#expand(str)
-  if type(a:str) != type('')
-    return ''
+function! quickrun#expand(input)
+  if type(a:input) != type('')
+    return a:input
   endif
   let i = 0
-  let rest = a:str
+  let rest = a:input
   let result = ''
   while 1
     let f = match(rest, '\\\?[@&${]')
