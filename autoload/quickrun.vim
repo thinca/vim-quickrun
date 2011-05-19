@@ -18,10 +18,8 @@ unlet! g:quickrun#default_config  " {{{1
 let g:quickrun#default_config = {
 \ '_': {
 \   'shebang': 1,
-\   'output': '',
 \   'outputter': 'buffer',
 \   'append': 0,
-\   'runmode': 'simple',
 \   'runner': 'system',
 \   'cmdopt': '',
 \   'args': '',
@@ -233,7 +231,6 @@ let g:quickrun#default_config = {
 \   'command': ':source',
 \   'exec': '%c %s',
 \   'eval_template': "echo %s",
-\   'runmode': 'simple',
 \   'runner': 'system',
 \ },
 \ 'wsh': {
@@ -349,7 +346,7 @@ function! s:set_options_from_arglist(arglist)
         let config.append = 1
         let arg = arg[1:]
       endif
-      let config.output = arg[1:]
+      let config.outputter = arg[1:]
     elseif arg[0] == '<'
       let config.input = arg[1:]
     else
@@ -409,11 +406,6 @@ function! s:normalize(config)
   let config.command = get(config, 'command', config.type)
   let config.start = get(config, 'start', 1)
   let config.end = get(config, 'end', line('$'))
-
-  let config.output = quickrun#expand(config.output)
-  if config.output == '!'
-    let config.runmode = 'simple'
-  endif
 
   if has_key(config, 'src')
     if config.eval
