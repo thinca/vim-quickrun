@@ -693,6 +693,7 @@ endfunction
 function! s:register_module(name, kind, module)
   " TODO: validate
   let module = extend(deepcopy(s:{a:kind}), a:module)
+  let module.kind = a:kind
   let module.name = a:name
   let s:registered_{a:kind}s[a:name] = module
 endfunction
