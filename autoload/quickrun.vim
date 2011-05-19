@@ -785,7 +785,9 @@ endfunction
 " - {expr}
 " Escape by \ if you does not want to expand.
 function! quickrun#expand(input)
-  if type(a:input) != type('')
+  if type(a:input) == type([]) || type(a:input) == type({})
+    return map(copy(a:input), 'quickrun#expand(v:val)')
+  elseif type(a:input) != type('')
     return a:input
   endif
   let i = 0
