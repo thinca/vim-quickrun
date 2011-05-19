@@ -261,7 +261,7 @@ function! s:module.init(args, session)
 endfunction
 " Template of runner.
 let s:runner = copy(s:module)
-function! s:runner.run(commands, session)
+function! s:runner.run(commands, input, session)
   throw 'quickrun: A runner should implements run()'
 endfunction
 function! s:runner.sweep()
@@ -484,7 +484,7 @@ endfunction
 
 " Run commands.
 function! s:Session.run()
-  call self.runner.run(self.commands, self)
+  call self.runner.run(self.commands, self.config.input, self)
   if !has_key(self, '_continue_key')
     call self.finish()
   endif

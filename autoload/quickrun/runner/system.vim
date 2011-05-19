@@ -8,10 +8,9 @@ set cpo&vim
 
 let s:runner = {}
 
-function! s:runner.run(commands, session)
-  let config = a:session.config
+function! s:runner.run(commands, input, session)
   for cmd in a:commands
-    call a:session.output(s:execute(cmd, config.input))
+    call a:session.output(s:execute(cmd, a:input))
     if v:shell_error != 0
       break
     endif
