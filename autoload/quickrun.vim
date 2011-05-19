@@ -740,9 +740,11 @@ function! quickrun#complete(lead, cmd, pos)
       elseif opt ==# 'mode'
         let list = ['n', 'v', 'o']
       elseif opt ==# 'runner'
-        let list = keys(s:registered_runners)
+        let list = keys(filter(copy(s:registered_runners),
+        \                      'v:val.available()'))
       elseif opt ==# 'outputter'
-        let list = keys(s:registered_outputters)
+        let list = keys(filter(copy(s:registered_outputters),
+        \                      'v:val.available()'))
       end
       return filter(list, 'v:val =~ "^".a:lead')
     endif
