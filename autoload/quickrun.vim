@@ -19,19 +19,14 @@ let g:quickrun#default_config = {
 \ '_': {
 \   'shebang': 1,
 \   'outputter': 'buffer',
-\   'append': 0,
 \   'runner': 'system',
 \   'cmdopt': '',
 \   'args': '',
 \   'output_encode': '&fileencoding',
 \   'tempfile'  : '{tempname()}',
 \   'exec': '%c %o %s %a',
-\   'split': '{winwidth(0) * 2 < winheight(0) * 5 ? "" : "vertical"}',
-\   'into': 0,
 \   'eval': 0,
 \   'eval_template': '%s',
-\   'shellcmd': s:is_cmd_exe() ? 'silent !%s & pause ' : '!%s',
-\   'running_mark': ':-)',
 \ },
 \ 'awk': {
 \   'exec': '%c %o -f %s %a',
@@ -451,7 +446,7 @@ function! s:normalize(config)
     endif
   endif
 
-  for opt in ['cmdopt', 'args', 'split', 'running_mark', 'output_encode']
+  for opt in ['cmdopt', 'args', 'output_encode']
     let config[opt] = quickrun#expand(config[opt])
   endfor
   return config
