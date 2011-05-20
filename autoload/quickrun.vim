@@ -243,7 +243,7 @@ lockvar! g:quickrun#default_config
 
 
 " Template of module.
-let s:module = {}
+let s:module = {'config': {}}
 function! s:module.available()
   try
     call self.validate()
@@ -253,6 +253,18 @@ function! s:module.available()
   return 1
 endfunction
 function! s:module.validate()
+endfunction
+function! s:module.build(config)
+  for name in keys(self.config)
+    for conf in [self.kind . '/' . self.name . '/' . name,
+    \            self.kind . '/' . name,
+    \            name]
+      if has_key(a:config, conf)
+        let self.config[name] = a:config[conf]
+        break
+      endif
+    endfor
+  endfor
 endfunction
 function! s:module.init(args, session)
 endfunction
@@ -470,6 +482,8 @@ function! s:Session.make_module(kind, line)
     throw printf("quickrun: Specified %s is not available: %s: %s",
     \            a:kind, name, v:exception)
   endtry
+  call module.build(self.config)
+  call map(module.config, 'quickrun#expand(v:val)')
   call module.init(args, self)
   return module
 endfunction
