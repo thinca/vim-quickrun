@@ -6,15 +6,16 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-let s:outputter = {}
+let s:outputter = {
+\   'config': {'append': 0},
+\ }
 
 function! s:outputter.init(args, session)
-  let self._log = a:session.config.append
   let self._buf = ''
 endfunction
 
 function! s:outputter.output(data, session)
-  if !self._log
+  if !self.config.append
     echon a:data
     return
   endif
@@ -27,7 +28,7 @@ function! s:outputter.output(data, session)
 endfunction
 
 function! s:outputter.finish(session)
-  if self._log
+  if self.config.append
     echomsg self._buf
   endif
 endfunction

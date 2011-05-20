@@ -6,26 +6,29 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-let s:outputter = {}
+let s:outputter = {
+\   'config': {
+\     'append': 0,
+\     'split': '{winwidth(0) * 2 < winheight(0) * 5 ? "" : "vertical"}',
+\     'into': 0,
+\     'running_mark': ':-)',
+\   }
+\ }
 
 function! s:outputter.init(args, session)
-  let config = a:session.config
-  let self._split = config.split
-  let self._into = config.into
-  let self._running_mark = config.running_mark
   let winnr = winnr()
-  call s:open_result_window(self._split)
+  call s:open_result_window(self.config.split)
   let self._line = line('$')
-  if !config.append
+  if !self.config.append
     silent % delete _
   endif
-  call s:set_running_mark(self._running_mark)
+  call s:set_running_mark(self.config.running_mark)
   execute winnr 'wincmd w'
 endfunction
 
 function! s:outputter.output(data, session)
   let winnr = winnr()
-  call s:open_result_window(self._split)
+  call s:open_result_window(self.config.split)
   let cursor = getpos('.')
   let oneline = line('$') == 1
   let data = getline('$') . a:data
@@ -38,7 +41,7 @@ function! s:outputter.output(data, session)
   if oneline
     silent 1 delete _
   endif
-  call s:set_running_mark(self._running_mark)
+  call s:set_running_mark(self.config.running_mark)
   call setpos('.', cursor)
   execute winnr 'wincmd w'
   redraw
@@ -46,10 +49,10 @@ endfunction
 
 function! s:outputter.finish(session)
   let winnr = winnr()
-  call s:open_result_window(self._split)
+  call s:open_result_window(self.config.split)
   execute self._line
   silent normal! zt
-  if !self._into
+  if !self.config.into
     execute winnr 'wincmd w'
   endif
   redraw
