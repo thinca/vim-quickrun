@@ -15,7 +15,7 @@ let s:outputter = {
 \   }
 \ }
 
-function! s:outputter.init(args, session)
+function! s:outputter.init(session)
   let winnr = winnr()
   call s:open_result_window(self.config.split)
   let self._line = line('$')

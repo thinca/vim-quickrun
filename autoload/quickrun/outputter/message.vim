@@ -10,7 +10,7 @@ let s:outputter = {
 \   'config': {'append': 0},
 \ }
 
-function! s:outputter.init(args, session)
+function! s:outputter.init(session)
   let self._buf = ''
 endfunction
 

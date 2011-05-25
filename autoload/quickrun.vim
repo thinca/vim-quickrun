@@ -261,7 +261,7 @@ function! s:module.build(config)
     endfor
   endfor
 endfunction
-function! s:module.init(args, session)
+function! s:module.init(session)
 endfunction
 " Template of runner.
 let s:runner = copy(s:module)
@@ -479,7 +479,7 @@ function! s:Session.make_module(kind, line)
   endtry
   call module.build(self.config)
   call map(module.config, 'quickrun#expand(v:val)')
-  call module.init(args, self)
+  call module.init(self)
   return module
 endfunction
 
