@@ -238,7 +238,7 @@ lockvar! g:quickrun#default_config
 
 
 " Template of module.
-let s:module = {'config': {}}
+let s:module = {'config': {}, 'config_order': []}
 function! s:module.available()
   try
     call self.validate()
@@ -249,16 +249,50 @@ function! s:module.available()
 endfunction
 function! s:module.validate()
 endfunction
-function! s:module.build(config)
-  for name in keys(self.config)
-    for conf in [self.kind . '/' . self.name . '/' . name,
-    \            self.kind . '/' . name,
-    \            name]
-      if has_key(a:config, conf)
-        let self.config[name] = a:config[conf]
-        break
-      endif
-    endfor
+function! s:module.build(...)
+  for config in a:000
+    if type(config) == type({})
+      for name in keys(self.config)
+        for conf in [self.kind . '/' . self.name . '/' . name,
+        \            self.kind . '/' . name,
+        \            name]
+          if has_key(config, conf)
+            let self.config[name] = config[conf]
+            break
+          endif
+        endfor
+      endfor
+    elseif type(config) == type('') && config != ''
+      call self.parse_option(config)
+    endif
+    unlet config
+  endfor
+endfunction
+function! s:module.parse_option(argline)
+  let sep = a:argline[0]
+  let args = split(a:argline[1:], '\V' . escape(sep, '\'))
+  let order = copy(self.config_order)
+  for arg in args
+    let name = matchstr(arg, '^\w\+\ze=')
+    if !empty(name)
+      let value = matchstr(arg, '^\w\+=\zs.*')
+    elseif len(self.config) == 1
+      let [name, value] = [keys(self.config)[0], arg]
+    elseif !empty(order)
+      let name = remove(order, 0)
+      let value = arg
+    endif
+    if !has_key(self.config, name)
+      throw 'unknown option: ' . name
+    endif
+    if empty(name)
+      throw 'could not parse the option: ' . arg
+    endif
+    if type(self.config[name]) == type([])
+      call add(self.config[name], value)
+    else
+      let self.config[name] = value
+    endif
   endfor
 endfunction
 function! s:module.init(session)
@@ -465,7 +499,7 @@ function! s:Session.setup()
 endfunction
 
 function! s:Session.make_module(kind, line)
-  let [name; args] = split(a:line, ':', 1)
+  let [name, args] = split(a:line, '^\w\+\zs', 1)
   if !has_key(s:registered_{a:kind}s, name)
     throw printf('quickrun: Specified %s is not registered: %s',
     \            a:kind, name)
@@ -477,7 +511,7 @@ function! s:Session.make_module(kind, line)
     throw printf("quickrun: Specified %s is not available: %s: %s",
     \            a:kind, name, v:exception)
   endtry
-  call module.build(self.config)
+  call module.build(self.config, args)
   call map(module.config, 'quickrun#expand(v:val)')
   call module.init(self)
   return module
