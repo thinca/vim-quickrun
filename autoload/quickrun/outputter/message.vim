@@ -1,4 +1,4 @@
-" quickrun: outputter: echo
+" quickrun: outputter: message
 " Author : thinca <thinca+vim@gmail.com>
 " License: Creative Commons Attribution 2.1 Japan License
 "          <http://creativecommons.org/licenses/by/2.1/jp/deed.en>
@@ -7,7 +7,7 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 let s:outputter = {
-\   'config': {'append': 0},
+\   'config': {'log': 0},
 \ }
 
 function! s:outputter.init(session)
@@ -15,7 +15,7 @@ function! s:outputter.init(session)
 endfunction
 
 function! s:outputter.output(data, session)
-  if !self.config.append
+  if !self.config.log
     echon a:data
     return
   endif
@@ -28,7 +28,7 @@ function! s:outputter.output(data, session)
 endfunction
 
 function! s:outputter.finish(session)
-  if self.config.append
+  if self.config.log
     echomsg self._buf
   endif
 endfunction
