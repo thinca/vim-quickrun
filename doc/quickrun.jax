@@ -167,24 +167,8 @@ outputter (*)				*quickrun-option-outputter*
 	outputter を指定します。詳細は |quickrun-outputter| を参照してくださ
 	い。
 
-append					*quickrun-option-append*
-	0 以外が指定された場合、(可能ならば)出力先に対して追記します。
-
 runner					*quickrun-option-runner*
 	runner を指定します。詳細は |quickrun-runner| を参照してください。
-
-split (*)				*quickrun-option-split*
-	出力専用バッファを開く際の補助コマンドを指定します。バッファを開く際に
-	|:split| コマンドの前に挿入されます。|:tab| も指定できますが、タブペー
-	ジ内に出力専用バッファが存在しない場合常に新しく開くのでおすすめしませ
-	ん。
-	デフォルトは
-	'{winwidth(0) * 2 < winheight(0) * 5 ? "" : "vertical"}'
-	です。
-
-into					*quickrun-option-into*
-	0 以外を指定すると、結果が出た際に出力専用バッファへカーソルを移動しま
-	す。
 
 mode					*quickrun-option-mode*
 	実行モードです。n,v,o のいずれかを指定します。これは範囲をどのように取
@@ -213,12 +197,6 @@ tempfile (*)				*quickrun-option-tempfile*
 	一時ファイルは実行する度に削除されます。
 	デフォルトは "{tempname()}" です。
 
-shellcmd				*quickrun-option-shellcmd*
-	runner が "shell" の時に実行する Vim コマンドのテンプレートです。%s が
-	exec オプションで生成されたコマンドに置換されます。
-	デフォルトは MS Windows の場合は
-	'silent !"%s" & pause' それ以外の場合は '!%s' です。
-
 eval					*quickrun-option-eval*
 	0 以外が指定された場合、src を eval_template に埋め込んで置き変えま
 	す。
@@ -226,11 +204,6 @@ eval					*quickrun-option-eval*
 eval_template				*quickrun-option-eval_template*
 	eval が指定された際に使用されるテンプレート文字列です。テンプレート内
 	の %s が src に置き変えられます。
-
-running_mark (*)			*quickrun-option-running_mark*
-	この値が空文字列でない場合、実行中にこの文字列が出力先に表示されます。
-	表示は実行完了後に削除されます。
-	デフォルトは ":-)" です。
 
 
 ------------------------------------------------------------------------------
@@ -286,29 +259,87 @@ exec を展開した結果先頭の文字が ":" だった場合、Vim のコマ
 
 
 ==============================================================================
-RUNNER						*quickrun-runner*
+モジュール					*quickrun-module*
 
-quickrun はプログラムを実行するのに複数の方法が選択できます。これは runner と
-いう形でモジュール化されています。
-runner は引数を取る場合があります。その場合、runner 名に続けて : で区切って引
-数を指定します。
-デフォルトでは以下の runner が登録されています。
+quickrun のいくつかの部分はモジュール化されています。モジュールには以下の種類
+があります。
 
+- runner	(|quickrun-module-runner|)
+- outputter	(|quickrun-module-outputter|)
+
+モジュールは独自のオプションを持っている場合があります。モジュールのオプション
+は、通常のオプションか、モジュール名の後ろで指定します。
+
+通常のオプションで指定する
+--------------------------
+通常のオプションで指定した場合、以下の優先順位でモジュールに読み取られます。
+
+1. "{module-type}/{module-name}/{option-name}"
+2. "{module-type}/{option-name}"
+3. "{option-name}"
+
+例えば、"outputter/buffer" モジュールに "append" オプションを指定したい場合、
+>
+	let b:quickrun_config = {'outputter/buffer/append': 1}
+<
+もしくは、
+>
+	:QuickRun -outputter/buffer/append 1
+<
+以下のように省略することも可能です。ただし、別の場所で優先度の高い指定があった
+場合はそちらが優先されます。
+>
+	:QuickRun -append 1
+<
+
+モジュール名に指定する
+----------------------
+オプションにモジュール名を指定する際に、オプションの値を指定することができま
+す。オプションはモジュール名の後に任意の記号を続け、その記号でオプションを区切
+ります。各オプションは name=value の形式で指定します。
+>
+	:QuickRun -outputter buffer:append=1:into=1
+<
+モジュールによってはオプションが 1 つしかなかったり、オプションの順序が指定さ
+れていることがあります。その場合、name を省略することができます。
+>
+	:QuickRun -outputter file:/path/to/file
+	:QuickRun -outputter parallel:file,/path/to/file1:file,/path/to/file2
+<
+モジュールの値がリストだった場合は、オプションの値は追加されます。
+
+
+全てのモジュールオプションはモジュールに渡される前に |quickrun-syntax-option|
+によって展開されます。
+
+------------------------------------------------------------------------------
+RUNNER						*quickrun-module-runner*
+
+runner はプログラムを実行するモジュールです。
+デフォルトでは以下の runner が使えます。
 NOTE: "system" 以外は不安定な場合があります。
+
 - "system"
   |system()| を使って実行します。これが既定値です。
 
 - "shell"
   |:!| を使って実行します。この runner は outputter を無視します。
+  オプション ~
+  {shellcmd}		デフォルト: MS Windows の場合は 'silent !"%s" & pause'
+				    それ以外は '!%s'
+	実行する Vim コマンドのテンプレートです。%s が exec オプションで生成さ
+	れたコマンドに置換されます。
 
-- "vimproc[:{updatetime}]"
+- "vimproc"
   {|vimproc| が必要}
-  |vimproc| を使ってコマンドをバックグラウンドで実行します。実行の完了
-  を |CursorHold| と |CursorHoldI| イベントを使って検査します。オプションの値
-  として {updatetime} を指定すると一時的に 'updatetime' を変更します。50 ミリ
-  秒以内に実行が終了した場合は、即座に結果を表示します。
+  |vimproc| を使ってコマンドをバックグラウンドで実行します。実行の完了を
+  |CursorHold| と |CursorHoldI| イベントを使って検査します。50 ミリ秒以内に実
+  行が終了した場合は、即座に結果を表示します。
+  オプション ~
+  {updatetime}		デフォルト: 0
+	一時的に 'updatetime' をこの値に変更します。0 の場合は変更しません。
 
-- "remote[:vimproc]"
+- "remote"
   {|+clientserver| が必要}
   コマンドをバックグラウンドで実行し、終了を |+clientserver| 機能を利用して通
   知し結果を表示します。
@@ -316,8 +347,10 @@ NOTE: "system" 以外は不安定な場合があります。
   プションを使って Vim を起動してください。
   バックグラウンドで実行するため、コマンドが無限ループや入力待ち等で終了しな
   い場合、Vim から制御することはできないので注意してください。
-  引数に "vimproc" が与えられた場合、可能ならば |vimproc| でコマンドを実行しま
-  す。これにより、実行のキャンセルが可能になります。
+  オプション ~
+  {vimproc}		デフォルト: 0
+	可能ならば |vimproc| でコマンドを実行します。これにより、実行のキャン
+	セルが可能になります。
 
 - "python"
   {|+python| が必要}
@@ -326,34 +359,54 @@ NOTE: "system" 以外は不安定な場合があります。
   警告: X11 環境では使用しないでください。Vim がクラッシュします。
 
 
+------------------------------------------------------------------------------
+OUTPUTTER					*quickrun-module-outputter*
 
-==============================================================================
-OUTPUTTER					*quickrun-outputter*
-
-quickrun は結果の出力先を選択することができます。これは outputter という形でモ
-ジュール化されています。
-outputter は引数を取る場合があります。その場合、outputter 名に続けて : で区
-切って引 数を指定します。
-デフォルトでは以下の outputter が登録されています。
+outputter は結果の出力を行うモジュールです。
+デフォルトでは以下の outputter が使えます。
 
 - "buffer"
   出力専用バッファを開いてそこへ出力します。このバッファは同じものが再利用され
   ます。このバッファにはカスタマイズのために 'filetype' に "quickrun" が設定さ
   れます。これが既定値です。
+  オプション ~
+  {append}		デフォルト: 0
+	1 の場合は追記を行います。
+  {split}
+	デフォルト: '{winwidth(0) * 2 < winheight(0) * 5 ? "" : "vertical"}'
+	出力専用バッファを開く際の補助コマンドを指定します。バッファを開く際に
+	|:split| コマンドの前に挿入されます。
+  {into}		デフォルト: 0
+	0 以外を指定すると、結果が出た際に出力専用バッファへカーソルを移動しま
+	す。
+  {running_mark}	デフォルト: ':-)'
+	この値が空文字列でない場合、実行中にこの文字列が出力先に表示されます。
+	表示は実行完了後に削除されます。
 
 - "message"
-  |hit-enter-prompt| に出力します。 append を有効にした場合、|message-history|
-  に記録します。
+  |messages| に出力します。
+  オプション ~
+  {log}			デフォルト: 0
+	1 の場合、出力を |message-history| に記録します。
 
 - "variable"
-  変数に対して出力します。引数として変数名を受け取ります。環境変数やオプション
-  に対しても出力可能です。
+  変数に対して出力します。環境変数やオプションに対しても出力可能です。
+  オプション ~
+  {name}		デフォルト: ''
+	出力先の変数名です。空の場合はエラーになります。
+  {append}		デフォルト: 0
+	1 の場合は追記を行います。
+
+- "file"
+  ファイルに対して出力します。
+  オプション ~
+  {name}		デフォルト: ''
+	出力先のファイル名です。空の場合はエラーになります。
+  {append}		デフォルト: 0
+	1 の場合は追記を行います。
 
 - "null"
   出力を行いません。
-
-- "file"
-  ファイルに対して出力します。引数としてファイル名を受け取ります。
 
 
 
