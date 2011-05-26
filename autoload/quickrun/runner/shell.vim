@@ -18,18 +18,18 @@ function! s:runner.init(session)
 endfunction
 
 function! s:runner.run(commands, input, session)
-  if a:input != ''
+  if a:input !=# ''
     let inputfile = tempname()
     call writefile(split(a:input, "\n", 1), inputfile, 'b')
     let a:session._temp_input = inputfile
   endif
 
   for cmd in a:commands
-    if cmd =~ '^\s*:'
+    if cmd =~# '^\s*:'
       " A vim command.
       call quickrun#execute(cmd)
     endif
-    if a:input != ''
+    if a:input !=# ''
       let cmd .= ' <' . self.shellescape(inputfile)
     endif
 

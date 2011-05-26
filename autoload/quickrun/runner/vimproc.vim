@@ -17,7 +17,7 @@ let s:runner = {
 \ }
 
 function! s:runner.validate()
-  if globpath(&runtimepath, 'autoload/vimproc.vim') == ''
+  if globpath(&runtimepath, 'autoload/vimproc.vim') ==# ''
     throw 'Needs vimproc.'
   endif
 endfunction

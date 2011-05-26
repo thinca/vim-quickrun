@@ -23,7 +23,7 @@ function! s:outputter.init(session)
     let name = 'g:' . name
   endif
   let assign = self.config.append &&
-  \            (name[0] =~ '\W' || exists(name)) ? '.=' : '='
+  \            (name[0] =~# '\W' || exists(name)) ? '.=' : '='
   let self._name = name
   let self._assign = assign
   let self._size = 0

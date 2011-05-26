@@ -22,7 +22,7 @@ function! s:is_cmd_exe()
 endfunction
 
 function! s:execute(cmd, input)
-  if a:cmd =~ '^\s*:'
+  if a:cmd =~# '^\s*:'
     " A vim command.
     return quickrun#execute(a:cmd)
   endif
@@ -35,7 +35,7 @@ function! s:execute(cmd, input)
     let cmd = a:cmd
 
     let cmd = iconv(cmd, &encoding, &termencoding)
-    return a:input == '' ? system(cmd)
+    return a:input ==# '' ? system(cmd)
     \                    : system(cmd, a:input)
   finally
     if s:is_cmd_exe()

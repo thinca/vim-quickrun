@@ -7,7 +7,7 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-let s:available_vimproc = globpath(&runtimepath, 'autoload/vimproc.vim') != ''
+let s:available_vimproc = globpath(&runtimepath, 'autoload/vimproc.vim') !=# ''
 let s:is_win = has('win32') || has('win64')
 
 function! s:is_cmd_exe()
@@ -121,7 +121,7 @@ let g:quickrun#default_config = {
 \   'output_encode': 'utf-8',
 \ },
 \ 'groovy': {
-\   'cmdopt': '-c {&fenc==""?&enc:&fenc}'
+\   'cmdopt': '-c {&fenc==#""?&enc:&fenc}'
 \ },
 \ 'haskell': {
 \   'command': 'runghc',
@@ -262,7 +262,7 @@ function! s:module.build(...)
           endif
         endfor
       endfor
-    elseif type(config) == type('') && config != ''
+    elseif type(config) == type('') && config !=# ''
       call self.parse_option(config)
     endif
     unlet config
@@ -347,9 +347,9 @@ function! s:parse_argline(argline)
   " => ['foo, 'bar buz', "hoge \nhuga"]
   let argline = a:argline
   let arglist = []
-  while argline !~ '^\s*$'
+  while argline !~# '^\s*$'
     let argline = matchstr(argline, '^\s*\zs.*$')
-    if argline[0] =~ '[''"]'
+    if argline[0] =~# '[''"]'
       let arg = matchstr(argline, '\v([''"])\zs.{-}\ze\\@<!\1')
       let argline = argline[strlen(arg) + 2 :]
     else
@@ -367,7 +367,7 @@ function! s:set_options_from_arglist(arglist)
   let config = {}
   let option = ''
   for arg in a:arglist
-    if option != ''
+    if option !=# ''
       if has_key(config, option)
         if type(config[option]) == type([])
           call add(config[option], arg)
@@ -380,15 +380,15 @@ function! s:set_options_from_arglist(arglist)
         let config[option] = arg
       endif
       let option = ''
-    elseif arg[0] == '-'
+    elseif arg[0] ==# '-'
       let option = arg[1:]
-    elseif arg[0] == '>'
-      if arg[1] == '>'
+    elseif arg[0] ==# '>'
+      if arg[1] ==# '>'
         let config.append = 1
         let arg = arg[1:]
       endif
       let config.outputter = arg[1:]
-    elseif arg[0] == '<'
+    elseif arg[0] ==# '<'
       let config.input = arg[1:]
     else
       let config.type = arg
@@ -435,7 +435,7 @@ function! s:normalize(config)
   if has_key(config, 'input')
     let input = quickrun#expand(config.input)
     try
-      let config.input = input[0] == '=' ? input[1:]
+      let config.input = input[0] ==# '=' ? input[1:]
       \                                  : join(readfile(input, 'b'), "\n")
     catch
       throw 'quickrun: Can not treat input: ' . v:exception
@@ -494,7 +494,7 @@ function! s:Session.setup()
   let exec = get(self.config, 'exec', '')
   let commands = type(exec) == type([]) ? copy(exec) : [exec]
   call filter(map(commands, 'self.build_command(source_name, v:val)'),
-  \           'v:val =~ "\\S"')
+  \           'v:val =~# "\\S"')
   let self.commands = commands
 endfunction
 
@@ -539,9 +539,9 @@ function! s:Session.continue()
 endfunction
 
 function! s:Session.output(data)
-  if a:data != ''
+  if a:data !=# ''
     let data = a:data
-    if get(self.config, 'output_encode', '') != ''
+    if get(self.config, 'output_encode', '') !=# ''
       let enc = split(self.config.output_encode, '[^[:alnum:]-_]')
       if len(enc) == 1
         let enc += [&encoding]
@@ -566,7 +566,7 @@ function! s:Session.build_command(source_name, tmpl)
   let config = self.config
   let shebang = config.shebang ? self.detect_shebang() : ''
   let src = string(a:source_name)
-  let command = shebang != '' ? string(shebang) : 'config.command'
+  let command = shebang !=# '' ? string(shebang) : 'config.command'
   let rule = [
   \  ['c', command], ['C', command],
   \  ['s', src], ['S', src],
@@ -574,13 +574,13 @@ function! s:Session.build_command(source_name, tmpl)
   \  ['a', 'config.args'],
   \  ['\%', string('%')],
   \]
-  let is_file = '[' . (shebang != '' ? 's' : 'cs') . ']'
+  let is_file = '[' . (shebang !=# '' ? 's' : 'cs') . ']'
   let cmd = a:tmpl
   for [key, value] in rule
     if key =~? is_file
       let value = 'fnamemodify('.value.',submatch(1))'
       if key =~# '\U'
-        let value = printf(config.command =~ '^\s*:' ? 'fnameescape(%s)'
+        let value = printf(config.command =~# '^\s*:' ? 'fnameescape(%s)'
           \ : 'self.runner.shellescape(%s)', value)
       endif
       let key .= '(%(\:[p8~.htre]|\:g?s(.).{-}\2.{-}\2)*)'
@@ -596,7 +596,7 @@ function! s:Session.detect_shebang()
   let line = type(src) == type('') ? matchstr(src, '^.\{-}\ze\(\n\|$\)'):
   \          type(src) == type(0)  ? getbufline(src, 1)[0]:
   \                                  ''
-  return line =~ '^#!' ? line[2:] : ''
+  return line =~# '^#!' ? line[2:] : ''
 endfunction
 
 " Return the source file name.
@@ -718,7 +718,7 @@ function! s:iconv(expr, from, to)
     return a:expr
   endif
   let result = iconv(a:expr, a:from, a:to)
-  return result != '' ? result : a:expr
+  return result !=# '' ? result : a:expr
 endfunction
 
 " ----------------------------------------------------------------------------
@@ -775,7 +775,7 @@ endfunction
 function! quickrun#complete(lead, cmd, pos)
   let line = split(a:cmd[:a:pos - 1], '', 1)
   let head = line[-1]
-  if 2 <= len(line) && line[-2] =~ '^-'
+  if 2 <= len(line) && line[-2] =~# '^-'
     let opt = line[-2][1:]
     if opt !=# 'type'
       let list = []
@@ -790,18 +790,18 @@ function! quickrun#complete(lead, cmd, pos)
         let list = keys(filter(copy(s:registered_outputters),
         \                      'v:val.available()'))
       end
-      return filter(list, 'v:val =~ "^".a:lead')
+      return filter(list, 'v:val =~# "^".a:lead')
     endif
-  elseif head =~ '^-'
+  elseif head =~# '^-'
     let options = map(['type', 'src', 'input', 'outputter', 'append', 'command',
       \ 'exec', 'cmdopt', 'args', 'tempfile', 'shebang', 'eval', 'mode',
       \ 'runner', 'split', 'into', 'output_encode', 'shellcmd',
       \ 'running_mark', 'eval_template'], '"-".v:val')
-    return filter(options, 'v:val =~ "^".head')
+    return filter(options, 'v:val =~# "^".head')
   end
   let types = keys(extend(exists('g:quickrun_config') ?
   \                copy(g:quickrun_config) : {}, g:quickrun#default_config))
-  return filter(types, 'v:val !~ "^[_*]$" && v:val =~ "^".a:lead')
+  return filter(types, 'v:val !~# "^[_*]$" && v:val =~# "^".a:lead')
 endfunction
 
 
@@ -864,20 +864,20 @@ function! quickrun#expand(input)
       let rest = rest[f :]
     endif
 
-    if rest[0] == '\'
+    if rest[0] ==# '\'
       let result .= rest[1]
       let rest = rest[2 :]
     else
-      if rest =~ '^[@&$]{'
+      if rest =~# '^[@&$]{'
         let rest = rest[1] . rest[0] . rest[2 :]
       endif
-      if rest[0] == '@'
+      if rest[0] ==# '@'
         let e = 2
         let expr = rest[0 : 1]
-      elseif rest =~ '^[&$]'
+      elseif rest =~# '^[&$]'
         let e = matchend(rest, '.\w\+')
         let expr = rest[: e - 1]
-      else  " rest =~ '^{'
+      else  " rest =~# '^{'
         let e = matchend(rest, '\\\@<!}')
         let expr = substitute(rest[1 : e - 2], '\\}', '}', 'g')
       endif

@@ -33,7 +33,7 @@ function! s:outputter.output(data, session)
   let oneline = line('$') == 1
   let data = getline('$') . a:data
   silent $ delete _
-  if data =~ '\n$'
+  if data =~# '\n$'
     " :put command do not insert the last line.
     let data .= "\n"
   endif
@@ -83,7 +83,7 @@ function! s:open_result_window(sp)
 endfunction
 
 function! s:set_running_mark(mark)
-  if a:mark != '' && !exists('b:quickrun_running_mark')
+  if a:mark !=# '' && !exists('b:quickrun_running_mark')
     let &undolevels = &undolevels  " split the undo block
     silent $ put =a:mark
     let b:quickrun_running_mark = 1
