@@ -282,11 +282,11 @@ function! s:module.parse_option(argline)
       let name = remove(order, 0)
       let value = arg
     endif
-    if !has_key(self.config, name)
-      throw 'unknown option: ' . name
-    endif
     if empty(name)
       throw 'could not parse the option: ' . arg
+    endif
+    if !has_key(self.config, name)
+      throw 'unknown option: ' . name
     endif
     if type(self.config[name]) == type([])
       call add(self.config[name], value)
