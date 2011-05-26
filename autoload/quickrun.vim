@@ -13,7 +13,8 @@ function! s:is_cmd_exe()
   return &shell =~? 'cmd\.exe'
 endfunction
 
-unlet! g:quickrun#default_config  " {{{1
+" Default config.  " {{{1
+unlet! g:quickrun#default_config
 let g:quickrun#default_config = {
 \ '_': {
 \   'shebang': 1,
@@ -236,7 +237,8 @@ let g:quickrun#default_config = {
 lockvar! g:quickrun#default_config
 
 
-" Template of module.
+" Modules.  {{{1
+" Template of module.  {{{2
 let s:module = {'config': {}, 'config_order': []}
 function! s:module.available()
   try
@@ -296,7 +298,8 @@ function! s:module.parse_option(argline)
 endfunction
 function! s:module.init(session)
 endfunction
-" Template of runner.
+
+" Template of runner.  {{{2
 let s:runner = copy(s:module)
 function! s:runner.run(commands, input, session)
   throw 'quickrun: A runner should implements run()'
@@ -313,7 +316,7 @@ function! s:runner.shellescape(str)
   return shellescape(a:str)
 endfunction
 
-" Template of outputter.
+" Template of outputter.  {{{2
 let s:outputter = copy(s:module)
 function! s:outputter.output(data, session)
   throw 'quickrun: An outputter should implements output()'
@@ -322,7 +325,6 @@ function! s:outputter.finish(session)
 endfunction
 
 
-" ----------------------------------------------------------------------------
 let s:Session = {}  " {{{1
 " Constructor.
 function! s:Session.new(args)
@@ -337,6 +339,345 @@ function! s:Session.initialize(config)
   call self.setup()
 endfunction
 
+function! s:Session.setup()
+  let self.runner = self.make_module('runner', self.config.runner)
+  let self.outputter = self.make_module('outputter', self.config.outputter)
+
+  let source_name = self.get_source_name()
+  let exec = get(self.config, 'exec', '')
+  let commands = type(exec) == type([]) ? copy(exec) : [exec]
+  call filter(map(commands, 'self.build_command(source_name, v:val)'),
+  \           'v:val =~# "\\S"')
+  let self.commands = commands
+endfunction
+
+function! s:Session.make_module(kind, line)
+  let [name, args] = split(a:line, '^\w\+\zs', 1)
+  if !has_key(s:registered_{a:kind}s, name)
+    throw printf('quickrun: Specified %s is not registered: %s',
+    \            a:kind, name)
+  endif
+  let module = deepcopy(s:registered_{a:kind}s[name])
+
+  try
+    call module.validate()
+  catch
+    throw printf('quickrun: Specified %s is not available: %s: %s',
+    \            a:kind, name, v:exception)
+  endtry
+
+  try
+    call module.build(self.config, args)
+    call map(module.config, 'quickrun#expand(v:val)')
+    call module.init(self)
+  catch
+    throw printf('quickrun: %s/%s: %s',
+    \            a:kind, name, v:exception)
+  endtry
+
+  return module
+endfunction
+
+function! s:Session.run()
+  call self.runner.run(self.commands, self.config.input, self)
+  if !has_key(self, '_continue_key')
+    call self.finish()
+  endif
+endfunction
+
+function! s:Session.continue()
+  let self._continue_key = s:save_session(self)
+  return self._continue_key
+endfunction
+
+function! s:Session.output(data)
+  if a:data !=# ''
+    let data = a:data
+    if get(self.config, 'output_encode', '') !=# ''
+      let enc = split(self.config.output_encode, '[^[:alnum:]-_]')
+      if len(enc) == 1
+        let enc += [&encoding]
+      endif
+      if len(enc) == 2
+        let [from, to] = enc
+        let data = s:iconv(data, from, to)
+      endif
+    endif
+    call self.outputter.output(data, self)
+  endif
+endfunction
+
+function! s:Session.finish()
+  call self.outputter.finish(self)
+  call self.sweep()
+endfunction
+
+" Build a command to execute it from options.
+function! s:Session.build_command(source_name, tmpl)
+  " FIXME: Possibility to be multiple expanded.
+  let config = self.config
+  let shebang = config.shebang ? s:detect_shebang(config.src) : ''
+  let src = string(a:source_name)
+  let command = shebang !=# '' ? string(shebang) : 'config.command'
+  let rule = [
+  \  ['c', command], ['C', command],
+  \  ['s', src], ['S', src],
+  \  ['o', 'config.cmdopt'],
+  \  ['a', 'config.args'],
+  \  ['\%', string('%')],
+  \]
+  let is_file = '[' . (shebang !=# '' ? 's' : 'cs') . ']'
+  let cmd = a:tmpl
+  for [key, value] in rule
+    if key =~? is_file
+      let value = 'fnamemodify('.value.',submatch(1))'
+      if key =~# '\U'
+        let value = printf(config.command =~# '^\s*:' ? 'fnameescape(%s)'
+          \ : 'self.runner.shellescape(%s)', value)
+      endif
+      let key .= '(%(\:[p8~.htre]|\:g?s(.).{-}\2.{-}\2)*)'
+    endif
+    let cmd = substitute(cmd, '\C\v[^%]?\zs\%' . key, '\=' . value, 'g')
+  endfor
+  return substitute(quickrun#expand(cmd), '[\r\n]\+', ' ', 'g')
+endfunction
+
+" Return the source file name.
+" Output to a temporary file if self.config.src is string.
+function! s:Session.get_source_name()
+  let fname = expand('%')
+  if exists('self.config.src')
+    let src = self.config.src
+    if type(src) == type('')
+      if has_key(self, '_temp_source')
+        let fname = self._temp_source
+      else
+        let fname = quickrun#expand(self.config.tempfile)
+        let self._temp_source = fname
+        call writefile(split(src, "\n", 1), fname, 'b')
+      endif
+    elseif type(src) == type(0)
+      let fname = expand('#'.src.':p')
+    endif
+  endif
+  return fname
+endfunction
+
+" Sweep the session.
+function! s:Session.sweep()
+  " Remove temporary files.
+  for file in filter(keys(self), 'v:val =~# "^_temp"')
+    if filewritable(self[file])
+      call delete(self[file])
+    endif
+    call remove(self, file)
+  endfor
+
+  " Restore options.
+  for opt in filter(keys(self), 'v:val =~# "^_option_"')
+    let optname = matchstr(opt, '^_option_\zs.*')
+    if exists('+' . optname)
+      execute 'let'  '&' . optname '= self[opt]'
+    endif
+    call remove(self, opt)
+  endfor
+
+  " Delete autocmds.
+  for cmd in filter(keys(self), 'v:val =~# "^_autocmd_"')
+    execute 'autocmd!' 'plugin-quickrun-' . self[cmd]
+    call remove(self, cmd)
+  endfor
+
+  " Sweep the execution of vimproc.
+  if has_key(self, '_vimproc')
+    try
+      call self._vimproc.kill(15)
+      call self._vimproc.waitpid()
+    catch
+    endtry
+    call remove(self, '_vimproc')
+  endif
+
+  if has_key(self, '_continue_key')
+    if has_key(s:sessions, self._continue_key)
+      call remove(s:sessions, self._continue_key)
+    endif
+    call remove(self, '_continue_key')
+  endif
+
+  call self.runner.sweep()
+endfunction
+
+
+let s:sessions = {}  " Store for sessions.
+
+function! s:save_session(session)
+  let key = has('reltime') ? reltimestr(reltime()) : string(localtime())
+  let s:sessions[key] = a:session
+  return key
+endfunction
+
+function! quickrun#get_session(key)
+  return get(s:sessions, a:key, {})
+endfunction
+
+" Call a function of a session by key.
+function! quickrun#session(key, func, ...)
+  let session = quickrun#get_session(a:key)
+  if !empty(session)
+    return call(session[a:func], a:000, session)
+  endif
+endfunction
+
+function! s:dispose_session(key)
+  if has_key(s:sessions, a:key)
+    let session = remove(s:sessions, a:key)
+    call session.sweep()
+  endif
+endfunction
+
+function! s:sweep_sessions()
+  call map(keys(s:sessions), 's:dispose_session(v:val)')
+endfunction
+
+
+" Interfaces.  {{{1
+function! quickrun#run(config)
+  call s:sweep_sessions()
+
+  let session = s:Session.new(a:config)
+  let config = session.config
+
+  if has_key(config, 'debug') && config.debug
+    let g:runner = session  " for debug
+  endif
+
+  call session.run()
+endfunction
+
+" function for main command.
+function! quickrun#command(argline)
+  try
+    let arglist = s:parse_argline(a:argline)
+    let config = s:set_options_from_arglist(arglist)
+    call quickrun#run(config)
+  catch /^quickrun:/
+    echohl ErrorMsg
+    for line in split(v:exception, "\n")
+      echomsg line
+    endfor
+    echohl None
+  endtry
+endfunction
+
+" completion function for main command.
+function! quickrun#complete(lead, cmd, pos)
+  let line = split(a:cmd[:a:pos - 1], '', 1)
+  let head = line[-1]
+  if 2 <= len(line) && line[-2] =~# '^-'
+    let opt = line[-2][1:]
+    if opt !=# 'type'
+      let list = []
+      if opt ==# 'append' || opt ==# 'shebang' || opt ==# 'into'
+        let list = ['0', '1']
+      elseif opt ==# 'mode'
+        let list = ['n', 'v', 'o']
+      elseif opt ==# 'runner'
+        let list = keys(filter(copy(s:registered_runners),
+        \                      'v:val.available()'))
+      elseif opt ==# 'outputter'
+        let list = keys(filter(copy(s:registered_outputters),
+        \                      'v:val.available()'))
+      end
+      return filter(list, 'v:val =~# "^".a:lead')
+    endif
+  elseif head =~# '^-'
+    let options = map(['type', 'src', 'input', 'outputter', 'append', 'command',
+      \ 'exec', 'cmdopt', 'args', 'tempfile', 'shebang', 'eval', 'mode',
+      \ 'runner', 'split', 'into', 'output_encode', 'shellcmd',
+      \ 'running_mark', 'eval_template'], '"-".v:val')
+    return filter(options, 'v:val =~# "^".head')
+  end
+  let types = keys(extend(exists('g:quickrun_config') ?
+  \                copy(g:quickrun_config) : {}, g:quickrun#default_config))
+  return filter(types, 'v:val !~# "^[_*]$" && v:val =~# "^".a:lead')
+endfunction
+
+
+" Expand the keyword.
+" - @register @{register}
+" - &option &{option}
+" - $ENV_NAME ${ENV_NAME}
+" - {expr}
+" Escape by \ if you does not want to expand.
+function! quickrun#expand(input)
+  if type(a:input) == type([]) || type(a:input) == type({})
+    return map(copy(a:input), 'quickrun#expand(v:val)')
+  elseif type(a:input) != type('')
+    return a:input
+  endif
+  let i = 0
+  let rest = a:input
+  let result = ''
+  while 1
+    let f = match(rest, '\\\?[@&${]')
+    if f < 0
+      let result .= rest
+      break
+    endif
+
+    if f != 0
+      let result .= rest[: f - 1]
+      let rest = rest[f :]
+    endif
+
+    if rest[0] ==# '\'
+      let result .= rest[1]
+      let rest = rest[2 :]
+    else
+      if rest =~# '^[@&$]{'
+        let rest = rest[1] . rest[0] . rest[2 :]
+      endif
+      if rest[0] ==# '@'
+        let e = 2
+        let expr = rest[0 : 1]
+      elseif rest =~# '^[&$]'
+        let e = matchend(rest, '.\w\+')
+        let expr = rest[: e - 1]
+      else  " rest =~# '^{'
+        let e = matchend(rest, '\\\@<!}')
+        let expr = substitute(rest[1 : e - 2], '\\}', '}', 'g')
+      endif
+      if e < 0
+        break
+      endif
+      try
+        let result .= eval(expr)
+      catch
+      endtry
+      let rest = rest[e :]
+    endif
+  endwhile
+  return result
+endfunction
+
+" Execute commands by expr.  This is used by remote_expr()
+function! quickrun#execute(...)
+  " XXX: Can't get a result if a:cmd contains :redir command.
+  let result = ''
+  try
+    redir => result
+    for cmd in a:000
+      silent execute cmd
+    endfor
+  finally
+    redir END
+  endtry
+  return result
+endfunction
+
+
+" Misc functions.  {{{1
 function! s:parse_argline(argline)
   " foo 'bar buz' "hoge \"huga"
   " => ['foo', 'bar buz', 'hoge "huga']
@@ -485,182 +826,12 @@ function! s:normalize(config)
   return config
 endfunction
 
-function! s:Session.setup()
-  let self.runner = self.make_module('runner', self.config.runner)
-  let self.outputter = self.make_module('outputter', self.config.outputter)
-
-  let source_name = self.get_source_name()
-  let exec = get(self.config, 'exec', '')
-  let commands = type(exec) == type([]) ? copy(exec) : [exec]
-  call filter(map(commands, 'self.build_command(source_name, v:val)'),
-  \           'v:val =~# "\\S"')
-  let self.commands = commands
-endfunction
-
-function! s:Session.make_module(kind, line)
-  let [name, args] = split(a:line, '^\w\+\zs', 1)
-  if !has_key(s:registered_{a:kind}s, name)
-    throw printf('quickrun: Specified %s is not registered: %s',
-    \            a:kind, name)
-  endif
-  let module = deepcopy(s:registered_{a:kind}s[name])
-
-  try
-    call module.validate()
-  catch
-    throw printf('quickrun: Specified %s is not available: %s: %s',
-    \            a:kind, name, v:exception)
-  endtry
-
-  try
-    call module.build(self.config, args)
-    call map(module.config, 'quickrun#expand(v:val)')
-    call module.init(self)
-  catch
-    throw printf('quickrun: %s/%s: %s',
-    \            a:kind, name, v:exception)
-  endtry
-
-  return module
-endfunction
-
-" Run commands.
-function! s:Session.run()
-  call self.runner.run(self.commands, self.config.input, self)
-  if !has_key(self, '_continue_key')
-    call self.finish()
-  endif
-endfunction
-
-function! s:Session.continue()
-  let self._continue_key = s:save_session(self)
-  return self._continue_key
-endfunction
-
-function! s:Session.output(data)
-  if a:data !=# ''
-    let data = a:data
-    if get(self.config, 'output_encode', '') !=# ''
-      let enc = split(self.config.output_encode, '[^[:alnum:]-_]')
-      if len(enc) == 1
-        let enc += [&encoding]
-      endif
-      if len(enc) == 2
-        let [from, to] = enc
-        let data = s:iconv(data, from, to)
-      endif
-    endif
-    call self.outputter.output(data, self)
-  endif
-endfunction
-
-function! s:Session.finish()
-  call self.outputter.finish(self)
-  call self.sweep()
-endfunction
-
-" Build a command to execute it from options.
-function! s:Session.build_command(source_name, tmpl)
-  " FIXME: Possibility to be multiple expanded.
-  let config = self.config
-  let shebang = config.shebang ? s:detect_shebang(config.src) : ''
-  let src = string(a:source_name)
-  let command = shebang !=# '' ? string(shebang) : 'config.command'
-  let rule = [
-  \  ['c', command], ['C', command],
-  \  ['s', src], ['S', src],
-  \  ['o', 'config.cmdopt'],
-  \  ['a', 'config.args'],
-  \  ['\%', string('%')],
-  \]
-  let is_file = '[' . (shebang !=# '' ? 's' : 'cs') . ']'
-  let cmd = a:tmpl
-  for [key, value] in rule
-    if key =~? is_file
-      let value = 'fnamemodify('.value.',submatch(1))'
-      if key =~# '\U'
-        let value = printf(config.command =~# '^\s*:' ? 'fnameescape(%s)'
-          \ : 'self.runner.shellescape(%s)', value)
-      endif
-      let key .= '(%(\:[p8~.htre]|\:g?s(.).{-}\2.{-}\2)*)'
-    endif
-    let cmd = substitute(cmd, '\C\v[^%]?\zs\%' . key, '\=' . value, 'g')
-  endfor
-  return substitute(quickrun#expand(cmd), '[\r\n]\+', ' ', 'g')
-endfunction
-
 " Detect the shebang, and return the shebang command if it exists.
 function! s:detect_shebang(src)
   let line = type(a:src) == type('') ? matchstr(a:src, '^.\{-}\ze\(\n\|$\)'):
   \          type(a:src) == type(0)  ? getbufline(a:src, 1)[0]:
   \                                  ''
   return line =~# '^#!' ? line[2:] : ''
-endfunction
-
-" Return the source file name.
-" Output to a temporary file if self.config.src is string.
-function! s:Session.get_source_name()
-  let fname = expand('%')
-  if exists('self.config.src')
-    let src = self.config.src
-    if type(src) == type('')
-      if has_key(self, '_temp_source')
-        let fname = self._temp_source
-      else
-        let fname = quickrun#expand(self.config.tempfile)
-        let self._temp_source = fname
-        call writefile(split(src, "\n", 1), fname, 'b')
-      endif
-    elseif type(src) == type(0)
-      let fname = expand('#'.src.':p')
-    endif
-  endif
-  return fname
-endfunction
-
-" Sweep the session.
-function! s:Session.sweep()
-  " Remove temporary files.
-  for file in filter(keys(self), 'v:val =~# "^_temp"')
-    if filewritable(self[file])
-      call delete(self[file])
-    endif
-    call remove(self, file)
-  endfor
-
-  " Restore options.
-  for opt in filter(keys(self), 'v:val =~# "^_option_"')
-    let optname = matchstr(opt, '^_option_\zs.*')
-    if exists('+' . optname)
-      execute 'let'  '&' . optname '= self[opt]'
-    endif
-    call remove(self, opt)
-  endfor
-
-  " Delete autocmds.
-  for cmd in filter(keys(self), 'v:val =~# "^_autocmd_"')
-    execute 'autocmd!' 'plugin-quickrun-' . self[cmd]
-    call remove(self, cmd)
-  endfor
-
-  " Sweep the execution of vimproc.
-  if has_key(self, '_vimproc')
-    try
-      call self._vimproc.kill(15)
-      call self._vimproc.waitpid()
-    catch
-    endtry
-    call remove(self, '_vimproc')
-  endif
-
-  if has_key(self, '_continue_key')
-    if has_key(s:sessions, self._continue_key)
-      call remove(s:sessions, self._continue_key)
-    endif
-    call remove(self, '_continue_key')
-  endif
-
-  call self.runner.sweep()
 endfunction
 
 " Get the text of specified region.
@@ -719,7 +890,9 @@ function! s:iconv(expr, from, to)
   return result !=# '' ? result : a:expr
 endfunction
 
-" ----------------------------------------------------------------------------
+
+
+" Module system.  {{{1
 let s:registered_runners = {}
 let s:registered_outputters = {}
 
@@ -739,174 +912,8 @@ function! s:register_module(name, kind, module)
   let s:registered_{a:kind}s[a:name] = module
 endfunction
 
-" ----------------------------------------------------------------------------
-" Interfaces.  {{{1
-" function for main command.
-function! quickrun#run(config)
-  call s:sweep_sessions()
 
-  let session = s:Session.new(a:config)
-  let config = session.config
-
-  if has_key(config, 'debug') && config.debug
-    let g:runner = session  " for debug
-  endif
-
-  call session.run()
-endfunction
-
-" function for main command.
-function! quickrun#command(argline)
-  try
-    let arglist = s:parse_argline(a:argline)
-    let config = s:set_options_from_arglist(arglist)
-    call quickrun#run(config)
-  catch /^quickrun:/
-    echohl ErrorMsg
-    for line in split(v:exception, "\n")
-      echomsg line
-    endfor
-    echohl None
-  endtry
-endfunction
-
-function! quickrun#complete(lead, cmd, pos)
-  let line = split(a:cmd[:a:pos - 1], '', 1)
-  let head = line[-1]
-  if 2 <= len(line) && line[-2] =~# '^-'
-    let opt = line[-2][1:]
-    if opt !=# 'type'
-      let list = []
-      if opt ==# 'append' || opt ==# 'shebang' || opt ==# 'into'
-        let list = ['0', '1']
-      elseif opt ==# 'mode'
-        let list = ['n', 'v', 'o']
-      elseif opt ==# 'runner'
-        let list = keys(filter(copy(s:registered_runners),
-        \                      'v:val.available()'))
-      elseif opt ==# 'outputter'
-        let list = keys(filter(copy(s:registered_outputters),
-        \                      'v:val.available()'))
-      end
-      return filter(list, 'v:val =~# "^".a:lead')
-    endif
-  elseif head =~# '^-'
-    let options = map(['type', 'src', 'input', 'outputter', 'append', 'command',
-      \ 'exec', 'cmdopt', 'args', 'tempfile', 'shebang', 'eval', 'mode',
-      \ 'runner', 'split', 'into', 'output_encode', 'shellcmd',
-      \ 'running_mark', 'eval_template'], '"-".v:val')
-    return filter(options, 'v:val =~# "^".head')
-  end
-  let types = keys(extend(exists('g:quickrun_config') ?
-  \                copy(g:quickrun_config) : {}, g:quickrun#default_config))
-  return filter(types, 'v:val !~# "^[_*]$" && v:val =~# "^".a:lead')
-endfunction
-
-
-let s:sessions = {}  " Store for sessions.
-
-function! s:save_session(session)
-  let key = has('reltime') ? reltimestr(reltime()) : string(localtime())
-  let s:sessions[key] = a:session
-  return key
-endfunction
-
-function! quickrun#get_session(key)
-  return get(s:sessions, a:key, {})
-endfunction
-
-" Call a function of a session by key.
-function! quickrun#session(key, func, ...)
-  let session = quickrun#get_session(a:key)
-  if !empty(session)
-    return call(session[a:func], a:000, session)
-  endif
-endfunction
-
-function! s:dispose_session(key)
-  if has_key(s:sessions, a:key)
-    let session = remove(s:sessions, a:key)
-    call session.sweep()
-  endif
-endfunction
-
-function! s:sweep_sessions()
-  call map(keys(s:sessions), 's:dispose_session(v:val)')
-endfunction
-
-
-" Expand the keyword.
-" - @register @{register}
-" - &option &{option}
-" - $ENV_NAME ${ENV_NAME}
-" - {expr}
-" Escape by \ if you does not want to expand.
-function! quickrun#expand(input)
-  if type(a:input) == type([]) || type(a:input) == type({})
-    return map(copy(a:input), 'quickrun#expand(v:val)')
-  elseif type(a:input) != type('')
-    return a:input
-  endif
-  let i = 0
-  let rest = a:input
-  let result = ''
-  while 1
-    let f = match(rest, '\\\?[@&${]')
-    if f < 0
-      let result .= rest
-      break
-    endif
-
-    if f != 0
-      let result .= rest[: f - 1]
-      let rest = rest[f :]
-    endif
-
-    if rest[0] ==# '\'
-      let result .= rest[1]
-      let rest = rest[2 :]
-    else
-      if rest =~# '^[@&$]{'
-        let rest = rest[1] . rest[0] . rest[2 :]
-      endif
-      if rest[0] ==# '@'
-        let e = 2
-        let expr = rest[0 : 1]
-      elseif rest =~# '^[&$]'
-        let e = matchend(rest, '.\w\+')
-        let expr = rest[: e - 1]
-      else  " rest =~# '^{'
-        let e = matchend(rest, '\\\@<!}')
-        let expr = substitute(rest[1 : e - 2], '\\}', '}', 'g')
-      endif
-      if e < 0
-        break
-      endif
-      try
-        let result .= eval(expr)
-      catch
-      endtry
-      let rest = rest[e :]
-    endif
-  endwhile
-  return result
-endfunction
-
-" Execute commands by expr.  This is used by remote_expr()
-function! quickrun#execute(...)
-  " XXX: Can't get a result if a:cmd contains :redir command.
-  let result = ''
-  try
-    redir => result
-    for cmd in a:000
-      silent execute cmd
-    endfor
-  finally
-    redir END
-  endtry
-  return result
-endfunction
-
+" Register the default modules.  {{{1
 function! s:register_defaults(kind)
   let pat = 'autoload/quickrun/' . a:kind . '/*.vim'
   for name in map(split(globpath(&runtimepath, pat), "\n"),
