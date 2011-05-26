@@ -28,7 +28,7 @@ function! s:outputter.output(data, session)
 endfunction
 
 function! s:outputter.finish(session)
-  if self.config.log
+  if self.config.log && self._buf !=# ''
     echomsg self._buf
   endif
 endfunction
