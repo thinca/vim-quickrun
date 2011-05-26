@@ -505,15 +505,23 @@ function! s:Session.make_module(kind, line)
     \            a:kind, name)
   endif
   let module = deepcopy(s:registered_{a:kind}s[name])
+
   try
     call module.validate()
   catch
-    throw printf("quickrun: Specified %s is not available: %s: %s",
+    throw printf('quickrun: Specified %s is not available: %s: %s',
     \            a:kind, name, v:exception)
   endtry
-  call module.build(self.config, args)
-  call map(module.config, 'quickrun#expand(v:val)')
-  call module.init(self)
+
+  try
+    call module.build(self.config, args)
+    call map(module.config, 'quickrun#expand(v:val)')
+    call module.init(self)
+  catch
+    throw printf('quickrun: %s/%s: %s',
+    \            a:kind, name, v:exception)
+  endtry
+
   return module
 endfunction
 
