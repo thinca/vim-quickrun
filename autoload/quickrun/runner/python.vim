@@ -34,7 +34,7 @@ class QuickRun(threading.Thread):
             err = traceback.format_exc()
             pass
         finally:
-            vim.eval("quickrun#runner#python#finish(%s)" % self.key)
+            vim.eval("quickrun#session(%s, 'finish')" % self.key)
 
     def execute(self, cmd):
         if re.match('^\s*:', cmd):
@@ -57,7 +57,7 @@ class QuickRun(threading.Thread):
     def output(self, fp):
         try:
             data = fp.read()
-            vim.eval("quickrun#runner#python#output(%s, %s)" %
+            vim.eval("quickrun#session(%s, 'output', %s)" %
               (self.key, self.vimstr(data)))
         except:
             pass
@@ -94,20 +94,6 @@ function! s:runner.run(commands, input, session)
   python QuickRun(vim.eval('a:commands'),
   \               vim.eval('key'),
   \               vim.eval('a:input')).start()
-endfunction
-
-function! quickrun#runner#python#output(key, data)
-  let session = quickrun#get_session(a:key)
-  if !empty(session)
-    call session.output(a:data)
-  endif
-endfunction
-
-function! quickrun#runner#python#finish(key)
-  let session = quickrun#get_session(a:key)
-  if !empty(session)
-    call session.finish()
-  endif
 endfunction
 
 

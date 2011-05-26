@@ -809,6 +809,14 @@ function! quickrun#get_session(key)
   return get(s:sessions, a:key, {})
 endfunction
 
+" Call a function of a session by key.
+function! quickrun#session(key, func, ...)
+  let session = quickrun#get_session(a:key)
+  if !empty(session)
+    return call(session[a:func], a:000, session)
+  endif
+endfunction
+
 function! s:dispose_session(key)
   if has_key(s:sessions, a:key)
     let session = remove(s:sessions, a:key)
