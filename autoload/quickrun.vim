@@ -546,9 +546,9 @@ function! quickrun#run(config)
 
   let session = s:Session.new(a:config)
 
-  let config = session.config
-  if has_key(config, 'debug') && config.debug
-    let g:runner = session  " for debug
+  " for debug
+  if has_key(session.config, 'debug')
+    let g:{matchstr(session.config.debug, '\h\w*')} = session
   endif
 
   call session.setup()
