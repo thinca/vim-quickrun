@@ -336,7 +336,6 @@ endfunction
 " Initialize of instance.
 function! s:Session.initialize(config)
   let self.config = s:normalize(a:config)
-  call self.setup()
 endfunction
 
 function! s:Session.setup()
@@ -546,11 +545,13 @@ function! quickrun#run(config)
   call s:sweep_sessions()
 
   let session = s:Session.new(a:config)
-  let config = session.config
 
+  let config = session.config
   if has_key(config, 'debug') && config.debug
     let g:runner = session  " for debug
   endif
+
+  call session.setup()
 
   call session.run()
 endfunction
