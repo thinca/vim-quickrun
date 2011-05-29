@@ -410,6 +410,12 @@ outputter は結果の出力を行うモジュールです。
   {target}		デフォルト: ''
 	実際の出力に使う outputter です。
 
+- "multi"
+  複数の outputter に対して同時に出力を行います。
+  オプション ~
+  {targets}		デフォルト: []
+	実際の出力に使う outputter のリストです。
+
 - "null"
   出力を行いません。
 
