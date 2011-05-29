@@ -15,7 +15,7 @@ set cpo&vim
 " MISC Functions. {{{1
 " ----------------------------------------------------------------------------
 " Function for |g@|.
-function! QuickRun(mode)  " {{{2
+function! QuickRun(mode)
   execute 'QuickRun -mode o -visualmode' a:mode
 endfunction
 

@@ -21,7 +21,7 @@ function! s:quicklaunch(no)
 
   if !exists('g:quicklaunch_commands[a:no]')
   \  || type(g:quicklaunch_commands[a:no]) != type('')
-  \  || g:quicklaunch_commands[a:no] == ''
+  \  || g:quicklaunch_commands[a:no] ==# ''
     echoerr 'quicklaunch has no such command:' a:no
     return
   endif
