@@ -369,8 +369,9 @@ function! s:Session.make_module(kind, line)
   try
     call module.validate()
   catch
+    let exception = matchstr(v:exception, '^\%(quickrun:\s*\)\?\zs.*')
     throw printf('quickrun: Specified %s is not available: %s: %s',
-    \            a:kind, name, v:exception)
+    \            a:kind, name, exception)
   endtry
 
   try
@@ -378,8 +379,9 @@ function! s:Session.make_module(kind, line)
     call map(module.config, 'quickrun#expand(v:val)')
     call module.init(self)
   catch
+    let exception = matchstr(v:exception, '^\%(quickrun:\s*\)\?\zs.*')
     throw printf('quickrun: %s/%s: %s',
-    \            a:kind, name, v:exception)
+    \            a:kind, name, exception)
   endtry
 
   return module
