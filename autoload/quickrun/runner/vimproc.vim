@@ -53,7 +53,7 @@ endfunction
 
 
 function! s:receive_vimproc_result(key)
-  let session = quickrun#get_session(a:key)
+  let session = quickrun#session(a:key)
 
   let vimproc = session._vimproc
 

@@ -521,11 +521,12 @@ function! quickrun#get_session(key)
 endfunction
 
 " Call a function of a session by key.
-function! quickrun#session(key, func, ...)
-  let session = quickrun#get_session(a:key)
-  if !empty(session)
-    return call(session[a:func], a:000, session)
+function! quickrun#session(key, ...)
+  let session = get(s:sessions, a:key, {})
+  if a:0 && !empty(session)
+    return call(session[a:1], a:000[1 :], session)
   endif
+  return session
 endfunction
 
 function! s:dispose_session(key)
