@@ -250,8 +250,8 @@ function! s:module.available()
 endfunction
 function! s:module.validate()
 endfunction
-function! s:module.build(...)
-  for config in a:000
+function! s:module.build(configs)
+  for config in a:configs
     if type(config) == type({})
       for name in keys(self.config)
         for conf in [self.kind . '/' . self.name . '/' . name,
@@ -351,11 +351,19 @@ function! s:Session.setup()
 endfunction
 
 function! s:Session.make_module(kind, line)
-  let [name, args] = split(a:line, '^\w\+\zs', 1)
+  let name = ''
+  if type(a:line) == type([]) && !empty([])
+    let [name; args] = a:line
+  elseif a:line =~# '^\w'
+    let [name, arg] = split(a:line, '^\w\+\zs', 1)
+    let args = [arg]
+  endif
+
   if !has_key(s:registered_{a:kind}s, name)
     throw printf('quickrun: Specified %s is not registered: %s',
     \            a:kind, name)
   endif
+
   let module = deepcopy(s:registered_{a:kind}s[name])
 
   try
@@ -366,7 +374,7 @@ function! s:Session.make_module(kind, line)
   endtry
 
   try
-    call module.build(self.config, args)
+    call module.build([self.config] + args)
     call map(module.config, 'quickrun#expand(v:val)')
     call module.init(self)
   catch
