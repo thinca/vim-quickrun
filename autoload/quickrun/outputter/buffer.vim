@@ -18,10 +18,10 @@ let s:outputter = {
 function! s:outputter.init(session)
   let winnr = winnr()
   call s:open_result_window(self.config.split)
-  let self._line = line('$')
   if !self.config.append
     silent % delete _
   endif
+  let self._line = line('$')
   call s:set_running_mark(self.config.running_mark)
   execute winnr 'wincmd w'
 endfunction
