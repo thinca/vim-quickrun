@@ -29,7 +29,6 @@ endfunction
 function! s:outputter.output(data, session)
   let winnr = winnr()
   call s:open_result_window(self.config.split)
-  let cursor = getpos('.')
   let oneline = line('$') == 1
   let data = getline('$') . a:data
   silent $ delete _
@@ -42,9 +41,8 @@ function! s:outputter.output(data, session)
     silent 1 delete _
   endif
   call s:set_running_mark(self.config.running_mark)
-  call setpos('.', cursor)
-  execute winnr 'wincmd w'
   redraw
+  execute winnr 'wincmd w'
 endfunction
 
 function! s:outputter.finish(session)
