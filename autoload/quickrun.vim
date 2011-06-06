@@ -7,7 +7,12 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-let s:is_win = has('win32') || has('win64')
+let s:V = vital#of('quickrun').load('Data.List')
+unlet! g:quickrun#V
+let g:quickrun#V = s:V
+lockvar! g:quickrun#V
+
+let s:is_win = s:V.is_windows()
 
 function! s:is_cmd_exe()
   return &shell =~? 'cmd\.exe'
@@ -409,7 +414,7 @@ function! s:Session.output(data)
       endif
       if len(enc) == 2
         let [from, to] = enc
-        let data = s:iconv(data, from, to)
+        let data = s:V.iconv(data, from, to)
       endif
     endif
     call self.outputter.output(data, self)
@@ -817,7 +822,7 @@ function! s:normalize(config)
         let body = printf(config.eval_template, body)
       endif
 
-      let body = s:iconv(body, &enc, &fenc)
+      let body = s:V.iconv(body, &enc, &fenc)
 
       if &l:ff ==# 'mac'
         let body = substitute(body, "\n", "\r", 'g')
@@ -891,15 +896,6 @@ function! s:get_region(config)
     let &selection = save_sel
   endif
   return selected
-endfunction
-
-" iconv() wrapper for safety.
-function! s:iconv(expr, from, to)
-  if a:from ==# a:to
-    return a:expr
-  endif
-  let result = iconv(a:expr, a:from, a:to)
-  return result !=# '' ? result : a:expr
 endfunction
 
 

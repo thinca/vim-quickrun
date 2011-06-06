@@ -59,7 +59,7 @@ function! s:runner.run(commands, input, session)
     call insert(scriptbody, '@echo off')
     call map(scriptbody, 'v:val . "\r"')
   endif
-  call map(scriptbody, 'iconv(v:val, &encoding, &termencoding)')
+  call map(scriptbody, 'g:quickrun#V.iconv(v:val, &encoding, &termencoding)')
   let a:session._temp_script = script
   call writefile(scriptbody, script, 'b')
 

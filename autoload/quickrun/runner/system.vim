@@ -34,7 +34,7 @@ function! s:execute(cmd, input)
     endif
     let cmd = a:cmd
 
-    let cmd = iconv(cmd, &encoding, &termencoding)
+    let cmd = g:quickrun#V.iconv(cmd, &encoding, &termencoding)
     return a:input ==# '' ? system(cmd)
     \                    : system(cmd, a:input)
   finally

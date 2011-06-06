@@ -50,7 +50,7 @@ function! s:execute(cmd)
       let sxq = &shellxquote
       let &shellxquote = '"'
     endif
-    execute iconv(a:cmd, &encoding, &termencoding)
+    execute g:quickrun#V.iconv(a:cmd, &encoding, &termencoding)
   finally
     if s:is_cmd_exe()
       let &shellxquote = sxq
