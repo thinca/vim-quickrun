@@ -592,32 +592,48 @@ function! quickrun#complete(lead, cmd, pos)
   let line = split(a:cmd[:a:pos - 1], '', 1)
   let head = line[-1]
   if 2 <= len(line) && line[-2] =~# '^-'
+    " a value of option.
     let opt = line[-2][1:]
     if opt !=# 'type'
       let list = []
-      if opt ==# 'append' || opt ==# 'shebang' || opt ==# 'into'
+      if opt ==# 'shebang'
         let list = ['0', '1']
       elseif opt ==# 'mode'
         let list = ['n', 'v', 'o']
-      elseif opt ==# 'runner'
-        let list = keys(filter(copy(s:registered_runners),
-        \                      'v:val.available()'))
-      elseif opt ==# 'outputter'
-        let list = keys(filter(copy(s:registered_outputters),
+      elseif opt ==# 'runner' || opt ==# 'outputter'
+        let list = keys(filter(copy(s:registered_{opt}s),
         \                      'v:val.available()'))
       end
       return filter(list, 'v:val =~# "^".a:lead')
     endif
+
   elseif head =~# '^-'
-    let options = map(['type', 'src', 'input', 'outputter', 'append', 'command',
-      \ 'exec', 'cmdopt', 'args', 'tempfile', 'shebang', 'eval', 'mode',
-      \ 'runner', 'split', 'into', 'output_encode', 'shellcmd',
-      \ 'running_mark', 'eval_template'], '"-".v:val')
-    return filter(options, 'v:val =~# "^".head')
+    " a name of option.
+    let list = ['type', 'src', 'input', 'runner', 'outputter',
+    \ 'command', 'exec', 'cmdopt', 'args', 'tempfile', 'shebang', 'eval',
+    \ 'mode', 'output_encode', 'eval_template']
+    let mod_options = {}
+    for kind in ['runner', 'outputter']
+      for module in filter(values(s:registered_{kind}s), 'v:val.available()')
+        for opt in keys(module.config)
+          let mod_options[opt] = 1
+          let mod_options[kind . '/' . opt] = 1
+          let mod_options[kind . '/' . module.name . '/' . opt] = 1
+        endfor
+      endfor
+    endfor
+    let list += keys(mod_options)
+    call map(list, '"-" . v:val')
+
+  else
+    " no context: types
+    let list = keys(extend(exists('g:quickrun_config') ?
+    \               copy(g:quickrun_config) : {}, g:quickrun#default_config))
+    call filter(list, 'v:val !~# "^[_*]$"')
   end
-  let types = keys(extend(exists('g:quickrun_config') ?
-  \                copy(g:quickrun_config) : {}, g:quickrun#default_config))
-  return filter(types, 'v:val !~# "^[_*]$" && v:val =~# "^".a:lead')
+
+  let re = '^' . head . '\w*\W\?'
+  return s:V.Data.List.uniq(sort(map(list, 'matchstr(v:val, re)')))
 endfunction
 
 
