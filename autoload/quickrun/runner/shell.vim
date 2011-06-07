@@ -27,8 +27,14 @@ function! s:runner.run(commands, input, session)
   for cmd in a:commands
     if cmd =~# '^\s*:'
       " A vim command.
-      call quickrun#execute(cmd)
+      try
+        call quickrun#execute(cmd)
+      catch
+        break
+      endtry
+      continue
     endif
+
     if a:input !=# ''
       let cmd .= ' <' . self.shellescape(inputfile)
     endif

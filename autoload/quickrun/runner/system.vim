@@ -10,8 +10,9 @@ let s:runner = {}
 
 function! s:runner.run(commands, input, session)
   for cmd in a:commands
-    call a:session.output(s:execute(cmd, a:input))
-    if v:shell_error != 0
+    let [result, code] = s:execute(cmd, a:input)
+    call a:session.output(result)
+    if code != 0
       break
     endif
   endfor
@@ -20,7 +21,12 @@ endfunction
 function! s:execute(cmd, input)
   if a:cmd =~# '^\s*:'
     " A vim command.
-    return quickrun#execute(a:cmd)
+    try
+      let result = quickrun#execute(a:cmd)
+    catch
+      return ['', 1]
+    endtry
+    return [result, 0]
   endif
 
   let is_cmd_exe = &shell =~? 'cmd\.exe'
@@ -32,13 +38,14 @@ function! s:execute(cmd, input)
     let cmd = a:cmd
 
     let cmd = g:quickrun#V.iconv(cmd, &encoding, &termencoding)
-    return a:input ==# '' ? system(cmd)
-    \                    : system(cmd, a:input)
+    let result = a:input ==# '' ? system(cmd)
+    \                           : system(cmd, a:input)
   finally
     if is_cmd_exe
       let &shellxquote = sxq
     endif
   endtry
+  return [result, v:shell_error]
 endfunction
 
 
