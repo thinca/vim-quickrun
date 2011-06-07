@@ -17,18 +17,15 @@ function! s:runner.run(commands, input, session)
   endfor
 endfunction
 
-function! s:is_cmd_exe()
-  return &shell =~? 'cmd\.exe'
-endfunction
-
 function! s:execute(cmd, input)
   if a:cmd =~# '^\s*:'
     " A vim command.
     return quickrun#execute(a:cmd)
   endif
 
+  let is_cmd_exe = &shell =~? 'cmd\.exe'
   try
-    if s:is_cmd_exe()
+    if is_cmd_exe
       let sxq = &shellxquote
       let &shellxquote = '"'
     endif
@@ -38,7 +35,7 @@ function! s:execute(cmd, input)
     return a:input ==# '' ? system(cmd)
     \                    : system(cmd, a:input)
   finally
-    if s:is_cmd_exe()
+    if is_cmd_exe
       let &shellxquote = sxq
     endif
   endtry
