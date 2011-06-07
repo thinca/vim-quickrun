@@ -23,15 +23,12 @@ class QuickRun(threading.Thread):
         self.input = input
 
     def run(self):
-        global err
-        err = ''
         try:
             for cmd in self.cmds:
                 ret = self.execute(cmd)
                 if ret != 0:
                     break
         except:
-            err = traceback.format_exc()
             pass
         finally:
             vim.eval("quickrun#session(%s, 'finish')" % self.key)
