@@ -40,19 +40,16 @@ function! s:runner.run(commands, input, session)
   endfor
 endfunction
 
-function! s:is_cmd_exe()
-  return &shell =~? 'cmd\.exe'
-endfunction
-
 function! s:execute(cmd)
+  let is_cmd_exe = &shell =~? 'cmd\.exe'
   try
-    if s:is_cmd_exe()
+    if is_cmd_exe
       let sxq = &shellxquote
       let &shellxquote = '"'
     endif
     execute g:quickrun#V.iconv(a:cmd, &encoding, &termencoding)
   finally
-    if s:is_cmd_exe()
+    if is_cmd_exe
       let &shellxquote = sxq
     endif
   endtry
