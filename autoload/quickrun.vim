@@ -393,9 +393,9 @@ function! s:Session.make_module(kind, line)
 endfunction
 
 function! s:Session.run()
-  call self.runner.run(self.commands, self.config.input, self)
+  let exit_code = self.runner.run(self.commands, self.config.input, self)
   if !has_key(self, '_continue_key')
-    call self.finish()
+    call self.finish(exit_code)
   endif
 endfunction
 
@@ -421,8 +421,9 @@ function! s:Session.output(data)
   endif
 endfunction
 
-function! s:Session.finish()
+function! s:Session.finish(...)
   call self.outputter.finish(self)
+  let self.exit_code = a:0 ? a:1 : 0
   call self.sweep()
 endfunction
 

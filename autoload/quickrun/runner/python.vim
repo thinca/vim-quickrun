@@ -23,6 +23,7 @@ class QuickRun(threading.Thread):
         self.input = input
 
     def run(self):
+        ret = 0
         try:
             for cmd in self.cmds:
                 ret = self.execute(cmd)
@@ -31,7 +32,7 @@ class QuickRun(threading.Thread):
         except:
             pass
         finally:
-            vim.eval("quickrun#session(%s, 'finish')" % self.key)
+            vim.eval("quickrun#session(%s, 'finish', %s)" % (self.key, ret))
 
     def execute(self, cmd):
         if re.match('^\s*:', cmd):

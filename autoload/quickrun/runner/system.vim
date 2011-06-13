@@ -9,6 +9,7 @@ set cpo&vim
 let s:runner = {}
 
 function! s:runner.run(commands, input, session)
+  let code = 0
   for cmd in a:commands
     let [result, code] = s:execute(cmd, a:input)
     call a:session.output(result)
@@ -16,6 +17,7 @@ function! s:runner.run(commands, input, session)
       break
     endif
   endfor
+  return code
 endfunction
 
 function! s:execute(cmd, input)

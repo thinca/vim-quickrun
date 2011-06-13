@@ -72,7 +72,7 @@ function! s:receive_vimproc_result(key)
   call vimproc.stdout.close()
   call vimproc.stderr.close()
   call vimproc.waitpid()
-  call session.finish()
+  call session.finish(vimproc.status)
   return 1
 endfunction
 
