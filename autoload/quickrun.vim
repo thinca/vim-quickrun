@@ -427,8 +427,8 @@ function! s:Session.output(data)
 endfunction
 
 function! s:Session.finish(...)
-  call self.outputter.finish(self)
   let self.exit_code = a:0 ? a:1 : 0
+  call self.outputter.finish(self)
   call self.sweep()
 endfunction
 
