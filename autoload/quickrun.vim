@@ -142,6 +142,7 @@ let g:quickrun#default_config = {
 \   'type': executable('js') ? 'javascript/spidermonkey':
 \           executable('d8') ? 'javascript/v8':
 \           executable('node') ? 'javascript/nodejs':
+\           executable('phantomjs') ? 'javascript/phantomjs':
 \           executable('jrunscript') ? 'javascript/rhino':
 \           executable('cscript') ? 'javascript/cscript': '',
 \ },
@@ -164,6 +165,10 @@ let g:quickrun#default_config = {
 \ },
 \ 'javascript/nodejs': {
 \   'command': 'node',
+\   'tempfile': '{tempname()}.js',
+\ },
+\ 'javascript/phantomjs': {
+\   'command': 'phantomjs',
 \   'tempfile': '{tempname()}.js',
 \ },
 \ 'lisp': {
