@@ -404,6 +404,12 @@ outputter は結果の出力を行うモジュールです。
   {append}		デフォルト: 0
 	1 の場合は追記を行います。
 
+- "quickfix"
+  |quickfix| へ出力します。
+  オプション ~
+  {errorformat}		デフォルト: "&errorformat"
+	出力を解釈するための 'errorformat' オプションの値です。
+
 - "buffered"
   出力をバッファリングして、最後に一度に出力します。
   オプション ~
