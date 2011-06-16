@@ -163,7 +163,7 @@ input (*)				*quickrun-option-input*
 	標準入力に流し込むファイルを指定します。先頭が = で始まっていた場合、
 	それ以降の文字列を入力として扱います。
 
-outputter (*)				*quickrun-option-outputter*
+outputter				*quickrun-option-outputter*
 	outputter を指定します。詳細は |quickrun-outputter| を参照してくださ
 	い。
 
