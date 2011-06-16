@@ -13,10 +13,6 @@ let s:outputter.config = {
 \ }
 let s:outputter.config_order = ['success', 'error']
 
-function! s:outputter.init(session)
-  let self._result = ''
-endfunction
-
 function! s:outputter.finish(session)
   let outputter = a:session.make_module('outputter',
   \   self.config[a:session.exit_code ? 'error' : 'success'])

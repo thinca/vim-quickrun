@@ -11,10 +11,6 @@ let s:outputter.config = {
 \   'errorformat': '&errorformat',
 \ }
 
-function! s:outputter.init(session)
-  let self._result = ''
-endfunction
-
 function! s:outputter.finish(session)
   try
     let errorformat = &l:errorformat
