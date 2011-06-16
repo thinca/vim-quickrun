@@ -701,12 +701,12 @@ function! quickrun#expand(input)
 endfunction
 
 " Execute commands by expr.  This is used by remote_expr()
-function! quickrun#execute(...)
+function! quickrun#execute(cmd)
   " XXX: Can't get a result if a:cmd contains :redir command.
   let result = ''
   try
     redir => result
-    for cmd in a:000
+    for cmd in type(a:cmd) == type([]) ? a:cmd : [a:cmd]
       silent execute cmd
     endfor
   finally
