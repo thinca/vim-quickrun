@@ -13,8 +13,6 @@ let s:outputter = {
 \ }
 
 function! s:outputter.init(session)
-  let self._outputter =
-  \   a:session.make_module('outputter', self.config.target)
   let self._result = ''
 endfunction
 
@@ -23,8 +21,9 @@ function! s:outputter.output(data, session)
 endfunction
 
 function! s:outputter.finish(session)
-  call self._outputter.output(self._result, a:session)
-  call self._outputter.finish(a:session)
+  let outputter = a:session.make_module('outputter', self.config.target)
+  call outputter.output(self._result, a:session)
+  call outputter.finish(a:session)
 endfunction
 
 
