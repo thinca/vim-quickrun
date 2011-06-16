@@ -638,7 +638,7 @@ function! quickrun#complete(lead, cmd, pos)
     call filter(list, 'v:val !~# "^[_*]$"')
   end
 
-  let re = '^' . head . '\w*\W\?'
+  let re = '^\V' . escape(head, '\') . '\v[^/]*/?'
   return s:V.Data.List.uniq(sort(map(list, 'matchstr(v:val, re)')))
 endfunction
 
