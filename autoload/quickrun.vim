@@ -427,9 +427,11 @@ function! s:Session.output(data)
 endfunction
 
 function! s:Session.finish(...)
-  let self.exit_code = a:0 ? a:1 : 0
-  call self.outputter.finish(self)
-  call self.sweep()
+  if !has_key(self, 'exit_code')
+    let self.exit_code = a:0 ? a:1 : 0
+    call self.outputter.finish(self)
+    call self.sweep()
+  endif
 endfunction
 
 " Build a command to execute it from options.
