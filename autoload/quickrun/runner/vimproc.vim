@@ -78,7 +78,7 @@ endfunction
 
 
 function! quickrun#runner#vimproc#new()
-  return copy(s:runner)
+  return deepcopy(s:runner)
 endfunction
 
 let &cpo = s:save_cpo

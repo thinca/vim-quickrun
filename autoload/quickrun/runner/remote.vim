@@ -100,7 +100,7 @@ endfunction
 
 
 function! quickrun#runner#remote#new()
-  return copy(s:runner)
+  return deepcopy(s:runner)
 endfunction
 
 let &cpo = s:save_cpo

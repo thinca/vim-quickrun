@@ -99,7 +99,7 @@ endfunction
 
 
 function! quickrun#runner#python#new()
-  return copy(s:runner)
+  return deepcopy(s:runner)
 endfunction
 
 

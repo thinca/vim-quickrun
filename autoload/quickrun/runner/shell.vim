@@ -63,7 +63,7 @@ endfunction
 
 
 function! quickrun#runner#shell#new()
-  return copy(s:runner)
+  return deepcopy(s:runner)
 endfunction
 
 let &cpo = s:save_cpo

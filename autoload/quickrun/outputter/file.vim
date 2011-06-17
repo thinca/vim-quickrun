@@ -42,7 +42,7 @@ endfunction
 
 
 function! quickrun#outputter#file#new()
-  return copy(s:outputter)
+  return deepcopy(s:outputter)
 endfunction
 
 let &cpo = s:save_cpo

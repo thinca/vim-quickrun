@@ -35,7 +35,7 @@ endfunction
 
 
 function! quickrun#outputter#message#new()
-  return copy(s:outputter)
+  return deepcopy(s:outputter)
 endfunction
 
 let &cpo = s:save_cpo

@@ -28,7 +28,7 @@ endfunction
 
 
 function! quickrun#outputter#buffered#new()
-  return copy(s:outputter)
+  return deepcopy(s:outputter)
 endfunction
 
 let &cpo = s:save_cpo
