@@ -36,6 +36,12 @@ function! s:outputter.output(data, session)
     " :put command do not insert the last line.
     let data .= "\n"
   endif
+
+  " XXX 'fileformat' of a new buffer depends on 'fileformats'.
+  if &l:fileformat ==# 'dos'
+    let data = substitute(data, "\r\n", "\n", 'g')
+  endif
+
   silent $ put = data
   if oneline
     silent 1 delete _
