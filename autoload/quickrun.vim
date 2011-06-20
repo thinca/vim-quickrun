@@ -438,7 +438,7 @@ endfunction
 function! s:Session.build_command(source_name, tmpl)
   " FIXME: Possibility to be multiple expanded.
   let config = self.config
-  let shebang = config.shebang ? s:detect_shebang(config.src) : ''
+  let shebang = config.shebang ? s:detect_shebang(a:source_name) : ''
   let src = string(a:source_name)
   let command = shebang !=# '' ? string(shebang) : 'config.command'
   let rule = [
@@ -868,10 +868,8 @@ function! s:normalize(config)
 endfunction
 
 " Detect the shebang, and return the shebang command if it exists.
-function! s:detect_shebang(src)
-  let line = type(a:src) == type('') ? matchstr(a:src, '^.\{-}\ze\(\n\|$\)'):
-  \          type(a:src) == type(0)  ? getbufline(a:src, 1)[0]:
-  \                                  ''
+function! s:detect_shebang(file)
+  let line = get(readfile(a:file, 0, 1), 0, '')
   return line =~# '^#!' ? line[2:] : ''
 endfunction
 
