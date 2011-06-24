@@ -849,12 +849,12 @@ function! s:normalize(config)
         let body = printf(config.eval_template, body)
       endif
 
-      let body = s:V.iconv(body, &enc, &fenc)
+      let body = s:V.iconv(body, &encoding, &fileencoding)
 
-      if &l:ff ==# 'mac'
+      if &l:fileformat ==# 'mac'
         let body = substitute(body, "\n", "\r", 'g')
-      elseif &l:ff ==# 'dos'
-        if !&l:bin
+      elseif &l:fileformat ==# 'dos'
+        if !&l:binary
           let body .= "\n"
         endif
         let body = substitute(body, "\n", "\r\n", 'g')
