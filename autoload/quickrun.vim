@@ -661,7 +661,7 @@ function! quickrun#expand(input)
   let rest = a:input
   let result = ''
   while 1
-    let f = match(rest, '\\\?[@&$%]')
+    let f = match(rest, '\\\?[@&$%\\]')
     if f < 0
       let result .= rest
       break
@@ -673,7 +673,7 @@ function! quickrun#expand(input)
     endif
 
     if rest[0] ==# '\'
-      let result .= rest[1]
+      let result .= rest[1] =~# '[@&$%\\]' ? rest[1] : rest[0 : 1]
       let rest = rest[2 :]
     else
       if rest =~# '^[@&$]{'
