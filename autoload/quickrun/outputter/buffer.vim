@@ -9,7 +9,7 @@ set cpo&vim
 let s:outputter = {
 \   'config': {
 \     'append': 0,
-\     'split': '{winwidth(0) * 2 < winheight(0) * 5 ? "" : "vertical"}',
+\     'split': '%{winwidth(0) * 2 < winheight(0) * 5 ? "" : "vertical"}',
 \     'into': 0,
 \     'running_mark': ':-)',
 \   }

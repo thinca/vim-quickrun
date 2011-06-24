@@ -649,7 +649,7 @@ endfunction
 " - @register @{register}
 " - &option &{option}
 " - $ENV_NAME ${ENV_NAME}
-" - {expr}
+" - %{expr}
 " Escape by \ if you does not want to expand.
 function! quickrun#expand(input)
   if type(a:input) == type([]) || type(a:input) == type({})
@@ -661,7 +661,7 @@ function! quickrun#expand(input)
   let rest = a:input
   let result = ''
   while 1
-    let f = match(rest, '\\\?[@&${]')
+    let f = match(rest, '\\\?[@&$%]')
     if f < 0
       let result .= rest
       break
@@ -677,7 +677,7 @@ function! quickrun#expand(input)
       let rest = rest[2 :]
     else
       if rest =~# '^[@&$]{'
-        let rest = rest[1] . rest[0] . rest[2 :]
+        let rest = '%{' . rest[0] . rest[2 :]
       endif
       if rest[0] ==# '@'
         let e = 2
@@ -685,9 +685,9 @@ function! quickrun#expand(input)
       elseif rest =~# '^[&$]'
         let e = matchend(rest, '.\w\+')
         let expr = rest[: e - 1]
-      else  " rest =~# '^{'
+      else  " rest =~# '^%{'
         let e = matchend(rest, '\\\@<!}')
-        let expr = substitute(rest[1 : e - 2], '\\}', '}', 'g')
+        let expr = substitute(rest[2 : e - 2], '\\}', '}', 'g')
       endif
       if e < 0
         break
