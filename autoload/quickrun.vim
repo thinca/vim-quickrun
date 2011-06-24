@@ -369,12 +369,12 @@ function! s:Session.make_module(kind, line)
     let args = [arg]
   endif
 
-  if !has_key(s:registered_{a:kind}s, name)
+  if !has_key(s:modules[a:kind], name)
     throw printf('quickrun: Specified %s is not registered: %s',
     \            a:kind, name)
   endif
 
-  let module = deepcopy(s:registered_{a:kind}s[name])
+  let module = deepcopy(s:modules[a:kind][name])
 
   try
     call module.validate()
@@ -609,7 +609,7 @@ function! quickrun#complete(lead, cmd, pos)
       elseif opt ==# 'mode'
         let list = ['n', 'v', 'o']
       elseif opt ==# 'runner' || opt ==# 'outputter'
-        let list = keys(filter(copy(s:registered_{opt}s),
+        let list = keys(filter(copy(s:modules[opt]),
         \                      'v:val.available()'))
       end
       return filter(list, 'v:val =~# "^".a:lead')
@@ -622,7 +622,7 @@ function! quickrun#complete(lead, cmd, pos)
     \ 'mode', 'output_encode', 'eval_template']
     let mod_options = {}
     for kind in ['runner', 'outputter']
-      for module in filter(values(s:registered_{kind}s), 'v:val.available()')
+      for module in filter(values(s:modules[kind]), 'v:val.available()')
         for opt in keys(module.config)
           let mod_options[opt] = 1
           let mod_options[kind . '/' . opt] = 1
@@ -926,8 +926,10 @@ endfunction
 
 
 " Module system.  {{{1
-let s:registered_runners = {}
-let s:registered_outputters = {}
+let s:modules = {
+\   'runner': {},
+\   'outputter': {},
+\ }
 
 function! quickrun#register_runner(name, runner)
   return s:register_module(a:name, 'runner', a:runner)
@@ -942,7 +944,7 @@ function! s:register_module(name, kind, module)
   let module = extend(deepcopy(s:{a:kind}), a:module)
   let module.kind = a:kind
   let module.name = a:name
-  let s:registered_{a:kind}s[a:name] = module
+  let s:modules[a:kind][a:name] = module
 endfunction
 
 
