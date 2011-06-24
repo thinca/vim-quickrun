@@ -685,9 +685,12 @@ function! quickrun#expand(input)
       elseif rest =~# '^[&$]'
         let e = matchend(rest, '.\w\+')
         let expr = rest[: e - 1]
-      else  " rest =~# '^%{'
+      elseif rest =~# '^%{'
         let e = matchend(rest, '\\\@<!}')
         let expr = substitute(rest[2 : e - 2], '\\}', '}', 'g')
+      else
+        let e = 1
+        let expr = string(rest[0])
       endif
       if e < 0
         break
