@@ -55,12 +55,12 @@ http://github.com/thinca/vim-quickrun
 	let g:quickrun_config = {}
 	let g:quickrun_config.haskell = {'command' : 'runhugs'}
 
-	" ショートカットキーを設定する
+	" 出力先別にショートカットキーを設定する
 	for [key, com] in items({
-	\   '<Leader>x' : '>:',
-	\   '<Leader>p' : '>!',
-	\   '<Leader>w' : '>',
-	\   '<Leader>q' : '>>',
+	\   '<Leader>x' : '>message',
+	\   '<Leader>p' : '-runner shell',
+	\   '<Leader>w' : '>buffer',
+	\   '<Leader>q' : '>>buffer',
 	\ })
 		execute 'nnoremap <silent>' key ':QuickRun' com '-mode n<CR>'
 		execute 'vnoremap <silent>' key ':QuickRun' com '-mode v<CR>'
@@ -75,7 +75,7 @@ http://github.com/thinca/vim-quickrun
 コマンド					*quickrun-commands*
 
 						*:QuickRun*
-:[range]QuickRun [{type}] [<{input}] [>[>][{output}]] [-option value]...
+:[range]QuickRun [{type}] [<{input}] [>[>]{output}] [-option value]...
 	プログラムを実行します。実行する際にオプションを指定できます。指定でき
 	るオプションについては |quickrun-options| を参照してください。
 	オプションは名前と値の組で、
