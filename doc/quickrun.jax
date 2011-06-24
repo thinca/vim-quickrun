@@ -16,6 +16,9 @@ License: クリエイティブ・コモンズの表示 2.1 日本ライセンス
 オプション			|quickrun-options|
   オプション値の構文		  |quickrun-syntax-option|
   exec オプションの書式		  |quickrun-exec-format|
+モジュール			|quickrun-module|
+  RUNNER			  |quickrun-module-runner|
+  OUTPUTTER			  |quickrun-module-outputter|
 設定				|quickrun-settings|
 更新履歴			|quickrun-changelog|
 
