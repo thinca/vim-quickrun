@@ -555,14 +555,14 @@ function! s:dispose_session(key)
   endif
 endfunction
 
-function! s:sweep_sessions()
+function! quickrun#sweep_sessions()
   call map(keys(s:sessions), 's:dispose_session(v:val)')
 endfunction
 
 
 " Interfaces.  {{{1
 function! quickrun#run(config)
-  call s:sweep_sessions()
+  call quickrun#sweep_sessions()
 
   let session = s:Session.new(a:config)
 
