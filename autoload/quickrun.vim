@@ -539,10 +539,6 @@ function! s:save_session(session)
   return key
 endfunction
 
-function! quickrun#get_session(key)
-  return get(s:sessions, a:key, {})
-endfunction
-
 " Call a function of a session by key.
 function! quickrun#session(key, ...)
   let session = get(s:sessions, a:key, {})
