@@ -28,7 +28,7 @@ let g:quickrun#default_config = {
 \   'cmdopt': '',
 \   'args': '',
 \   'output_encode': '&fileencoding',
-\   'tempfile'  : '{tempname()}',
+\   'tempfile'  : '%{tempname()}',
 \   'exec': '%c %o %s %a',
 \   'eval': 0,
 \   'eval_template': '%s',
@@ -50,18 +50,18 @@ let g:quickrun#default_config = {
 \ 'c/clang': {
 \   'command': 'clang',
 \   'exec': ['%c %o %s -o %s:p:r', '%s:p:r %a', 'rm -f %s:p:r'],
-\   'tempfile': '{tempname()}.c',
+\   'tempfile': '%{tempname()}.c',
 \ },
 \ 'c/gcc': {
 \   'command': 'gcc',
 \   'exec': ['%c %o %s -o %s:p:r', '%s:p:r %a', 'rm -f %s:p:r'],
-\   'tempfile': '{tempname()}.c',
+\   'tempfile': '%{tempname()}.c',
 \ },
 \ 'c/vc': {
 \   'command': 'cl',
 \   'exec': ['%c %o %s /nologo /Fo%s:p:r.obj /Fe%s:p:r.exe > nul',
 \             '%s:p:r.exe %a', 'del %s:p:r.exe %s:p:r.obj'],
-\   'tempfile': '{tempname()}.c',
+\   'tempfile': '%{tempname()}.c',
 \ },
 \ 'cpp': {
 \   'type':
@@ -75,18 +75,18 @@ let g:quickrun#default_config = {
 \ 'cpp/g++': {
 \   'command': 'g++',
 \   'exec': ['%c %o %s -o %s:p:r', '%s:p:r %a', 'rm -f %s:p:r'],
-\   'tempfile': '{tempname()}.cpp',
+\   'tempfile': '%{tempname()}.cpp',
 \ },
 \ 'cpp/vc': {
 \   'command': 'cl',
 \   'exec': ['%c %o %s /nologo /Fo%s:p:r.obj /Fe%s:p:r.exe > nul',
 \             '%s:p:r.exe %a', 'del %s:p:r.exe %s:p:r.obj'],
-\   'tempfile': '{tempname()}.cpp',
+\   'tempfile': '%{tempname()}.cpp',
 \ },
 \ 'dosbatch': {
 \   'command': '',
 \   'exec': 'call %s %a',
-\   'tempfile': '{tempname()}.bat',
+\   'tempfile': '%{tempname()}.bat',
 \ },
 \ 'erlang': {
 \   'command': 'escript',
@@ -104,25 +104,25 @@ let g:quickrun#default_config = {
 \ 'go/386': {
 \   'exec': ['8g %o -o %s:p:r.8 %s', '8l -o %s:p:r %s:p:r.8',
 \            '%s:p:r %a', 'rm -f %s:p:r'],
-\   'tempfile': '{tempname()}.go',
+\   'tempfile': '%{tempname()}.go',
 \   'output_encode': 'utf-8',
 \ },
 \ 'go/386/win': {
 \   'exec': ['8g %o -o %s:p:r.8 %s', '8l -o %s:p:r.exe %s:p:r.8',
 \            '%s:p:r.exe %a', 'del /F %s:p:r.exe'],
-\   'tempfile': '{tempname()}.go',
+\   'tempfile': '%{tempname()}.go',
 \   'output_encode': 'utf-8',
 \ },
 \ 'go/amd64': {
 \   'exec': ['6g %o -o %s:p:r.6 %s', '6l -o %s:p:r %s:p:r.6',
 \            '%s:p:r %a', 'rm -f %s:p:r'],
-\   'tempfile': '{tempname()}.go',
+\   'tempfile': '%{tempname()}.go',
 \   'output_encode': 'utf-8',
 \ },
 \ 'go/arm': {
 \   'exec': ['5g %o -o %s:p:r.5 %s', '5l -o %s:p:r %s:p:r.5',
 \            '%s:p:r %a', 'rm -f %s:p:r'],
-\   'tempfile': '{tempname()}.go',
+\   'tempfile': '%{tempname()}.go',
 \   'output_encode': 'utf-8',
 \ },
 \ 'groovy': {
@@ -130,7 +130,7 @@ let g:quickrun#default_config = {
 \ },
 \ 'haskell': {
 \   'command': 'runghc',
-\   'tempfile': '{tempname()}.hs',
+\   'tempfile': '%{tempname()}.hs',
 \   'eval_template': 'main = print $ %s',
 \ },
 \ 'io': {},
@@ -149,27 +149,27 @@ let g:quickrun#default_config = {
 \ 'javascript/cscript': {
 \   'command': 'cscript',
 \   'cmdopt': '//Nologo',
-\   'tempfile': '{tempname()}.js',
+\   'tempfile': '%{tempname()}.js',
 \ },
 \ 'javascript/rhino': {
 \   'command': 'jrunscript',
-\   'tempfile': '{tempname()}.js',
+\   'tempfile': '%{tempname()}.js',
 \ },
 \ 'javascript/spidermonkey': {
 \   'command': 'js',
-\   'tempfile': '{tempname()}.js',
+\   'tempfile': '%{tempname()}.js',
 \ },
 \ 'javascript/v8': {
 \   'command': 'd8',
-\   'tempfile': '{tempname()}.js',
+\   'tempfile': '%{tempname()}.js',
 \ },
 \ 'javascript/nodejs': {
 \   'command': 'node',
-\   'tempfile': '{tempname()}.js',
+\   'tempfile': '%{tempname()}.js',
 \ },
 \ 'javascript/phantomjs': {
 \   'command': 'phantomjs',
-\   'tempfile': '{tempname()}.js',
+\   'tempfile': '%{tempname()}.js',
 \ },
 \ 'lisp': {
 \   'command': 'clisp',
