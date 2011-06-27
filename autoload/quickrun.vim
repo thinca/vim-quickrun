@@ -8,6 +8,7 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 let s:V = vital#of('quickrun').load('Data.List')
+call s:V.import('Data.String', s:V)
 unlet! g:quickrun#V
 let g:quickrun#V = s:V
 lockvar! g:quickrun#V
