@@ -103,12 +103,11 @@ http://github.com/thinca/vim-quickrun
 
 ------------------------------------------------------------------------------
 関数						*quickrun-functions*
-						*quickrun-operator*
 
-QuickRun({type})				*QuickRun()*
+quickrun#operator({wise})			*quickrun#operator()*
 	'operatorfunc' に対して設定するための関数です。
 	例えば、 >
-	nnoremap <silent> <C-CR> :<C-u>set opfunc=QuickRun<CR>g@ip
+	nnoremap <silent> <C-CR> :<C-u>set opfunc=quickrun#operator<CR>g@ip
 <	これは、<C-CR> で現在の段落(|ip|)を実行します。
 
 
@@ -117,7 +116,7 @@ QuickRun({type})				*QuickRun()*
 
 <Plug>(quickrun-op)				*<Plug>(quickrun-op)*
 	続くモーションの範囲を実行します。これは
-	'operatorfunc' の値を "QuickRun" に変更します。
+	'operatorfunc' の値を "quickrun#operator" に変更します。
 
 <Plug>(quickrun)				*<Plug>(quickrun)*
 	現在のバッファに適したコマンドを実行して結果を別ウィンドウに表示しま
@@ -504,6 +503,7 @@ outputter は結果の出力を行うモジュールです。
 
 0.5.0	xxxx-xx-xx
 	- モジュールシステムを導入。
+	- QuickRun() を |quickrun#operator()| へ移動。
 
 0.4.7	2011-05-23
 	- デフォルトの設定に markdown を追加。

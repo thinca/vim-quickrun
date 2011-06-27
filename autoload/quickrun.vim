@@ -576,6 +576,11 @@ function! quickrun#run(config)
   call session.run()
 endfunction
 
+" function for |g@|.
+function! quickrun#operator(wise)
+  call quickrun#run({'mode': 'o', 'visualmode': a:wise})
+endfunction
+
 " function for main command.
 function! quickrun#command(argline)
   try
