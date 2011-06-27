@@ -629,7 +629,8 @@ function! quickrun#complete(lead, cmd, pos)
     let list += keys(mod_options)
     call map(list, '"-" . v:val')
 
-  else
+  endif
+  if !exists('list')
     " no context: types
     let list = keys(extend(exists('g:quickrun_config') ?
     \               copy(g:quickrun_config) : {}, g:quickrun#default_config))
