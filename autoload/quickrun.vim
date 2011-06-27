@@ -929,14 +929,14 @@ let s:modules = {
 \ }
 
 function! quickrun#register_runner(name, runner)
-  return s:register_module(a:name, 'runner', a:runner)
+  return s:register_module('runner', a:name, a:runner)
 endfunction
 
 function! quickrun#register_outputter(name, outputter)
-  return s:register_module(a:name, 'outputter', a:outputter)
+  return s:register_module('outputter', a:name, a:outputter)
 endfunction
 
-function! s:register_module(name, kind, module)
+function! s:register_module(kind, name, module)
   " TODO: validate
   let module = extend(deepcopy(s:{a:kind}), a:module)
   let module.kind = a:kind
@@ -951,7 +951,7 @@ function! s:register_defaults(kind)
   for name in map(split(globpath(&runtimepath, pat), "\n"),
   \               'fnamemodify(v:val, ":t:r")')
     try
-      call s:register_module(name, a:kind, quickrun#{a:kind}#{name}#new())
+      call s:register_module(a:kind, name, quickrun#{a:kind}#{name}#new())
     catch /:E\%(117\|716\):/
     endtry
   endfor
