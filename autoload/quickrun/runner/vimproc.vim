@@ -57,22 +57,28 @@ function! s:receive_vimproc_result(key)
 
   let vimproc = session._vimproc
 
-  if !vimproc.stdout.eof
-    call session.output(vimproc.stdout.read())
-  endif
-  if !vimproc.stderr.eof
-    call session.output(vimproc.stderr.read())
-  endif
+  try
+    if !vimproc.stdout.eof
+      call session.output(vimproc.stdout.read())
+    endif
+    if !vimproc.stderr.eof
+      call session.output(vimproc.stderr.read())
+    endif
 
-  if !(vimproc.stdout.eof && vimproc.stderr.eof)
-    call feedkeys(mode() ==# 'i' ? "\<C-g>\<ESC>" : "g\<ESC>", 'n')
-    return 0
-  endif
+    if !(vimproc.stdout.eof && vimproc.stderr.eof)
+      call feedkeys(mode() ==# 'i' ? "\<C-g>\<ESC>" : "g\<ESC>", 'n')
+      return 0
+    endif
+  catch
+    " XXX: How is an internal error displayed?
+    call session.output(
+    \    'quickrun: vimproc: ' . v:throwpoint . "\n" . v:exception)
+  endtry
 
   call vimproc.stdout.close()
   call vimproc.stderr.close()
   call vimproc.waitpid()
-  call session.finish(vimproc.status)
+  call session.finish(get(vimproc, 'status', 1))
   return 1
 endfunction
 
