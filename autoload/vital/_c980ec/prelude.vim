@@ -1,3 +1,65 @@
+
+" glob() wrapper which returns List.
+function! s:glob(...)
+    let R = call('glob', a:000)
+    return split(R, '\n')
+endfunction
+" globpath() wrapper which returns List.
+function! s:globpath(...)
+    let R = call('globpath', a:000)
+    return split(R, '\n')
+endfunction
+
+" Wrapper functions for type().
+let [
+\   s:__TYPE_NUMBER,
+\   s:__TYPE_STRING,
+\   s:__TYPE_FUNCREF,
+\   s:__TYPE_LIST,
+\   s:__TYPE_DICT,
+\   s:__TYPE_FLOAT
+\] = [
+\   type(3),
+\   type(""),
+\   type(function('tr')),
+\   type([]),
+\   type({}),
+\   type(3.14159)
+\]
+" Number or Float
+function! s:is_numeric(Value)
+    let _ = type(a:Value)
+    return _ ==# s:__TYPE_NUMBER
+    \   || _ ==# s:__TYPE_FLOAT
+endfunction
+" Number
+function! s:is_integer(Value)
+    return type(a:Value) ==# s:__TYPE_NUMBER
+endfunction
+function! s:is_number(Value)
+    return type(a:Value) ==# s:__TYPE_NUMBER
+endfunction
+" Float
+function! s:is_float(Value)
+    return type(a:Value) ==# s:__TYPE_FLOAT
+endfunction
+" String
+function! s:is_string(Value)
+    return type(a:Value) ==# s:__TYPE_STRING
+endfunction
+" Funcref
+function! s:is_funcref(Value)
+    return type(a:Value) ==# s:__TYPE_FUNCREF
+endfunction
+" List
+function! s:is_list(Value)
+    return type(a:Value) ==# s:__TYPE_LIST
+endfunction
+" Dictionary
+function! s:is_dict(Value)
+    return type(a:Value) ==# s:__TYPE_DICT
+endfunction
+
 function! s:truncate_smart(str, max, footer_width, separator)"{{{
   let width = s:wcswidth(a:str)
   if width <= a:max
@@ -44,7 +106,7 @@ function! s:strwidthpart(str, width)"{{{
   while width > a:width
     let char = matchstr(ret, '.$')
     let ret = ret[: -1 - len(char)]
-    let width -= s:wcwidth(char)
+    let width -= s:wcswidth(char)
   endwhile
 
   return ret
@@ -55,7 +117,7 @@ function! s:strwidthpart_reverse(str, width)"{{{
   while width > a:width
     let char = matchstr(ret, '^.')
     let ret = ret[len(char) :]
-    let width -= s:wcwidth(char)
+    let width -= s:wcswidth(char)
   endwhile
 
   return ret
@@ -64,9 +126,6 @@ endfunction"}}}
 if v:version >= 703
   " Use builtin function.
   function! s:wcswidth(str)"{{{
-    return strdisplaywidth(a:str)
-  endfunction"}}}
-  function! s:wcwidth(str)"{{{
     return strwidth(a:str)
   endfunction"}}}
 else
@@ -83,14 +142,14 @@ else
       if ucs == 0
         break
       endif
-      let width += s:wcwidth(ucs)
+      let width += s:_wcwidth(ucs)
       let str = substitute(str, mx_first, '', '')
     endwhile
     return width
   endfunction"}}}
 
   " UTF-8 only.
-  function! s:wcwidth(ucs)"{{{
+  function! s:_wcwidth(ucs)"{{{
     let ucs = a:ucs
     if (ucs >= 0x1100
           \  && (ucs <= 0x115f
@@ -139,18 +198,35 @@ endfunction"}}}
 function! s:escape_pattern(str)"{{{
   return escape(a:str, '~"\.^$[]*')
 endfunction"}}}
-" iconv() wrapper for safety.
-function! s:iconv(expr, from, to)
-  if a:from == '' || a:to == '' || a:from ==# a:to
-    return a:expr
-  endif
-  let result = iconv(a:expr, a:from, a:to)
-  return result != '' ? result : a:expr
-endfunction
 " Like builtin getchar() but returns string always.
 function! s:getchar(...)
   let c = call('getchar', a:000)
   return type(c) == type(0) ? nr2char(c) : c
+endfunction
+" Like builtin getchar() but returns string always.
+" and do inputsave()/inputrestore() before/after getchar().
+function! s:getchar_safe(...)
+  let c = s:input_helper('getchar', a:000)
+  return type(c) == type("") ? c : nr2char(c)
+endfunction
+" Like builtin getchar() but
+" do inputsave()/inputrestore() before/after input().
+function! s:input_safe(...)
+    return s:input_helper('input', a:000)
+endfunction
+" Do inputsave()/inputrestore() before/after calling a:funcname.
+function! s:input_helper(funcname, args)
+    let success = 0
+    if inputsave() !=# success
+        throw 'inputsave() failed'
+    endif
+    try
+        return call(a:funcname, a:args)
+    finally
+        if inputrestore() !=# success
+            throw 'inputrestore() failed'
+        endif
+    endtry
 endfunction
 
 function! s:set_default(var, val)  "{{{
@@ -226,9 +302,13 @@ function! s:system(str, ...)"{{{
   if a:0 == 0
     let l:output = s:has_vimproc() ?
           \ vimproc#system(l:command) : system(l:command)
-  else
+  elseif a:0 == 1
     let l:output = s:has_vimproc() ?
           \ vimproc#system(l:command, l:input) : system(l:command, l:input)
+  else
+    " ignores 3rd argument unless you have vimproc.
+    let l:output = s:has_vimproc() ?
+          \ vimproc#system(l:command, l:input, a:2) : system(l:command, l:input)
   endif
 
   if &termencoding != '' && &termencoding != &encoding
