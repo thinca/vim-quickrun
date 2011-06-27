@@ -16,6 +16,7 @@ License: クリエイティブ・コモンズの表示 2.1 日本ライセンス
 オプション			|quickrun-options|
   オプション値の構文		  |quickrun-syntax-option|
   exec オプションの書式		  |quickrun-exec-format|
+設定				|quickrun-settings|
 モジュール			|quickrun-module|
   RUNNER			  |quickrun-module-runner|
   OUTPUTTER			  |quickrun-module-outputter|
@@ -25,7 +26,6 @@ License: クリエイティブ・コモンズの表示 2.1 日本ライセンス
   共通の属性			  |quickrun-module-attributes|
   RUNNER の属性			  |quickrun-runner-attributes|
   OUTPUTTER の属性		  |quickrun-outputter-attributes|
-設定				|quickrun-settings|
 更新履歴			|quickrun-changelog|
 
 
@@ -283,6 +283,52 @@ exec を展開した結果先頭の文字が ":" だった場合、Vim のコマ
 |:QuickRun| コマンドに exec オプションを複数回指定したり、 |g:quickrun_config|
 の exec にリストを指定した場合、先頭から順に実行します。コンパイルや後始末が必
 要な場合に便利です。
+
+
+
+==============================================================================
+設定						*quickrun-settings*
+						*g:quickrun_config*
+
+グローバル変数 |g:quickrun_config| を使って各オプションのデフォルト値を設定で
+きます。
+デフォルト値はオプション名をキーとした辞書で指定します。|g:quickrun_config| に
+は {type} をキー、デフォルト値を値にした辞書を指定します。つまり、この変数には
+二層構造の辞書を指定します。
+{type} はコマンドラインから |quickrun-option-type| で指定される値です。未指定
+の場合は 'filetype' が使用されます。
+特殊なタイプ名 "_" には全ての {type} のデフォルト値を指定できます。
+
+全体共通の設定よりタイプ毎の設定が、タイプ毎の設定よりコマンドで指定された引数
+が優先されます。
+
+標準の設定					*g:quickrun#default_config*
+----------
+|g:quickrun#default_config| には標準的なデフォルトの設定が入っています。これ
+は |g:quickrun_config| と同じ構造になっています。
+|quickrun-options| に記載されているデフォルト値は実際にはこの変数のデフォルト
+値です。通常はユーザがこの値を操作する必要はありません。
+
+バッファローカルな設定				*b:quickrun_config*
+----------------------
+|b:quickrun_config| を使ってバッファローカルな設定を追加できます。これには
+|g:quickrun_config| とは違い、デフォルト値を直接指定します。
+この値はコマンドライン引数の次に優先されます。
+
+以上をまとめると、コマンド実行時の各オプションの値は以下の優先順位で決定しま
+す。
+
+1. コマンドラインで指定された値
+2. |b:quickrun_config|
+3. |g:quickrun_config| の {type}
+4. |g:quickrun#default_config| の {type}
+5. |g:quickrun_config| の '_'
+6. |g:quickrun#default_config| の '_'
+
+1 や 2 で {type} を設定しておくことで 3 で通常とは別の {type} を参照できます。
+また、3 か 4 で {type} の指定があった場合、新しい {type} の値を同じ変数から
+ロードし直します。これにより、無限ループが発生する可能性もあるので注意してくだ
+さい。
 
 
 
@@ -587,52 +633,6 @@ outputter.output({data}, {session})	*quickrun-outputter.output()*
 outputter.finish({session})		*quickrun-outputter.finish()*
 	実行の終了時に呼び出されます。終了処理を行います。
 	また、|quickrun-session.exit_code| が参照できます。
-
-
-
-==============================================================================
-設定						*quickrun-settings*
-						*g:quickrun_config*
-
-グローバル変数 |g:quickrun_config| を使って各オプションのデフォルト値を設定で
-きます。
-デフォルト値はオプション名をキーとした辞書で指定します。|g:quickrun_config| に
-は {type} をキー、デフォルト値を値にした辞書を指定します。つまり、この変数には
-二層構造の辞書を指定します。
-{type} はコマンドラインから |quickrun-option-type| で指定される値です。未指定
-の場合は 'filetype' が使用されます。
-特殊なタイプ名 "_" には全ての {type} のデフォルト値を指定できます。
-
-全体共通の設定よりタイプ毎の設定が、タイプ毎の設定よりコマンドで指定された引数
-が優先されます。
-
-標準の設定					*g:quickrun#default_config*
-----------
-|g:quickrun#default_config| には標準的なデフォルトの設定が入っています。これ
-は |g:quickrun_config| と同じ構造になっています。
-|quickrun-options| に記載されているデフォルト値は実際にはこの変数のデフォルト
-値です。通常はユーザがこの値を操作する必要はありません。
-
-バッファローカルな設定				*b:quickrun_config*
-----------------------
-|b:quickrun_config| を使ってバッファローカルな設定を追加できます。これには
-|g:quickrun_config| とは違い、デフォルト値を直接指定します。
-この値はコマンドライン引数の次に優先されます。
-
-以上をまとめると、コマンド実行時の各オプションの値は以下の優先順位で決定しま
-す。
-
-1. コマンドラインで指定された値
-2. |b:quickrun_config|
-3. |g:quickrun_config| の {type}
-4. |g:quickrun#default_config| の {type}
-5. |g:quickrun_config| の '_'
-6. |g:quickrun#default_config| の '_'
-
-1 や 2 で {type} を設定しておくことで 3 で通常とは別の {type} を参照できます。
-また、3 か 4 で {type} の指定があった場合、新しい {type} の値を同じ変数から
-ロードし直します。これにより、無限ループが発生する可能性もあるので注意してくだ
-さい。
 
 
 
