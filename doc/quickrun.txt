@@ -103,13 +103,29 @@ COMMANDS					*quickrun-commands*
 
 ------------------------------------------------------------------------------
 FUNCTIONS					*quickrun-functions*
-						*quickrun-operator*
 
-QuickRun({type})				*QuickRun()*
-			Function for 'operatorfunc'.
-			e.g.: >
-		nnoremap <silent> <C-CR> :<C-u>set opfunc=QuickRun<CR>g@ip
-<			<C-CR> will execute current paragraph (|ip|).
+quickrun#operator({wise})			*quickrun#operator()*
+	A function for 'operatorfunc'.
+	e.g.: >
+	nnoremap <silent> <C-CR> :<C-u>set opfunc=quickrun#operator<CR>g@ip
+<	This runs current paragraph (|ip|) with <C-CR>.
+
+						*quickrun#register_module()*
+quickrun#register_module({kind}, {name}, {module})
+	Registers {module}. See details in |quickrun-create-module|.
+
+quickrun#register_runner({name}, {runner})	*quickrun#register_runner()*
+	An alias of quickrun#register_module("runner", {name}, {runner}).
+
+						*quickrun#register_outputter()*
+quickrun#register_outputter({name}, {outputter})
+	An alias of quickrun#register_module("outputter", {name}, {outputter}).
+
+						*quickrun#session()*
+quickrun#session({key} [, {func-name} [, {args} ...]])
+	This is used in a module. This fetches the current runnning session if
+	you skipped {func-name}. This calls the session function with
+	arguments {args} if you specified {func-name}.
 
 
 ------------------------------------------------------------------------------
@@ -137,6 +153,10 @@ or |g:quickrun_no_default_key_mappings| has been set to 1.
 
 ==============================================================================
 OPTIONS					*quickrun-options*
+
+NOTE:	Currently this section explains about |quickrun| version 0.4.7 or
+	older. |quickrun| version 0.5.0 OPTION system is very different to
+	0.4.7.
 
 Here are the list of options you can specify at command-line.
 |g:quickrun_config| is used for options which are not specified.
@@ -358,6 +378,9 @@ It is useful when you need to do compile, clean up something.
 ==============================================================================
 SETTINGS					*quickrun-settings*
 						*g:quickrun_config*
+
+NOTE:	Currently this section explains about |quickrun| version 0.4.7 or
+	older. |quickrun| version 0.5.0 setting is very different to 0.4.7.
 
 You can define default values using |g:quickrun_config|.
 "Default Value" is |Dictionary| whose key is |quickrun-options| names.
