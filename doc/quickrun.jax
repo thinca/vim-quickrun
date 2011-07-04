@@ -1,6 +1,6 @@
 *quickrun.txt*	コマンドを素早く実行します。
 
-Version: 0.5.0dev
+Version: 0.5.0
 Author : thinca <thinca+vim@gmail.com>
 License: クリエイティブ・コモンズの表示 2.1 日本ライセンス
          <http://creativecommons.org/licenses/by/2.1/jp/>
@@ -639,7 +639,7 @@ outputter.finish({session})		*quickrun-outputter.finish()*
 ==============================================================================
 更新履歴					*quickrun-changelog*
 
-0.5.0	xxxx-xx-xx
+0.5.0	2011-07-05
 	- モジュールシステムを導入。
 	- QuickRun() を |quickrun#operator()| へ移動。
 
