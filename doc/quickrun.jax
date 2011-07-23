@@ -1,7 +1,10 @@
 *quickrun.txt*	コマンドを素早く実行します。
 
 Version: 0.5.0
-Author : thinca <thinca+vim@gmail.com>
+Author: thinca <thinca+vim@gmail.com>
+英訳:
+  * ujihisa <ujihisa at gmail com>
+  * tyru <tyru.exe@gmail.com>
 License: クリエイティブ・コモンズの表示 2.1 日本ライセンス
          <http://creativecommons.org/licenses/by/2.1/jp/>
 
@@ -368,7 +371,7 @@ quickrun のいくつかの部分はモジュール化されています。モ�
 
 モジュール名に指定する
 ----------------------
-オプションにモジュール名を指定する際に、オプションの値を指定することができま
+コマンドラインオプションにモジュール名を指定する際に、オプションの値を指定することができま
 す。オプションはモジュール名の後に任意の記号を続け、その記号でオプションを区切
 ります。各オプションは name=value の形式で指定します。
 >
