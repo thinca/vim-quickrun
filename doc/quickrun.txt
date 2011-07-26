@@ -567,91 +567,87 @@ loaded when quickrun is loaded for the first time in the process.
 ------------------------------------------------------------------------------
 SESSION				*quickrun-session*
 
-NOTE: This section is not translated yet.
-
-quickrun では 1 回の実行をセッション({session})として管理しており、モジュール
-の各関数に引数として渡されます。
+Quickrun manages an execution as a {session}, and gives it as an argument to
+functions of a module.
 
 session.make_module({kind}, {line})	*quickrun-session.make_module()*
-	セッション中で使えるようにモジュールを生成します。
+	Creates a module to use it in a session.
 
 session.output({data})			*quickrun-session.output()*
-	runner が出力を行う際に呼び出します。{data} はその場で outputter へ渡
-	されます。実行中は何度呼び出しても問題ありません。
+	Calls when the runner outputs the result. Gives the {data} to
+	outputter at the time. You can call is at any times when the process
+	is running.
 
 session.continue()			*quickrun-session.continue()*
-	runner がその場で実行を完了できない時に呼び出します。{key} を返しま
-	す。|quickrun#session()| に {key} を渡すことで、実行を継続します。
+	Calls when the runner cannot complete the process at the time.
+	Continues if you give {key} to |quickrun#session()|.
 
 session.finish([{exit-code}])		*quickrun-session.finish()*
-	runner が実行が全て完了した際に呼び出します。{exit-code} が省略された
-	場合は 0 になります。
+	Calls when the runner finished the process. Unless {exit-code} is
+	given it'll be 0.
 
 session.exit_code			*quickrun-session.exit_code*
-	実行が完了した後にのみ参照できます。|quickrun-session.finish()| で渡さ
-	れた値です。
+	You can refer this only after the process finished. This is the value
+	of |quickrun-session.finish()|.
 
 session.sweep()				*quickrun-session.sweep()*
-	セッションの後始末を行います。セッションに対して以下の属性が設定されて
-	いた場合、それに応じた処理が行われます。
-	- "_temp_" で始まる属性があった場合、その値をファイル名としてファイル
-	  を削除します。
-	- "_option_{option-name}" という属性があった場合、オプションの値を復元
-	  します。
-	- "_autocmd_" で始まる属性があった場合、"plugin-quickrun-{value}" とい
-	  う名前のグループに属する autocmd を全て削除します。
-	- "_vimproc" という属性があった場合、その |vimproc| を強制終了します。
-	また、|quickrun-runner.sweep()| を呼び出します。
-	これらは便利ですが、今のところ複数のモジュールから使われた際の名前の衝
-	突が考慮されていません。これは将来改善される可能性があります。
+	This is a cleaning up. This does procedures with respect to the
+	following attributes in the session.
+	- If it has an attribute begins with "_temp_", deletes the file.
+	- If it has an attribute "_option_{option-name}", recovers the object
+	  value.
+	- If it has an attribute begins with "_autocmd_", deletes all autocmd
+	  belonging to "plugin-quickrun-{value}".
+	- If it has an attribute "_vimproc", forcefully terminates the |vimproc|.
+	Or calls |quickrun-runner.sweep()|.
+	They are handy, however, they don't care naming colisions by multiple
+	modules. The author is going to solve them in the future.
 
 ------------------------------------------------------------------------------
 MODULE COMMON ATTRIBUTES				*quickrun-module-attributes*
 
-NOTE: This section is not translated yet.
+Most module attributes have default values, so you don't have to explicitly
+set unless it requires one. Of course you can overwrite the default value if
+you want.
 
-モジュールの属性の多くはデフォルト値があり、必須と明記されている属性以外は明示
-的に設定する必要はありません。ただし、必要に応じてデフォルト値を上書きすること
-ができます。
-モジュールが実際に使われる際は、登録したモジュールのコピーが使われます。セッ
-ション中にモジュール毎に値を保持したい場合は、既存の属性との衝突を避けるために
-"_" で始まる属性を使用してください。
-以下は全モジュールで共通の属性です。
+Quickrun uses a copy of a module you registered. To preserve a value among
+each modules, use attributes which name begin with "_" to avoid conflicts.
+
+Below common attributes among all modules.
 
 module.config				*quickrun-module.config*
-	これは辞書で、このモジュールが取る config のデフォルト値です。ここで定
-	義されているものだけが、モジュールで有効なコンフィグとなります。
-	モジュールを実際に使う際には、セッションによって設定が上書きされます。
+	This is a dictionary for the module config default values. The items
+	defined in this are only available in modules. When you actually use a
+	module, session will overwrite a config.
 
 module.config_order			*quickrun-module.config_order*
-	これはリストで、config の引数の順序です。|quickrun-module.config| で指
-	定されている名前を任意の順序で並べます。
+	This is a list of order of the arguments of config. You can give
+	arbitrary order of names in |quickrun-module.config|.
 
 module.available()			*quickrun-module.available()*
-	|quickrun-module.validate()| を使ってこのモジュールが利用可能かを調べ
-	ます。利用可能なら 1、そうでなければ 0 を返します。
+	Checks if the module is avaiable, using |quickrun-module.validate()|.
+	Returns 1 if it's available; otherwise returns 0.
 
 module.validate()			*quickrun-module.validate()*
-	モジュールが利用可能な状況にあるかを検証します。利用できない場合は、そ
-	の理由となる文字列を |:throw| します。
+	Validates if the module is currently available. If not, thie |:throw|s
+	the reason in String.
 
 module.init({session})			*quickrun-module.init()*
-	モジュールの初期化時に呼び出されます。
+	This is called in module initialization.
 
 ------------------------------------------------------------------------------
 RUNNER ATTRIBUTES				*quickrun-runner-attributes*
 
-NOTE: This section is not translated yet.
-
 runner.run({commands}, {input}, {session})	*quickrun-runner.run()*
-	必須です。実行時に呼び出されます。{commands} で渡されたコマンドのリス
-	トを実行 し、{exit-code} を返します。{input} は標準入力データです。
-	その場で実行を完了できない時は、|quickrun-session.continue()| を使いま
-	す。その場合、|quickrun-session.finish()| を呼び出す必要があります。
+	Required. This is called in run-time. This runs the list of command
+	given in {commands}, and returns {exit-code}. {input} is data for
+	stdion. When this cannot finish the process at the time this uses 
+	|quickrun-session.continue()|. In the case this has to call
+	|quickrun-session.finish()|.
 
 runner.sweep()				*quickrun-runner.sweep()*
-	実行の完了、もしくは強制終了時に呼び出されます。実行中のデータの後始末
-	を行います。
+	This is called when the process is finished or forcefully terminated.
+	This sweeps data.
 
 ------------------------------------------------------------------------------
 OUTPUTTER ATTRIBUTES			*quickrun-outputter-attributes*
