@@ -24,7 +24,7 @@ function! s:runner.validate()
 endfunction
 
 function! s:runner.run(commands, input, session)
-  let selfvim = s:is_win ? split($PATH, ';')[-1] . '\vim.exe' :
+  let selfvim = s:is_win ? 'vim.exe' :
   \             !empty($_) ? $_ : v:progname
 
   let key = a:session.continue()
