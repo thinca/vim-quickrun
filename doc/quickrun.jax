@@ -29,6 +29,7 @@ License: クリエイティブ・コモンズの表示 2.1 日本ライセンス
   共通の属性			  |quickrun-module-attributes|
   RUNNER の属性			  |quickrun-runner-attributes|
   OUTPUTTER の属性		  |quickrun-outputter-attributes|
+既知の問題			|quickrun-known-issues|
 更新履歴			|quickrun-changelog|
 
 
@@ -636,6 +637,19 @@ outputter.output({data}, {session})	*quickrun-outputter.output()*
 outputter.finish({session})		*quickrun-outputter.finish()*
 	実行の終了時に呼び出されます。終了処理を行います。
 	また、|quickrun-session.exit_code| が参照できます。
+
+
+
+==============================================================================
+既知の問題					*quickrun-known-issues*
+
+- : による Vim コマンドの実行は、|quickrun-module-runner/vimproc| では動きませ
+  ん。
+
+- コマンドが複数ある場合の標準入力の扱いは runner に依存します。
+
+- 標準出力と標準エラー出力を区別できません。
+  - 出力順序は runner に依存します。
 
 
 
