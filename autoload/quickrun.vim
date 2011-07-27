@@ -322,7 +322,7 @@ function! s:runner.shellescape(str)
     return '^"' . substitute(substitute(substitute(a:str,
     \             '[&|<>()^"%]', '^\0', 'g'),
     \             '\\\+\ze"', '\=repeat(submatch(0), 2)', 'g'),
-    \             '\ze\^"', '\', 'g') . '^"'
+    \             '\^"', '\\\0', 'g') . '^"'
   endif
   return shellescape(a:str)
 endfunction
