@@ -127,7 +127,7 @@ let g:quickrun#default_config = {
 \   'output_encode': 'utf-8',
 \ },
 \ 'groovy': {
-\   'cmdopt': '-c {&fenc==#""?&enc:&fenc}'
+\   'cmdopt': '-c %{&fenc==#""?&enc:&fenc}'
 \ },
 \ 'haskell': {
 \   'command': 'runghc',
