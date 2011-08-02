@@ -149,6 +149,7 @@ let g:quickrun#default_config = {
 \ },
 \ 'javascript/cscript': {
 \   'command': 'cscript',
+\   'exec': '%c //e:jscript %o %s %a',
 \   'cmdopt': '//Nologo',
 \   'tempfile': '%{tempname()}.js',
 \ },
