@@ -196,11 +196,11 @@ input (*)				*quickrun-option-input*
 	それ以降の文字列を入力として扱います。
 
 outputter				*quickrun-option-outputter*
-	outputter を指定します。詳細は |quickrun-outputter| を参照してくださ
+	outputter を指定します。詳細は |quickrun-module-outputter| を参照してくださ
 	い。
 
 runner					*quickrun-option-runner*
-	runner を指定します。詳細は |quickrun-runner| を参照してください。
+	runner を指定します。詳細は |quickrun-module-runner| を参照してください。
 
 mode					*quickrun-option-mode*
 	実行モードです。n,v,o のいずれかを指定します。これは範囲をどのように取
