@@ -200,11 +200,11 @@ input (*)				*quickrun-option-input*
 
 outputter				*quickrun-option-outputter*
 			Specifies an outputter. See the details in
-			|quickrun-outputter|.
+			|quickrun-module-outputter|.
 
 runner					*quickrun-option-runner*
 			Specifies a runner. See the details in
-			|quickrun-runner|.
+			|quickrun-module-runner|.
 
 mode					*quickrun-option-mode*
 			This value is one of n, v, o .
