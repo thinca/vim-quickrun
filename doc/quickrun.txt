@@ -665,6 +665,13 @@ outputter.finish({session})		*quickrun-outputter.finish()*
 ==============================================================================
 KNOWN ISSUES					*quickrun-known-issues*
 
+- |quickrun-module-runner/vimproc| doesn't support : to run a Vim command.
+
+- It depends on runner how to handle multiple stdins when you gave multiple
+  commands
+
+- Quickrun cannot distinguish stdout from stderr.
+  - It depends on runner which order to output.
 
 
 
