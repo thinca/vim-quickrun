@@ -29,6 +29,7 @@ CREATE MODULE			|quickrun-create-module|
   MODULE COMMON ATTRIBUTES	  |quickrun-module-attributes|
   RUNNER ATTRIBUTES		  |quickrun-runner-attributes|
   OUTPUTTER ATTRIBUTES		  |quickrun-outputter-attributes|
+KNOWN ISSUES			|quickrun-known-issues|
 CHANGELOG			|quickrun-changelog|
 
 
@@ -481,7 +482,7 @@ available by default.
 	If this value is not an empty string, |quickrun| displays this string
 	to output buffer while it's running.
 
-- "message"
+- "message"				*quickrun-module-outputter/message*
   Outputs on |messages|.
   Option ~
   {log}			Default: 0
@@ -658,6 +659,12 @@ outputter.output({data}, {session})	*quickrun-outputter.output()*
 outputter.finish({session})		*quickrun-outputter.finish()*
 	Called in termination for finishing it. You can refer
 	|quickrun-session.exit_code|.
+
+
+
+==============================================================================
+KNOWN ISSUES					*quickrun-known-issues*
+
 
 
 
