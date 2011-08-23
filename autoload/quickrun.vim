@@ -400,10 +400,14 @@ function! s:Session.make_module(kind, line)
 endfunction
 
 function! s:Session.run()
-  let exit_code = self.runner.run(self.commands, self.config.input, self)
-  if !has_key(self, '_continue_key')
-    call self.finish(exit_code)
-  endif
+  let exit_code = 1
+  try
+    let exit_code = self.runner.run(self.commands, self.config.input, self)
+  finally
+    if !has_key(self, '_continue_key')
+      call self.finish(exit_code)
+    endif
+  endtry
 endfunction
 
 function! s:Session.continue()
