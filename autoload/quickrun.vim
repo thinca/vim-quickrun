@@ -606,11 +606,7 @@ function! quickrun#command(argline)
     let config = s:set_options_from_arglist(arglist)
     call quickrun#run(config)
   catch /^quickrun:/
-    echohl ErrorMsg
-    for line in split(v:exception, "\n")
-      echomsg line
-    endfor
-    echohl None
+    call s:V.print_error(v:exception)
   endtry
 endfunction
 
