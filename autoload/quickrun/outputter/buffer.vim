@@ -48,8 +48,8 @@ function! s:outputter.output(data, session)
     silent 1 delete _
   endif
   call s:set_running_mark(self.config.running_mark)
-  redraw
   execute winnr 'wincmd w'
+  redraw
 endfunction
 
 function! s:outputter.finish(session)
