@@ -236,7 +236,7 @@ let g:quickrun#default_config = {
 \ 'sh': {},
 \ 'vim': {
 \   'command': ':source',
-\   'exec': '%c %s',
+\   'exec': '%C %s',
 \   'eval_template': "echo %s",
 \   'runner': 'system',
 \ },
