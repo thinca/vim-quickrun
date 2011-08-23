@@ -140,6 +140,10 @@ quickrun#session({key} [, {func-name} [, {args} ...]])
 	you skipped {func-name}. This calls the session function with
 	arguments {args} if you specified {func-name}.
 
+quickrun#sweep_sessions()			*quickrun#sweep_sessions()*
+	Stops the sessions under execution. This is called before new
+	execution.  When execution doesn't end, you can call this by manually.
+
 
 ------------------------------------------------------------------------------
 KEY MAPPINGS					*quickrun-key-mappings*
