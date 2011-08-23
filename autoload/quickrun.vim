@@ -545,7 +545,9 @@ function! s:Session.sweep()
     call remove(self, '_continue_key')
   endif
 
-  call self.runner.sweep()
+  if has_key(self, 'runner')
+    call self.runner.sweep()
+  endif
 endfunction
 
 
