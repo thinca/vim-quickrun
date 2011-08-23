@@ -456,7 +456,7 @@ function! s:Session.build_command(source_name, tmpl)
     if key =~? is_file
       let value = 'fnamemodify('.value.',submatch(1))'
       if key =~# '\U'
-        let value = printf(config.command =~# '^\s*:' ? 'fnameescape(%s)'
+        let value = printf(eval(command) =~# '^\s*:' ? 'fnameescape(%s)'
           \ : 'self.runner.shellescape(%s)', value)
       endif
       let key .= '(%(\:[p8~.htre]|\:g?s(.).{-}\2.{-}\2)*)'
