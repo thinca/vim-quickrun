@@ -657,6 +657,9 @@ outputter.finish({session})		*quickrun-outputter.finish()*
 ==============================================================================
 更新履歴					*quickrun-changelog*
 
+x.x.x	xxxx-xx-xx
+	- exec の展開処理を改善。
+
 0.5.0	2011-07-05
 	- モジュールシステムを導入。
 	- QuickRun() を |quickrun#operator()| へ移動。

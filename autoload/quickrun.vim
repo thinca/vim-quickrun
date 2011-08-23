@@ -438,32 +438,44 @@ endfunction
 
 " Build a command to execute it from options.
 function! s:Session.build_command(source_name, tmpl)
-  " FIXME: Possibility to be multiple expanded.
   let config = self.config
   let shebang = config.shebang ? s:detect_shebang(a:source_name) : ''
-  let src = string(a:source_name)
-  let command = shebang !=# '' ? string(shebang) : 'config.command'
-  let rule = [
-  \  ['c', command], ['C', command],
-  \  ['s', src], ['S', src],
-  \  ['o', 'config.cmdopt'],
-  \  ['a', 'config.args'],
-  \  ['\%', string('%')],
-  \]
+  let command = shebang !=# '' ? shebang : config.command
+  let rule = {
+  \  'c': command,
+  \  's': a:source_name,
+  \  'o': config.cmdopt,
+  \  'a': config.args,
+  \  '%': '%',
+  \}
   let is_file = '[' . (shebang !=# '' ? 's' : 'cs') . ']'
-  let cmd = a:tmpl
-  for [key, value] in rule
-    if key =~? is_file
-      let value = 'fnamemodify('.value.',submatch(1))'
-      if key =~# '\U'
-        let value = printf(eval(command) =~# '^\s*:' ? 'fnameescape(%s)'
-          \ : 'self.runner.shellescape(%s)', value)
-      endif
-      let key .= '(%(\:[p8~.htre]|\:g?s(.).{-}\2.{-}\2)*)'
+  let rest = a:tmpl
+  let result = ''
+  while 1
+    let pos = match(rest, '%')
+    if pos < 0
+      let result .= rest
+      break
+    elseif pos != 0
+      let result .= rest[: pos - 1]
+      let rest = rest[pos :]
     endif
-    let cmd = substitute(cmd, '\C\v[^%]?\zs\%' . key, '\=' . value, 'g')
-  endfor
-  return substitute(quickrun#expand(cmd), '[\r\n]\+', ' ', 'g')
+
+    let symbol = rest[1]
+    let value = get(rule, tolower(symbol), '')
+    let rest = rest[2 :]
+    if symbol =~? is_file
+      let mod = matchstr(rest, '^\v\zs%(\:[p8~.htre]|\:g?s(.).{-}\1.{-}\1)*')
+      let value = fnamemodify(value, mod)
+      if symbol =~# '\U'
+        let value = command =~# '^\s*:' ? fnameescape(value)
+        \                               : self.runner.shellescape(value)
+      endif
+      let rest = rest[len(mod) :]
+    endif
+    let result .= value
+  endwhile
+  return substitute(quickrun#expand(result), '[\r\n]\+', ' ', 'g')
 endfunction
 
 " Return the source file name.
