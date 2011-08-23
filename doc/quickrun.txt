@@ -6,7 +6,7 @@ English documentation by:
   * ujihisa <ujihisa at gmail com>
   * tyru <tyru.exe@gmail.com>
 License: Creative Commons 2.1 Japanese
-	 <http://creativecommons.org/licenses/by/2.1/jp/>
+         <http://creativecommons.org/licenses/by/2.1/jp/>
 
 ==============================================================================
 CONTENTS					*quickrun-contents*
@@ -129,9 +129,10 @@ quickrun#register_module({kind}, {name}, {module})
 quickrun#register_runner({name}, {runner})	*quickrun#register_runner()*
 	An alias of quickrun#register_module("runner", {name}, {runner}).
 
-						*quickrun#register_outputter()*
+					       *quickrun#register_outputter()*
 quickrun#register_outputter({name}, {outputter})
-	An alias of quickrun#register_module("outputter", {name}, {outputter}).
+	An alias of quickrun#register_module("outputter", {name},
+	{outputter}).
 
 						*quickrun#session()*
 quickrun#session({key} [, {func-name} [, {args} ...]])
@@ -145,7 +146,7 @@ KEY MAPPINGS					*quickrun-key-mappings*
 
 <Plug>(quickrun-op)				*<Plug>(quickrun-op)*
 			Execute next motion's range.
-			This sets 'operatorfunc' to "QuickRun".
+			This sets 'operatorfunc' to "quickrun#operator".
 
 <Plug>(quickrun)				*<Plug>(quickrun)*
 			Execute and display the result for current buffer.
@@ -359,7 +360,7 @@ current (3 or 4) config.  Note infinite loop.
 
 
 ==============================================================================
-MODULE					*quickrun-module*
+MODULE						*quickrun-module*
 
 |quickrun| is structured modularly. There are the following kinds of modules.
 
@@ -535,8 +536,8 @@ available by default.
 	A list of outputters to output.
 
 - "error"				*quickrun-module-outputter/error*
-  Switches where to output based on the exit status; 0 means success. Note that
-  some runners only can give success.
+  Switches where to output based on the exit status; 0 means success. Note
+  that some runners only can give success.
   This buffers because this waits the process terminates.
   Option ~
   {success}		Default: "null"
@@ -599,13 +600,14 @@ session.sweep()				*quickrun-session.sweep()*
 	  value.
 	- If it has an attribute begins with "_autocmd_", deletes all autocmd
 	  belonging to "plugin-quickrun-{value}".
-	- If it has an attribute "_vimproc", forcefully terminates the |vimproc|.
+	- If it has an attribute "_vimproc", forcefully terminates the
+	  |vimproc|.
 	Or calls |quickrun-runner.sweep()|.
 	They are handy, however, they don't care naming colisions by multiple
 	modules. The author is going to solve them in the future.
 
 ------------------------------------------------------------------------------
-MODULE COMMON ATTRIBUTES				*quickrun-module-attributes*
+MODULE COMMON ATTRIBUTES		*quickrun-module-attributes*
 
 Most module attributes have default values, so you don't have to explicitly
 set unless it requires one. Of course you can overwrite the default value if
