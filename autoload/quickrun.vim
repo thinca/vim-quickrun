@@ -479,6 +479,11 @@ function! s:Session.build_command(source_name, tmpl)
 
     let symbol = rest[1]
     let value = get(rule, tolower(symbol), '')
+
+    if symbol ==? 'c' && value ==# ''
+      throw 'quickrun: "command" option is empty.'
+    endif
+
     let rest = rest[2 :]
     if symbol =~? is_file
       let mod = matchstr(rest, '^\v\zs%(\:[p8~.htre]|\:g?s(.).{-}\1.{-}\1)*')
