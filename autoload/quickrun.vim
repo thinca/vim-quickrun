@@ -646,7 +646,7 @@ function! quickrun#complete(lead, cmd, pos)
       elseif opt ==# 'runner' || opt ==# 'outputter'
         let list = keys(filter(copy(s:modules[opt]),
         \                      'v:val.available()'))
-      end
+      endif
       return filter(list, 'v:val =~# "^".a:lead')
     endif
 
@@ -674,7 +674,7 @@ function! quickrun#complete(lead, cmd, pos)
     let list = keys(extend(exists('g:quickrun_config') ?
     \               copy(g:quickrun_config) : {}, g:quickrun#default_config))
     call filter(list, 'v:val !~# "^[_*]$"')
-  end
+  endif
 
   let re = '^\V' . escape(head, '\') . '\v[^/]*/?'
   return s:V.Data.List.uniq(sort(map(list, 'matchstr(v:val, re)')))
@@ -950,7 +950,7 @@ function! s:get_region(config)
 
   else
     return ''
-  end
+  endif
 
   let [reg_save, reg_save_type] = [getreg(), getregtype()]
   let [pos_c, pos_s, pos_e] = [getpos('.'), getpos("'<"), getpos("'>")]
