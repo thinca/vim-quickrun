@@ -352,6 +352,9 @@ endfunction
 
 function! s:Session.setup()
   try
+    if has_key(self, 'exit_code')
+      call remove(self, 'exit_code')
+    endif
     let self.runner = self.make_module('runner', self.config.runner)
     let self.outputter = self.make_module('outputter', self.config.outputter)
 
