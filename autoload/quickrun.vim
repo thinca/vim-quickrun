@@ -338,13 +338,6 @@ endfunction
 
 
 let s:Session = {}  " {{{1
-" Constructor.
-function! s:Session.new(args)
-  let obj = copy(self)
-  call obj.initialize(a:args)
-  return obj
-endfunction
-
 " Initialize of instance.
 function! s:Session.initialize(config)
   let self.config = s:normalize(a:config)
@@ -599,10 +592,16 @@ endfunction
 
 
 " Interfaces.  {{{1
+function! quickrun#new(config)
+  let session = copy(s:Session)
+  call session.initialize(a:config)
+  return session
+endfunction
+
 function! quickrun#run(config)
   call quickrun#sweep_sessions()
 
-  let session = s:Session.new(a:config)
+  let session = quickrun#new(a:config)
 
   " for debug
   if has_key(session.config, 'debug')
