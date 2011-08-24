@@ -13,8 +13,8 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 
-command! -nargs=* -range=% -complete=customlist,quickrun#complete QuickRun
-\ call quickrun#command('-start <line1> -end <line2> ' . <q-args>)
+command! -nargs=* -range=0 -complete=customlist,quickrun#complete QuickRun
+\ call quickrun#command(<q-args>, <count>, <line1>, <line2>)
 
 
 nnoremap <silent> <Plug>(quickrun-op)

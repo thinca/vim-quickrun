@@ -617,9 +617,14 @@ function! quickrun#operator(wise)
 endfunction
 
 " function for main command.
-function! quickrun#command(config)
+function! quickrun#command(config, use_range, line1, line2)
   try
-    call quickrun#run(a:config)
+    let config = {}
+    if a:use_range
+      let config.start = a:line1
+      let config.end = a:line2
+    endif
+    call quickrun#run([config, a:config])
   catch /^quickrun:/
     call s:V.print_error(v:exception)
   endtry
@@ -875,19 +880,19 @@ function! s:normalize(config)
   endif
 
   let config.command = get(config, 'command', config.type)
-  let config.start = get(config, 'start', 1)
-  let config.end = get(config, 'end', line('$'))
 
   if has_key(config, 'src')
     if config.eval
       let config.src = printf(config.eval_template, config.src)
     endif
   else
-    if !config.eval && config.mode ==# 'n' && filereadable(expand('%:p'))
-          \ && config.start == 1 && config.end == line('$') && !&modified
+    if !config.eval && config.mode ==# 'n' && filereadable(expand('%:p')) &&
+    \   !has_key(config, 'start') &&  !has_key(config, 'start') && !&modified
       " Use file in direct.
       let config.src = bufnr('%')
     else
+      let config.start = get(config, 'start', 1)
+      let config.end = get(config, 'end', line('$'))
       " Executes on the temporary file.
       let body = s:get_region(config)
 
