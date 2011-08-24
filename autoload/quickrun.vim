@@ -617,11 +617,9 @@ function! quickrun#operator(wise)
 endfunction
 
 " function for main command.
-function! quickrun#command(argline)
+function! quickrun#command(config)
   try
-    let arglist = s:parse_argline(a:argline)
-    let config = s:build_config_from_arglist(arglist)
-    call quickrun#run(config)
+    call quickrun#run(a:config)
   catch /^quickrun:/
     call s:V.print_error(v:exception)
   endtry
@@ -814,9 +812,24 @@ function! s:build_config_from_arglist(arglist)
   return config
 endfunction
 
+" Converts a string as argline or a list of config to config object.
+function! s:to_config(config)
+  if type(a:config) == type('')
+    return s:build_config_from_arglist(s:parse_argline(a:config))
+  elseif type(a:config) == type([])
+    let config = {}
+    for c in a:config
+      call extend(config, s:to_config(c))
+      unlet c
+    endfor
+    return config
+  endif
+  return a:config
+endfunction
+
 " The option is appropriately set referring to default options.
 function! s:normalize(config)
-  let config = a:config
+  let config = s:to_config(a:config)
   if !has_key(config, 'mode')
     let config.mode = histget(':') =~# "^'<,'>\\s*Q\\%[uickRun]" ? 'v' : 'n'
   endif
