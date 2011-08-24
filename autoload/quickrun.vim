@@ -369,7 +369,7 @@ function! s:Session.setup()
     throw v:exception
   catch
     call self.sweep()
-    throw join(['quickrun: An error occurred in setup():',
+    throw join(['quickrun: Error occurred in setup():',
     \           v:exception, v:throwpoint], "\n")
   endtry
 endfunction
@@ -412,6 +412,7 @@ function! s:Session.make_module(kind, line)
 endfunction
 
 function! s:Session.run()
+  call self.setup()
   let exit_code = 1
   try
     let exit_code = self.runner.run(self.commands, self.config.input, self)
@@ -607,8 +608,6 @@ function! quickrun#run(config)
   if has_key(session.config, 'debug')
     let g:{matchstr(session.config.debug, '\h\w*')} = session
   endif
-
-  call session.setup()
 
   call session.run()
 endfunction
