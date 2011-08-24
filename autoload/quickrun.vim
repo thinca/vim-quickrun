@@ -351,15 +351,24 @@ function! s:Session.initialize(config)
 endfunction
 
 function! s:Session.setup()
-  let self.runner = self.make_module('runner', self.config.runner)
-  let self.outputter = self.make_module('outputter', self.config.outputter)
+  try
+    let self.runner = self.make_module('runner', self.config.runner)
+    let self.outputter = self.make_module('outputter', self.config.outputter)
 
-  let source_name = self.get_source_name()
-  let exec = get(self.config, 'exec', '')
-  let commands = type(exec) == type([]) ? copy(exec) : [exec]
-  call filter(map(commands, 'self.build_command(source_name, v:val)'),
-  \           'v:val =~# "\\S"')
-  let self.commands = commands
+    let source_name = self.get_source_name()
+    let exec = get(self.config, 'exec', '')
+    let commands = type(exec) == type([]) ? copy(exec) : [exec]
+    call filter(map(commands, 'self.build_command(source_name, v:val)'),
+    \           'v:val =~# "\\S"')
+    let self.commands = commands
+  catch /^quickrun:/
+    call self.sweep()
+    throw v:exception
+  catch
+    call self.sweep()
+    throw join(['quickrun: An error occurred in setup():',
+    \           v:exception, v:throwpoint], "\n")
+  endtry
 endfunction
 
 function! s:Session.make_module(kind, line)
