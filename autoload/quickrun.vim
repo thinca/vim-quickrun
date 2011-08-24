@@ -620,7 +620,7 @@ endfunction
 function! quickrun#command(argline)
   try
     let arglist = s:parse_argline(a:argline)
-    let config = s:set_options_from_arglist(arglist)
+    let config = s:build_config_from_arglist(arglist)
     call quickrun#run(config)
   catch /^quickrun:/
     call s:V.print_error(v:exception)
@@ -780,7 +780,7 @@ function! s:parse_argline(argline)
   return arglist
 endfunction
 
-function! s:set_options_from_arglist(arglist)
+function! s:build_config_from_arglist(arglist)
   let config = {}
   let option = ''
   for arg in a:arglist
