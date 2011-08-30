@@ -994,6 +994,12 @@ function! quickrun#register_module(kind, name, module)
   if !has_key(s:modules, a:kind)
     throw 'quickrun: Unknown kind of module: ' . a:kind
   endif
+  if empty(a:module)
+    if has_key(s:modules[a:kind], a:name)
+      call remove(s:modules[a:kind], a:name)
+    endif
+    return
+  endif
   let module = extend(deepcopy(s:{a:kind}), a:module)
   let module.kind = a:kind
   let module.name = a:name

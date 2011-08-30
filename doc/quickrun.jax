@@ -123,7 +123,7 @@ quickrun#operator({wise})			*quickrun#operator()*
 						*quickrun#register_module()*
 quickrun#register_module({kind}, {name}, {module})
 	{module} を登録します。詳しくは |quickrun-create-module| を参照してく
-	ださい。
+	ださい。{module} が空の辞書の場合、登録済みのモジュールを削除します。
 
 quickrun#register_runner({name}, {runner})	*quickrun#register_runner()*
 	quickrun#register_module("runner", {name}, {runner}) の省略形です。
@@ -668,6 +668,7 @@ outputter.finish({session})		*quickrun-outputter.finish()*
 
 x.x.x	xxxx-xx-xx
 	- |quickrun#get_module()| を追加。
+	- |quickrun#register_module()| でモジュールを削除できるようにした。
 	- exec の展開処理を改善。
 
 0.5.0	2011-07-05
