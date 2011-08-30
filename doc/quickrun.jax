@@ -133,6 +133,11 @@ quickrun#register_outputter({name}, {outputter})
 	quickrun#register_module("outputter", {name}, {outputter}) の省略形で
 	す。
 
+quickrun#get_module({kind} [, {name}])		*quickrun#get_module()*
+	登録済みのモジュールを取得します。{name} を省略した場合、登録された全
+	ての {kind} モジュールを含む辞書を返します。{name} で指定した辞書が登
+	録されていなかった場合は空の辞書を返します。
+
 						*quickrun#session()*
 quickrun#session({key} [, {func-name} [, {args} ...]])
 	モジュール内で使用されます。
@@ -662,6 +667,7 @@ outputter.finish({session})		*quickrun-outputter.finish()*
 更新履歴					*quickrun-changelog*
 
 x.x.x	xxxx-xx-xx
+	- |quickrun#get_module()| を追加。
 	- exec の展開処理を改善。
 
 0.5.0	2011-07-05

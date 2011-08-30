@@ -134,6 +134,11 @@ quickrun#register_outputter({name}, {outputter})
 	An alias of quickrun#register_module("outputter", {name},
 	{outputter}).
 
+quickrun#get_module({kind} [, {name}])		*quickrun#get_module()*
+	Returns the registered module.  Returns the all registered {kind}
+	modules by |Dictionary| if you skipped {name}.  Returns a empty
+	dictionary if the module named {name} had not registered.
+
 						*quickrun#session()*
 quickrun#session({key} [, {func-name} [, {args} ...]])
 	This is used in a module. This fetches the current runnning session if

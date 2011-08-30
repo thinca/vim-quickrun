@@ -1000,6 +1000,13 @@ function! quickrun#register_module(kind, name, module)
   let s:modules[a:kind][a:name] = module
 endfunction
 
+function! quickrun#get_module(kind, ...)
+  if a:0
+    return get(get(s:modules, a:kind, {}), a:1, {})
+  endif
+  return copy(get(s:modules, a:kind, {}))
+endfunction
+
 
 " Register the default modules.  {{{1
 function! s:register_defaults(kind)
