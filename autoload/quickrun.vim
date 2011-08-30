@@ -887,7 +887,7 @@ function! s:normalize(config)
     endif
   else
     if !config.eval && config.mode ==# 'n' && filereadable(expand('%:p')) &&
-    \   !has_key(config, 'start') &&  !has_key(config, 'start') && !&modified
+    \   !has_key(config, 'start') &&  !has_key(config, 'end') && !&modified
       " Use file in direct.
       let config.src = bufnr('%')
     else
