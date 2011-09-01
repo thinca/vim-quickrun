@@ -28,7 +28,7 @@ function! s:runner.run(commands, input, session)
     if cmd =~# '^\s*:'
       " A vim command.
       try
-        call quickrun#execute(cmd)
+        execute cmd
       catch
         break
       endtry
