@@ -685,6 +685,11 @@ KNOWN ISSUES					*quickrun-known-issues*
 - Quickrun cannot distinguish stdout from stderr.
   - It depends on runner which order to output.
 
+- Vim command that contains |:redir| command can not run.
+  - quickrun.vim gets the output of vim script by |:redir| command. And,
+    |:redir| can not nest.
+  - If you not need the output, use |quickrun-module-runner/shell|.
+
 
 
 ==============================================================================

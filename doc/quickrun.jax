@@ -661,6 +661,11 @@ outputter.finish({session})		*quickrun-outputter.finish()*
 - 標準出力と標準エラー出力を区別できません。
   - 出力順序は runner に依存します。
 
+- |:redir| コマンドを含む Vim コマンドは実行できません。
+  - これは quickrun.vim が出力を得るために |:redir| を使っているためです。そし
+    て |:redir| はネストできません。
+  - 出力が必要ない場合は、|quickrun-module-runner/shell| を使ってください。
+
 
 
 ==============================================================================
