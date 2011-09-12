@@ -198,7 +198,7 @@ let g:quickrun#default_config = {
 \ },
 \ 'markdown/pandoc': {
 \   'command': 'pandoc',
-\   'cmdopt': '--from=markdown --to=html',
+\   'exec': '%c --from=markdown --to=html %o %s %a',
 \ },
 \ 'ocaml': {},
 \ 'perl': {
