@@ -29,6 +29,7 @@ CREATE MODULE			|quickrun-create-module|
   MODULE COMMON ATTRIBUTES	  |quickrun-module-attributes|
   RUNNER ATTRIBUTES		  |quickrun-runner-attributes|
   OUTPUTTER ATTRIBUTES		  |quickrun-outputter-attributes|
+SETTING EXAMPLES		|quickrun-examples|
 KNOWN ISSUES			|quickrun-known-issues|
 CHANGELOG			|quickrun-changelog|
 
@@ -339,6 +340,8 @@ Special {type} '_' has default values for all unspecified keys by each
 Options given by command-line has higher priority than {type} specific
 settings.
 And {type} specific settings has higher priority than {type} '_' settings.
+
+See alto |quickrun-examples| about well-known examples.
 
 Default settings				*g:quickrun#default_config*
 ----------------
@@ -671,6 +674,27 @@ outputter.output({data}, {session})	*quickrun-outputter.output()*
 outputter.finish({session})		*quickrun-outputter.finish()*
 	Called in termination for finishing it. You can refer
 	|quickrun-session.exit_code|.
+
+
+
+==============================================================================
+SETTING EXAMPLES				*quickrun-examples*
+
+Converts a markdown buffer to html by pandoc, and opens it on browser.
+requirement: |open-browser.vim|
+
+>
+	let g:quickrun_config['markdown'] = {
+	      \ 'type': 'markdown/pandoc',
+	      \ 'cmdopt': '-s',
+	      \ 'outputter': 'browser'
+	      \ }
+<
+
+where you already defined |g:quickrun_config| by like the following code.
+>
+	let g:quickrun_config = {}
+<
 
 
 
