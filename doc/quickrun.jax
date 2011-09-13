@@ -29,6 +29,7 @@ License: クリエイティブ・コモンズの表示 2.1 日本ライセンス
   共通の属性			  |quickrun-module-attributes|
   RUNNER の属性			  |quickrun-runner-attributes|
   OUTPUTTER の属性		  |quickrun-outputter-attributes|
+設定例				|quickrun-examples|
 既知の問題			|quickrun-known-issues|
 更新履歴			|quickrun-changelog|
 
@@ -315,6 +316,8 @@ exec を展開した結果先頭の文字が ":" だった場合、Vim のコマ
 
 全体共通の設定よりタイプ毎の設定が、タイプ毎の設定よりコマンドで指定された引数
 が優先されます。
+
+他、よくある設定例を |quickrun-examples| に掲載しています。
 
 標準の設定					*g:quickrun#default_config*
 ----------
@@ -647,6 +650,27 @@ outputter.output({data}, {session})	*quickrun-outputter.output()*
 outputter.finish({session})		*quickrun-outputter.finish()*
 	実行の終了時に呼び出されます。終了処理を行います。
 	また、|quickrun-session.exit_code| が参照できます。
+
+
+
+==============================================================================
+SETTING EXAMPLES				*quickrun-examples*
+
+pandocを使用してmarkdownをhtmlにしてブラウザで開く (要|open-browser.vim|)
+
+>
+	let g:quickrun_config['markdown'] = {
+	      \ 'type': 'markdown/pandoc',
+	      \ 'cmdopt': '-s',
+	      \ 'outputter': 'browser'
+	      \ }
+<
+
+ただし既に以下のようにして|g:quickrun_config| が定義されていると仮定していま
+す。
+>
+	let g:quickrun_config = {}
+<
 
 
 
