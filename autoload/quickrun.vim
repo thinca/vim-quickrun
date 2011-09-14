@@ -743,15 +743,21 @@ endfunction
 
 " Execute commands by expr.  This is used by remote_expr()
 function! quickrun#execute(cmd)
-  " XXX: Can't get a result if a:cmd contains :redir command.
   let result = ''
+  let temp = tempname()
   try
-    redir => result
+    let save_vfile = &verbosefile
+    let &verbosefile = temp
+
     for cmd in type(a:cmd) == type([]) ? a:cmd : [a:cmd]
       silent execute cmd
     endfor
   finally
-    redir END
+    if &verbosefile ==# temp
+      let &verbosefile = save_vfile
+      let result = join(readfile(temp, 'b'), "\n")
+    endif
+    call delete(temp)
   endtry
   return result
 endfunction
