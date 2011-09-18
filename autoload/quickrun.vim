@@ -182,12 +182,16 @@ let g:quickrun#default_config = {
 \ 'lua': {},
 \ 'markdown': {
 \   'type': executable('Markdown.pl') ? 'markdown/Markdown.pl':
+\           executable('redcarpet') ? 'markdown/redcarpet':
 \           executable('kramdown') ? 'markdown/kramdown':
 \           executable('bluecloth') ? 'markdown/bluecloth':
 \           executable('pandoc') ? 'markdown/pandoc': '',
 \ },
 \ 'markdown/Markdown.pl': {
 \   'command': 'Markdown.pl',
+\ },
+\ 'markdown/redcarpet': {
+\   'command': 'redcarpet',
 \ },
 \ 'markdown/bluecloth': {
 \   'command': 'bluecloth',
