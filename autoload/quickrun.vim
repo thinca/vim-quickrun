@@ -84,6 +84,19 @@ let g:quickrun#default_config = {
 \             '%s:p:r.exe %a', 'del %s:p:r.exe %s:p:r.obj'],
 \   'tempfile': '%{tempname()}.cpp',
 \ },
+\ 'clojure': {
+\   'type': executable('jark') ? 'clojure/jark':
+\           executable('clj') ? 'clojure/clj':
+\           '',
+\ },
+\ 'clojure/jark': {
+\   'command': 'jark',
+\   'exec': '%c ns load %s',
+\ },
+\ 'clojure/clj': {
+\   'command': 'clj',
+\   'exec': '%c %s',
+\ },
 \ 'dosbatch': {
 \   'command': '',
 \   'exec': 'call %s %a',
