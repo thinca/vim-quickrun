@@ -630,7 +630,16 @@ endfunction
 
 " function for |g@|.
 function! quickrun#operator(wise)
-  call quickrun#run({'mode': 'o', 'visualmode': a:wise})
+  let wise = {
+  \ 'line': 'V',
+  \ 'char': 'v',
+  \ 'block': "\<C-v>" }[a:wise]
+  call quickrun#run({'region': {
+  \   'first': getpos("'[")[1 :],
+  \   'last':  getpos("']")[1 :],
+  \   'wise': wise,
+  \   'selection': 'inclusive',
+  \ }})
 endfunction
 
 " function for main command.
@@ -638,8 +647,11 @@ function! quickrun#command(config, use_range, line1, line2)
   try
     let config = {}
     if a:use_range
-      let config.start = a:line1
-      let config.end = a:line2
+      let config.region = {
+      \   'first': [a:line1, 0, 0],
+      \   'last':  [a:line2, 0, 0],
+      \   'wise': 'V',
+      \ }
     endif
     call quickrun#run([config, a:config])
   catch /^quickrun:/
@@ -659,7 +671,7 @@ function! quickrun#complete(lead, cmd, pos)
       if opt ==# 'shebang'
         let list = ['0', '1']
       elseif opt ==# 'mode'
-        let list = ['n', 'v', 'o']
+        let list = ['n', 'v']
       elseif opt ==# 'runner' || opt ==# 'outputter'
         let list = keys(filter(copy(s:modules[opt]),
         \                      'v:val.available()'))
@@ -861,6 +873,13 @@ function! s:normalize(config)
   if !has_key(config, 'mode')
     let config.mode = histget(':') =~# "^'<,'>\\s*Q\\%[uickRun]" ? 'v' : 'n'
   endif
+  if config.mode ==# 'v'
+    let config.region = {
+    \   'first': getpos("'<")[1 :],
+    \   'last':  getpos("'>")[1 :],
+    \   'wise': visualmode(),
+    \ }
+  endif
 
   let type = {"type": &filetype}
   for c in [
@@ -909,15 +928,18 @@ function! s:normalize(config)
       let config.src = printf(config.eval_template, config.src)
     endif
   else
-    if !config.eval && config.mode ==# 'n' && filereadable(expand('%:p')) &&
-    \   !has_key(config, 'start') &&  !has_key(config, 'end') && !&modified
+    if !config.eval && filereadable(expand('%:p')) &&
+    \  !has_key(config, 'region') && !&modified
       " Use file in direct.
       let config.src = bufnr('%')
     else
-      let config.start = get(config, 'start', 1)
-      let config.end = get(config, 'end', line('$'))
+      let config.region = get(config, 'region', {
+      \   'first': [1, 0, 0],
+      \   'last':  [line('$'), 0, 0],
+      \   'wise': 'V',
+      \ })
       " Executes on the temporary file.
-      let body = s:get_region(config)
+      let body = s:get_region(config.region)
 
       if config.eval
         let body = printf(config.eval_template, body)
@@ -951,47 +973,41 @@ function! s:detect_shebang(file)
 endfunction
 
 " Get the text of specified region.
-function! s:get_region(config)
-  let mode = a:config.mode
-  if mode ==# 'n'
-    " Normal mode
-    return join(getline(a:config.start, a:config.end), "\n")
-
-  elseif mode ==# 'o'
-    " Operation mode
-    let vm = {
-        \ 'line': 'V',
-        \ 'char': 'v',
-        \ 'block': "\<C-v>" }[a:config.visualmode]
-    let [sm, em] = ['[', ']']
-    let save_sel = &selection
-    set selection=inclusive
-
-  elseif mode ==# 'v'
-    " Visual mode
-    let [vm, sm, em] = [visualmode(), '<', '>']
-
-  else
-    return ''
+" region = {
+"   'first': [line, col, off],
+"   'last': [line, col, off],
+"   'wise': 'v' / 'V' / "\<C-v>",
+"   'selection': 'inclusive' / 'exclusive' / 'old'
+" }
+function! s:get_region(region)
+  let wise = get(a:region, 'wise', 'V')
+  if wise ==# 'V'
+    return join(getline(a:region.first[0], a:region.last[0]), "\n")
   endif
 
-  let [reg_save, reg_save_type] = [getreg(), getregtype()]
+  if has_key(a:region, 'selection')
+    let save_sel = &selection
+    let &selection = a:region.selection
+  endif
+  let [reg_save, reg_save_type] = [getreg('"'), getregtype('"')]
   let [pos_c, pos_s, pos_e] = [getpos('.'), getpos("'<"), getpos("'>")]
 
-  execute 'silent normal! `' . sm . vm . '`' . em . 'y'
+  call cursor(a:region.first)
+  execute 'silent normal!' wise
+  call cursor(a:region.last)
+  normal! y
+  let selected = @"
 
   " Restore '< '>
   call setpos('.', pos_s)
-  execute 'normal!' vm
+  execute 'normal!' wise
   call setpos('.', pos_e)
-  execute 'normal!' vm
+  execute 'normal!' wise
   call setpos('.', pos_c)
 
-  let selected = @"
+  call setreg('"', reg_save, reg_save_type)
 
-  call setreg(v:register, reg_save, reg_save_type)
-
-  if mode ==# 'o'
+  if exists('save_sel')
     let &selection = save_sel
   endif
   return selected
