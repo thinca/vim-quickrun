@@ -199,6 +199,10 @@ command					*quickrun-option-command*
 cmdopt (*)				*quickrun-option-cmdopt*
 			String expanded to %o in exec.
 
+srcfile (*)				*quickrun-option-srcfile*
+			Source file of program.  If this is specified, "src"
+			is not used.
+
 src					*quickrun-option-src*
 			Executed program.
 			Default value is whole lines of editing file.

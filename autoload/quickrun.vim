@@ -513,22 +513,17 @@ endfunction
 " Return the source file name.
 " Output to a temporary file if self.config.src is string.
 function! s:Session.get_source_name()
-  let fname = expand('%')
-  if exists('self.config.src')
-    let src = self.config.src
-    if type(src) == type('')
-      if has_key(self, '_temp_source')
-        let fname = self._temp_source
-      else
-        let fname = quickrun#expand(self.config.tempfile)
-        let self._temp_source = fname
-        call writefile(split(src, "\n", 1), fname, 'b')
-      endif
-    elseif type(src) == type(0)
-      let fname = expand('#'.src.':p')
+  if !has_key(self.config, 'srcfile')
+    if exists('self.config.src')
+      let fname = quickrun#expand(self.config.tempfile)
+      let self._temp_source = fname
+      call writefile(split(self.config.src, "\n", 1), fname, 'b')
+      let self.config.srcfile = fname
+    else
+      let self.config.srcfile = expand('%:p')
     endif
   endif
-  return fname
+  return self.config.srcfile
 endfunction
 
 " Sweep the session.
@@ -681,7 +676,7 @@ function! quickrun#complete(lead, cmd, pos)
 
   elseif head =~# '^-'
     " a name of option.
-    let list = ['type', 'src', 'input', 'runner', 'outputter',
+    let list = ['type', 'src', 'srcfile', 'input', 'runner', 'outputter',
     \ 'command', 'exec', 'cmdopt', 'args', 'tempfile', 'shebang', 'eval',
     \ 'mode', 'output_encode', 'eval_template']
     let mod_options = {}
@@ -923,7 +918,9 @@ function! s:normalize(config)
 
   let config.command = get(config, 'command', config.type)
 
-  if has_key(config, 'src')
+  if has_key(config, 'srcfile')
+    let config.srcfile = quickrun#expand(expand(config.srcfile))
+  elseif has_key(config, 'src')
     if config.eval
       let config.src = printf(config.eval_template, config.src)
     endif
@@ -931,7 +928,7 @@ function! s:normalize(config)
     if !config.eval && filereadable(expand('%:p')) &&
     \  !has_key(config, 'region') && !&modified
       " Use file in direct.
-      let config.src = bufnr('%')
+      let config.srcfile = expand('%:p')
     else
       let config.region = get(config, 'region', {
       \   'first': [1, 0, 0],

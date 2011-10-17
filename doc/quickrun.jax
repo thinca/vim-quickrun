@@ -194,6 +194,10 @@ command					*quickrun-option-command*
 cmdopt (*)				*quickrun-option-cmdopt*
 	exec 内の %o に展開される文字列です。
 
+srcfile (*)				*quickrun-option-srcfile*
+	実行するプログラムのソースファイルです。これが指定された場合、"src" は
+	使われません。
+
 src					*quickrun-option-src*
 	実行するプログラムのソースとなる文字列を指定します。デフォルトでは編集
 	中のファイル全体ですが、指定することで変更が可能です。
@@ -696,6 +700,7 @@ pandocを使用してmarkdownをhtmlにしてブラウザで開く (要|open-bro
 更新履歴					*quickrun-changelog*
 
 x.x.x	xxxx-xx-xx
+	- "srcfile" オプション(|quickrun-option-srcfile|)を追加。
 	- |quickrun#get_module()| を追加。
 	- |quickrun#register_module()| でモジュールを削除できるようにした。
 	- exec の展開処理を改善。
