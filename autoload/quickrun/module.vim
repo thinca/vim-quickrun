@@ -7,11 +7,12 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-function! s:is_cmd_exe()
-  return &shell =~? 'cmd\.exe'
-endfunction
+let s:modules = {
+\   'runner': {},
+\   'outputter': {},
+\ }
 
-" Modules.  {{{1
+" Templates.  {{{1
 " Template of module.  {{{2
 let s:module = {'config': {}, 'config_order': []}
 function! s:module.available()
@@ -99,12 +100,7 @@ function! s:outputter.finish(session)
 endfunction
 
 
-
-let s:modules = {
-\   'runner': {},
-\   'outputter': {},
-\ }
-
+" functions.  {{{1
 function! quickrun#module#register(module)
   call s:validate_module(a:module)
   let kind = a:module.kind
@@ -147,6 +143,10 @@ function! s:validate_module(module)
   if !has_key(s:modules, a:module.kind)
     throw 'quickrun: Unknown kind of module: ' . a:kind
   endif
+endfunction
+
+function! s:is_cmd_exe()
+  return &shell =~? 'cmd\.exe'
 endfunction
 
 
