@@ -393,12 +393,11 @@ function! s:Session.make_module(kind, line)
     let args = [arg]
   endif
 
-  if !has_key(s:modules[a:kind], name)
+  let module = deepcopy(quickrun#get_module(a:kind, name))
+  if empty(module)
     throw printf('quickrun: Specified %s is not registered: %s',
     \            a:kind, name)
   endif
-
-  let module = deepcopy(s:modules[a:kind][name])
 
   try
     call module.validate()
@@ -668,7 +667,7 @@ function! quickrun#complete(lead, cmd, pos)
       elseif opt ==# 'mode'
         let list = ['n', 'v']
       elseif opt ==# 'runner' || opt ==# 'outputter'
-        let list = keys(filter(copy(s:modules[opt]),
+        let list = keys(filter(copy(quickrun#get_module(opt)),
         \                      'v:val.available()'))
       endif
       return filter(list, 'v:val =~# "^".a:lead')
@@ -681,7 +680,7 @@ function! quickrun#complete(lead, cmd, pos)
     \ 'mode', 'output_encode', 'eval_template']
     let mod_options = {}
     for kind in ['runner', 'outputter']
-      for module in filter(values(s:modules[kind]), 'v:val.available()')
+      for module in filter(values(quickrun#get_module(kind)), 'v:val.available()')
         for opt in keys(module.config)
           let mod_options[opt] = 1
           let mod_options[kind . '/' . opt] = 1
