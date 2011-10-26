@@ -76,7 +76,7 @@ function! s:module.init(session)
 endfunction
 
 " Template of runner.  {{{2
-let s:templates.runner = copy(s:module)
+let s:templates.runner = deepcopy(s:module)
 function! s:templates.runner.run(commands, input, session)
   throw 'quickrun: A runner should implements run()'
 endfunction
@@ -93,7 +93,7 @@ function! s:templates.runner.shellescape(str)
 endfunction
 
 " Template of outputter.  {{{2
-let s:templates.outputter = copy(s:module)
+let s:templates.outputter = deepcopy(s:module)
 function! s:templates.outputter.output(data, session)
   throw 'quickrun: An outputter should implements output()'
 endfunction
