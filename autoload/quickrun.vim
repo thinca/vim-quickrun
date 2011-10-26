@@ -575,7 +575,7 @@ function! quickrun#complete(lead, cmd, pos)
       elseif opt ==# 'mode'
         let list = ['n', 'v']
       elseif opt ==# 'runner' || opt ==# 'outputter'
-        let list = keys(filter(copy(quickrun#module#get(opt)),
+        let list = keys(filter(quickrun#module#get(opt),
         \                      'v:val.available()'))
       endif
       return filter(list, 'v:val =~# "^".a:lead')
