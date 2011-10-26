@@ -131,6 +131,11 @@ quickrun#module#unregister({module})		*quickrun#module#unregister()*
 quickrun#module#unregister({kind}, {name})
 	Unregisters a module.
 
+quickrun#module#get({kind} [, {name}])		*quickrun#module#get()*
+	Returns the registered module.  Returns the all registered {kind}
+	modules by |Dictionary| if you skipped {name}.  Returns a empty
+	dictionary if the module named {name} had not registered.
+
 quickrun#register_runner({name}, {runner})	*quickrun#register_runner()*
 	An alias of quickrun#module#register("runner", {name}, {runner}).
 
@@ -138,11 +143,6 @@ quickrun#register_runner({name}, {runner})	*quickrun#register_runner()*
 quickrun#register_outputter({name}, {outputter})
 	An alias of quickrun#module#register("outputter", {name},
 	{outputter}).
-
-quickrun#module#get({kind} [, {name}])		*quickrun#module#get()*
-	Returns the registered module.  Returns the all registered {kind}
-	modules by |Dictionary| if you skipped {name}.  Returns a empty
-	dictionary if the module named {name} had not registered.
 
 						*quickrun#session()*
 quickrun#session({key} [, {func-name} [, {args} ...]])

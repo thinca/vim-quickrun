@@ -130,6 +130,11 @@ quickrun#module#unregister({module})		*quickrun#module#unregister()*
 quickrun#module#unregister({kind}, {name})
 	モジュールの登録を解除します。
 
+quickrun#module#get({kind} [, {name}])		*quickrun#module#get()*
+	登録済みのモジュールを取得します。{name} を省略した場合、登録された全
+	ての {kind} モジュールを含む辞書を返します。{name} で指定した辞書が登
+	録されていなかった場合は空の辞書を返します。
+
 quickrun#register_runner({name}, {runner})	*quickrun#register_runner()*
 	quickrun#module#register("runner", {name}, {runner}) の省略形です。
 
@@ -137,11 +142,6 @@ quickrun#register_runner({name}, {runner})	*quickrun#register_runner()*
 quickrun#register_outputter({name}, {outputter})
 	quickrun#module#register("outputter", {name}, {outputter}) の省略形で
 	す。
-
-quickrun#module#get({kind} [, {name}])		*quickrun#module#get()*
-	登録済みのモジュールを取得します。{name} を省略した場合、登録された全
-	ての {kind} モジュールを含む辞書を返します。{name} で指定した辞書が登
-	録されていなかった場合は空の辞書を返します。
 
 						*quickrun#session()*
 quickrun#session({key} [, {func-name} [, {args} ...]])
