@@ -123,23 +123,23 @@ quickrun#operator({wise})			*quickrun#operator()*
 	nnoremap <silent> <C-CR> :<C-u>set opfunc=quickrun#operator<CR>g@ip
 <	This runs current paragraph (|ip|) with <C-CR>.
 
-						*quickrun#register_module()*
-quickrun#register_module({module})
+						*quickrun#module#register()*
+quickrun#module#register({module})
 	Registers {module}. See details in |quickrun-create-module|.
 
-quickrun#unregister_module({module})		*quickrun#unregister_module()*
-quickrun#unregister_module({kind}, {name})
+quickrun#module#unregister({module})		*quickrun#module#unregister()*
+quickrun#module#unregister({kind}, {name})
 	Unregisters a module.
 
 quickrun#register_runner({name}, {runner})	*quickrun#register_runner()*
-	An alias of quickrun#register_module("runner", {name}, {runner}).
+	An alias of quickrun#module#register("runner", {name}, {runner}).
 
 					       *quickrun#register_outputter()*
 quickrun#register_outputter({name}, {outputter})
-	An alias of quickrun#register_module("outputter", {name},
+	An alias of quickrun#module#register("outputter", {name},
 	{outputter}).
 
-quickrun#get_module({kind} [, {name}])		*quickrun#get_module()*
+quickrun#module#get({kind} [, {name}])		*quickrun#module#get()*
 	Returns the registered module.  Returns the all registered {kind}
 	modules by |Dictionary| if you skipped {name}.  Returns a empty
 	dictionary if the module named {name} had not registered.
@@ -579,7 +579,7 @@ what's the problem? You can use the module after registering it.
 ------------------------------------------------------------------------------
 REGISTER MODULE				*quickrun-register-module*
 
-You use a module with registering by |quickrun#register_module()| or its
+You use a module with registering by |quickrun#module#register()| or its
 handier version |quickrun#register_runner()| and
 |quickrun#register_outputter()|. You can also register a module automatically
 by making autoload#quickrun#{module-kind}#{module-name}#new() function in

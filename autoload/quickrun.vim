@@ -15,10 +15,6 @@ lockvar! g:quickrun#V
 
 let s:is_win = s:V.is_windows()
 
-function! s:is_cmd_exe()
-  return &shell =~? 'cmd\.exe'
-endfunction
-
 " Default config.  " {{{1
 unlet! g:quickrun#default_config
 let g:quickrun#default_config = {
@@ -266,94 +262,6 @@ let g:quickrun#default_config = {
 lockvar! g:quickrun#default_config
 
 
-" Modules.  {{{1
-" Template of module.  {{{2
-let s:module = {'config': {}, 'config_order': []}
-function! s:module.available()
-  try
-    call self.validate()
-  catch
-    return 0
-  endtry
-  return 1
-endfunction
-function! s:module.validate()
-endfunction
-function! s:module.build(configs)
-  for config in a:configs
-    if type(config) == type({})
-      for name in keys(self.config)
-        for conf in [self.kind . '/' . self.name . '/' . name,
-        \            self.kind . '/' . name,
-        \            name]
-          if has_key(config, conf)
-            let self.config[name] = config[conf]
-            break
-          endif
-        endfor
-      endfor
-    elseif type(config) == type('') && config !=# ''
-      call self.parse_option(config)
-    endif
-    unlet config
-  endfor
-endfunction
-function! s:module.parse_option(argline)
-  let sep = a:argline[0]
-  let args = split(a:argline[1:], '\V' . escape(sep, '\'))
-  let order = copy(self.config_order)
-  for arg in args
-    let name = matchstr(arg, '^\w\+\ze=')
-    if !empty(name)
-      let value = matchstr(arg, '^\w\+=\zs.*')
-    elseif len(self.config) == 1
-      let [name, value] = [keys(self.config)[0], arg]
-    elseif !empty(order)
-      let name = remove(order, 0)
-      let value = arg
-    endif
-    if empty(name)
-      throw 'could not parse the option: ' . arg
-    endif
-    if !has_key(self.config, name)
-      throw 'unknown option: ' . name
-    endif
-    if type(self.config[name]) == type([])
-      call add(self.config[name], value)
-    else
-      let self.config[name] = value
-    endif
-  endfor
-endfunction
-function! s:module.init(session)
-endfunction
-
-" Template of runner.  {{{2
-let s:runner = copy(s:module)
-function! s:runner.run(commands, input, session)
-  throw 'quickrun: A runner should implements run()'
-endfunction
-function! s:runner.sweep()
-endfunction
-function! s:runner.shellescape(str)
-  if s:is_cmd_exe()
-    return '^"' . substitute(substitute(substitute(a:str,
-    \             '[&|<>()^"%]', '^\0', 'g'),
-    \             '\\\+\ze"', '\=repeat(submatch(0), 2)', 'g'),
-    \             '\^"', '\\\0', 'g') . '^"'
-  endif
-  return shellescape(a:str)
-endfunction
-
-" Template of outputter.  {{{2
-let s:outputter = copy(s:module)
-function! s:outputter.output(data, session)
-  throw 'quickrun: An outputter should implements output()'
-endfunction
-function! s:outputter.finish(session)
-endfunction
-
-
 let s:Session = {}  " {{{1
 " Initialize of instance.
 function! s:Session.initialize(config)
@@ -393,7 +301,7 @@ function! s:Session.make_module(kind, line)
     let args = [arg]
   endif
 
-  let module = deepcopy(quickrun#get_module(a:kind, name))
+  let module = deepcopy(quickrun#module#get(a:kind, name))
   if empty(module)
     throw printf('quickrun: Specified %s is not registered: %s',
     \            a:kind, name)
@@ -667,7 +575,7 @@ function! quickrun#complete(lead, cmd, pos)
       elseif opt ==# 'mode'
         let list = ['n', 'v']
       elseif opt ==# 'runner' || opt ==# 'outputter'
-        let list = keys(filter(copy(quickrun#get_module(opt)),
+        let list = keys(filter(copy(quickrun#module#get(opt)),
         \                      'v:val.available()'))
       endif
       return filter(list, 'v:val =~# "^".a:lead')
@@ -680,7 +588,7 @@ function! quickrun#complete(lead, cmd, pos)
     \ 'mode', 'output_encode', 'eval_template']
     let mod_options = {}
     for kind in ['runner', 'outputter']
-      for module in filter(values(quickrun#get_module(kind)), 'v:val.available()')
+      for module in filter(values(quickrun#module#get(kind)), 'v:val.available()')
         for opt in keys(module.config)
           let mod_options[opt] = 1
           let mod_options[kind . '/' . opt] = 1
@@ -1012,65 +920,16 @@ endfunction
 
 
 " Module system.  {{{1
-let s:modules = {
-\   'runner': {},
-\   'outputter': {},
-\ }
-
 function! quickrun#register_runner(name, runner)
   let a:runner.kind = 'runner'
   let a:runner.name = a:name
-  return quickrun#register_module(a:runner)
+  return quickrun#module#register(a:runner)
 endfunction
 
 function! quickrun#register_outputter(name, outputter)
   let a:outputter.kind = 'outputter'
   let a:outputter.name = a:name
-  return quickrun#register_module(a:outputter)
-endfunction
-
-function! quickrun#register_module(module)
-  call s:validate_module(a:module)
-  let kind = a:module.kind
-  let module = extend(deepcopy(s:{kind}), a:module)
-  let s:modules[kind][module.name] = module
-endfunction
-
-function! quickrun#unregister_module(...)
-  if a:0 && type(a:1) == type({})
-    let kind = get(a:module, 'kind', '')
-    let name = get(a:module, 'name', '')
-  elseif 2 <= a:0
-    let kind = a:1
-    let name = a:2
-  else
-    return 0
-  endif
-
-  if has_key(s:modules, kind) && has_key(s:modules[kind], name)
-    call remove(s:modules[kind], name)
-    return 1
-  endif
-  return 0
-endfunction
-
-function! quickrun#get_module(kind, ...)
-  if a:0
-    return get(get(s:modules, a:kind, {}), a:1, {})
-  endif
-  return copy(get(s:modules, a:kind, {}))
-endfunction
-
-function! s:validate_module(module)
-  if !has_key(a:module, 'kind')
-    throw 'quickrun: A module must have a "kind" attribute.'
-  endif
-  if !has_key(a:module, 'name')
-    throw 'quickrun: A module must have a "name" attribute.'
-  endif
-  if !has_key(s:modules, a:module.kind)
-    throw 'quickrun: Unknown kind of module: ' . a:kind
-  endif
+  return quickrun#module#register(a:outputter)
 endfunction
 
 
@@ -1083,7 +942,7 @@ function! s:register_defaults(kind)
       let module = quickrun#{a:kind}#{name}#new()
       let module.kind = a:kind
       let module.name = name
-      call quickrun#register_module(module)
+      call quickrun#module#register(module)
     catch /:E\%(117\|716\):/
     endtry
   endfor
