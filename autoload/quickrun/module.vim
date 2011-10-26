@@ -13,6 +13,7 @@ let s:modules = {
 \ }
 
 " Templates.  {{{1
+let s:templates = {}
 " Template of module.  {{{2
 let s:module = {'config': {}, 'config_order': []}
 function! s:module.available()
@@ -75,13 +76,13 @@ function! s:module.init(session)
 endfunction
 
 " Template of runner.  {{{2
-let s:runner = copy(s:module)
-function! s:runner.run(commands, input, session)
+let s:templates.runner = copy(s:module)
+function! s:templates.runner.run(commands, input, session)
   throw 'quickrun: A runner should implements run()'
 endfunction
-function! s:runner.sweep()
+function! s:templates.runner.sweep()
 endfunction
-function! s:runner.shellescape(str)
+function! s:templates.runner.shellescape(str)
   if s:is_cmd_exe()
     return '^"' . substitute(substitute(substitute(a:str,
     \             '[&|<>()^"%]', '^\0', 'g'),
@@ -92,11 +93,11 @@ function! s:runner.shellescape(str)
 endfunction
 
 " Template of outputter.  {{{2
-let s:outputter = copy(s:module)
-function! s:outputter.output(data, session)
+let s:templates.outputter = copy(s:module)
+function! s:templates.outputter.output(data, session)
   throw 'quickrun: An outputter should implements output()'
 endfunction
-function! s:outputter.finish(session)
+function! s:templates.outputter.finish(session)
 endfunction
 
 
@@ -107,7 +108,7 @@ function! quickrun#module#register(module, ...)
   let kind = a:module.kind
   let name = a:module.name
   if overwrite || !quickrun#module#exists(kind, name)
-    let module = extend(deepcopy(s:{kind}), a:module)
+    let module = extend(deepcopy(s:templates[kind]), a:module)
     let s:modules[kind][name] = module
   endif
 endfunction
