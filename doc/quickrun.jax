@@ -1,6 +1,6 @@
 *quickrun.txt*	コマンドを素早く実行します。
 
-Version: 0.5.1
+Version: 0.6.0dev
 Author: thinca <thinca+vim@gmail.com>
 英訳:
   * ujihisa <ujihisa at gmail com>
@@ -698,6 +698,8 @@ pandocを使用してmarkdownをhtmlにしてブラウザで開く (要|open-bro
 
 ==============================================================================
 更新履歴					*quickrun-changelog*
+
+0.6.0	xxxx-xx-xx
 
 0.5.1	2011-10-21
 	- "srcfile" オプション(|quickrun-option-srcfile|)を追加。

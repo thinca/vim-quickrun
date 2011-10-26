@@ -1,6 +1,6 @@
 *quickrun.txt*	Run a command and show its result quickly.
 
-Version: 0.5.0
+Version: 0.6.0dev
 Author: thinca <thinca+vim@gmail.com>
 English documentation by:
   * ujihisa <ujihisa at gmail com>
