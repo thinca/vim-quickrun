@@ -1019,27 +1019,22 @@ let s:modules = {
 \ }
 
 function! quickrun#register_runner(name, runner)
-  return quickrun#register_module('runner', a:name, a:runner)
+  let a:runner.kind = 'runner'
+  let a:runner.name = a:name
+  return quickrun#register_module(a:runner)
 endfunction
 
 function! quickrun#register_outputter(name, outputter)
-  return quickrun#register_module('outputter', a:name, a:outputter)
+  let a:outputter.kind = 'outputter'
+  let a:outputter.name = a:name
+  return quickrun#register_module(a:outputter)
 endfunction
 
-function! quickrun#register_module(kind, name, module)
-  if !has_key(s:modules, a:kind)
-    throw 'quickrun: Unknown kind of module: ' . a:kind
-  endif
-  if empty(a:module)
-    if has_key(s:modules[a:kind], a:name)
-      call remove(s:modules[a:kind], a:name)
-    endif
-    return
-  endif
-  let module = extend(deepcopy(s:{a:kind}), a:module)
-  let module.kind = a:kind
-  let module.name = a:name
-  let s:modules[a:kind][a:name] = module
+function! quickrun#register_module(module)
+  call s:validate_module(a:module)
+  let kind = a:module.kind
+  let module = extend(deepcopy(s:{kind}), a:module)
+  let s:modules[kind][module.name] = module
 endfunction
 
 function! quickrun#get_module(kind, ...)
@@ -1047,6 +1042,18 @@ function! quickrun#get_module(kind, ...)
     return get(get(s:modules, a:kind, {}), a:1, {})
   endif
   return copy(get(s:modules, a:kind, {}))
+endfunction
+
+function! s:validate_module(module)
+  if !has_key(a:module, 'kind')
+    throw 'quickrun: A module must have a "kind" attribute.'
+  endif
+  if !has_key(a:module, 'name')
+    throw 'quickrun: A module must have a "name" attribute.'
+  endif
+  if !has_key(s:modules, a:module.kind)
+    throw 'quickrun: Unknown kind of module: ' . a:kind
+  endif
 endfunction
 
 
@@ -1057,7 +1064,9 @@ function! s:register_defaults(kind)
   \               'fnamemodify(v:val, ":t:r")')
     try
       let module = quickrun#{a:kind}#{name}#new()
-      call quickrun#register_module(a:kind, name, module)
+      let module.kind = a:kind
+      let module.name = name
+      call quickrun#register_module(module)
     catch /:E\%(117\|716\):/
     endtry
   endfor

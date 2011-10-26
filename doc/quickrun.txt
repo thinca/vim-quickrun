@@ -124,9 +124,8 @@ quickrun#operator({wise})			*quickrun#operator()*
 <	This runs current paragraph (|ip|) with <C-CR>.
 
 						*quickrun#register_module()*
-quickrun#register_module({kind}, {name}, {module})
+quickrun#register_module({module})
 	Registers {module}. See details in |quickrun-create-module|.
-	Unregisters a registered module if {module} is empty.
 
 quickrun#register_runner({name}, {runner})	*quickrun#register_runner()*
 	An alias of quickrun#register_module("runner", {name}, {runner}).
@@ -634,6 +633,12 @@ Quickrun uses a copy of a module you registered. To preserve a value among
 each modules, use attributes which name begin with "_" to avoid conflicts.
 
 Below common attributes among all modules.
+
+module.kind				*quickrun-module.kind*
+	Required.  Kind of the module.
+
+module.name				*quickrun-module.name*
+	Required.  Name of the module.
 
 module.config				*quickrun-module.config*
 	This is a dictionary for the module config default values. The items
