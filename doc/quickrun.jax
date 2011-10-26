@@ -126,6 +126,10 @@ quickrun#register_module({module})
 	{module} を登録します。詳しくは |quickrun-create-module| を参照してく
 	ださい。
 
+quickrun#unregister_module({module})		*quickrun#unregister_module()*
+quickrun#unregister_module({kind}, {name})
+	モジュールの登録を解除します。
+
 quickrun#register_runner({name}, {runner})	*quickrun#register_runner()*
 	quickrun#register_module("runner", {name}, {runner}) の省略形です。
 
@@ -707,6 +711,7 @@ pandocを使用してmarkdownをhtmlにしてブラウザで開く (要|open-bro
 
 0.6.0	xxxx-xx-xx
 	- |quickrun#register_module()| の引数を変更。
+	- |quickrun#unregister_module()| を追加。
 
 0.5.1	2011-10-21
 	- "srcfile" オプション(|quickrun-option-srcfile|)を追加。

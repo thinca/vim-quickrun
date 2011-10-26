@@ -1037,6 +1037,24 @@ function! quickrun#register_module(module)
   let s:modules[kind][module.name] = module
 endfunction
 
+function! quickrun#unregister_module(...)
+  if a:0 && type(a:1) == type({})
+    let kind = get(a:module, 'kind', '')
+    let name = get(a:module, 'name', '')
+  elseif 2 <= a:0
+    let kind = a:1
+    let name = a:2
+  else
+    return 0
+  endif
+
+  if has_key(s:modules, kind) && has_key(s:modules[kind], name)
+    call remove(s:modules[kind], name)
+    return 1
+  endif
+  return 0
+endfunction
+
 function! quickrun#get_module(kind, ...)
   if a:0
     return get(get(s:modules, a:kind, {}), a:1, {})

@@ -127,6 +127,10 @@ quickrun#operator({wise})			*quickrun#operator()*
 quickrun#register_module({module})
 	Registers {module}. See details in |quickrun-create-module|.
 
+quickrun#unregister_module({module})		*quickrun#unregister_module()*
+quickrun#unregister_module({kind}, {name})
+	Unregisters a module.
+
 quickrun#register_runner({name}, {runner})	*quickrun#register_runner()*
 	An alias of quickrun#register_module("runner", {name}, {runner}).
 
