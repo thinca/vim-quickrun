@@ -588,7 +588,7 @@ function! quickrun#complete(lead, cmd, pos)
     \ 'mode', 'output_encode', 'eval_template']
     let mod_options = {}
     for kind in ['runner', 'outputter']
-      for module in filter(values(quickrun#module#get(kind)), 'v:val.available()')
+      for module in values(filter(quickrun#module#get(kind), 'v:val.available()'))
         for opt in keys(module.config)
           let mod_options[opt] = 1
           let mod_options[kind . '/' . opt] = 1
