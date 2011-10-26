@@ -121,23 +121,31 @@ quickrun#operator({wise})			*quickrun#operator()*
 	nnoremap <silent> <C-CR> :<C-u>set opfunc=quickrun#operator<CR>g@ip
 <	これは、<C-CR> で現在の段落(|ip|)を実行します。
 
-						*quickrun#register_module()*
-quickrun#register_module({kind}, {name}, {module})
-	{module} を登録します。詳しくは |quickrun-create-module| を参照してく
-	ださい。{module} が空の辞書の場合、登録済みのモジュールを削除します。
+						*quickrun#module#register()*
+quickrun#module#register({module} [, {overwrite}])
+	{module} を登録します。{overwrite} が与えられて 1 だった場合、登録済み
+	のモジュールを上書きします。
+	詳しくは |quickrun-create-module| を参照してください。
 
-quickrun#register_runner({name}, {runner})	*quickrun#register_runner()*
-	quickrun#register_module("runner", {name}, {runner}) の省略形です。
+quickrun#module#unregister({module})		*quickrun#module#unregister()*
+quickrun#module#unregister({kind}, {name})
+	モジュールの登録を解除します。
 
-					       *quickrun#register_outputter()*
-quickrun#register_outputter({name}, {outputter})
-	quickrun#register_module("outputter", {name}, {outputter}) の省略形で
-	す。
+quickrun#module#exists({kind}, {name})		*quickrun#module#exists()*
+	モジュールが登録されているかどうかを確認します。
 
-quickrun#get_module({kind} [, {name}])		*quickrun#get_module()*
+quickrun#module#get({kind} [, {name}])		*quickrun#module#get()*
 	登録済みのモジュールを取得します。{name} を省略した場合、登録された全
 	ての {kind} モジュールを含む辞書を返します。{name} で指定した辞書が登
 	録されていなかった場合は空の辞書を返します。
+
+quickrun#register_runner({name}, {runner})	*quickrun#register_runner()*
+	quickrun#module#register("runner", {name}, {runner}) の省略形です。
+
+					       *quickrun#register_outputter()*
+quickrun#register_outputter({name}, {outputter})
+	quickrun#module#register("outputter", {name}, {outputter}) の省略形で
+	す。
 
 						*quickrun#session()*
 quickrun#session({key} [, {func-name} [, {args} ...]])
@@ -555,7 +563,7 @@ outputter は結果の出力を行うモジュールです。
 ------------------------------------------------------------------------------
 モジュールの登録				*quickrun-register-module*
 
-モジュールは、|quickrun#register_module()| やその省略形である
+モジュールは、|quickrun#module#register()| やその省略形である
 |quickrun#register_runner()|、|quickrun#register_outputter()| を使って登録する
 ことで 使えるようになります。
 また、'runtimepath' 内に autoload/quickrun/{module-kind}/{module-name}.vim を
@@ -611,6 +619,12 @@ session.sweep()				*quickrun-session.sweep()*
 ション中にモジュール毎に値を保持したい場合は、既存の属性との衝突を避けるために
 "_" で始まる属性を使用してください。
 以下は全モジュールで共通の属性です。
+
+module.kind				*quickrun-module.kind*
+	必須です。モジュールの種類です。
+
+module.name				*quickrun-module.name*
+	必須です。モジュールの名前です。
 
 module.config				*quickrun-module.config*
 	これは辞書で、このモジュールが取る config のデフォルト値です。ここで定
@@ -700,6 +714,11 @@ pandocを使用してmarkdownをhtmlにしてブラウザで開く (要|open-bro
 更新履歴					*quickrun-changelog*
 
 0.6.0	xxxx-xx-xx
+	- モジュール周りの構成を変更。
+	  - quickrun#xxx_module() => quickrun#module#xxx()
+	  - |quickrun#module#register()| の引数を変更。
+	  - |quickrun#module#unregister()| を追加。
+	  - |quickrun#module#exists()| を追加。
 
 0.5.1	2011-10-21
 	- "srcfile" オプション(|quickrun-option-srcfile|)を追加。
