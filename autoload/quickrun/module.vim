@@ -131,10 +131,17 @@ function! quickrun#module#exists(kind, name)
 endfunction
 
 function! quickrun#module#get(kind, ...)
-  if a:0
-    return get(get(s:modules, a:kind, {}), a:1, {})
+  if !has_key(s:modules, a:kind)
+    throw 'quickrun: Unknown kind of module: ' . a:kind
   endif
-  return copy(get(s:modules, a:kind, {}))
+  if a:0 == 0
+    return copy(s:modules[a:kind])
+  endif
+  let name = a:1
+  if !has_key(s:modules[a:kind], name)
+    throw 'quickrun: Unregistered module: ' . a:kind . '/' . name
+  endif
+  return s:modules[a:kind][name]
 endfunction
 
 function! s:validate_module(module)

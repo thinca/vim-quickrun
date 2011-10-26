@@ -302,10 +302,6 @@ function! s:Session.make_module(kind, line)
   endif
 
   let module = deepcopy(quickrun#module#get(a:kind, name))
-  if empty(module)
-    throw printf('quickrun: Specified %s is not registered: %s',
-    \            a:kind, name)
-  endif
 
   try
     call module.validate()
