@@ -702,7 +702,7 @@ Converts a markdown buffer to html by pandoc, and opens it on browser.
 requirement: |open-browser.vim|
 
 >
-	let g:quickrun_config['markdown'] = {
+	let g:quickrun_config.markdown = {
 	      \ 'type': 'markdown/pandoc',
 	      \ 'cmdopt': '-s',
 	      \ 'outputter': 'browser'

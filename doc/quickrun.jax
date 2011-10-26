@@ -672,19 +672,19 @@ outputter.finish({session})		*quickrun-outputter.finish()*
 
 
 ==============================================================================
-SETTING EXAMPLES				*quickrun-examples*
+設定例						*quickrun-examples*
 
 pandocを使用してmarkdownをhtmlにしてブラウザで開く (要|open-browser.vim|)
 
 >
-	let g:quickrun_config['markdown'] = {
+	let g:quickrun_config.markdown = {
 	      \ 'type': 'markdown/pandoc',
 	      \ 'cmdopt': '-s',
 	      \ 'outputter': 'browser'
 	      \ }
 <
 
-ただし既に以下のようにして|g:quickrun_config| が定義されていると仮定していま
+ただし既に以下のようにして |g:quickrun_config| が定義されていると仮定していま
 す。
 >
 	let g:quickrun_config = {}
