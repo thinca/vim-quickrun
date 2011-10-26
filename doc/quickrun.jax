@@ -130,6 +130,9 @@ quickrun#module#unregister({module})		*quickrun#module#unregister()*
 quickrun#module#unregister({kind}, {name})
 	モジュールの登録を解除します。
 
+quickrun#module#exists({kind}, {name})		*quickrun#module#exists()*
+	モジュールが登録されているかどうかを確認します。
+
 quickrun#module#get({kind} [, {name}])		*quickrun#module#get()*
 	登録済みのモジュールを取得します。{name} を省略した場合、登録された全
 	ての {kind} モジュールを含む辞書を返します。{name} で指定した辞書が登
@@ -714,6 +717,7 @@ pandocを使用してmarkdownをhtmlにしてブラウザで開く (要|open-bro
 	  - quickrun#xxx_module() => quickrun#module#xxx()
 	  - |quickrun#module#register()| の引数を変更。
 	  - |quickrun#module#unregister()| を追加。
+	  - |quickrun#module#exists()| を追加。
 
 0.5.1	2011-10-21
 	- "srcfile" オプション(|quickrun-option-srcfile|)を追加。

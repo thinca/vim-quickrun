@@ -119,11 +119,15 @@ function! quickrun#module#unregister(...)
     return 0
   endif
 
-  if has_key(s:modules, kind) && has_key(s:modules[kind], name)
+  if quickrun#module#exists(kind, name)
     call remove(s:modules[kind], name)
     return 1
   endif
   return 0
+endfunction
+
+function! quickrun#module#exists(kind, name)
+  return has_key(s:modules, a:kind) && has_key(s:modules[a:kind], a:name)
 endfunction
 
 function! quickrun#module#get(kind, ...)

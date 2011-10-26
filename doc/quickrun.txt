@@ -136,6 +136,9 @@ quickrun#module#get({kind} [, {name}])		*quickrun#module#get()*
 	modules by |Dictionary| if you skipped {name}.  Returns a empty
 	dictionary if the module named {name} had not registered.
 
+quickrun#module#exists({kind}, {name})		*quickrun#module#exists()*
+	Checks a module is registered.
+
 quickrun#register_runner({name}, {runner})	*quickrun#register_runner()*
 	An alias of quickrun#module#register("runner", {name}, {runner}).
 
