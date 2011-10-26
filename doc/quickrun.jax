@@ -122,9 +122,10 @@ quickrun#operator({wise})			*quickrun#operator()*
 <	これは、<C-CR> で現在の段落(|ip|)を実行します。
 
 						*quickrun#module#register()*
-quickrun#module#register({module})
-	{module} を登録します。詳しくは |quickrun-create-module| を参照してく
-	ださい。
+quickrun#module#register({module} [, {overwrite}])
+	{module} を登録します。{overwrite} が与えられて 1 だった場合、登録済み
+	のモジュールを上書きします。
+	詳しくは |quickrun-create-module| を参照してください。
 
 quickrun#module#unregister({module})		*quickrun#module#unregister()*
 quickrun#module#unregister({kind}, {name})

@@ -124,8 +124,10 @@ quickrun#operator({wise})			*quickrun#operator()*
 <	This runs current paragraph (|ip|) with <C-CR>.
 
 						*quickrun#module#register()*
-quickrun#module#register({module})
-	Registers {module}. See details in |quickrun-create-module|.
+quickrun#module#register({module} [, {overwrite}])
+	Registers {module}.  Overwrites the registered module if {overwrite}
+	is specified and it is 1.
+	See details in |quickrun-create-module|.
 
 quickrun#module#unregister({module})		*quickrun#module#unregister()*
 quickrun#module#unregister({kind}, {name})

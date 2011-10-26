@@ -101,11 +101,15 @@ endfunction
 
 
 " functions.  {{{1
-function! quickrun#module#register(module)
+function! quickrun#module#register(module, ...)
   call s:validate_module(a:module)
+  let overwrite = a:0 && a:1
   let kind = a:module.kind
-  let module = extend(deepcopy(s:{kind}), a:module)
-  let s:modules[kind][module.name] = module
+  let name = a:module.name
+  if overwrite || !quickrun#module#exists(kind, name)
+    let module = extend(deepcopy(s:{kind}), a:module)
+    let s:modules[kind][name] = module
+  endif
 endfunction
 
 function! quickrun#module#unregister(...)
