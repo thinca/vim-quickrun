@@ -142,10 +142,28 @@ let g:quickrun#default_config = {
 \ 'groovy': {
 \   'cmdopt': '-c %{&fenc==#""?&enc:&fenc}'
 \ },
-\ 'haskell': {
+\ 'haskell': {'type': 'haskell/runghc'},
+\ 'haskell/runghc': {
 \   'command': 'runghc',
 \   'tempfile': '%{tempname()}.hs',
 \   'eval_template': 'main = print $ %s',
+\ },
+\ 'haskell/ghc': {
+\   'command': 'ghc',
+\   'exec': [
+\     '%c %o %s -o %s:p:r',
+\     '%s:p:r %a',
+\     'rm %s:p:r %s:p:r.o %s:p:r.hi'],
+\   'cmdopt': '-v0 --make',
+\   'tempfile': '%{tempname()}.hs',
+\ },
+\ 'haskell/ghc/core': {
+\   'command': 'ghc',
+\   'exec': [
+\     '%c %o -ddump-simpl -dsuppress-coercions %s',
+\     'rm %s:p:r %s:p:r.o %s:p:r.hi'],
+\   'cmdopt': '-v0 --make',
+\   'tempfile': '%{tempname()}.hs',
 \ },
 \ 'io': {},
 \ 'java': {
