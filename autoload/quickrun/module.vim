@@ -140,7 +140,7 @@ function! quickrun#module#get(kind, ...)
     throw 'quickrun: Unknown kind of module: ' . a:kind
   endif
   if a:0 == 0
-    return copy(s:modules[a:kind])
+    return values(s:modules[a:kind])
   endif
   let name = a:1
   if !has_key(s:modules[a:kind], name)
