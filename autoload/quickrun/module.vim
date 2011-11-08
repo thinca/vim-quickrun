@@ -157,7 +157,7 @@ function! s:validate_module(module)
     throw 'quickrun: A module must have a "name" attribute.'
   endif
   if !has_key(s:modules, a:module.kind)
-    throw 'quickrun: Unknown kind of module: ' . a:kind
+    throw 'quickrun: Unknown kind of module: ' . a:module.kind
   endif
 endfunction
 
