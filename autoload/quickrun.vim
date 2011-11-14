@@ -328,6 +328,7 @@ endfunction
 
 function! s:Session.run()
   call self.setup()
+  call self.invoke_hook('ready')
   let exit_code = 1
   try
     let exit_code = self.runner.run(self.commands, self.config.input, self)
@@ -356,7 +357,9 @@ function! s:Session.output(data)
         let data = s:V.iconv(data, from, to)
       endif
     endif
-    call self.outputter.output(data, self)
+    let context = {'data': data}
+    call self.invoke_hook('output', context)
+    call self.outputter.output(context.data, self)
   endif
 endfunction
 
@@ -365,6 +368,12 @@ function! s:Session.finish(...)
     let self.exit_code = a:0 ? a:1 : 0
     call self.outputter.finish(self)
     call self.sweep()
+    if self.exit_code == 0
+      call self.invoke_hook('success')
+    else
+      call self.invoke_hook('failure', {'exit_code': self.exit_code})
+    endif
+    call self.invoke_hook('finish')
   endif
 endfunction
 
