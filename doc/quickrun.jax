@@ -727,12 +727,16 @@ hook.config.enable			*quickrun-hook.config.enable*
 
 - "output"
   runner から出力を受け取り、outputter へ渡す前です。
+  コンテキスト ~
+  "data": 出力データ
 
 - "success"
   実行時が正常に完了したときです。
 
 - "failure"
   実行時にエラーが発生した時。
+  コンテキスト ~
+  "exit_code": 終了コード
 
 - "finish"
   実行が完了した時です。success/failure の後に、成功か失敗かに関わらず呼ばれま
