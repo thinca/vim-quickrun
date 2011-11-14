@@ -273,6 +273,8 @@ function! s:Session.setup()
     if has_key(self, 'exit_code')
       call remove(self, 'exit_code')
     endif
+    let self.hooks = map(quickrun#module#get('hook'),
+    \                    'self.make_module("hook", v:val.name)')
     let self.runner = self.make_module('runner', self.config.runner)
     let self.outputter = self.make_module('outputter', self.config.outputter)
 
@@ -474,6 +476,17 @@ function! s:Session.sweep()
   if has_key(self, 'runner')
     call self.runner.sweep()
   endif
+endfunction
+
+function! s:Session.invoke_hook(point, ...)
+  let context = a:0 ? a:1 : {}
+  let func = 'on_' . a:point
+  let pri = printf('v:val.priority(%s)', string(a:point))
+  for hook in s:V.Data.List.sort_by(self.hooks, pri)
+    if hook.config.enable && has_key(hook, func)
+      call hook[func](self, context)
+    endif
+  endfor
 endfunction
 
 
