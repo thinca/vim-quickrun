@@ -959,6 +959,7 @@ endfunction
 
 call s:register_defaults('runner')
 call s:register_defaults('outputter')
+call s:register_defaults('hook')
 
 
 let &cpo = s:save_cpo
