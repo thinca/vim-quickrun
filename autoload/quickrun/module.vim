@@ -7,11 +7,7 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-let s:modules = {
-\   'runner': {},
-\   'outputter': {},
-\   'hook': {},
-\ }
+let s:modules = {}
 
 " Templates.  {{{1
 let s:templates = {}
@@ -115,6 +111,9 @@ function! quickrun#module#register(module, ...)
   let overwrite = a:0 && a:1
   let kind = a:module.kind
   let name = a:module.name
+  if !has_key(s:modules, kind)
+    let s:modules[kind] = {}
+  endif
   if overwrite || !quickrun#module#exists(kind, name)
     let module = s:deepextend(deepcopy(s:templates[kind]), a:module)
     let s:modules[kind][name] = module
@@ -163,9 +162,6 @@ function! s:validate_module(module)
   endif
   if !has_key(a:module, 'name')
     throw 'quickrun: A module must have a "name" attribute.'
-  endif
-  if !has_key(s:modules, a:module.kind)
-    throw 'quickrun: Unknown kind of module: ' . a:module.kind
   endif
 endfunction
 
