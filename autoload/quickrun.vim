@@ -583,6 +583,7 @@ endfunction
 function! quickrun#complete(lead, cmd, pos)
   let line = split(a:cmd[:a:pos - 1], '', 1)
   let head = line[-1]
+  let kinds = quickrun#module#get_kinds()
   if 2 <= len(line) && line[-2] =~# '^-'
     " a value of option.
     let opt = line[-2][1:]
@@ -592,7 +593,7 @@ function! quickrun#complete(lead, cmd, pos)
         let list = ['0', '1']
       elseif opt ==# 'mode'
         let list = ['n', 'v']
-      elseif opt ==# 'runner' || opt ==# 'outputter'
+      elseif 0 <= index(kinds, opt)
         let list = map(filter(quickrun#module#get(opt),
         \                     'v:val.available()'), 'v:val.name')
       endif
@@ -605,7 +606,7 @@ function! quickrun#complete(lead, cmd, pos)
     \ 'command', 'exec', 'cmdopt', 'args', 'tempfile', 'shebang', 'eval',
     \ 'mode', 'output_encode', 'eval_template']
     let mod_options = {}
-    for kind in ['runner', 'outputter']
+    for kind in kinds
       for module in filter(quickrun#module#get(kind), 'v:val.available()')
         for opt in keys(module.config)
           let mod_options[opt] = 1
