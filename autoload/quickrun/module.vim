@@ -156,6 +156,10 @@ function! quickrun#module#get(kind, ...)
   return s:modules[a:kind][name]
 endfunction
 
+function! quickrun#module#get_kinds()
+  return keys(s:modules)
+endfunction
+
 function! s:validate_module(module)
   if !has_key(a:module, 'kind')
     throw 'quickrun: A module must have a "kind" attribute.'
