@@ -485,6 +485,16 @@ function! s:Session.sweep()
   if has_key(self, 'runner')
     call self.runner.sweep()
   endif
+  if has_key(self, 'outputter')
+    call self.outputter.sweep()
+  endif
+  if has_key(self, 'hooks')
+    for hook in self.hooks
+      if hook.config.enable
+        call hook.sweep()
+      endif
+    endfor
+  endif
 endfunction
 
 function! s:Session.invoke_hook(point, ...)

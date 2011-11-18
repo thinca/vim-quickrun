@@ -71,13 +71,13 @@ function! s:module.parse_option(argline)
 endfunction
 function! s:module.init(session)
 endfunction
+function! s:module.sweep()
+endfunction
 
 " Template of runner.  {{{2
 let s:templates.runner = deepcopy(s:module)
 function! s:templates.runner.run(commands, input, session)
   throw 'quickrun: A runner should implements run()'
-endfunction
-function! s:templates.runner.sweep()
 endfunction
 function! s:templates.runner.shellescape(str)
   if s:is_cmd_exe()

@@ -666,6 +666,10 @@ module.validate()			*quickrun-module.validate()*
 module.init({session})			*quickrun-module.init()*
 	モジュールの初期化時に呼び出されます。
 
+module.sweep()				*quickrun-module.sweep()*
+	実行の完了、もしくは強制終了時に呼び出されます。実行中のデータの後始末
+	を行います。
+
 ------------------------------------------------------------------------------
 RUNNER の属性				*quickrun-runner-attributes*
 
@@ -674,10 +678,6 @@ runner.run({commands}, {input}, {session})	*quickrun-runner.run()*
 	トを実行 し、{exit-code} を返します。{input} は標準入力データです。
 	その場で実行を完了できない時は、|quickrun-session.continue()| を使いま
 	す。その場合、|quickrun-session.finish()| を呼び出す必要があります。
-
-runner.sweep()				*quickrun-runner.sweep()*
-	実行の完了、もしくは強制終了時に呼び出されます。実行中のデータの後始末
-	を行います。
 
 ------------------------------------------------------------------------------
 OUTPUTTER の属性			*quickrun-outputter-attributes*
