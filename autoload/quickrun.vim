@@ -277,6 +277,7 @@ function! s:Session.setup()
     \                    'self.make_module("hook", v:val.name)')
     let self.runner = self.make_module('runner', self.config.runner)
     let self.outputter = self.make_module('outputter', self.config.outputter)
+    call filter(self.hooks, 'v:val.config.enable')
 
     let source_name = self.get_source_name()
     let exec = get(self.config, 'exec', '')
@@ -490,9 +491,7 @@ function! s:Session.sweep()
   endif
   if has_key(self, 'hooks')
     for hook in self.hooks
-      if hook.config.enable
-        call hook.sweep()
-      endif
+      call hook.sweep()
     endfor
   endif
 endfunction
@@ -502,7 +501,7 @@ function! s:Session.invoke_hook(point, ...)
   let func = 'on_' . a:point
   let pri = printf('v:val.priority(%s)', string(a:point))
   for hook in s:V.Data.List.sort_by(self.hooks, pri)
-    if hook.config.enable && has_key(hook, func)
+    if has_key(hook, func)
       call hook[func](self, context)
     endif
   endfor
