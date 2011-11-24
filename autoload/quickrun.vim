@@ -24,7 +24,6 @@ let g:quickrun#default_config = {
 \   'runner': 'system',
 \   'cmdopt': '',
 \   'args': '',
-\   'output_encode': '&fileencoding',
 \   'tempfile'  : '%{tempname()}',
 \   'exec': '%c %o %s %a',
 \   'eval': 0,
@@ -115,25 +114,25 @@ let g:quickrun#default_config = {
 \   'exec': ['8g %o -o %s:p:r.8 %s', '8l -o %s:p:r %s:p:r.8',
 \            '%s:p:r %a', 'rm -f %s:p:r'],
 \   'tempfile': '%{tempname()}.go',
-\   'output_encode': 'utf-8',
+\   'hook/output_encode/encoding': 'utf-8',
 \ },
 \ 'go/386/win': {
 \   'exec': ['8g %o -o %s:p:r.8 %s', '8l -o %s:p:r.exe %s:p:r.8',
 \            '%s:p:r.exe %a', 'del /F %s:p:r.exe'],
 \   'tempfile': '%{tempname()}.go',
-\   'output_encode': 'utf-8',
+\   'hook/output_encode/encoding': 'utf-8',
 \ },
 \ 'go/amd64': {
 \   'exec': ['6g %o -o %s:p:r.6 %s', '6l -o %s:p:r %s:p:r.6',
 \            '%s:p:r %a', 'rm -f %s:p:r'],
 \   'tempfile': '%{tempname()}.go',
-\   'output_encode': 'utf-8',
+\   'hook/output_encode/encoding': 'utf-8',
 \ },
 \ 'go/arm': {
 \   'exec': ['5g %o -o %s:p:r.5 %s', '5l -o %s:p:r %s:p:r.5',
 \            '%s:p:r %a', 'rm -f %s:p:r'],
 \   'tempfile': '%{tempname()}.go',
-\   'output_encode': 'utf-8',
+\   'hook/output_encode/encoding': 'utf-8',
 \ },
 \ 'groovy': {
 \   'cmdopt': '-c %{&fenc==#""?&enc:&fenc}'
@@ -146,7 +145,7 @@ let g:quickrun#default_config = {
 \ 'io': {},
 \ 'java': {
 \   'exec': ['javac %o %s', '%c %s:t:r %a', ':call delete("%S:t:r.class")'],
-\   'output_encode': '&termencoding',
+\   'hook/output_encode/encoding': '&termencoding',
 \ },
 \ 'javascript': {
 \   'type': executable('js') ? 'javascript/spidermonkey':
@@ -230,7 +229,7 @@ let g:quickrun#default_config = {
 \ },
 \ 'ruby': {'eval_template': " p proc {\n%s\n}.call"},
 \ 'scala': {
-\   'output_encode': '&termencoding',
+\   'hook/output_encode/encoding': '&termencoding',
 \ },
 \ 'scheme': {
 \   'type': executable('gosh')     ? 'scheme/gauche':
@@ -348,16 +347,6 @@ endfunction
 function! s:Session.output(data)
   if a:data !=# ''
     let data = a:data
-    if get(self.config, 'output_encode', '') !=# ''
-      let enc = split(self.config.output_encode, '[^[:alnum:]-_]')
-      if len(enc) == 1
-        let enc += [&encoding]
-      endif
-      if len(enc) == 2
-        let [from, to] = enc
-        let data = s:V.iconv(data, from, to)
-      endif
-    endif
     let context = {'data': data}
     call self.invoke_hook('output', context)
     call self.outputter.output(context.data, self)
@@ -613,7 +602,7 @@ function! quickrun#complete(lead, cmd, pos)
     " a name of option.
     let list = ['type', 'src', 'srcfile', 'input', 'runner', 'outputter',
     \ 'command', 'exec', 'cmdopt', 'args', 'tempfile', 'shebang', 'eval',
-    \ 'mode', 'output_encode', 'eval_template']
+    \ 'mode', 'eval_template']
     let mod_options = {}
     for kind in kinds
       for module in filter(quickrun#module#get(kind), 'v:val.available()')
@@ -892,7 +881,7 @@ function! s:normalize(config)
     endif
   endif
 
-  for opt in ['cmdopt', 'args', 'output_encode']
+  for opt in ['cmdopt', 'args']
     let config[opt] = quickrun#expand(config[opt])
   endfor
   return config
