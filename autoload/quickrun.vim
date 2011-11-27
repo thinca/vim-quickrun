@@ -97,6 +97,26 @@ let g:quickrun#default_config = {
 \   'command': 'clj',
 \   'exec': '%c %s',
 \ },
+\ 'd': {
+\   'type':
+\     executable('rdmd')           ? 'd/rdmd' :
+\     executable('ldc')            ? 'd/ldc' :
+\     executable('gdc')            ? 'd/gdc' : '',
+\ },
+\ 'd/rdmd': {
+\   'command': 'rdmd',
+\   'tempfile': '%{tempname()}.d',
+\ },
+\ 'd/ldc': {
+\   'command': 'ldc',
+\   'exec': ['%c %o %s -o %s:p:r', '%s:p:r %a', 'rm -f %s:p:r'],
+\   'tempfile': '%{tempname()}.d',
+\ },
+\ 'd/gdc': {
+\   'command': 'gdc',
+\   'exec': ['%c %o %s -o %s:p:r', '%s:p:r %a', 'rm -f %s:p:r'],
+\   'tempfile': '%{tempname()}.d',
+\ },
 \ 'dosbatch': {
 \   'command': '',
 \   'exec': 'call %s %a',
