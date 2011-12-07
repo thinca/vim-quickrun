@@ -948,23 +948,23 @@ endfunction
 
 
 " Register the default modules.  {{{1
-function! s:register_defaults(kind)
-  let pat = 'autoload/quickrun/' . a:kind . '/*.vim'
-  for name in map(split(globpath(&runtimepath, pat), "\n"),
-  \               'fnamemodify(v:val, ":t:r")')
-    try
-      let module = quickrun#{a:kind}#{name}#new()
-      let module.kind = a:kind
-      let module.name = name
-      call quickrun#module#register(module)
-    catch /:E\%(117\|716\):/
-    endtry
+function! s:register_defaults(kinds)
+  for kind in a:kinds
+    let pat = 'autoload/quickrun/' . kind . '/*.vim'
+    for name in map(split(globpath(&runtimepath, pat), "\n"),
+    \               'fnamemodify(v:val, ":t:r")')
+      try
+        let module = quickrun#{kind}#{name}#new()
+        let module.kind = kind
+        let module.name = name
+        call quickrun#module#register(module)
+      catch /:E\%(117\|716\):/
+      endtry
+    endfor
   endfor
 endfunction
 
-call s:register_defaults('runner')
-call s:register_defaults('outputter')
-call s:register_defaults('hook')
+call s:register_defaults(['runner', 'outputter', 'hook'])
 
 
 let &cpo = s:save_cpo
