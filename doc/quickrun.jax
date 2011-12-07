@@ -23,12 +23,17 @@ License: クリエイティブ・コモンズの表示 2.1 日本ライセンス
 モジュール			|quickrun-module|
   RUNNER			  |quickrun-module-runner|
   OUTPUTTER			  |quickrun-module-outputter|
+  HOOK				  |quickrun-module-hook|
 モジュールの作成		|quickrun-create-module|
   モジュールの登録		  |quickrun-register-module|
   セッション			  |quickrun-session|
   共通の属性			  |quickrun-module-attributes|
   RUNNER の属性			  |quickrun-runner-attributes|
   OUTPUTTER の属性		  |quickrun-outputter-attributes|
+  HOOK の属性			  |quickrun-hook-attributes|
+フック				|quickrun-hook|
+  フック関数			  |quickrun-hook-function|
+  フックポイント		  |quickrun-hook-point|
 設定例				|quickrun-examples|
 既知の問題			|quickrun-known-issues|
 更新履歴			|quickrun-changelog|
@@ -138,6 +143,9 @@ quickrun#module#get({kind} [, {name}])		*quickrun#module#get()*
 	登録済みのモジュールを取得します。{name} を省略した場合、登録された全
 	ての {kind} モジュールを含む辞書を返します。{name} で指定した辞書が登
 	録されていなかった場合は空の辞書を返します。
+
+quickrun#module#get_kinds()			*quickrun#module#get_kinds()*
+	モジュールの種類の名前のリストを取得します。
 
 quickrun#register_runner({name}, {runner})	*quickrun#register_runner()*
 	quickrun#module#register("runner", {name}, {runner}) の省略形です。
@@ -369,6 +377,7 @@ quickrun のいくつかの部分はモジュール化されています。モ�
 
 - runner	(|quickrun-module-runner|)
 - outputter	(|quickrun-module-outputter|)
+- hook		(|quickrun-module-hook|)
 
 モジュールは独自のオプションを持っている場合があります。モジュールのオプション
 は、通常のオプションか、モジュール名の後ろで指定します。
@@ -553,6 +562,12 @@ outputter は結果の出力を行うモジュールです。
   出力を行いません。
 
 
+------------------------------------------------------------------------------
+HOOK						*quickrun-module-hook*
+
+hook は特定のポイントで追加の処理を行うモジュールです。
+
+
 
 ==============================================================================
 モジュールの作成				*quickrun-create-module*
@@ -578,6 +593,11 @@ quickrun では 1 回の実行をセッション({session})として管理して
 
 session.make_module({kind}, {line})	*quickrun-session.make_module()*
 	セッション中で使えるようにモジュールを生成します。
+
+session.invoke_hook({point} [, {context}]) *quickrun-session.invoke_hook()*
+	フックを起動します。{context} には基本的には辞書を指定します。指定した
+	値がそのままフック関数に渡されます。指定しなかった場合は空の辞書が使わ
+	れます。
 
 session.output({data})			*quickrun-session.output()*
 	runner が出力を行う際に呼び出します。{data} はその場で outputter へ渡
@@ -646,6 +666,10 @@ module.validate()			*quickrun-module.validate()*
 module.init({session})			*quickrun-module.init()*
 	モジュールの初期化時に呼び出されます。
 
+module.sweep()				*quickrun-module.sweep()*
+	実行の完了、もしくは強制終了時に呼び出されます。実行中のデータの後始末
+	を行います。
+
 ------------------------------------------------------------------------------
 RUNNER の属性				*quickrun-runner-attributes*
 
@@ -654,10 +678,6 @@ runner.run({commands}, {input}, {session})	*quickrun-runner.run()*
 	トを実行 し、{exit-code} を返します。{input} は標準入力データです。
 	その場で実行を完了できない時は、|quickrun-session.continue()| を使いま
 	す。その場合、|quickrun-session.finish()| を呼び出す必要があります。
-
-runner.sweep()				*quickrun-runner.sweep()*
-	実行の完了、もしくは強制終了時に呼び出されます。実行中のデータの後始末
-	を行います。
 
 ------------------------------------------------------------------------------
 OUTPUTTER の属性			*quickrun-outputter-attributes*
@@ -668,6 +688,65 @@ outputter.output({data}, {session})	*quickrun-outputter.output()*
 outputter.finish({session})		*quickrun-outputter.finish()*
 	実行の終了時に呼び出されます。終了処理を行います。
 	また、|quickrun-session.exit_code| が参照できます。
+
+------------------------------------------------------------------------------
+HOOK の属性				*quickrun-hook-attributes*
+
+hook.on_{hook-point}({session})		*quickrun-hook.on_hook-point()*
+	フック時に呼ばれる関数です。詳細は |quickrun-hook| を参照してくださ
+	い。
+
+hook.priority({hook-point})		*quickrun-hook.priority*
+	フックの実行順序の優先度を返します。数値が小さいほど先に実行されます。
+	デフォルトは常に 0 を返します。
+
+hook.config.enable			*quickrun-hook.config.enable*
+	フックが有効かどうかです。デフォルトは 1 (有効) です。
+	これは主にユーザが設定するためにあります。
+
+
+
+==============================================================================
+フック						*quickrun-hook*
+
+フック機能を使うことで実行の特定のポイントで任意のコードを実行できます。
+
+------------------------------------------------------------------------------
+フック関数					*quickrun-hook-function*
+
+フックの処理はフック関数で行います。全てのフック関数は、引数として {session}
+(|quickrun-session|) と {context} を受け取ります。{context} は通常は辞書で、そ
+のフックに関係した値が格納されています。フック関数では、単純に処理をする以外に
+も {session} やその中に含まれている {config}、{context} を書き換えることが可能
+です。
+
+------------------------------------------------------------------------------
+フックポイント					*quickrun-hook-point*
+
+標準では以下のフックポイントが利用できます。
+
+- "ready"
+  全てのオプションの設定が終わって、最初のコマンドが実行される前です。
+
+- "output"
+  runner から出力を受け取り、outputter へ渡す前です。
+  コンテキスト ~
+  "data": 出力データ
+
+- "success"
+  実行時が正常に完了したときです。
+
+- "failure"
+  実行時にエラーが発生した時。
+  コンテキスト ~
+  "exit_code": 終了コード
+
+- "finish"
+  実行が完了した時です。success/failure の後に、成功か失敗かに関わらず呼ばれま
+  す。
+
+これら以外に、モジュールが |quickrun-session.invoke_hook()| を使うことで任意の
+タイミングでフックを発生させることができます。
 
 
 

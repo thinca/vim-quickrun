@@ -273,8 +273,11 @@ function! s:Session.setup()
     if has_key(self, 'exit_code')
       call remove(self, 'exit_code')
     endif
+    let self.hooks = map(quickrun#module#get('hook'),
+    \                    'self.make_module("hook", v:val.name)')
     let self.runner = self.make_module('runner', self.config.runner)
     let self.outputter = self.make_module('outputter', self.config.outputter)
+    call filter(self.hooks, 'v:val.config.enable')
 
     let source_name = self.get_source_name()
     let exec = get(self.config, 'exec', '')
@@ -326,6 +329,7 @@ endfunction
 
 function! s:Session.run()
   call self.setup()
+  call self.invoke_hook('ready')
   let exit_code = 1
   try
     let exit_code = self.runner.run(self.commands, self.config.input, self)
@@ -354,7 +358,9 @@ function! s:Session.output(data)
         let data = s:V.iconv(data, from, to)
       endif
     endif
-    call self.outputter.output(data, self)
+    let context = {'data': data}
+    call self.invoke_hook('output', context)
+    call self.outputter.output(context.data, self)
   endif
 endfunction
 
@@ -363,6 +369,12 @@ function! s:Session.finish(...)
     let self.exit_code = a:0 ? a:1 : 0
     call self.outputter.finish(self)
     call self.sweep()
+    if self.exit_code == 0
+      call self.invoke_hook('success')
+    else
+      call self.invoke_hook('failure', {'exit_code': self.exit_code})
+    endif
+    call self.invoke_hook('finish')
   endif
 endfunction
 
@@ -474,6 +486,25 @@ function! s:Session.sweep()
   if has_key(self, 'runner')
     call self.runner.sweep()
   endif
+  if has_key(self, 'outputter')
+    call self.outputter.sweep()
+  endif
+  if has_key(self, 'hooks')
+    for hook in self.hooks
+      call hook.sweep()
+    endfor
+  endif
+endfunction
+
+function! s:Session.invoke_hook(point, ...)
+  let context = a:0 ? a:1 : {}
+  let func = 'on_' . a:point
+  let pri = printf('v:val.priority(%s)', string(a:point))
+  for hook in s:V.Data.List.sort_by(self.hooks, pri)
+    if has_key(hook, func)
+      call hook[func](self, context)
+    endif
+  endfor
 endfunction
 
 
@@ -561,6 +592,7 @@ endfunction
 function! quickrun#complete(lead, cmd, pos)
   let line = split(a:cmd[:a:pos - 1], '', 1)
   let head = line[-1]
+  let kinds = quickrun#module#get_kinds()
   if 2 <= len(line) && line[-2] =~# '^-'
     " a value of option.
     let opt = line[-2][1:]
@@ -570,7 +602,7 @@ function! quickrun#complete(lead, cmd, pos)
         let list = ['0', '1']
       elseif opt ==# 'mode'
         let list = ['n', 'v']
-      elseif opt ==# 'runner' || opt ==# 'outputter'
+      elseif 0 <= index(kinds, opt)
         let list = map(filter(quickrun#module#get(opt),
         \                     'v:val.available()'), 'v:val.name')
       endif
@@ -583,7 +615,7 @@ function! quickrun#complete(lead, cmd, pos)
     \ 'command', 'exec', 'cmdopt', 'args', 'tempfile', 'shebang', 'eval',
     \ 'mode', 'output_encode', 'eval_template']
     let mod_options = {}
-    for kind in ['runner', 'outputter']
+    for kind in kinds
       for module in filter(quickrun#module#get(kind), 'v:val.available()')
         for opt in keys(module.config)
           let mod_options[opt] = 1
@@ -946,6 +978,7 @@ endfunction
 
 call s:register_defaults('runner')
 call s:register_defaults('outputter')
+call s:register_defaults('hook')
 
 
 let &cpo = s:save_cpo

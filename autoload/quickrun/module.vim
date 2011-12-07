@@ -7,10 +7,7 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-let s:modules = {
-\   'runner': {},
-\   'outputter': {},
-\ }
+let s:modules = {}
 
 " Templates.  {{{1
 let s:templates = {}
@@ -74,13 +71,13 @@ function! s:module.parse_option(argline)
 endfunction
 function! s:module.init(session)
 endfunction
+function! s:module.sweep()
+endfunction
 
 " Template of runner.  {{{2
 let s:templates.runner = deepcopy(s:module)
 function! s:templates.runner.run(commands, input, session)
   throw 'quickrun: A runner should implements run()'
-endfunction
-function! s:templates.runner.sweep()
 endfunction
 function! s:templates.runner.shellescape(str)
   if s:is_cmd_exe()
@@ -100,6 +97,13 @@ endfunction
 function! s:templates.outputter.finish(session)
 endfunction
 
+" Template of hook.  {{{2
+let s:templates.hook = deepcopy(s:module)
+function! s:templates.hook.priority(point)
+  return 0
+endfunction
+let s:templates.hook.config.enable = 1
+
 
 " functions.  {{{1
 function! quickrun#module#register(module, ...)
@@ -107,8 +111,11 @@ function! quickrun#module#register(module, ...)
   let overwrite = a:0 && a:1
   let kind = a:module.kind
   let name = a:module.name
+  if !has_key(s:modules, kind)
+    let s:modules[kind] = {}
+  endif
   if overwrite || !quickrun#module#exists(kind, name)
-    let module = extend(deepcopy(s:templates[kind]), a:module)
+    let module = s:deepextend(deepcopy(s:templates[kind]), a:module)
     let s:modules[kind][name] = module
   endif
 endfunction
@@ -149,6 +156,10 @@ function! quickrun#module#get(kind, ...)
   return s:modules[a:kind][name]
 endfunction
 
+function! quickrun#module#get_kinds()
+  return keys(s:modules)
+endfunction
+
 function! s:validate_module(module)
   if !has_key(a:module, 'kind')
     throw 'quickrun: A module must have a "kind" attribute.'
@@ -156,9 +167,37 @@ function! s:validate_module(module)
   if !has_key(a:module, 'name')
     throw 'quickrun: A module must have a "name" attribute.'
   endif
-  if !has_key(s:modules, a:module.kind)
-    throw 'quickrun: Unknown kind of module: ' . a:kind
+endfunction
+
+let s:list_t = type([])
+let s:dict_t = type({})
+function! s:deepextend(a, b)
+  let type_a = type(a:a)
+  if type_a != type(a:b)
+    throw ''
   endif
+  if type_a == s:list_t
+    call extend(a:a, a:b)
+  elseif type_a == s:dict_t
+    for [k, V] in items(a:b)
+      let copied = 0
+      if has_key(a:a, k)
+        let type_k = type(a:a[k])
+        if type_k == type(V) &&
+        \  (type_k == s:list_t || type_k == s:dict_t)
+          call s:deepextend(a:a[k], V)
+          let copied = 1
+        endif
+      endif
+      if !copied
+        let a:a[k] = deepcopy(V)
+      endif
+      unlet V
+    endfor
+  else
+    throw ''
+  endif
+  return a:a
 endfunction
 
 function! s:is_cmd_exe()
