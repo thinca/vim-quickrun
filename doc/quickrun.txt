@@ -23,12 +23,17 @@ SETTINGS			|quickrun-settings|
 MODULE				|quickrun-module|
   RUNNER			  |quickrun-module-runner|
   OUTPUTTER			  |quickrun-module-outputter|
+  HOOK				  |quickrun-module-hook|
 CREATE MODULE			|quickrun-create-module|
   REGISTER MODULE		  |quickrun-register-module|
   SESSION			  |quickrun-session|
   MODULE COMMON ATTRIBUTES	  |quickrun-module-attributes|
   RUNNER ATTRIBUTES		  |quickrun-runner-attributes|
   OUTPUTTER ATTRIBUTES		  |quickrun-outputter-attributes|
+  HOOK ATTRIBUTES		  |quickrun-hook-attributes|
+HOOK				|quickrun-hook|
+  HOOK FUNCTION			  |quickrun-hook-function|
+  HOOK POINT			  |quickrun-hook-point|
 SETTING EXAMPLES		|quickrun-examples|
 KNOWN ISSUES			|quickrun-known-issues|
 CHANGELOG			|quickrun-changelog|
@@ -133,13 +138,16 @@ quickrun#module#unregister({module})		*quickrun#module#unregister()*
 quickrun#module#unregister({kind}, {name})
 	Unregisters a module.
 
+quickrun#module#exists({kind}, {name})		*quickrun#module#exists()*
+	Checks a module is registered.
+
 quickrun#module#get({kind} [, {name}])		*quickrun#module#get()*
 	Returns the registered module.  Returns the all registered {kind}
 	modules by |Dictionary| if you skipped {name}.  Returns a empty
 	dictionary if the module named {name} had not registered.
 
-quickrun#module#exists({kind}, {name})		*quickrun#module#exists()*
-	Checks a module is registered.
+quickrun#module#get_kinds()			*quickrun#module#get_kinds()*
+	Returns a list of name of kind of module.
 
 						*quickrun#session()*
 quickrun#session({key} [, {func-name} [, {args} ...]])
@@ -566,6 +574,12 @@ available by default.
   No outputs.
 
 
+------------------------------------------------------------------------------
+HOOK						*quickrun-module-hook*
+
+Hook is a module to do additional process in specific points.
+
+
 
 ==============================================================================
 CREATE MODULE				*quickrun-create-module*
@@ -591,6 +605,9 @@ functions of a module.
 
 session.make_module({kind}, {line})	*quickrun-session.make_module()*
 	Creates a module to use it in a session.
+
+session.invoke_hook({point} [, {context}]) *quickrun-session.invoke_hook()*
+	TODO:
 
 session.output({data})			*quickrun-session.output()*
 	Calls when the runner outputs the result. Gives the {data} to
@@ -661,6 +678,9 @@ module.validate()			*quickrun-module.validate()*
 module.init({session})			*quickrun-module.init()*
 	This is called in module initialization.
 
+module.sweep()				*quickrun-module.sweep()*
+	TODO:
+
 ------------------------------------------------------------------------------
 RUNNER ATTRIBUTES				*quickrun-runner-attributes*
 
@@ -684,6 +704,45 @@ outputter.output({data}, {session})	*quickrun-outputter.output()*
 outputter.finish({session})		*quickrun-outputter.finish()*
 	Called in termination for finishing it. You can refer
 	|quickrun-session.exit_code|.
+
+------------------------------------------------------------------------------
+HOOK ATTRIBUTES				*quickrun-hook-attributes*
+
+hook.on_{hook-point}({session})		*quickrun-hook.on_hook-point()*
+	TODO:
+
+hook.priority({hook-point})		*quickrun-hook.priority*
+	TODO:
+
+hook.config.enable			*quickrun-hook.config.enable*
+	TODO:
+
+
+
+==============================================================================
+HOOK						*quickrun-hook*
+
+TODO:
+
+------------------------------------------------------------------------------
+HOOK FUNCTION					*quickrun-hook-function*
+
+TODO:
+
+------------------------------------------------------------------------------
+HOOK POINT					*quickrun-hook-point*
+
+TODO:
+
+- "ready"
+
+- "output"
+
+- "success"
+
+- "failure"
+
+- "finish"
 
 
 
