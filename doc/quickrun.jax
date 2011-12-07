@@ -147,14 +147,6 @@ quickrun#module#get({kind} [, {name}])		*quickrun#module#get()*
 quickrun#module#get_kinds()			*quickrun#module#get_kinds()*
 	モジュールの種類の名前のリストを取得します。
 
-quickrun#register_runner({name}, {runner})	*quickrun#register_runner()*
-	quickrun#module#register("runner", {name}, {runner}) の省略形です。
-
-					       *quickrun#register_outputter()*
-quickrun#register_outputter({name}, {outputter})
-	quickrun#module#register("outputter", {name}, {outputter}) の省略形で
-	す。
-
 						*quickrun#session()*
 quickrun#session({key} [, {func-name} [, {args} ...]])
 	モジュール内で使用されます。

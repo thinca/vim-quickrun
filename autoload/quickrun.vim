@@ -947,20 +947,6 @@ endfunction
 
 
 
-" Module system.  {{{1
-function! quickrun#register_runner(name, runner)
-  let a:runner.kind = 'runner'
-  let a:runner.name = a:name
-  return quickrun#module#register(a:runner)
-endfunction
-
-function! quickrun#register_outputter(name, outputter)
-  let a:outputter.kind = 'outputter'
-  let a:outputter.name = a:name
-  return quickrun#module#register(a:outputter)
-endfunction
-
-
 " Register the default modules.  {{{1
 function! s:register_defaults(kind)
   let pat = 'autoload/quickrun/' . a:kind . '/*.vim'
