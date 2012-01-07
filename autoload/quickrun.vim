@@ -67,11 +67,17 @@ let g:quickrun#default_config = {
 \ 'cpp': {
 \   'type':
 \     s:is_win && executable('cl') ? 'cpp/vc'  :
+\     executable('clang++')        ? 'cpp/clang++'  :
 \     executable('g++')            ? 'cpp/g++' : '',
 \ },
 \ 'cpp/C': {
 \   'command': 'C',
 \   'exec': '%c %o -p %s',
+\ },
+\ 'cpp/clang++': {
+\   'command': 'clang++',
+\   'exec': ['%c %o %s -o %s:p:r', '%s:p:r %a', 'rm -f %s:p:r'],
+\   'tempfile': '%{tempname()}.cpp',
 \ },
 \ 'cpp/g++': {
 \   'command': 'g++',
