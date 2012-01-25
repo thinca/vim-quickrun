@@ -135,6 +135,11 @@ let g:quickrun#default_config = {
 \   'command': 'erb',
 \   'exec': '%c %o -T - %s %a',
 \ },
+\ 'rust': {
+\   'command': 'rustc',
+\   'exec': ['%c %o %s -o %s:p:r', '%s:p:r %a', 'rm -f %s:p:r'],
+\   'tempfile': '%{tempname()}.rs',
+\ },
 \ 'go': {
 \   'type':
 \     $GOARCH ==# '386'   ? (s:is_win ? 'go/386/win' : 'go/386'):
