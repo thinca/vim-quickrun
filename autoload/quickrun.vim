@@ -361,6 +361,13 @@ function! s:Session.normalize(config)
     endif
   endif
 
+  if !has_key(config, 'srcfile')
+    let fname = quickrun#expand(config.tempfile)
+    call self.tempname(fname)
+    call writefile(split(config.src, "\n", 1), fname, 'b')
+    let config.srcfile = fname
+  endif
+
   for opt in ['cmdopt', 'args']
     let config[opt] = quickrun#expand(config[opt])
   endfor
@@ -378,7 +385,7 @@ function! s:Session.setup()
     let self.outputter = self.make_module('outputter', self.config.outputter)
     call filter(self.hooks, 'v:val.config.enable')
 
-    let source_name = self.get_source_name()
+    let source_name = self.config.srcfile
     let exec = get(self.config, 'exec', '')
     let commands = type(exec) == type([]) ? copy(exec) : [exec]
     call filter(map(commands, 'self.build_command(source_name, v:val)'),
@@ -512,22 +519,6 @@ function! s:Session.build_command(source_name, tmpl)
     let result .= value
   endwhile
   return substitute(quickrun#expand(result), '[\r\n]\+', ' ', 'g')
-endfunction
-
-" Return the source file name.
-" Output to a temporary file if self.config.src is string.
-function! s:Session.get_source_name()
-  if !has_key(self.config, 'srcfile')
-    if exists('self.config.src')
-      let fname = quickrun#expand(self.config.tempfile)
-      call self.tempname(fname)
-      call writefile(split(self.config.src, "\n", 1), fname, 'b')
-      let self.config.srcfile = fname
-    else
-      let self.config.srcfile = expand('%:p')
-    endif
-  endif
-  return self.config.srcfile
 endfunction
 
 function! s:Session.tempname(...)
