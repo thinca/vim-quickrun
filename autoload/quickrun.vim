@@ -7,7 +7,7 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-let s:V = vital#of('quickrun').load('Data.List')
+let s:V = vital#of('quickrun').load('Data.List', 'System.File')
 unlet! g:quickrun#V
 let g:quickrun#V = s:V
 lockvar! g:quickrun#V
@@ -419,7 +419,7 @@ function! s:Session.get_source_name()
   if !has_key(self.config, 'srcfile')
     if exists('self.config.src')
       let fname = quickrun#expand(self.config.tempfile)
-      let self._temp_source = fname
+      call self.tempname(fname)
       call writefile(split(self.config.src, "\n", 1), fname, 'b')
       let self.config.srcfile = fname
     else
@@ -429,15 +429,27 @@ function! s:Session.get_source_name()
   return self.config.srcfile
 endfunction
 
+function! s:Session.tempname(...)
+  let name = a:0 ? a:1 : tempname()
+  if !has_key(self, '_temp_names')
+    let self._temp_names = []
+  endif
+  call add(self._temp_names, name)
+  return name
+endfunction
+
 " Sweep the session.
 function! s:Session.sweep()
   " Remove temporary files.
-  for file in filter(keys(self), 'v:val =~# "^_temp"')
-    if filewritable(self[file])
-      call delete(self[file])
-    endif
-    call remove(self, file)
-  endfor
+  if has_key(self, '_temp_names')
+    for name in self._temp_names
+      if filewritable(name)
+        call delete(name)
+      elseif isdirectory(name)
+        call s:V.System.File.rmdir(name)
+      endif
+    endfor
+  endif
 
   " Sweep the execution of vimproc.
   if has_key(self, '_vimproc')
