@@ -613,7 +613,7 @@ session.sweep()				*quickrun-session.sweep()*
 	- "_temp_" で始まる属性があった場合、その値をファイル名としてファイル
 	  を削除します。
 	- "_vimproc" という属性があった場合、その |vimproc| を強制終了します。
-	また、|quickrun-runner.sweep()| を呼び出します。
+	また、|quickrun-module.sweep()| を呼び出します。
 	これらは便利ですが、今のところ複数のモジュールから使われた際の名前の衝
 	突が考慮されていません。これは将来改善される可能性があります。
 
