@@ -612,10 +612,6 @@ session.sweep()				*quickrun-session.sweep()*
 	いた場合、それに応じた処理が行われます。
 	- "_temp_" で始まる属性があった場合、その値をファイル名としてファイル
 	  を削除します。
-	- "_option_{option-name}" という属性があった場合、オプションの値を復元
-	  します。
-	- "_autocmd_" で始まる属性があった場合、"plugin-quickrun-{value}" とい
-	  う名前のグループに属する autocmd を全て削除します。
 	- "_vimproc" という属性があった場合、その |vimproc| を強制終了します。
 	また、|quickrun-runner.sweep()| を呼び出します。
 	これらは便利ですが、今のところ複数のモジュールから使われた際の名前の衝
