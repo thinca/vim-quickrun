@@ -36,19 +36,28 @@ function! s:runner.run(commands, input, session)
     return
   endif
   " Execution is continuing.
-  augroup plugin-quickrun-vimproc
+  augroup plugin-quickrun-runner-vimproc
     execute 'autocmd! CursorHold,CursorHoldI * call'
     \       's:receive_vimproc_result(' . string(key) . ')'
   augroup END
-  let a:session._autocmd_vimproc = 'vimproc'
+  let self._autocmd = 1
   if self.config.updatetime
-    let a:session._option_updatetime = &updatetime
+    let self._updatetime = &updatetime
     let &updatetime = self.config.updatetime
   endif
 endfunction
 
 function! s:runner.shellescape(str)
    return "'" . substitute(a:str, '\\', '/', 'g') . "'"
+endfunction
+
+function! s:runner.sweep()
+  if has_key(self, '_autocmd')
+    autocmd! plugin-quickrun-runner-vimproc
+  endif
+  if has_key(self, '_updatetime')
+    let &updatetime = self._updatetime
+  endif
 endfunction
 
 
