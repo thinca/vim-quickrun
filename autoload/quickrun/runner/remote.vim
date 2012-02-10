@@ -28,8 +28,7 @@ function! s:runner.run(commands, input, session)
   \             !empty($_) ? $_ : v:progname
 
   let key = a:session.continue()
-  let outfile = tempname()
-  let a:session._temp_result = outfile
+  let outfile = a:session.tempname()
   let readfile = printf('join(readfile(%s, 1), "\n")', string(outfile))
   let expr = printf('quickrun#session(%s, "output", %s) + ' .
   \                 'quickrun#session(%s, "finish")',
@@ -42,8 +41,7 @@ function! s:runner.run(commands, input, session)
 
   let in = a:input
   if in !=# ''
-    let inputfile = tempname()
-    let a:session._temp_input = inputfile
+    let inputfile = a:session.tempname()
     call writefile(split(in, "\n", 1), inputfile, 'b')
     let in = ' <' . self.shellescape(inputfile)
   endif
@@ -60,7 +58,7 @@ function! s:runner.run(commands, input, session)
     call map(scriptbody, 'v:val . "\r"')
   endif
   call map(scriptbody, 'g:quickrun#V.iconv(v:val, &encoding, &termencoding)')
-  let a:session._temp_script = script
+  call a:session.tempname(script)
   call writefile(scriptbody, script, 'b')
 
   let available_vimproc = globpath(&runtimepath, 'autoload/vimproc.vim') !=# ''

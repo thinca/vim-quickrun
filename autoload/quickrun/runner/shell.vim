@@ -19,9 +19,8 @@ endfunction
 
 function! s:runner.run(commands, input, session)
   if a:input !=# ''
-    let inputfile = tempname()
+    let inputfile = a:session.tempname()
     call writefile(split(a:input, "\n", 1), inputfile, 'b')
-    let a:session._temp_input = inputfile
   endif
 
   for cmd in a:commands

@@ -7,8 +7,7 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-let s:V = vital#of('quickrun').load('Data.List')
-call s:V.import('Data.String', s:V)
+let s:V = vital#of('quickrun').load('Data.List', 'System.File')
 unlet! g:quickrun#V
 let g:quickrun#V = s:V
 lockvar! g:quickrun#V
@@ -264,7 +263,115 @@ lockvar! g:quickrun#default_config
 let s:Session = {}  " {{{1
 " Initialize of instance.
 function! s:Session.initialize(config)
-  let self.config = s:normalize(a:config)
+  let self.config = self.normalize(a:config)
+endfunction
+
+" The option is appropriately set referring to default options.
+function! s:Session.normalize(config)
+  let config = s:to_config(a:config)
+  if !has_key(config, 'mode')
+    let config.mode = histget(':') =~# "^'<,'>\\s*Q\\%[uickRun]" ? 'v' : 'n'
+  endif
+  if config.mode ==# 'v'
+    let config.region = {
+    \   'first': getpos("'<")[1 :],
+    \   'last':  getpos("'>")[1 :],
+    \   'wise': visualmode(),
+    \ }
+  endif
+
+  let type = {"type": &filetype}
+  for c in [
+  \ 'b:quickrun_config',
+  \ 'type',
+  \ 'g:quickrun_config[config.type]',
+  \ 'g:quickrun#default_config[config.type]',
+  \ 'g:quickrun_config["_"]',
+  \ 'g:quickrun_config["*"]',
+  \ 'g:quickrun#default_config["_"]',
+  \ ]
+    if exists(c)
+      let new_config = eval(c)
+      if 0 <= stridx(c, 'config.type')
+        let config_type = ''
+        while has_key(config, 'type')
+        \   && has_key(new_config, 'type')
+        \   && config.type !=# ''
+        \   && config.type !=# config_type
+          let config_type = config.type
+          call extend(config, new_config, 'keep')
+          let config.type = new_config.type
+          let new_config = exists(c) ? eval(c) : {}
+        endwhile
+      endif
+      call extend(config, new_config, 'keep')
+    endif
+  endfor
+
+  if has_key(config, 'input')
+    let input = quickrun#expand(config.input)
+    try
+      let config.input = input[0] ==# '=' ? input[1:]
+      \                                  : join(readfile(input, 'b'), "\n")
+    catch
+      throw 'quickrun: Can not treat input: ' . v:exception
+    endtry
+  else
+    let config.input = ''
+  endif
+
+  let config.command = get(config, 'command', config.type)
+
+  if has_key(config, 'srcfile')
+    let config.srcfile = quickrun#expand(expand(config.srcfile))
+  elseif has_key(config, 'src')
+    if config.eval
+      let config.src = printf(config.eval_template, config.src)
+    endif
+  else
+    if !config.eval && filereadable(expand('%:p')) &&
+    \  !has_key(config, 'region') && !&modified
+      " Use file in direct.
+      let config.srcfile = expand('%:p')
+    else
+      let config.region = get(config, 'region', {
+      \   'first': [1, 0, 0],
+      \   'last':  [line('$'), 0, 0],
+      \   'wise': 'V',
+      \ })
+      " Executes on the temporary file.
+      let body = s:get_region(config.region)
+
+      if config.eval
+        let body = printf(config.eval_template, body)
+      endif
+
+      let body = s:V.iconv(body, &encoding, &fileencoding)
+
+      if &l:fileformat ==# 'mac'
+        let body = substitute(body, "\n", "\r", 'g')
+      elseif &l:fileformat ==# 'dos'
+        if !&l:binary
+          let body .= "\n"
+        endif
+        let body = substitute(body, "\n", "\r\n", 'g')
+      endif
+
+      let config.src = body
+    endif
+  endif
+
+  if !has_key(config, 'srcfile')
+    let fname = quickrun#expand(config.tempfile)
+    call self.tempname(fname)
+    call writefile(split(config.src, "\n", 1), fname, 'b')
+    let config.srcfile = fname
+  endif
+
+  for opt in ['cmdopt', 'args']
+    let config[opt] = quickrun#expand(config[opt])
+  endfor
+  return config
 endfunction
 
 function! s:Session.setup()
@@ -278,7 +385,7 @@ function! s:Session.setup()
     let self.outputter = self.make_module('outputter', self.config.outputter)
     call filter(self.hooks, 'v:val.config.enable')
 
-    let source_name = self.get_source_name()
+    let source_name = self.config.srcfile
     let exec = get(self.config, 'exec', '')
     let commands = type(exec) == type([]) ? copy(exec) : [exec]
     call filter(map(commands, 'self.build_command(source_name, v:val)'),
@@ -414,46 +521,27 @@ function! s:Session.build_command(source_name, tmpl)
   return substitute(quickrun#expand(result), '[\r\n]\+', ' ', 'g')
 endfunction
 
-" Return the source file name.
-" Output to a temporary file if self.config.src is string.
-function! s:Session.get_source_name()
-  if !has_key(self.config, 'srcfile')
-    if exists('self.config.src')
-      let fname = quickrun#expand(self.config.tempfile)
-      let self._temp_source = fname
-      call writefile(split(self.config.src, "\n", 1), fname, 'b')
-      let self.config.srcfile = fname
-    else
-      let self.config.srcfile = expand('%:p')
-    endif
+function! s:Session.tempname(...)
+  let name = a:0 ? a:1 : tempname()
+  if !has_key(self, '_temp_names')
+    let self._temp_names = []
   endif
-  return self.config.srcfile
+  call add(self._temp_names, name)
+  return name
 endfunction
 
 " Sweep the session.
 function! s:Session.sweep()
   " Remove temporary files.
-  for file in filter(keys(self), 'v:val =~# "^_temp"')
-    if filewritable(self[file])
-      call delete(self[file])
-    endif
-    call remove(self, file)
-  endfor
-
-  " Restore options.
-  for opt in filter(keys(self), 'v:val =~# "^_option_"')
-    let optname = matchstr(opt, '^_option_\zs.*')
-    if exists('+' . optname)
-      execute 'let'  '&' . optname '= self[opt]'
-    endif
-    call remove(self, opt)
-  endfor
-
-  " Delete autocmds.
-  for cmd in filter(keys(self), 'v:val =~# "^_autocmd_"')
-    execute 'autocmd!' 'plugin-quickrun-' . self[cmd]
-    call remove(self, cmd)
-  endfor
+  if has_key(self, '_temp_names')
+    for name in self._temp_names
+      if filewritable(name)
+        call delete(name)
+      elseif isdirectory(name)
+        call s:V.System.File.rmdir(name)
+      endif
+    endfor
+  endif
 
   " Sweep the execution of vimproc.
   if has_key(self, '_vimproc')
@@ -784,107 +872,6 @@ function! s:to_config(config)
     return config
   endif
   return a:config
-endfunction
-
-" The option is appropriately set referring to default options.
-function! s:normalize(config)
-  let config = s:to_config(a:config)
-  if !has_key(config, 'mode')
-    let config.mode = histget(':') =~# "^'<,'>\\s*Q\\%[uickRun]" ? 'v' : 'n'
-  endif
-  if config.mode ==# 'v'
-    let config.region = {
-    \   'first': getpos("'<")[1 :],
-    \   'last':  getpos("'>")[1 :],
-    \   'wise': visualmode(),
-    \ }
-  endif
-
-  let type = {"type": &filetype}
-  for c in [
-  \ 'b:quickrun_config',
-  \ 'type',
-  \ 'g:quickrun_config[config.type]',
-  \ 'g:quickrun#default_config[config.type]',
-  \ 'g:quickrun_config["_"]',
-  \ 'g:quickrun_config["*"]',
-  \ 'g:quickrun#default_config["_"]',
-  \ ]
-    if exists(c)
-      let new_config = eval(c)
-      if 0 <= stridx(c, 'config.type')
-        let config_type = ''
-        while has_key(config, 'type')
-        \   && has_key(new_config, 'type')
-        \   && config.type !=# ''
-        \   && config.type !=# config_type
-          let config_type = config.type
-          call extend(config, new_config, 'keep')
-          let config.type = new_config.type
-          let new_config = exists(c) ? eval(c) : {}
-        endwhile
-      endif
-      call extend(config, new_config, 'keep')
-    endif
-  endfor
-
-  if has_key(config, 'input')
-    let input = quickrun#expand(config.input)
-    try
-      let config.input = input[0] ==# '=' ? input[1:]
-      \                                  : join(readfile(input, 'b'), "\n")
-    catch
-      throw 'quickrun: Can not treat input: ' . v:exception
-    endtry
-  else
-    let config.input = ''
-  endif
-
-  let config.command = get(config, 'command', config.type)
-
-  if has_key(config, 'srcfile')
-    let config.srcfile = quickrun#expand(expand(config.srcfile))
-  elseif has_key(config, 'src')
-    if config.eval
-      let config.src = printf(config.eval_template, config.src)
-    endif
-  else
-    if !config.eval && filereadable(expand('%:p')) &&
-    \  !has_key(config, 'region') && !&modified
-      " Use file in direct.
-      let config.srcfile = expand('%:p')
-    else
-      let config.region = get(config, 'region', {
-      \   'first': [1, 0, 0],
-      \   'last':  [line('$'), 0, 0],
-      \   'wise': 'V',
-      \ })
-      " Executes on the temporary file.
-      let body = s:get_region(config.region)
-
-      if config.eval
-        let body = printf(config.eval_template, body)
-      endif
-
-      let body = s:V.iconv(body, &encoding, &fileencoding)
-
-      if &l:fileformat ==# 'mac'
-        let body = substitute(body, "\n", "\r", 'g')
-      elseif &l:fileformat ==# 'dos'
-        if !&l:binary
-          let body .= "\n"
-        endif
-        let body = substitute(body, "\n", "\r\n", 'g')
-      endif
-
-      let config.src = body
-    endif
-  endif
-
-  for opt in ['cmdopt', 'args']
-    let config[opt] = quickrun#expand(config[opt])
-  endfor
-  return config
 endfunction
 
 " Detect the shebang, and return the shebang command if it exists.

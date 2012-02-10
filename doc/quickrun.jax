@@ -607,19 +607,17 @@ session.exit_code			*quickrun-session.exit_code*
 	実行が完了した後にのみ参照できます。|quickrun-session.finish()| で渡さ
 	れた値です。
 
+session.tempname([{name}])		*quickrun-session.tempname()*
+	|tempname()| と同様ですが、名前を記録し、|quickrun-session.sweep()| で
+	作成されたファイルやディレクトリを削除します。引数を指定するとそのパス
+	を削除するように記録します。
+
 session.sweep()				*quickrun-session.sweep()*
-	セッションの後始末を行います。セッションに対して以下の属性が設定されて
-	いた場合、それに応じた処理が行われます。
-	- "_temp_" で始まる属性があった場合、その値をファイル名としてファイル
-	  を削除します。
-	- "_option_{option-name}" という属性があった場合、オプションの値を復元
-	  します。
-	- "_autocmd_" で始まる属性があった場合、"plugin-quickrun-{value}" とい
-	  う名前のグループに属する autocmd を全て削除します。
-	- "_vimproc" という属性があった場合、その |vimproc| を強制終了します。
-	また、|quickrun-runner.sweep()| を呼び出します。
-	これらは便利ですが、今のところ複数のモジュールから使われた際の名前の衝
-	突が考慮されていません。これは将来改善される可能性があります。
+	セッションの後始末を行います。|quickrun-session.tempname()| で登録され
+	たパスを削除し、|quickrun-module.sweep()| を呼び出します。
+	また、"_vimproc" という属性があった場合、その |vimproc| を強制終了しま
+	す。これは便利ですが、今のところ複数のモジュールから使われた際の名前の
+	衝突が考慮されていません。これは将来改善される可能性があります。
 
 ------------------------------------------------------------------------------
 共通の属性				*quickrun-module-attributes*
