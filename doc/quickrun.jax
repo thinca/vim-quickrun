@@ -246,7 +246,7 @@ shebang					*quickrun-option-shebang*
 	デフォルトは 1 です。
 
 tempfile (*)				*quickrun-option-tempfile*
-	ブログラムを実行する際、現在のバッファ全体を実行する以外の場合は、ソー
+	プログラムを実行する際、現在のバッファ全体を実行する以外の場合は、ソー
 	スファイルを一時ファイルに書き出して実行します。その際の一時ファイル名
 	を指定します。
 	一時ファイルは実行する度に削除されます。
@@ -572,7 +572,7 @@ hook は特定のポイントで追加の処理を行うモジュールです。
 
 モジュールは、|quickrun#module#register()| やその省略形である
 |quickrun#register_runner()|、|quickrun#register_outputter()| を使って登録する
-ことで 使えるようになります。
+ことで使えるようになります。
 また、'runtimepath' 内に autoload/quickrun/{module-kind}/{module-name}.vim を
 作成し、autoload#quickrun#{module-kind}#{module-name}#new() 関数を作っておく
 と、その戻り値が quickrun の初回ロード時に自動的に登録されます。
