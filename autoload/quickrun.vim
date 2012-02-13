@@ -33,6 +33,7 @@ let g:quickrun#default_config = {
 \   'exec': '%c %o %s %a',
 \   'eval': 0,
 \   'eval_template': '%s',
+\   'output_filetype': 'quickrun',
 \ },
 \ 'awk': {
 \   'exec': '%c %o -f %s %a',
@@ -1008,6 +1009,9 @@ function! s:normalize(config)
 
   for opt in ['cmdopt', 'args', 'output_encode']
     let config[opt] = quickrun#expand(config[opt])
+  endfor
+  for opt in ['output_filetype']
+    let config[opt] = config[opt]
   endfor
   return config
 endfunction

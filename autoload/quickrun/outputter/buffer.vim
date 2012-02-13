@@ -22,7 +22,7 @@ endfunction
 
 function! s:outputter.output(data, session)
   let winnr = winnr()
-  call s:open_result_window(self.config.split)
+  call s:open_result_window(self.config.split, a:session.config.output_filetype)
   if !self._append
     silent % delete _
     let self._append = 1
@@ -67,7 +67,7 @@ function! s:outputter.finish(session)
     return
   endif
 
-  call s:open_result_window(self.config.split)
+  call s:open_result_window(self.config.split, a:session.config.output_filetype)
   execute self._line
   silent normal! zt
   if !self.config.into
@@ -77,7 +77,7 @@ function! s:outputter.finish(session)
 endfunction
 
 
-function! s:open_result_window(sp)
+function! s:open_result_window(sp, ft)
   if !exists('s:bufnr')
     let s:bufnr = -1  " A number that doesn't exist.
   endif
@@ -87,7 +87,7 @@ function! s:open_result_window(sp)
     let s:bufnr = bufnr('%')
     nnoremap <buffer> q <C-w>c
     setlocal bufhidden=hide buftype=nofile noswapfile nobuflisted
-    setlocal filetype=quickrun
+    execute 'setlocal filetype=' . a:ft
   elseif bufwinnr(s:bufnr) != -1
     execute bufwinnr(s:bufnr) 'wincmd w'
   else
