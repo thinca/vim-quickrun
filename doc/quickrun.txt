@@ -494,6 +494,8 @@ available by default.
   quickrun opens output buffer and displays to the output buffer.  If output
   buffer already exists, quickrun uses it.
   Option ~
+  {name}		Default: "[quickrun output]"
+	The buffer name.
   {filetype}		Default: "quickrun"
 	Sets this value to 'filetype' of the buffer.
   {append}		Default: 0

@@ -8,6 +8,7 @@ set cpo&vim
 
 let s:outputter = {
 \   'config': {
+\     'name': '[quickrun output]',
 \     'filetype': 'quickrun',
 \     'append': 0,
 \     'split': '%{winwidth(0) * 2 < winheight(0) * 5 ? "" : "vertical"}',
@@ -83,17 +84,17 @@ function! s:open_result_window(config)
   if !exists('s:bufnr')
     let s:bufnr = -1  " A number that doesn't exist.
   endif
-  if !bufexists(s:bufnr)
+  let sname = g:quickrun#V.escape_file_searching(a:config.name)
+  if !bufexists(a:config.name)
     execute sp 'split'
-    edit `='[quickrun output]'`
-    let s:bufnr = bufnr('%')
+    edit `=a:config.name`
     nnoremap <buffer> q <C-w>c
     setlocal bufhidden=hide buftype=nofile noswapfile nobuflisted
-  elseif bufwinnr(s:bufnr) != -1
-    execute bufwinnr(s:bufnr) 'wincmd w'
+  elseif bufwinnr(sname) != -1
+    execute bufwinnr(sname) 'wincmd w'
   else
     execute sp 'split'
-    execute 'buffer' s:bufnr
+    execute 'buffer' bufnr(sname)
   endif
   if &l:filetype !=# a:config.filetype
     let &l:filetype = a:config.filetype
