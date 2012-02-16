@@ -664,8 +664,10 @@ module.sweep()				*quickrun-module.sweep()*
 RUNNER の属性				*quickrun-runner-attributes*
 
 runner.run({commands}, {input}, {session})	*quickrun-runner.run()*
-	必須です。実行時に呼び出されます。{commands} で渡されたコマンドのリス
-	トを実行 し、{exit-code} を返します。{input} は標準入力データです。
+	必須です。実行時に呼び出されます。
+	{commands} は実行するコマンドのリストです。{input} は標準入力です。
+	コマンドは順に実行され、途中で失敗した場合はそれ以降のコマンドは実行す
+	べきではありません。実行が完了したら {exit-code} を返します。
 	その場で実行を完了できない時は、|quickrun-session.continue()| を使いま
 	す。その場合、|quickrun-session.finish()| を呼び出す必要があります。
 
