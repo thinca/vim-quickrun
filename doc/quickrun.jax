@@ -234,11 +234,6 @@ mode					*quickrun-option-mode*
 		nnoremap <silent> <F5> :QuickRun -mode n<CR>
 		vnoremap <silent> <F5> :QuickRun -mode v<CR>
 
-output_encode (*)			*quickrun-option-output_encode*
-	出力の文字コードを変換したい場合に、"from:to" の形式で指定しま
-	す。":to" は省略できます。その場合、"from:&encoding" と解釈されます。
-	デフォルトは "&fileencoding" です。
-
 shebang					*quickrun-option-shebang*
 	0 以外を指定すると、 src の最初の行が #! で始まってた場合にその後続の
 	文字列を command として扱います。この場合、%c はエスケープ処理
@@ -558,6 +553,14 @@ outputter は結果の出力を行うモジュールです。
 HOOK						*quickrun-module-hook*
 
 hook は特定のポイントで追加の処理を行うモジュールです。
+デフォルトでは以下の hook が使えます。
+
+- "output_encode"			*quickrun-module-hook/output_encode*
+  出力の文字コードを変換します。
+  オプション ~
+  encoding		デフォルト: "&fileencoding"
+	"from:to" の形式で指定します。":to" は省略できます。その場合、
+	"from:&encoding" と解釈されます。
 
 
 
