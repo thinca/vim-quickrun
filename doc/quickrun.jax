@@ -555,6 +555,15 @@ HOOK						*quickrun-module-hook*
 hook は特定のポイントで追加の処理を行うモジュールです。
 デフォルトでは以下の hook が使えます。
 
+- "cd"					*quickrun-module-hook/cd*
+  カレントディレクトリを変更して実行します。
+  NOTE: この hook は開始時に Vim 内のカレントディレクトリを変更し、終了時に復
+	元しようとします。非同期実行を使っていると、予期しない結果になるかもし
+	れません。
+  オプション ~
+  directory		デフォルト: ""
+	変更先のディレクトリです。空文字列の場合は何もしません。
+
 - "output_encode"			*quickrun-module-hook/output_encode*
   出力の文字コードを変換します。
   オプション ~
