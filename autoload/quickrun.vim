@@ -463,14 +463,14 @@ endfunction
 function! s:Session.finish(...)
   if !has_key(self, 'exit_code')
     let self.exit_code = a:0 ? a:1 : 0
-    call self.outputter.finish(self)
-    call self.sweep()
     if self.exit_code == 0
       call self.invoke_hook('success')
     else
       call self.invoke_hook('failure', {'exit_code': self.exit_code})
     endif
     call self.invoke_hook('finish')
+    call self.outputter.finish(self)
+    call self.sweep()
   endif
 endfunction
 
