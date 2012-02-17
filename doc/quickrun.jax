@@ -687,7 +687,8 @@ outputter.finish({session})		*quickrun-outputter.finish()*
 ------------------------------------------------------------------------------
 HOOK の属性				*quickrun-hook-attributes*
 
-hook.on_{hook-point}({session})		*quickrun-hook.on_hook-point()*
+					*quickrun-hook.on_hook-point()*
+hook.on_{hook-point}({session}, {context})
 	フック時に呼ばれる関数です。詳細は |quickrun-hook| を参照してくださ
 	い。
 
