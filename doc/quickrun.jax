@@ -429,7 +429,7 @@ NOTE: "system" 以外は不安定な場合があります。
 - "shell"				*quickrun-module-runner/shell*
   |:!| を使って実行します。この runner は outputter を無視します。
   オプション ~
-  {shellcmd}		デフォルト: MS Windows の場合は 'silent !"%s" & pause'
+  shellcmd		デフォルト: MS Windows の場合は 'silent !"%s" & pause'
 				    それ以外は '!%s'
 	実行する Vim コマンドのテンプレートです。%s が exec オプションで生成さ
 	れたコマンドに置換されます。
@@ -440,7 +440,7 @@ NOTE: "system" 以外は不安定な場合があります。
   |CursorHold| と |CursorHoldI| イベントを使って検査します。50 ミリ秒以内に実
   行が終了した場合は、即座に結果を表示します。
   オプション ~
-  {updatetime}		デフォルト: 0
+  updatetime		デフォルト: 0
 	一時的に 'updatetime' をこの値に変更します。0 の場合は変更しません。
 
 - "remote"				*quickrun-module-runner/remote*
@@ -452,7 +452,7 @@ NOTE: "system" 以外は不安定な場合があります。
   バックグラウンドで実行するため、コマンドが無限ループや入力待ち等で終了しな
   い場合、Vim から制御することはできないので注意してください。
   オプション ~
-  {vimproc}		デフォルト: 0
+  vimproc		デフォルト: 0
 	可能ならば |vimproc| でコマンドを実行します。これにより、実行のキャン
 	セルが可能になります。
 
@@ -474,57 +474,57 @@ outputter は結果の出力を行うモジュールです。
   ます。このバッファにはカスタマイズのために 'filetype' に "quickrun" が設定さ
   れます。これが既定値です。
   オプション ~
-  {append}		デフォルト: 0
+  append		デフォルト: 0
 	1 の場合は追記を行います。
-  {split}
+  split
 	デフォルト: '{winwidth(0) * 2 < winheight(0) * 5 ? "" : "vertical"}'
 	出力専用バッファを開く際の補助コマンドを指定します。バッファを開く際に
 	|:split| コマンドの前に挿入されます。
-  {into}		デフォルト: 0
+  into			デフォルト: 0
 	0 以外を指定すると、結果が出た際に出力専用バッファへカーソルを移動しま
 	す。
-  {running_mark}	デフォルト: ':-)'
+  running_mark		デフォルト: ':-)'
 	この値が空文字列でない場合、実行中にこの文字列が出力先に表示されます。
 	表示は実行完了後に削除されます。
 
 - "message"				*quickrun-module-outputter/message*
   |messages| に出力します。
   オプション ~
-  {log}			デフォルト: 0
+  log			デフォルト: 0
 	1 の場合、出力を |message-history| に記録します。
 
 - "variable"				*quickrun-module-outputter/variable*
   変数に対して出力します。環境変数やオプションに対しても出力可能です。
   オプション ~
-  {name}		デフォルト: ''
+  name			デフォルト: ''
 	出力先の変数名です。空の場合はエラーになります。
-  {append}		デフォルト: 0
+  append		デフォルト: 0
 	1 の場合は追記を行います。
 
 - "file"				*quickrun-module-outputter/file*
   ファイルに対して出力します。
   オプション ~
-  {name}		デフォルト: ''
+  name			デフォルト: ''
 	出力先のファイル名です。空の場合はエラーになります。
-  {append}		デフォルト: 0
+  append		デフォルト: 0
 	1 の場合は追記を行います。
 
 - "quickfix"				*quickrun-module-outputter/quickfix*
   |quickfix| へ出力します。
   オプション ~
-  {errorformat}		デフォルト: "&errorformat"
+  errorformat		デフォルト: "&errorformat"
 	出力を解釈するための 'errorformat' オプションの値です。
 
 - "browser"				*quickrun-module-outputter/browser*
   {|open-browser| が必要}
   |open-browser| を使って、結果をブラウザで開きます。
   オプション ~
-  {name}		デフォルト: tempname() . '.html'
+  name			デフォルト: tempname() . '.html'
 	この outputter はまず結果をファイルに書き出し、そのファイルをブラウザ
 	で開きます。その際の出力先のファイル名です。
 	デフォルト値の |tempname()| は初回ロード時に 1 度だけ呼び出され、全体
 	で固定になります。
-  {append}		デフォルト: 0
+  append		デフォルト: 0
 	1 の場合はファイルに対して追記を行います。
 
 - "buffered"				*quickrun-module-outputter/buffered*
@@ -536,7 +536,7 @@ outputter は結果の出力を行うモジュールです。
 - "multi"				*quickrun-module-outputter/multi*
   複数の outputter に対して同時に出力を行います。
   オプション ~
-  {targets}		デフォルト: []
+  targets		デフォルト: []
 	実際の出力に使う outputter のリストです。
 
 - "error"				*quickrun-module-outputter/error*
@@ -545,9 +545,9 @@ outputter は結果の出力を行うモジュールです。
   まうことがあります。
   終了を待つため、出力はバッファリングされます。
   オプション ~
-  {success}		デフォルト: "null"
+  success		デフォルト: "null"
 	実行の成功時に使う outputter です。
-  {error}		デフォルト: "null"
+  error			デフォルト: "null"
 	実行の失敗時に使う outputter です。
 
 - "null"				*quickrun-module-outputter/null*
