@@ -379,11 +379,11 @@ function! s:Session.setup()
     if has_key(self, 'exit_code')
       call remove(self, 'exit_code')
     endif
-    let self.hooks = map(quickrun#module#get('hook'),
-    \                    'self.make_module("hook", v:val.name)')
+    let self.hooks = filter(map(quickrun#module#get('hook'),
+    \        'self.make_module("hook", v:val.name)'), 'v:val.config.enable')
+    call self.invoke_hook('init')
     let self.runner = self.make_module('runner', self.config.runner)
     let self.outputter = self.make_module('outputter', self.config.outputter)
-    call filter(self.hooks, 'v:val.config.enable')
 
     let source_name = self.config.srcfile
     let exec = get(self.config, 'exec', '')

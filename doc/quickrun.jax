@@ -742,6 +742,10 @@ hook.config.enable			*quickrun-hook.config.enable*
 
 標準では以下のフックポイントが利用できます。
 
+- "init"
+  hook のロードが終わった直後です。この後に runner と outputter がロードされま
+  す。
+
 - "ready"
   全てのオプションの設定が終わって、最初のコマンドが実行される前です。
 
