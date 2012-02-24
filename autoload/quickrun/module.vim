@@ -91,6 +91,8 @@ endfunction
 
 " Template of outputter.  {{{2
 let s:templates.outputter = deepcopy(s:module)
+function! s:templates.outputter.start(session)
+endfunction
 function! s:templates.outputter.output(data, session)
   throw 'quickrun: An outputter should implements output()'
 endfunction

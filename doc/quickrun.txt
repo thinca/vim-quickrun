@@ -701,6 +701,9 @@ OUTPUTTER ATTRIBUTES			*quickrun-outputter-attributes*
 outputter.output({data}, {session})	*quickrun-outputter.output()*
 	Required. Outputs the data.
 
+outputter.start({session})		*quickrun-outputter.start()*
+	Called in before of startup.
+
 outputter.finish({session})		*quickrun-outputter.finish()*
 	Called in termination for finishing it. You can refer
 	|quickrun-session.exit_code|.

@@ -438,6 +438,7 @@ function! s:Session.run()
   call self.invoke_hook('ready')
   let exit_code = 1
   try
+    call self.outputter.start(self)
     let exit_code = self.runner.run(self.commands, self.config.input, self)
   finally
     if !has_key(self, '_continue_key')

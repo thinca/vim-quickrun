@@ -701,6 +701,9 @@ OUTPUTTER の属性			*quickrun-outputter-attributes*
 outputter.output({data}, {session})	*quickrun-outputter.output()*
 	必須です。データを出力します。
 
+outputter.start({session})		*quickrun-outputter.start()*
+	実行の開始直前に呼び出されます。開始処理を行います。
+
 outputter.finish({session})		*quickrun-outputter.finish()*
 	実行の終了時に呼び出されます。終了処理を行います。
 	また、|quickrun-session.exit_code| が参照できます。
