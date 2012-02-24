@@ -22,6 +22,12 @@ function! s:outputter.init(session)
   let self._line = 0
 endfunction
 
+function! s:outputter.start(session)
+  let winnr = winnr()
+  call s:open_result_window(self.config)
+  execute winnr 'wincmd w'
+endfunction
+
 function! s:outputter.output(data, session)
   let winnr = winnr()
   call s:open_result_window(self.config)
