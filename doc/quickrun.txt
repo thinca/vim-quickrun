@@ -492,9 +492,12 @@ available by default.
 
 - "buffer"				*quickrun-module-outputter/buffer*
   quickrun opens output buffer and displays to the output buffer.  If output
-  buffer already exists, quickrun uses it.  And for customize, quickrun sets
-  "quickrun" to 'filetype' of this buffer. This is the default.
+  buffer already exists, quickrun uses it.
   Option ~
+  {name}		Default: "[quickrun output]"
+	The buffer name.
+  {filetype}		Default: "quickrun"
+	Sets this value to 'filetype' of the buffer.
   {append}		Default: 0
 	Appends if it's 1.
   {split}

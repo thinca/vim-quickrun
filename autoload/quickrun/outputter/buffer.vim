@@ -8,6 +8,8 @@ set cpo&vim
 
 let s:outputter = {
 \   'config': {
+\     'name': '[quickrun output]',
+\     'filetype': 'quickrun',
 \     'append': 0,
 \     'split': '%{winwidth(0) * 2 < winheight(0) * 5 ? "" : "vertical"}',
 \     'into': 0,
@@ -20,9 +22,15 @@ function! s:outputter.init(session)
   let self._line = 0
 endfunction
 
+function! s:outputter.start(session)
+  let winnr = winnr()
+  call s:open_result_window(self.config)
+  execute winnr 'wincmd w'
+endfunction
+
 function! s:outputter.output(data, session)
   let winnr = winnr()
-  call s:open_result_window(self.config.split)
+  call s:open_result_window(self.config)
   if !self._append
     silent % delete _
     let self._append = 1
@@ -67,7 +75,7 @@ function! s:outputter.finish(session)
     return
   endif
 
-  call s:open_result_window(self.config.split)
+  call s:open_result_window(self.config)
   execute self._line
   silent normal! zt
   if !self.config.into
@@ -77,22 +85,25 @@ function! s:outputter.finish(session)
 endfunction
 
 
-function! s:open_result_window(sp)
+function! s:open_result_window(config)
+  let sp = a:config.split
   if !exists('s:bufnr')
     let s:bufnr = -1  " A number that doesn't exist.
   endif
-  if !bufexists(s:bufnr)
-    execute a:sp 'split'
-    edit `='[quickrun output]'`
-    let s:bufnr = bufnr('%')
+  let sname = g:quickrun#V.escape_file_searching(a:config.name)
+  if !bufexists(a:config.name)
+    execute sp 'split'
+    edit `=a:config.name`
     nnoremap <buffer> q <C-w>c
     setlocal bufhidden=hide buftype=nofile noswapfile nobuflisted
-    setlocal filetype=quickrun
-  elseif bufwinnr(s:bufnr) != -1
-    execute bufwinnr(s:bufnr) 'wincmd w'
+  elseif bufwinnr(sname) != -1
+    execute bufwinnr(sname) 'wincmd w'
   else
-    execute a:sp 'split'
-    execute 'buffer' s:bufnr
+    execute sp 'split'
+    execute 'buffer' bufnr(sname)
+  endif
+  if &l:filetype !=# a:config.filetype
+    let &l:filetype = a:config.filetype
   endif
   if exists('b:quickrun_running_mark')
     silent undo
