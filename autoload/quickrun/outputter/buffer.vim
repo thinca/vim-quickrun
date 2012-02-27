@@ -25,16 +25,15 @@ endfunction
 function! s:outputter.start(session)
   let winnr = winnr()
   call s:open_result_window(self.config)
+  if !self._append
+    silent % delete _
+  endif
   execute winnr 'wincmd w'
 endfunction
 
 function! s:outputter.output(data, session)
   let winnr = winnr()
   call s:open_result_window(self.config)
-  if !self._append
-    silent % delete _
-    let self._append = 1
-  endif
   if self._line == 0
     let self._line = line('$')
   endif
