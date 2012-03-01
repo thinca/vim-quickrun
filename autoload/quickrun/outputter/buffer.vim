@@ -89,7 +89,7 @@ function! s:open_result_window(config)
   if !exists('s:bufnr')
     let s:bufnr = -1  " A number that doesn't exist.
   endif
-  let sname = g:quickrun#V.escape_file_searching(a:config.name)
+  let sname = s:escape_file_pattern(a:config.name)
   if !bufexists(a:config.name)
     execute sp 'split'
     edit `=a:config.name`
@@ -116,6 +116,10 @@ function! s:set_running_mark(mark)
     silent $ put =a:mark
     let b:quickrun_running_mark = 1
   endif
+endfunction
+
+function! s:escape_file_pattern(pat)
+  return join(map(split(a:pat, '\zs'), '"[".v:val."]"'), '')
 endfunction
 
 
