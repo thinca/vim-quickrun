@@ -28,6 +28,7 @@ function! s:outputter.start(session)
   if !self._append
     silent % delete _
   endif
+  call s:set_running_mark(self.config.running_mark)
   execute winnr 'wincmd w'
 endfunction
 
