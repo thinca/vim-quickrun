@@ -62,18 +62,6 @@ endfunction
 function! s:outputter.finish(session)
   let winnr = winnr()
 
-  if self._line == 0  " no output
-    " clear the buffer if already opened.
-    if exists('s:bufnr') && bufwinnr(s:bufnr) != -1
-      execute bufwinnr(s:bufnr) 'wincmd w'
-      silent % delete _
-      if !self.config.into
-        execute winnr 'wincmd w'
-      endif
-    endif
-    return
-  endif
-
   call s:open_result_window(self.config)
   execute self._line
   silent normal! zt
@@ -86,9 +74,6 @@ endfunction
 
 function! s:open_result_window(config)
   let sp = a:config.split
-  if !exists('s:bufnr')
-    let s:bufnr = -1  " A number that doesn't exist.
-  endif
   let sname = s:escape_file_pattern(a:config.name)
   if !bufexists(a:config.name)
     execute sp 'split'
