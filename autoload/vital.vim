@@ -8,5 +8,5 @@ function! vital#of(name)
   if empty(ver)
     throw 'vital: invalid version file: ' . a:name
   endif
-  return vital#_{ver[0]}#new()
+  return vital#_{substitute(ver[0], '\W', '', 'g')}#new()
 endfunction
