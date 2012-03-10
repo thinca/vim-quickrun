@@ -24,8 +24,11 @@ let [
 \   type(function('tr')),
 \   type([]),
 \   type({}),
-\   type(3.14159)
+\   has('float') ? type(str2float('0')) : -1
 \]
+" __TYPE_FLOAT = -1 when -float
+" This doesn't match to anything.
+
 " Number or Float
 function! s:is_numeric(Value)
     let _ = type(a:Value)
@@ -101,6 +104,9 @@ function! s:strchars(str)"{{{
 endfunction"}}}
 
 function! s:strwidthpart(str, width)"{{{
+  if a:width <= 0
+    return ''
+  endif
   let ret = a:str
   let width = s:wcswidth(a:str)
   while width > a:width
@@ -112,6 +118,9 @@ function! s:strwidthpart(str, width)"{{{
   return ret
 endfunction"}}}
 function! s:strwidthpart_reverse(str, width)"{{{
+  if a:width <= 0
+    return ''
+  endif
   let ret = a:str
   let width = s:wcswidth(a:str)
   while width > a:width
@@ -172,9 +181,13 @@ else
 endif
 
 let s:is_windows = has('win16') || has('win32') || has('win64')
+let s:is_cygwin = has('win32unix')
 let s:is_mac = !s:is_windows && (has('mac') || has('macunix') || has('gui_macvim') || system('uname') =~? '^darwin')
 function! s:is_windows()"{{{
   return s:is_windows
+endfunction"}}}
+function! s:is_cygwin()"{{{
+  return s:is_cygwin
 endfunction"}}}
 function! s:is_mac()"{{{
   return s:is_mac
@@ -193,11 +206,19 @@ function! s:smart_execute_command(action, word)"{{{
 endfunction"}}}
 
 function! s:escape_file_searching(buffer_name)"{{{
-  return escape(a:buffer_name, '*[]?{},')
+  return escape(a:buffer_name, '*[]?{}, ')
 endfunction"}}}
 function! s:escape_pattern(str)"{{{
   return escape(a:str, '~"\.^$[]*')
 endfunction"}}}
+" iconv() wrapper for safety.
+function! s:iconv(expr, from, to)
+  if a:from == '' || a:to == '' || a:from ==? a:to
+    return a:expr
+  endif
+  let result = iconv(a:expr, a:from, a:to)
+  return result != '' ? result : a:expr
+endfunction
 " Like builtin getchar() but returns string always.
 function! s:getchar(...)
   let c = call('getchar', a:000)
@@ -248,42 +269,42 @@ function! s:path2directory(path)"{{{
   return s:substitute_path_separator(isdirectory(a:path) ? a:path : fnamemodify(a:path, ':p:h'))
 endfunction"}}}
 function! s:path2project_directory(path)"{{{
-  let l:search_directory = s:path2directory(a:path)
-  let l:directory = ''
+  let search_directory = s:path2directory(a:path)
+  let directory = ''
 
   " Search VCS directory.
   for d in ['.git', '.bzr', '.hg']
-    let d = finddir(d, s:escape_file_searching(l:search_directory) . ';')
+    let d = finddir(d, s:escape_file_searching(search_directory) . ';')
     if d != ''
-      let l:directory = fnamemodify(d, ':p:h:h')
+      let directory = fnamemodify(d, ':p:h:h')
       break
     endif
   endfor
 
   " Search project file.
-  if l:directory == ''
+  if directory == ''
     for d in ['build.xml', 'prj.el', '.project', 'pom.xml', 'Makefile', 'configure', 'Rakefile', 'NAnt.build', 'tags', 'gtags']
-      let d = findfile(d, s:escape_file_searching(l:search_directory) . ';')
+      let d = findfile(d, s:escape_file_searching(search_directory) . ';')
       if d != ''
-        let l:directory = fnamemodify(d, ':p:h')
+        let directory = fnamemodify(d, ':p:h')
         break
       endif
     endfor
   endif
 
-  if l:directory == ''
+  if directory == ''
     " Search /src/ directory.
-    let l:base = s:substitute_path_separator(l:search_directory)
-    if l:base =~# '/src/'
-      let l:directory = l:base[: strridx(l:base, '/src/') + 3]
+    let base = s:substitute_path_separator(search_directory)
+    if base =~# '/src/'
+      let directory = base[: strridx(base, '/src/') + 3]
     endif
   endif
 
-  if l:directory == ''
-    let l:directory = l:search_directory
+  if directory == ''
+    let directory = search_directory
   endif
 
-  return s:substitute_path_separator(l:directory)
+  return s:substitute_path_separator(directory)
 endfunction"}}}
 " Check vimproc."{{{
 let s:exists_vimproc = globpath(&rtp, 'autoload/vimproc.vim') != ''
@@ -292,30 +313,26 @@ function! s:has_vimproc()"{{{
   return s:exists_vimproc
 endfunction"}}}
 function! s:system(str, ...)"{{{
-  let l:command = a:str
-  let l:input = a:0 >= 1 ? a:1 : ''
-  if &termencoding != '' && &termencoding != &encoding
-    let l:command = s:iconv(l:command, &encoding, &termencoding)
-    let l:input = s:iconv(l:input, &encoding, &termencoding)
-  endif
+  let command = a:str
+  let input = a:0 >= 1 ? a:1 : ''
+  let command = s:iconv(command, &encoding, 'char')
+  let input = s:iconv(input, &encoding, 'char')
 
   if a:0 == 0
-    let l:output = s:has_vimproc() ?
-          \ vimproc#system(l:command) : system(l:command)
+    let output = s:has_vimproc() ?
+          \ vimproc#system(command) : system(command)
   elseif a:0 == 1
-    let l:output = s:has_vimproc() ?
-          \ vimproc#system(l:command, l:input) : system(l:command, l:input)
+    let output = s:has_vimproc() ?
+          \ vimproc#system(command, input) : system(command, input)
   else
     " ignores 3rd argument unless you have vimproc.
-    let l:output = s:has_vimproc() ?
-          \ vimproc#system(l:command, l:input, a:2) : system(l:command, l:input)
+    let output = s:has_vimproc() ?
+          \ vimproc#system(command, input, a:2) : system(command, input)
   endif
 
-  if &termencoding != '' && &termencoding != &encoding
-    let l:output = s:iconv(l:output, &termencoding, &encoding)
-  endif
+  let output = s:iconv(output, 'char', &encoding)
 
-  return l:output
+  return output
 endfunction"}}}
 function! s:get_last_status()"{{{
   return s:has_vimproc() ?
