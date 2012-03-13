@@ -172,7 +172,7 @@ let g:quickrun#default_config = {
 \   'output_encode': 'utf-8',
 \ },
 \ 'go/go': {
-\   'exec': ['(cd %s:p:h & go run %s:p:t)'],
+\   'exec': ['cd %s:p:h \&\& go run %s:p:t'],
 \   'tempfile': '%{tempname()}.go',
 \   'output_encode': 'utf-8',
 \ },
