@@ -127,6 +127,20 @@ let g:quickrun#default_config = {
 \   'exec': 'call %s %a',
 \   'tempfile': '%{tempname()}.bat',
 \ },
+\ 'dart': {
+\   'type':
+\     executable('dart') ? 'dart/dart/checked':
+\   '',
+\ },
+\ 'dart/dart/checked': {
+\   'command': 'dart',
+\   'cmdopt': '--enable-type-checks',
+\   'tempfile': '%{tempname()}.dart',
+\ },
+\ 'dart/dart/production': {
+\   'command': 'dart',
+\   'tempfile': '%{tempname()}.dart',
+\ },
 \ 'erlang': {
 \   'command': 'escript',
 \ },
