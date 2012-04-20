@@ -748,9 +748,12 @@ hook.config.enable			*quickrun-hook.config.enable*
 
 標準では以下のフックポイントが利用できます。
 
-- "init"
+- "hook_loaded"
   hook のロードが終わった直後です。この後に runner と outputter がロードされま
   す。
+
+- "module_loaded"
+  runner と outputter のロードが終わった直後です。
 
 - "ready"
   全てのオプションの設定が終わって、最初のコマンドが実行される前です。
@@ -761,7 +764,7 @@ hook.config.enable			*quickrun-hook.config.enable*
   "data": 出力データ
 
 - "success"
-  実行時が正常に完了したときです。
+  実行時が正常に完了した時です。
 
 - "failure"
   実行時にエラーが発生した時。
@@ -771,6 +774,9 @@ hook.config.enable			*quickrun-hook.config.enable*
 - "finish"
   実行が完了した時です。success/failure の後に、成功か失敗かに関わらず呼ばれま
   す。
+
+- "exit"
+  後処理が終わった後の処理の終了時です。
 
 これら以外に、モジュールが |quickrun-session.invoke_hook()| を使うことで任意の
 タイミングでフックを発生させることができます。

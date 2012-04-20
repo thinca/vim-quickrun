@@ -343,10 +343,11 @@ function! s:Session.setup()
     let self.config = deepcopy(self.base_config)
     let self.hooks = filter(map(quickrun#module#get('hook'),
     \        'self.make_module("hook", v:val.name)'), 'v:val.config.enable')
-    call self.invoke_hook('init')
+    call self.invoke_hook('hook_loaded')
     let self.config = self.normalize(self.config)
     let self.runner = self.make_module('runner', self.config.runner)
     let self.outputter = self.make_module('outputter', self.config.outputter)
+    call self.invoke_hook('module_loaded')
 
     let source_name = self.config.srcfile
     let exec = get(self.config, 'exec', '')
@@ -435,6 +436,7 @@ function! s:Session.finish(...)
     call self.invoke_hook('finish')
     call self.outputter.finish(self)
     call self.sweep()
+    call self.invoke_hook('exit')
   endif
 endfunction
 
