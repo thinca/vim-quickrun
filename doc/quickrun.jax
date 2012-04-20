@@ -234,12 +234,6 @@ mode					*quickrun-option-mode*
 		nnoremap <silent> <F5> :QuickRun -mode n<CR>
 		vnoremap <silent> <F5> :QuickRun -mode v<CR>
 
-shebang					*quickrun-option-shebang*
-	0 以外を指定すると、 src の最初の行が #! で始まってた場合にその後続の
-	文字列を command として扱います。この場合、%c はエスケープ処理
-	(|quickrun-exec-format|)されません。
-	デフォルトは 1 です。
-
 tempfile (*)				*quickrun-option-tempfile*
 	プログラムを実行する際、現在のバッファ全体を実行する以外の場合は、ソー
 	スファイルを一時ファイルに書き出して実行します。その際の一時ファイル名
@@ -573,6 +567,11 @@ hook は特定のポイントで追加の処理を行うモジュールです。
   encoding		デフォルト: "&fileencoding"
 	"from:to" の形式で指定します。":to" は省略できます。その場合、
 	"from:&encoding" と解釈されます。
+
+- "shebang"				*quickrun-module-hook/shebang*
+  ソースコードの先頭の #! を探し、その後続を command オプション
+  (|quickrun-option-command|) として扱います。同時に、exec オプション
+  (|quickrun-option-exec|) 内の "%c" を "%C" に変換します。
 
 - "time"				*quickrun-module-hook/time*
   実行時間を計測し、最後に出力します。

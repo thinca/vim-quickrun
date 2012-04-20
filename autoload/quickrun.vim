@@ -18,7 +18,6 @@ let s:is_win = s:V.is_windows()
 unlet! g:quickrun#default_config
 let g:quickrun#default_config = {
 \ '_': {
-\   'shebang': 1,
 \   'outputter': 'buffer',
 \   'runner': 'system',
 \   'cmdopt': '',
@@ -446,8 +445,7 @@ endfunction
 " Build a command to execute it from options.
 function! s:Session.build_command(source_name, tmpl)
   let config = self.config
-  let shebang = config.shebang ? s:detect_shebang(a:source_name) : ''
-  let command = shebang !=# '' ? shebang : config.command
+  let command = config.command
   let rule = {
   \  'c': command,
   \  's': a:source_name,
@@ -455,7 +453,6 @@ function! s:Session.build_command(source_name, tmpl)
   \  'a': config.args,
   \  '%': '%',
   \}
-  let is_file = '[' . (shebang !=# '' ? 's' : 'cs') . ']'
   let rest = a:tmpl
   let result = ''
   while 1
@@ -476,7 +473,7 @@ function! s:Session.build_command(source_name, tmpl)
     endif
 
     let rest = rest[2 :]
-    if symbol =~? is_file
+    if symbol ==? 's'
       let mod = matchstr(rest, '^\v\zs%(\:[p8~.htre]|\:g?s(.).{-}\1.{-}\1)*')
       let value = fnamemodify(value, mod)
       if symbol =~# '\U'
@@ -644,9 +641,7 @@ function! quickrun#complete(lead, cmd, pos)
     let opt = line[-2][1:]
     if opt !=# 'type'
       let list = []
-      if opt ==# 'shebang'
-        let list = ['0', '1']
-      elseif opt ==# 'mode'
+      if opt ==# 'mode'
         let list = ['n', 'v']
       elseif 0 <= index(kinds, opt)
         let list = map(filter(quickrun#module#get(opt),
@@ -658,7 +653,7 @@ function! quickrun#complete(lead, cmd, pos)
   elseif head =~# '^-'
     " a name of option.
     let list = ['type', 'src', 'srcfile', 'input', 'runner', 'outputter',
-    \ 'command', 'exec', 'cmdopt', 'args', 'tempfile', 'shebang', 'eval',
+    \ 'command', 'exec', 'cmdopt', 'args', 'tempfile', 'eval',
     \ 'mode', 'eval_template']
     let mod_options = {}
     for kind in kinds
@@ -884,12 +879,6 @@ function! s:build_config(config)
     endif
   endfor
   return config
-endfunction
-
-" Detect the shebang, and return the shebang command if it exists.
-function! s:detect_shebang(file)
-  let line = get(readfile(a:file, 0, 1), 0, '')
-  return line =~# '^#!' ? line[2:] : ''
 endfunction
 
 " Get the text of specified region.
