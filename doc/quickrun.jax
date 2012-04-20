@@ -725,6 +725,9 @@ hook.priority({hook-point})		*quickrun-hook.priority*
 hook.config.enable			*quickrun-hook.config.enable*
 	フックが有効かどうかです。デフォルトは 1 (有効) です。
 	これは主にユーザが設定するためにあります。
+	また、|quickrun-module.init()| のタイミングで 0 にすることで hook を無
+	効化してその後の hook 呼び出し時のオーバーヘッドを少しだけ減らすことが
+	できます。
 
 
 
