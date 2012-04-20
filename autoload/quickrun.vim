@@ -263,51 +263,12 @@ lockvar! g:quickrun#default_config
 let s:Session = {}  " {{{1
 " Initialize of instance.
 function! s:Session.initialize(config)
-  let self.config = self.normalize(a:config)
+  let self.base_config = s:build_config(a:config)
 endfunction
 
 " The option is appropriately set referring to default options.
 function! s:Session.normalize(config)
-  let config = s:to_config(a:config)
-  if !has_key(config, 'mode')
-    let config.mode = histget(':') =~# "^'<,'>\\s*Q\\%[uickRun]" ? 'v' : 'n'
-  endif
-  if config.mode ==# 'v'
-    let config.region = {
-    \   'first': getpos("'<")[1 :],
-    \   'last':  getpos("'>")[1 :],
-    \   'wise': visualmode(),
-    \ }
-  endif
-
-  let type = {"type": &filetype}
-  for c in [
-  \ 'b:quickrun_config',
-  \ 'type',
-  \ 'g:quickrun_config[config.type]',
-  \ 'g:quickrun#default_config[config.type]',
-  \ 'g:quickrun_config["_"]',
-  \ 'g:quickrun_config["*"]',
-  \ 'g:quickrun#default_config["_"]',
-  \ ]
-    if exists(c)
-      let new_config = eval(c)
-      if 0 <= stridx(c, 'config.type')
-        let config_type = ''
-        while has_key(config, 'type')
-        \   && has_key(new_config, 'type')
-        \   && config.type !=# ''
-        \   && config.type !=# config_type
-          let config_type = config.type
-          call extend(config, new_config, 'keep')
-          let config.type = new_config.type
-          let new_config = exists(c) ? eval(c) : {}
-        endwhile
-      endif
-      call extend(config, new_config, 'keep')
-    endif
-  endfor
-
+  let config = a:config
   if has_key(config, 'input')
     let input = quickrun#expand(config.input)
     try
@@ -379,9 +340,11 @@ function! s:Session.setup()
     if has_key(self, 'exit_code')
       call remove(self, 'exit_code')
     endif
+    let self.config = deepcopy(self.base_config)
     let self.hooks = filter(map(quickrun#module#get('hook'),
     \        'self.make_module("hook", v:val.name)'), 'v:val.config.enable')
     call self.invoke_hook('init')
+    let self.config = self.normalize(self.config)
     let self.runner = self.make_module('runner', self.config.runner)
     let self.outputter = self.make_module('outputter', self.config.outputter)
 
@@ -628,8 +591,8 @@ function! quickrun#run(config)
   let session = quickrun#new(a:config)
 
   " for debug
-  if has_key(session.config, 'debug')
-    let g:{matchstr(session.config.debug, '\h\w*')} = session
+  if has_key(session.base_config, 'debug')
+    let g:{matchstr(session.base_config.debug, '\h\w*')} = session
   endif
 
   call session.run()
@@ -873,6 +836,49 @@ function! s:to_config(config)
     return config
   endif
   return a:config
+endfunction
+
+function! s:build_config(config)
+  let config = s:to_config(a:config)
+  if !has_key(config, 'mode')
+    let config.mode = histget(':') =~# "^'<,'>\\s*Q\\%[uickRun]" ? 'v' : 'n'
+  endif
+  if config.mode ==# 'v'
+    let config.region = {
+    \   'first': getpos("'<")[1 :],
+    \   'last':  getpos("'>")[1 :],
+    \   'wise': visualmode(),
+    \ }
+  endif
+
+  let type = {"type": &filetype}
+  for c in [
+  \ 'b:quickrun_config',
+  \ 'type',
+  \ 'g:quickrun_config[config.type]',
+  \ 'g:quickrun#default_config[config.type]',
+  \ 'g:quickrun_config["_"]',
+  \ 'g:quickrun_config["*"]',
+  \ 'g:quickrun#default_config["_"]',
+  \ ]
+    if exists(c)
+      let new_config = eval(c)
+      if 0 <= stridx(c, 'config.type')
+        let config_type = ''
+        while has_key(config, 'type')
+        \   && has_key(new_config, 'type')
+        \   && config.type !=# ''
+        \   && config.type !=# config_type
+          let config_type = config.type
+          call extend(config, new_config, 'keep')
+          let config.type = new_config.type
+          let new_config = exists(c) ? eval(c) : {}
+        endwhile
+      endif
+      call extend(config, new_config, 'keep')
+    endif
+  endfor
+  return config
 endfunction
 
 " Detect the shebang, and return the shebang command if it exists.
