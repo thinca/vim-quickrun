@@ -5,8 +5,7 @@ Author: thinca <thinca+vim@gmail.com>
 English documentation by:
   * ujihisa <ujihisa at gmail com>
   * tyru <tyru.exe@gmail.com>
-License: Creative Commons 2.1 Japanese
-         <http://creativecommons.org/licenses/by/2.1/jp/>
+License: zlib License
 
 ==============================================================================
 CONTENTS					*quickrun-contents*
