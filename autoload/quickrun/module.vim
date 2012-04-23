@@ -27,6 +27,7 @@ function! s:module.build(configs)
     if type(config) == type({})
       for name in keys(self.config)
         for conf in [self.kind . '/' . self.name . '/' . name,
+        \            self.name . '/' . name,
         \            self.kind . '/' . name,
         \            name]
           if has_key(config, conf)

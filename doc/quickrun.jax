@@ -359,8 +359,9 @@ quickrun のいくつかの部分はモジュール化されています。モ�
 通常のオプションで指定した場合、以下の優先順位でモジュールに読み取られます。
 
 1. "{module-type}/{module-name}/{option-name}"
-2. "{module-type}/{option-name}"
-3. "{option-name}"
+2. "{module-name}/{option-name}"
+3. "{module-type}/{option-name}"
+4. "{option-name}"
 
 例えば、"outputter/buffer" モジュールに "append" オプションを指定したい場合、
 >
