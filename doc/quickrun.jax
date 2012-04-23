@@ -30,12 +30,14 @@ License: zlib License
   RUNNER の属性			  |quickrun-runner-attributes|
   OUTPUTTER の属性		  |quickrun-outputter-attributes|
   HOOK の属性			  |quickrun-hook-attributes|
+  実行順序			  |quickrun-execution-sequence|
 フック				|quickrun-hook|
   フック関数			  |quickrun-hook-function|
   フックポイント		  |quickrun-hook-point|
 設定例				|quickrun-examples|
 既知の問題			|quickrun-known-issues|
 更新履歴			|quickrun-changelog|
+
 
 
 ==============================================================================
@@ -629,7 +631,8 @@ session.output({data})			*quickrun-session.output()*
 
 session.continue()			*quickrun-session.continue()*
 	runner がその場で実行を完了できない時に呼び出します。{key} を返しま
-	す。|quickrun#session()| に {key} を渡すことで、実行を継続します。
+	す。|quickrun#session()| に {key} を渡すことで継続中の {session} を取
+	得できるので、これを使って実行を継続します。
 
 session.finish([{exit-code}])		*quickrun-session.finish()*
 	runner が実行が全て完了した際に呼び出します。{exit-code} が省略された
@@ -735,6 +738,43 @@ hook.config.enable			*quickrun-hook.config.enable*
 	効化してその後の hook 呼び出し時のオーバーヘッドを少しだけ減らすことが
 	できます。
 
+------------------------------------------------------------------------------
+実行順序					*quickrun-execution-sequence*
+
+モジュールを作成する上で、quickrun の内部の処理順序を知ることは重要です。以下
+は quickrun のおおまかな実行順序です。
+
+1.  config の構築
+    コマンドライン引数、各種オプション変数などから config を構築します。この時
+    点では指定されなかった一部のオプションが存在していない可能性があります。
+2.  hook の構築
+    hook モジュールを生成します。この時 |quickrun-module.init()| が呼ばれま
+    す。ここ以降でエラーが発生した場合は多くの場合 |quickrun-session.sweep()|
+    が呼ばれます。ただし、非同期実行などでうまく呼ばれないかもしれません。
+3.  |quickrun-hook-point-hook_loaded| の実行
+4.  無効な hook 削除
+    この時点で enable オプションが 0 な hook は {session} から取り除かれます。
+5.  config の標準化
+    config 内の |quickrun-syntax-option| を展開したり、いくつかの必要なオプ
+    ションがなかった場合に補完します。ファイルが直接実行できない場合に一時ファ
+    イルへ書き出す処理もここで行います。
+6.  runner/outputter の構築
+    runner モジュールと outputter モジュールを生成します。hook の時と同様に
+    |quickrun-module.init()| が呼ばれます。
+7.  |quickrun-hook-point-module_loaded| の実行
+8.  コマンドの構築
+    |quickrun-option-exec| の値を実際に実行するコマンドに展開します。
+9.  |quickrun-hook-point-ready| の実行
+10. |quickrun-outputter.start()| の実行
+11. |quickrun-runner.run()| の実行
+12. |quickrun-session.finish()| の実行
+    非同期実行の場合は runner が直接呼び出す必要があります。
+13. |quickrun-hook-point-success| / |quickrun-hook-point-failure| の実行
+14. |quickrun-hook-point-finish| の実行
+15. |quickrun-outputter.finish()| の実行
+16. |quickrun-session.sweep()| の実行
+17. |quickrun-hook-point-exit| の実行
+
 
 
 ==============================================================================
@@ -756,34 +796,34 @@ hook.config.enable			*quickrun-hook.config.enable*
 
 標準では以下のフックポイントが利用できます。
 
-- "hook_loaded"
+- "hook_loaded"				*quickrun-hook-point-hook_loaded*
   hook のロードが終わった直後です。この後に runner と outputter がロードされま
   す。
 
-- "module_loaded"
+- "module_loaded"			*quickrun-hook-point-module_loaded*
   runner と outputter のロードが終わった直後です。
 
-- "ready"
+- "ready"				*quickrun-hook-point-ready*
   全てのオプションの設定が終わって、最初のコマンドが実行される前です。
 
-- "output"
+- "output"				*quickrun-hook-point-output*
   runner から出力を受け取り、outputter へ渡す前です。
   コンテキスト ~
   "data": 出力データ
 
-- "success"
+- "success"				*quickrun-hook-point-success*
   実行時が正常に完了した時です。
 
-- "failure"
+- "failure"				*quickrun-hook-point-failure*
   実行時にエラーが発生した時。
   コンテキスト ~
   "exit_code": 終了コード
 
-- "finish"
+- "finish"				*quickrun-hook-point-finish*
   実行が完了した時です。success/failure の後に、成功か失敗かに関わらず呼ばれま
   す。
 
-- "exit"
+- "exit"				*quickrun-hook-point-exit*
   後処理が終わった後の処理の終了時です。
 
 これら以外に、モジュールが |quickrun-session.invoke_hook()| を使うことで任意の
@@ -809,7 +849,6 @@ pandocを使用してmarkdownをhtmlにしてブラウザで開く (要|open-bro
 >
 	let g:quickrun_config = {}
 <
-
 
 
 ==============================================================================
