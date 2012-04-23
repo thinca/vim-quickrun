@@ -240,14 +240,6 @@ tempfile (*)				*quickrun-option-tempfile*
 	一時ファイルは実行する度に削除されます。
 	デフォルトは "{tempname()}" です。
 
-eval					*quickrun-option-eval*
-	0 以外が指定された場合、src を eval_template に埋め込んで置き変えま
-	す。
-
-eval_template				*quickrun-option-eval_template*
-	eval が指定された際に使用されるテンプレート文字列です。テンプレート内
-	の %s が src に置き変えられます。
-
 
 ------------------------------------------------------------------------------
 オプション値の構文				*quickrun-syntax-option*
@@ -559,6 +551,20 @@ hook は特定のポイントで追加の処理を行うモジュールです。
   オプション ~
   directory		デフォルト: ""
 	変更先のディレクトリです。空文字列の場合は何もしません。
+
+- "eval"				*quickrun-module-hook/eval*
+  テンプレートを使ってソースファイルの中身を変更します。例えば、
+  ソースファイル: >
+    1 + 2 * 3
+< テンプレート: >
+    print(%s);
+< となっていた場合、実際に実行されるソースファイルは >
+    print(1 + 2 * 3);
+< になります。
+  オプション ~
+  template		デフォルト: ""
+  テンプレート文字列です。テンプレート内の "%s" が元のソースファイルに置き変え
+  られます。テンプレート内で "%" を使う場合は "%%" と書きます。
 
 - "output_encode"			*quickrun-module-hook/output_encode*
   出力の文字コードを変換します。

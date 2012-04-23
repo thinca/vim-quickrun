@@ -23,8 +23,6 @@ let g:quickrun#default_config = {
 \   'args': '',
 \   'tempfile'  : '%{tempname()}',
 \   'exec': '%c %o %s %a',
-\   'eval': 0,
-\   'eval_template': '%s',
 \ },
 \ 'awk': {
 \   'exec': '%c %o -f %s %a',
@@ -137,7 +135,7 @@ let g:quickrun#default_config = {
 \ 'haskell': {
 \   'command': 'runghc',
 \   'tempfile': '%{tempname()}.hs',
-\   'eval_template': 'main = print $ %s',
+\   'hook/eval/template': 'main = print \$ %s',
 \ },
 \ 'io': {},
 \ 'java': {
@@ -211,20 +209,20 @@ let g:quickrun#default_config = {
 \ },
 \ 'ocaml': {},
 \ 'perl': {
-\   'eval_template': join([
+\   'hook/eval/template': join([
 \     'use Data::Dumper',
-\     '$Data::Dumper::Terse = 1',
-\     '$Data::Dumper::Indent = 0',
+\     '\$Data::Dumper::Terse = 1',
+\     '\$Data::Dumper::Indent = 0',
 \     'print Dumper eval{%s}'], ';')
 \ },
-\ 'perl6': {'eval_template': '{%s}().perl.print'},
-\ 'python': {'eval_template': 'print(%s)'},
+\ 'perl6': {'hook/eval/template': '{%s}().perl.print'},
+\ 'python': {'hook/eval/template': 'print(%s)'},
 \ 'php': {},
 \ 'r': {
 \   'command': 'R',
 \   'exec': '%c %o --no-save --slave %a < %s',
 \ },
-\ 'ruby': {'eval_template': " p proc {\n%s\n}.call"},
+\ 'ruby': {'hook/eval/template': " p proc {\n%s\n}.call"},
 \ 'scala': {
 \   'hook/output_encode/encoding': '&termencoding',
 \ },
@@ -235,7 +233,7 @@ let g:quickrun#default_config = {
 \ 'scheme/gauche': {
 \   'command': 'gosh',
 \   'exec': '%c %o %s:p %a',
-\   'eval_template': '(display (begin %s))',
+\   'hook/eval/template': '(display (begin %s))',
 \ },
 \ 'scheme/mzscheme': {
 \   'command': 'mzscheme',
@@ -246,7 +244,7 @@ let g:quickrun#default_config = {
 \ 'vim': {
 \   'command': ':source',
 \   'exec': '%C %s',
-\   'eval_template': "echo %s",
+\   'hook/eval/template': "echo %s",
 \   'runner': 'system',
 \ },
 \ 'wsh': {
@@ -283,12 +281,8 @@ function! s:Session.normalize(config)
 
   if has_key(config, 'srcfile')
     let config.srcfile = quickrun#expand(expand(config.srcfile))
-  elseif has_key(config, 'src')
-    if config.eval
-      let config.src = printf(config.eval_template, config.src)
-    endif
-  else
-    if !config.eval && filereadable(expand('%:p')) &&
+  elseif !has_key(config, 'src')
+    if filereadable(expand('%:p')) &&
     \  !has_key(config, 'region') && !&modified
       " Use file in direct.
       let config.srcfile = expand('%:p')
@@ -300,10 +294,6 @@ function! s:Session.normalize(config)
       \ })
       " Executes on the temporary file.
       let body = s:get_region(config.region)
-
-      if config.eval
-        let body = printf(config.eval_template, body)
-      endif
 
       let body = s:V.iconv(body, &encoding, &fileencoding)
 
@@ -652,8 +642,7 @@ function! quickrun#complete(lead, cmd, pos)
   elseif head =~# '^-'
     " a name of option.
     let list = ['type', 'src', 'srcfile', 'input', 'runner', 'outputter',
-    \ 'command', 'exec', 'cmdopt', 'args', 'tempfile', 'eval',
-    \ 'mode', 'eval_template']
+    \ 'command', 'exec', 'cmdopt', 'args', 'tempfile', 'mode']
     let mod_options = {}
     for kind in kinds
       for module in filter(quickrun#module#get(kind), 'v:val.available()')
