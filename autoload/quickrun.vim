@@ -340,10 +340,9 @@ function! s:Session.setup()
     let self.outputter = self.make_module('outputter', self.config.outputter)
     call self.invoke_hook('module_loaded')
 
-    let source_name = self.config.srcfile
     let exec = get(self.config, 'exec', '')
     let commands = type(exec) == type([]) ? copy(exec) : [exec]
-    call filter(map(commands, 'self.build_command(source_name, v:val)'),
+    call filter(map(commands, 'self.build_command(v:val)'),
     \           'v:val =~# "\\S"')
     let self.commands = commands
   catch /^quickrun:/
@@ -432,12 +431,12 @@ function! s:Session.finish(...)
 endfunction
 
 " Build a command to execute it from options.
-function! s:Session.build_command(source_name, tmpl)
+function! s:Session.build_command(tmpl)
   let config = self.config
   let command = config.command
   let rule = {
   \  'c': command,
-  \  's': a:source_name,
+  \  's': config.srcfile,
   \  'o': config.cmdopt,
   \  'a': config.args,
   \  '%': '%',
