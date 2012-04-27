@@ -40,19 +40,22 @@ let g:quickrun#default_config = {
 \ },
 \ 'c/clang': {
 \   'command': 'clang',
-\   'exec': ['%c %o %s -o %s:p:r', '%s:p:r %a', 'rm -f %s:p:r'],
+\   'exec': ['%c %o %s -o %s:p:r', '%s:p:r %a'],
 \   'tempfile': '%{tempname()}.c',
+\   'hook/sweep/files': '%S:p:r',
 \ },
 \ 'c/gcc': {
 \   'command': 'gcc',
-\   'exec': ['%c %o %s -o %s:p:r', '%s:p:r %a', 'rm -f %s:p:r'],
+\   'exec': ['%c %o %s -o %s:p:r', '%s:p:r %a'],
 \   'tempfile': '%{tempname()}.c',
+\   'hook/sweep/files': '%S:p:r',
 \ },
 \ 'c/vc': {
 \   'command': 'cl',
 \   'exec': ['%c %o %s /nologo /Fo%s:p:r.obj /Fe%s:p:r.exe > nul',
-\             '%s:p:r.exe %a', 'del %s:p:r.exe %s:p:r.obj'],
+\            '%s:p:r.exe %a'],
 \   'tempfile': '%{tempname()}.c',
+\   'hook/sweep/files': ['%S:p:r.exe', '%S:p:r.obj'],
 \ },
 \ 'cpp': {
 \   'type':
@@ -65,14 +68,16 @@ let g:quickrun#default_config = {
 \ },
 \ 'cpp/g++': {
 \   'command': 'g++',
-\   'exec': ['%c %o %s -o %s:p:r', '%s:p:r %a', 'rm -f %s:p:r'],
+\   'exec': ['%c %o %s -o %s:p:r', '%s:p:r %a'],
 \   'tempfile': '%{tempname()}.cpp',
+\   'hook/sweep/files': '%S:p:r',
 \ },
 \ 'cpp/vc': {
 \   'command': 'cl',
 \   'exec': ['%c %o %s /nologo /Fo%s:p:r.obj /Fe%s:p:r.exe > nul',
-\             '%s:p:r.exe %a', 'del %s:p:r.exe %s:p:r.obj'],
+\            '%s:p:r.exe %a'],
 \   'tempfile': '%{tempname()}.cpp',
+\   'hook/sweep/files': ['%S:p:r.exe', '%S:p:r.obj'],
 \ },
 \ 'clojure': {
 \   'type': executable('jark') ? 'clojure/jark':
@@ -106,28 +111,29 @@ let g:quickrun#default_config = {
 \     $GOARCH ==# 'arm'   ? 'go/arm': '',
 \ },
 \ 'go/386': {
-\   'exec': ['8g %o -o %s:p:r.8 %s', '8l -o %s:p:r %s:p:r.8',
-\            '%s:p:r %a', 'rm -f %s:p:r'],
+\   'exec': ['8g %o -o %s:p:r.8 %s', '8l -o %s:p:r %s:p:r.8', '%s:p:r %a'],
 \   'tempfile': '%{tempname()}.go',
 \   'hook/output_encode/encoding': 'utf-8',
+\   'hook/sweep/files': '%S:p:r',
 \ },
 \ 'go/386/win': {
 \   'exec': ['8g %o -o %s:p:r.8 %s', '8l -o %s:p:r.exe %s:p:r.8',
-\            '%s:p:r.exe %a', 'del /F %s:p:r.exe'],
+\            '%s:p:r.exe %a'],
 \   'tempfile': '%{tempname()}.go',
 \   'hook/output_encode/encoding': 'utf-8',
+\   'hook/sweep/files': '%S:p:r.exe',
 \ },
 \ 'go/amd64': {
-\   'exec': ['6g %o -o %s:p:r.6 %s', '6l -o %s:p:r %s:p:r.6',
-\            '%s:p:r %a', 'rm -f %s:p:r'],
+\   'exec': ['6g %o -o %s:p:r.6 %s', '6l -o %s:p:r %s:p:r.6', '%s:p:r %a'],
 \   'tempfile': '%{tempname()}.go',
 \   'hook/output_encode/encoding': 'utf-8',
+\   'hook/sweep/files': '%S:p:r',
 \ },
 \ 'go/arm': {
-\   'exec': ['5g %o -o %s:p:r.5 %s', '5l -o %s:p:r %s:p:r.5',
-\            '%s:p:r %a', 'rm -f %s:p:r'],
+\   'exec': ['5g %o -o %s:p:r.5 %s', '5l -o %s:p:r %s:p:r.5', '%s:p:r %a'],
 \   'tempfile': '%{tempname()}.go',
 \   'hook/output_encode/encoding': 'utf-8',
+\   'hook/sweep/files': '%S:p:r',
 \ },
 \ 'groovy': {
 \   'cmdopt': '-c %{&fenc==#""?&enc:&fenc}'
@@ -139,8 +145,9 @@ let g:quickrun#default_config = {
 \ },
 \ 'io': {},
 \ 'java': {
-\   'exec': ['javac %o %s', '%c %s:t:r %a', ':call delete("%S:t:r.class")'],
+\   'exec': ['javac %o %s', '%c %s:t:r %a'],
 \   'hook/output_encode/encoding': '&termencoding',
+\   'hook/sweep/files': '%S:p:r.class',
 \ },
 \ 'javascript': {
 \   'type': executable('js') ? 'javascript/spidermonkey':
@@ -431,6 +438,7 @@ function! s:Session.finish(...)
 endfunction
 
 " Build a command to execute it from options.
+" XXX: Undocumented yet.  This is used by core modules only.
 function! s:Session.build_command(tmpl)
   let config = self.config
   let command = config.command

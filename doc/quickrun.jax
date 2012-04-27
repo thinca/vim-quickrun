@@ -581,6 +581,13 @@ hook は特定のポイントで追加の処理を行うモジュールです。
   (|quickrun-option-command|) として扱います。同時に、exec オプション
   (|quickrun-option-exec|) 内の "%c" を "%C" に変換します。
 
+- "sweep"				*quickrun-module-hook/sweep*
+  終了時に一時ファイルを削除します。
+  オプション ~
+  files			デフォルト: []
+	削除するファイルのリストです。この値は |quickrun-exec-format| のように
+	展開されます。エスケープを避けるために大文字を指定してください。
+
 - "time"				*quickrun-module-hook/time*
   実行時間を計測し、最後に出力します。
   NOTE: 時間には quickrun.vim 自体のオーバーヘッドも含まれています。正確な時間
