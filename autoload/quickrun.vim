@@ -656,6 +656,7 @@ function! quickrun#complete(lead, cmd, pos)
         for opt in keys(module.config)
           let mod_options[opt] = 1
           let mod_options[kind . '/' . opt] = 1
+          let mod_options[module.name . '/' . opt] = 1
           let mod_options[kind . '/' . module.name . '/' . opt] = 1
         endfor
       endfor
