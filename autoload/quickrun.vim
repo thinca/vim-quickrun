@@ -461,7 +461,7 @@ function! s:Session.build_command(tmpl)
     endif
 
     let rest = rest[2 :]
-    if symbol ==? 's'
+    if symbol =~? '^[cs]$'
       let mod = matchstr(rest, '^\v\zs%(\:[p8~.htre]|\:g?s(.).{-}\1.{-}\1)*')
       let value = fnamemodify(value, mod)
       if symbol =~# '\U'
