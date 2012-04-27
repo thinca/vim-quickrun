@@ -382,7 +382,7 @@ function! s:Session.make_module(kind, line)
   endtry
 
   try
-    call module.build([self.config] + args)
+    call s:build_module(module, [self.config] + args)
     call map(module.config, 'quickrun#expand(v:val)')
     call module.init(self)
   catch
@@ -875,6 +875,61 @@ function! s:build_config(config)
     endif
   endfor
   return config
+endfunction
+
+function! s:build_module(module, configs)
+  for config in a:configs
+    if type(config) == type({})
+      for name in keys(a:module.config)
+        for conf in [a:module.kind . '/' . a:module.name . '/' . name,
+        \            a:module.name . '/' . name,
+        \            a:module.kind . '/' . name,
+        \            name]
+          if has_key(config, conf)
+            let val = config[conf]
+            if s:V.is_list(a:module.config[name])
+              let a:module.config[name] += s:V.is_list(val) ? val : [val]
+            else
+              let a:module.config[name] = val
+            endif
+            unlet val
+            break
+          endif
+        endfor
+      endfor
+    elseif type(config) == type('') && config !=# ''
+      call s:parse_module_option(a:module, config)
+    endif
+    unlet config
+  endfor
+endfunction
+
+function! s:parse_module_option(module, argline)
+  let sep = a:argline[0]
+  let args = split(a:argline[1:], '\V' . escape(sep, '\'))
+  let order = copy(a:module.config_order)
+  for arg in args
+    let name = matchstr(arg, '^\w\+\ze=')
+    if !empty(name)
+      let value = matchstr(arg, '^\w\+=\zs.*')
+    elseif len(a:module.config) == 1
+      let [name, value] = [keys(a:module.config)[0], arg]
+    elseif !empty(order)
+      let name = remove(order, 0)
+      let value = arg
+    endif
+    if empty(name)
+      throw 'could not parse the option: ' . arg
+    endif
+    if !has_key(a:module.config, name)
+      throw 'unknown option: ' . name
+    endif
+    if type(a:module.config[name]) == type([])
+      call add(a:module.config[name], value)
+    else
+      let a:module.config[name] = value
+    endif
+  endfor
 endfunction
 
 " Get the text of specified region.

@@ -22,59 +22,6 @@ function! s:module.available()
 endfunction
 function! s:module.validate()
 endfunction
-function! s:module.build(configs)
-  for config in a:configs
-    if type(config) == type({})
-      for name in keys(self.config)
-        for conf in [self.kind . '/' . self.name . '/' . name,
-        \            self.name . '/' . name,
-        \            self.kind . '/' . name,
-        \            name]
-          if has_key(config, conf)
-            let val = config[conf]
-            if s:is_array(self.config[name])
-              let self.config[name] += s:is_array(val) ? val : [val]
-            else
-              let self.config[name] = val
-            endif
-            unlet val
-            break
-          endif
-        endfor
-      endfor
-    elseif type(config) == type('') && config !=# ''
-      call self.parse_option(config)
-    endif
-    unlet config
-  endfor
-endfunction
-function! s:module.parse_option(argline)
-  let sep = a:argline[0]
-  let args = split(a:argline[1:], '\V' . escape(sep, '\'))
-  let order = copy(self.config_order)
-  for arg in args
-    let name = matchstr(arg, '^\w\+\ze=')
-    if !empty(name)
-      let value = matchstr(arg, '^\w\+=\zs.*')
-    elseif len(self.config) == 1
-      let [name, value] = [keys(self.config)[0], arg]
-    elseif !empty(order)
-      let name = remove(order, 0)
-      let value = arg
-    endif
-    if empty(name)
-      throw 'could not parse the option: ' . arg
-    endif
-    if !has_key(self.config, name)
-      throw 'unknown option: ' . name
-    endif
-    if type(self.config[name]) == type([])
-      call add(self.config[name], value)
-    else
-      let self.config[name] = value
-    endif
-  endfor
-endfunction
 function! s:module.init(session)
 endfunction
 function! s:module.sweep()
@@ -210,10 +157,6 @@ endfunction
 
 function! s:is_cmd_exe()
   return &shell =~? 'cmd\.exe'
-endfunction
-
-function! s:is_array(val)
-  return type(a:val) == type([])
 endfunction
 
 
