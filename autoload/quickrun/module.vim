@@ -31,7 +31,13 @@ function! s:module.build(configs)
         \            self.kind . '/' . name,
         \            name]
           if has_key(config, conf)
-            let self.config[name] = config[conf]
+            let val = config[conf]
+            if s:is_array(self.config[name])
+              let self.config[name] += s:is_array(val) ? val : [val]
+            else
+              let self.config[name] = val
+            endif
+            unlet val
             break
           endif
         endfor
@@ -204,6 +210,10 @@ endfunction
 
 function! s:is_cmd_exe()
   return &shell =~? 'cmd\.exe'
+endfunction
+
+function! s:is_array(val)
+  return type(a:val) == type([])
 endfunction
 
 
