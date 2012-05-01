@@ -16,6 +16,12 @@ function! s:outputter.init(session)
   \   map(self.config.targets, 'a:session.make_module("outputter", v:val)')
 endfunction
 
+function! s:outputter.start(session)
+  for outputter in self._outputters
+    call outputter.start(a:session)
+  endfor
+endfunction
+
 function! s:outputter.output(data, session)
   for outputter in self._outputters
     call outputter.output(a:data, a:session)
