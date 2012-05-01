@@ -893,6 +893,14 @@ pandocを使用してmarkdownをhtmlにしてブラウザで開く (要|open-bro
 	  - |quickrun#module#register()| の引数を変更。
 	  - |quickrun#module#unregister()| を追加。
 	  - |quickrun#module#exists()| を追加。
+	- hook モジュール(|quickrun-module-hook|)を追加。
+	- いくつかのオプションをモジュールへ移動して削除。
+	  - output_encode
+	  - shebang
+	  - eval
+	- |quickrun-module-outputter/buffer| にオプションを追加。
+	  - name
+	  - filetype
 
 0.5.1	2011-10-21
 	- "srcfile" オプション(|quickrun-option-srcfile|)を追加。
