@@ -16,3 +16,4 @@ function! quickrun#outputter#null#new()
 endfunction
 
 let &cpo = s:save_cpo
+unlet s:save_cpo

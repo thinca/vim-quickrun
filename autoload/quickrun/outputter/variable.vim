@@ -45,3 +45,4 @@ function! quickrun#outputter#variable#new()
 endfunction
 
 let &cpo = s:save_cpo
+unlet s:save_cpo

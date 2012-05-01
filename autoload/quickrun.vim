@@ -1016,3 +1016,4 @@ call s:register_defaults(['runner', 'outputter', 'hook'])
 
 
 let &cpo = s:save_cpo
+unlet s:save_cpo

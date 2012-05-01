@@ -32,3 +32,4 @@ function! quickrun#hook#output_encode#new()
 endfunction
 
 let &cpo = s:save_cpo
+unlet s:save_cpo

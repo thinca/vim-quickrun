@@ -28,3 +28,4 @@ function! quickrun#hook#sweep#new()
 endfunction
 
 let &cpo = s:save_cpo
+unlet s:save_cpo
