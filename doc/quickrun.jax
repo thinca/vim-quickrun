@@ -160,6 +160,14 @@ quickrun#sweep_sessions()			*quickrun#sweep_sessions()*
 	ます。実行が終わらない場合は、手動で呼び出すこともできます。
 
 
+以下の関数は非推奨です。次のバージョンで削除される予定です。
+quickrun#register_module({kind}, {name}, {module})
+quickrun#register_runner({name}, {runner})
+quickrun#register_outputter({name}, {outputter})
+quickrun#register_hook({name}, {hook})
+quickrun#get_module({kind} [, {name}])
+
+
 ------------------------------------------------------------------------------
 キーマッピング					*quickrun-key-mappings*
 

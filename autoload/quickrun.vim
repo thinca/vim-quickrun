@@ -975,6 +975,26 @@ endfunction
 
 
 
+" Wrapper functions for compatibility.  {{{1
+function! quickrun#register_runner(name, runner)
+  return quickrun#register_module('runner', a:name, a:runner)
+endfunction
+function! quickrun#register_outputter(name, outputter)
+  return quickrun#register_module('outputter', a:name, a:outputter)
+endfunction
+function! quickrun#register_hook(name, hook)
+  return quickrun#register_module('hook', a:name, a:hook)
+endfunction
+function! quickrun#register_module(kind, name, module)
+  return quickrun#module#register(
+  \        extend(a:module, {'kind': a:kind, 'name': a:name}, 'keep'))
+endfunction
+function! quickrun#get_module(kind, ...)
+  return call('quickrun#module#get', [a:kind] + a:000)
+endfunction
+
+
+
 " Register the default modules.  {{{1
 function! s:register_defaults(kinds)
   for kind in a:kinds
