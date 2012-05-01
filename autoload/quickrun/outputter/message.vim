@@ -1,4 +1,4 @@
-" quickrun: outputter: message
+" quickrun: outputter/message: Outputs to messages area.
 " Author : thinca <thinca+vim@gmail.com>
 " License: zlib License
 

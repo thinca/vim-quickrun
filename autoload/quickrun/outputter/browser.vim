@@ -1,4 +1,4 @@
-" quickrun: outputter: browser
+" quickrun: outputter/browser: Outputs to a web browser.
 " Author : thinca <thinca+vim@gmail.com>
 " License: zlib License
 

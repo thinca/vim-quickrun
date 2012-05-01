@@ -1,4 +1,4 @@
-" quickrun: outputter: file
+" quickrun: outputter/file: Outputs to a file.
 " Author : thinca <thinca+vim@gmail.com>
 " License: zlib License
 

@@ -1,4 +1,4 @@
-" quickrun: hook: Changes current directory.
+" quickrun: hook/cd: Changes current directory.
 " Author : thinca <thinca+vim@gmail.com>
 " License: zlib License
 

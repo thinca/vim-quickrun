@@ -1,4 +1,4 @@
-" quickrun: hook: Converts to evaluable code.
+" quickrun: hook/eval: Converts to evaluable code.
 " Author : thinca <thinca+vim@gmail.com>
 " License: zlib License
 

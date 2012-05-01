@@ -465,7 +465,7 @@ default. NOTE: Everything except for "system" can be unstable.
 
 - "vimproc"				*quickrun-module-runner/vimproc*
   {Requirement: |vimproc|}
-  Runs by |vimproc| in background. This checks if the process completed with
+  Runs by |vimproc| at background. This checks if the process completed with
   using |CursorHold| |CursorHoldI| events. If the process completed within 50
   millisecond, it shows the result immediately.
   Option ~

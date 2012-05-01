@@ -1,4 +1,4 @@
-" quickrun: outputter: multi
+" quickrun: outputter/multi: Meta outputter; Outputs to multiple outputters.
 " Author : thinca <thinca+vim@gmail.com>
 " License: zlib License
 

@@ -1,4 +1,4 @@
-" quickrun: hook: Converts the encoding of output.
+" quickrun: hook/output_encode: Converts the encoding of output.
 " Author : thinca <thinca+vim@gmail.com>
 " License: zlib License
 

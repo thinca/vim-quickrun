@@ -1,4 +1,4 @@
-" quickrun: hook: Sweeps temporary files.
+" quickrun: hook/sweep: Sweeps temporary files.
 " Author : thinca <thinca+vim@gmail.com>
 " License: zlib License
 

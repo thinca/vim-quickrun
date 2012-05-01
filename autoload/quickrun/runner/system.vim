@@ -1,4 +1,4 @@
-" quickrun: runner: system
+" quickrun: runner/system: Runs by system().
 " Author : thinca <thinca+vim@gmail.com>
 " License: zlib License
 

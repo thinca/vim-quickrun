@@ -1,4 +1,4 @@
-" quickrun: hook: Detects shebang.
+" quickrun: hook/shebang: Detects shebang.
 " Author : thinca <thinca+vim@gmail.com>
 " License: zlib License
 

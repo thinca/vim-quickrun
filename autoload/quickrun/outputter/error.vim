@@ -1,4 +1,4 @@
-" quickrun: outputter: error
+" quickrun: outputter/error: Meta outputter; Switches outputters by result.
 " Author : thinca <thinca+vim@gmail.com>
 " License: zlib License
 

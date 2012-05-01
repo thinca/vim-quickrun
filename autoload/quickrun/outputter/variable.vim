@@ -1,4 +1,4 @@
-" quickrun: outputter: variable
+" quickrun: outputter/variable: Outputs to a variable.
 " Author : thinca <thinca+vim@gmail.com>
 " License: zlib License
 

@@ -1,4 +1,4 @@
-" quickrun: hook: Measures execution time.
+" quickrun: hook/time: Measures execution time.
 " Author : thinca <thinca+vim@gmail.com>
 " License: zlib License
 

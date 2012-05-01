@@ -1,4 +1,4 @@
-" quickrun: outputter: buffered
+" quickrun: outputter/buffered: Meta outputter; Buffers the output.
 " Author : thinca <thinca+vim@gmail.com>
 " License: zlib License
 

@@ -1,4 +1,4 @@
-" quickrun: outputter: null
+" quickrun: outputter/null: Doesn't output.
 " Author : thinca <thinca+vim@gmail.com>
 " License: zlib License
 

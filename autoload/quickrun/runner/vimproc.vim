@@ -1,4 +1,4 @@
-" quickrun: runner: vimproc
+" quickrun: runner/vimproc: Runs by vimproc at background.
 " Author : thinca <thinca+vim@gmail.com>
 " License: zlib License
 

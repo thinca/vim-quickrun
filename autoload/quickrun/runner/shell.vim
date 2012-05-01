@@ -1,4 +1,4 @@
-" quickrun: runner: shell
+" quickrun: runner/shell: Runs by :! .
 " Author : thinca <thinca+vim@gmail.com>
 " License: zlib License
 

@@ -1,4 +1,4 @@
-" quickrun: runner: python
+" quickrun: runner/python: Runs by thread of +python feature asynchronously.
 " Author : thinca <thinca+vim@gmail.com>
 " License: zlib License
 

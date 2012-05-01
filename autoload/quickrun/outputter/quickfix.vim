@@ -1,4 +1,4 @@
-" quickrun: outputter: quickfix
+" quickrun: outputter/quickfix: Outputs to quickfix.
 " Author : thinca <thinca+vim@gmail.com>
 " License: zlib License
 

@@ -1,4 +1,4 @@
-" quickrun: runner: remote
+" quickrun: runner/remote: Runs in background by +clientserver feature.
 " Author : thinca <thinca+vim@gmail.com>
 " License: zlib License
 

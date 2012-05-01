@@ -1,4 +1,4 @@
-" quickrun: outputter: buffer
+" quickrun: outputter/buffer: Outputs to a vim buffer.
 " Author : thinca <thinca+vim@gmail.com>
 " License: zlib License
 
