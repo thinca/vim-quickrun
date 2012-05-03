@@ -289,12 +289,6 @@ exec オプションの書式				*quickrun-exec-format*
 <
 コマンドに改行文字が含まれている場合は空白文字に置き換えられます。
 
-Vim のコマンドを実行する
-------------------------
-exec を展開した結果先頭の文字が ":" だった場合、Vim のコマンドとして実行されま
-す。また、この場合ファイルを指定するシンボルは |fnameescape()| でエスケープさ
-れます。
-
 複数のコマンドを指定する
 ------------------------
 |:QuickRun| コマンドに exec オプションを複数回指定したり、 |g:quickrun_config|
@@ -905,6 +899,7 @@ pandocを使用してmarkdownをhtmlにしてブラウザで開く (要|open-bro
 	  - name
 	  - filetype
 	- |quickrun-module-runner/vimscript| を追加。
+	- Vim のコマンドを実行する仕様を削除。
 
 0.5.1	2011-10-21
 	- "srcfile" オプション(|quickrun-option-srcfile|)を追加。

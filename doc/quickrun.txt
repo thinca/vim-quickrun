@@ -329,12 +329,6 @@ You can use |filename-modifiers| for the symbols.
 <
 And newline(s) are replaced by a whitespace.
 
-Execute Vim ex command
-------------------------
-If first character of result of exec is ":",
-It is executed as Vim's ex command.
-And in this case, symbols to specify file are escaped by |fnameescape()|.
-
 Specify multiple command
 ------------------------
 If you specify multiple exec options to |:QuickRun|,
