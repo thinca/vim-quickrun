@@ -252,7 +252,7 @@ let g:quickrun#default_config = {
 \   'command': ':source',
 \   'exec': '%C %s',
 \   'hook/eval/template': "echo %s",
-\   'runner': 'system',
+\   'runner': 'vimscript',
 \ },
 \ 'wsh': {
 \   'command': 'cscript',
