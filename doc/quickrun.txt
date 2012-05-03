@@ -491,6 +491,9 @@ default. NOTE: Everything except for "system" can be unstable.
   WARNING: This is absolutely unstable.
   WARNING: Don't use this on X11. Vim crashes.
 
+- "vimscript"				*quickrun-module-runner/vimscript*
+  Runs commands as Vim commands.
+
 
 ------------------------------------------------------------------------------
 OUTPUTTER					*quickrun-module-outputter*
