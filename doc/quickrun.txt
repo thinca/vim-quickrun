@@ -782,8 +782,6 @@ where you already defined |g:quickrun_config| by like the following code.
 ==============================================================================
 KNOWN ISSUES					*quickrun-known-issues*
 
-- |quickrun-module-runner/vimproc| doesn't support : to run a Vim command.
-
 - It depends on runner how to handle multiple stdins when you gave multiple
   commands
 
