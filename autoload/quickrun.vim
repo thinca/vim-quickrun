@@ -414,10 +414,9 @@ function! s:Session.continue()
 endfunction
 
 function! s:Session.output(data)
-  if a:data !=# ''
-    let data = a:data
-    let context = {'data': data}
-    call self.invoke_hook('output', context)
+  let context = {'data': a:data}
+  call self.invoke_hook('output', context)
+  if context.data !=# ''
     call self.outputter.output(context.data, self)
   endif
 endfunction
