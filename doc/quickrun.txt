@@ -463,6 +463,9 @@ default. NOTE: Everything except for "system" can be unstable.
   using |CursorHold| |CursorHoldI| events. If the process completed within 50
   millisecond, it shows the result immediately.
   Option ~
+  {sleep}		Default: 50
+	Waits specified times in millisecond.  This is useful to avoid polling
+	by 'updatetime' when program will stop immediately.
   {updatetime}		Default: 0
 	Changes 'updatetime' to the value temporary. Stays same if this is 0.
 

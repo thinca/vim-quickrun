@@ -12,6 +12,7 @@ augroup END
 let s:runner = {
 \   'config': {
 \     'updatetime': 0,
+\     'sleep': 50,
 \   }
 \ }
 
@@ -30,7 +31,9 @@ function! s:runner.run(commands, input, session)
   let key = a:session.continue()
 
   " Wait a little because execution might end immediately.
-  sleep 50m
+  if self.config.sleep
+    execute 'sleep' self.config.sleep . 'm'
+  endif
   if s:receive_vimproc_result(key)
     return
   endif
