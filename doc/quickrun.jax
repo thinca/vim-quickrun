@@ -892,9 +892,12 @@ pandocを使用してmarkdownをhtmlにしてブラウザで開く (要|open-bro
 	  - output_encode
 	  - shebang
 	  - eval
-	- |quickrun-module-outputter/buffer| にオプションを追加。
-	  - name
-	  - filetype
+	- いくつかのモジュールにオプションを追加。
+	  - |quickrun-module-runner/vimproc|
+	    - sleep
+	  - |quickrun-module-outputter/buffer|
+	    - name
+	    - filetype
 	- |quickrun-module-runner/vimscript| を追加。
 	- Vim のコマンドを実行する仕様を削除。
 
