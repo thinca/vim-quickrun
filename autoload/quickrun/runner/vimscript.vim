@@ -27,7 +27,7 @@ function! s:execute(cmd)
   let save_vfile = &verbosefile
   let &verbosefile = temp
 
-  silent! execute cmd
+  silent! execute a:cmd
 
   if &verbosefile ==# temp
     let &verbosefile = save_vfile
