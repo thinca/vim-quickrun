@@ -112,7 +112,7 @@ COMMANDS					*quickrun-commands*
 	|:Quickrun| can take |:range|.
 	if it was not given, |:QuickRun| treats whole lines.
 	If you specify '<,'> and do not specify -mode
-	(|quickrun-option-mode|), target is selected text in visual mode. And
+	(|quickrun-option-mode|), target is selected text in visual mode.  And
 	|blockwise-visual| also works.  But when |:QuickRun| is executed from
 	key mapping, you need to specify -mode because |:QuickRun| can't
 	detect current mode.
@@ -150,12 +150,12 @@ quickrun#module#get_kinds()			*quickrun#module#get_kinds()*
 
 						*quickrun#session()*
 quickrun#session({key} [, {func-name} [, {args} ...]])
-	This is used in a module. This fetches the current runnning session if
-	you skipped {func-name}. This calls the session function with
+	This is used in a module.  This fetches the current runnning session
+	if you skipped {func-name}.  This calls the session function with
 	arguments {args} if you specified {func-name}.
 
 quickrun#sweep_sessions()			*quickrun#sweep_sessions()*
-	Stops the sessions under execution. This is called before new
+	Stops the sessions under execution.  This is called before new
 	execution.  When execution doesn't end, you can call this by manually.
 
 
@@ -232,11 +232,11 @@ input (*)				*quickrun-option-input*
 			quickrun treats continued string as input.
 
 outputter				*quickrun-option-outputter*
-			Specifies an outputter. See the details in
+			Specifies an outputter.  See the details in
 			|quickrun-module-outputter|.
 
 runner					*quickrun-option-runner*
-			Specifies a runner. See the details in
+			Specifies a runner.  See the details in
 			|quickrun-module-runner|.
 
 mode					*quickrun-option-mode*
@@ -249,41 +249,12 @@ mode					*quickrun-option-mode*
 				nnoremap <silent> <F5> :QuickRun -mode n<CR>
 				vnoremap <silent> <F5> :QuickRun -mode v<CR>
 
-output_encode (*)			*quickrun-option-output_encode*
-			Encoding conversion filter like "from:to".  ":to" is
-			omitable.  In that case, it is interpreted like
-			"from:&encoding".
-			Default value is "&fileencoding".
-
-shebang					*quickrun-option-shebang*
-			If this value is not 0, and if "src"'s first line
-			started with "#!", the following string is treated as
-			"command".  In this case, "%c" is not escaped.
-			See |quickrun-exec-format| about escaping.
-			Default value is 1.
-
 tempfile (*)				*quickrun-option-tempfile*
 			quickrun makes temporary file to execute part of
 			lines.
 			This value is template for its filename.
 			Temporary file will be removed after execute.
 			Default value is "{tempname()}".
-
-shellcmd				*quickrun-option-shellcmd*
-			Template of Vim's command which is executed
-			if output is ! .
-			quickrun substitutes %s with commands generated
-			by exec option.
-			On MS Windows, default value is
-			'silent !"%s" & pause'.  Otherwise '!%s'.
-
-eval					*quickrun-option-eval*
-			If this value is not 0, quickrun substitutes src
-			embedding to eval_template.
-
-eval_template				*quickrun-option-eval_template*
-			Template for eval.
-			quickrun substitutes %s with src.
 
 
 ------------------------------------------------------------------------------
@@ -389,12 +360,13 @@ current (3 or 4) config.  Note infinite loop.
 ==============================================================================
 MODULE						*quickrun-module*
 
-|quickrun| is structured modularly. There are the following kinds of modules.
+|quickrun| is structured modularly.  There are the following kinds of modules.
 
 - runner	(|quickrun-module-runner|)
 - outputter	(|quickrun-module-outputter|)
+- hook		(|quickrun-module-hook|)
 
-A module sometimes has its specific options. You may specify an option as a
+A module sometimes has its specific options.  You may specify an option as a
 normal option or as a postfix of the module.
 
 Specifying an option as a normal option
@@ -403,8 +375,9 @@ A module reads options with the following prioitized order when you specified
 an option as a normal option.
 
 1. "{module-type}/{module-name}/{option-name}"
-2. "{module-type}/{option-name}"
-3. "{option-name}"
+2. "{module-name}/{option-name}"
+3. "{module-type}/{option-name}"
+4. "{option-name}"
 
 For example when you'd like to give "append" option to "outputter/buffer"
 module, you can give it by
@@ -423,14 +396,14 @@ prioitized option then that'll be prioitized.
 
 Specifying an option as a postfix of a module
 ----------------------
-You may give an option when you give a module in command line option. Write an
-arbitrary symbol after the module name, and split option values with the
-symbol. Specify each options in name=value format.
+You may give an option when you give a module in command line option.  Write
+an arbitrary symbol after the module name, and split option values with the
+symbol.  Specify each options in name=value format.
 >
 	:QuickRun -outputter buffer:append=1:into=1
 <
 Some modules only have one single option or have specific order of options
-defined in |quickrun-module.config_order|. In this case, you don't have to
+defined in |quickrun-module.config_order|.  In this case, you don't have to
 give name.
 >
 	:QuickRun -outputter file:/path/to/file
@@ -443,50 +416,50 @@ If the value of option is list, it appends the option value.
 ------------------------------------------------------------------------------
 RUNNER						*quickrun-module-runner*
 
-Runner is a module to run a program. The following runners are available by
-default. NOTE: Everything except for "system" can be unstable.
+Runner is a module to run a program.  The following runners are available by
+default.  NOTE: Everything except for "system" can be unstable.
 
 - "system"				*quickrun-module-runner/system*
-  Runs by |system()|. This is the default.
+  Runs by |system()|.  This is the default.
 
 - "shell"				*quickrun-module-runner/shell*
-  Runs by |:!|. This ignores given outputter.
+  Runs by |:!|.  This ignores given outputter.
   Option ~
-  {shellcmd}		Default: 'silent !"%s" & pause' for MS Windows
+  shellcmd		Default: 'silent !"%s" & pause' for MS Windows
 				    Otherwise '!%s'
-	The template of the Vim command to run. This replaces %s to the
+	The template of the Vim command to run.  This replaces %s to the
 	command given in exec option.
 
 - "vimproc"				*quickrun-module-runner/vimproc*
   {Requirement: |vimproc|}
-  Runs by |vimproc| at background. This checks if the process completed with
-  using |CursorHold| |CursorHoldI| events. If the process completed within 50
+  Runs by |vimproc| at background.  This checks if the process completed with
+  using |CursorHold| |CursorHoldI| events.  If the process completed within 50
   millisecond, it shows the result immediately.
   Option ~
-  {sleep}		Default: 50
+  sleep			Default: 50
 	Waits specified times in millisecond.  This is useful to avoid polling
 	by 'updatetime' when program will stop immediately.
-  {updatetime}		Default: 0
-	Changes 'updatetime' to the value temporary. Stays same if this is 0.
+  updatetime		Default: 0
+	Changes 'updatetime' to the value temporary.  Stays same if this is 0.
 
 - "remote"				*quickrun-module-runner/remote*
   {Requirement: |+clientserver|}
   Runs in background and fetches the result by |+clientserver| feature.
-  This requires |v:servername| to be set. If Vim doesn't, run it with
+  This requires |v:servername| to be set.  If Vim doesn't, run it with
   |--servername| option.
 
   Note that Vim cannot control the process when it doesn't terminate due to
   infinite loop or to wait for input since it runs in background.
   Option ~
-  {vimproc}		Default: 0
-	Runs by |vimproc| if it's available. You can cancel the process after
+  vimproc		Default: 0
+	Runs by |vimproc| if it's available.  You can cancel the process after
 	it ran.
 
 - "python"				*quickrun-module-runner/python*
   {Requirement: |+python|}
   Runs by |python| thread asynchronously.
   WARNING: This is absolutely unstable.
-  WARNING: Don't use this on X11. Vim crashes.
+  WARNING: Don't use this on X11.  Vim crashes.
 
 - "vimscript"				*quickrun-module-runner/vimscript*
   Runs commands as Vim commands.
@@ -497,90 +470,90 @@ default. NOTE: Everything except for "system" can be unstable.
 ------------------------------------------------------------------------------
 OUTPUTTER					*quickrun-module-outputter*
 
-Outputter is a module to output the result. The following outputters are
+Outputter is a module to output the result.  The following outputters are
 available by default.
 
 - "buffer"				*quickrun-module-outputter/buffer*
   quickrun opens output buffer and displays to the output buffer.  If output
   buffer already exists, quickrun uses it.
   Option ~
-  {name}		Default: "[quickrun output]"
+  name			Default: "[quickrun output]"
 	The buffer name.
-  {filetype}		Default: "quickrun"
+  filetype		Default: "quickrun"
 	Sets this value to 'filetype' of the buffer.
-  {append}		Default: 0
+  append		Default: 0
 	Appends if it's 1.
-  {split}
+  split
 	Default: '{winwidth(0) * 2 < winheight(0) * 5 ? "" : "vertical"}'
 
-	Specifies a sub-command to open a buffer for the output. |quickrun|
+	Specifies a sub-command to open a buffer for the output.  |quickrun|
 	inserts this before |:split| command when it opens a buffer.
-  {into}		Default: 0
+  into			Default: 0
 	Moves cursor to the output buffer if this isn't 0.
-  {running_mark}	Default: ':-)'
+  running_mark		Default: ':-)'
 	If this value is not an empty string, |quickrun| displays this string
 	to output buffer while it's running.
 
 - "message"				*quickrun-module-outputter/message*
   Outputs on |messages|.
   Option ~
-  {log}			Default: 0
+  log			Default: 0
 	Outputs on |message-history| is it's 1.
 
 - "variable"				*quickrun-module-outputter/variable*
-  Outputs on a variable. You also can let it output on an environment variable
-  or an option.
+  Outputs on a variable.  You also can let it output on an environment
+  variable or an option.
   Option ~
-  {name}		Default: ''
-	The name of the variable to output. Causes an error if it's empty.
-  {append}		Default: 0
+  name			Default: ''
+	The name of the variable to output.  Causes an error if it's empty.
+  append		Default: 0
 	Appends if it's 1.
 
 - "file"				*quickrun-module-outputter/file*
   Outputs on a file.
   Option ~
-  {name}		Default: ''
-	The file name where to output. Causea an error if it's empty.
-  {append}		Default: 0
+  name			Default: ''
+	The file name where to output.  Causea an error if it's empty.
+  append		Default: 0
 	Appends if it's 1.
 
 - "quickfix"				*quickrun-module-outputter/quickfix*
   Outputs on |quickfix|.
   Option ~
-  {errorformat}		Default: "&errorformat"
+  errorformat		Default: "&errorformat"
 	'errorformat' option to parse the output.
 
 - "browser"				*quickrun-module-outputter/browser*
   {Requires |open-browser|}
   Opens the output on browser, using |open-browser|.
   Option ~
-  {name}		Default: tempname() . '.html'
+  name			Default: tempname() . '.html'
 	The name of the filename; outputs the result on a file first then open
-	the file on your browser. The default value, |tempname()|, is called
+	the file on your browser.  The default value, |tempname()|, is called
 	only at once and the same result will be used since the second time.
-  {append}		Default: 0
+  append		Default: 0
 	Appends if it's 1.
 
 - "buffered"				*quickrun-module-outputter/buffered*
   Buffers the output, and shows the whole result at once finally.
   Option ~
-  {target}		Default: ''
+  target		Default: ''
 	The outputter to show the result.
 
 - "multi"				*quickrun-module-outputter/multi*
   Outputs multiple outputters at the same time.
   Option ~
-  {targets}		Default: []
+  targets		Default: []
 	A list of outputters to output.
 
 - "error"				*quickrun-module-outputter/error*
-  Switches where to output based on the exit status; 0 means success. Note
+  Switches where to output based on the exit status; 0 means success.  Note
   that some runners only can give success.
   This buffers because this waits the process terminates.
   Option ~
-  {success}		Default: "null"
+  success		Default: "null"
 	The outputter when it succeeded.
-  {error}		Default: "null"
+  error			Default: "null"
 	The outputter when it failed.
 
 - "null"				*quickrun-module-outputter/null*
@@ -590,9 +563,62 @@ available by default.
 ------------------------------------------------------------------------------
 HOOK						*quickrun-module-hook*
 
-Hook is a module to do additional process in specific points.
+Hook is a module to do additional process in specific points.  The following
+hooks are available by default.
 
-TODO:
+- "cd"					*quickrun-module-hook/cd*
+  Executes on specified directory.
+  NOTE: This hook changes the current directory, and tries to restore it when
+  finished.  An unexpected result may be brought when asynchronous execution
+  is being used.
+  Option ~
+  directory		Default: ""
+	Directory to change.  Does nothing if this is an empty string.
+
+- "eval"				*quickrun-module-hook/eval*
+  Changes the contents of source file by a template.  For example:
+  source file: >
+    1 + 2 * 3
+< template: >
+    print(%s);
+< In this case, the source file actually used is: >
+    print(1 + 2 * 3);
+< Option ~
+  template		Default: ""
+  A string of template.  "%s" is replaced by original source file.
+  This rule is same as |printf()|.
+
+- "output_encode"			*quickrun-module-hook/output_encode*
+  Converts encoding of the output.
+  Option ~
+  encoding		Default: "&fileencoding"
+	Specifies in the form of "from:to".  ":to" is omitable.
+	In this case, it is interpreted as "from:&encoding".
+
+- "shebang"				*quickrun-module-hook/shebang*
+  Searches "#!" in the head of source file, and treats the following of it as
+  command option(|quickrun-option-command|).  At the same time, converts "%c"
+  in exec option(|quickrun-option-exec|) into "%C".
+
+- "sweep"				*quickrun-module-hook/sweep*
+  Sweeps the temporary files at the end of session.
+  Option ~
+  files			Default: []
+	A list of files to remove.  This value is expanded by
+	|quickrun-exec-format|.  Please use upper case to avoid escaping.
+
+- "time"				*quickrun-module-hook/time*
+  Measures the execution time and outputs to the end.
+  NOTE: The time includes the overhead of quickrun.vim.  Don't expect exact
+	time.
+  Option ~
+  format		Default: "\n*** time: %g ***"
+	Format of output string.  This is passed to |printf()|.
+	Measured time is passed to the 2nd argument by |Float|.
+  dest			Default: ""
+	An outputter for outputting a result.  If this is empty, outputs to
+	the outputter of the session.
+
 
 
 ==============================================================================
@@ -606,10 +632,10 @@ REGISTER MODULE				*quickrun-register-module*
 
 You use a module with registering by |quickrun#module#register()| or its
 handier version |quickrun#register_runner()| and
-|quickrun#register_outputter()|. You can also register a module automatically
+|quickrun#register_outputter()|.  You can also register a module automatically
 by making autoload#quickrun#{module-kind}#{module-name}#new() function in
-autoload/quickrun/{module-kind}/{module-name}.vim in 'runtimepath'. That'll be
-loaded when quickrun is loaded for the first time in the process.
+autoload/quickrun/{module-kind}/{module-name}.vim in 'runtimepath'.  That'll
+be loaded when quickrun is loaded for the first time in the process.
 
 ------------------------------------------------------------------------------
 SESSION				*quickrun-session*
@@ -621,11 +647,13 @@ session.make_module({kind}, {line})	*quickrun-session.make_module()*
 	Creates a module to use it in a session.
 
 session.invoke_hook({point} [, {context}]) *quickrun-session.invoke_hook()*
-	TODO:
+	Invokes hook.  {context} is a dictionary normally.  {context} is
+	passed to the hook functions directly.  An empty dictionary is used if
+	{context} is not passed.
 
 session.output({data})			*quickrun-session.output()*
-	Calls when the runner outputs the result. Gives the {data} to
-	outputter at the time. You can call is at any times when the process
+	Calls when the runner outputs the result.  Gives the {data} to
+	outputter at the time.  You can call is at any times when the process
 	is running.
 
 session.continue()			*quickrun-session.continue()*
@@ -633,35 +661,28 @@ session.continue()			*quickrun-session.continue()*
 	Continues if you give {key} to |quickrun#session()|.
 
 session.finish([{exit-code}])		*quickrun-session.finish()*
-	Calls when the runner finished the process. Unless {exit-code} is
+	Calls when the runner finished the process.  Unless {exit-code} is
 	given it'll be 0.
 
 session.exit_code			*quickrun-session.exit_code*
-	You can refer this only after the process finished. This is the value
+	You can refer this only after the process finished.  This is the value
 	of |quickrun-session.finish()|.
 
 session.sweep()				*quickrun-session.sweep()*
-	This is a cleaning up. This does procedures with respect to the
-	following attributes in the session.
-	- If it has an attribute begins with "_temp_", deletes the file.
-	- If it has an attribute "_option_{option-name}", recovers the object
-	  value.
-	- If it has an attribute begins with "_autocmd_", deletes all autocmd
-	  belonging to "plugin-quickrun-{value}".
-	- If it has an attribute "_vimproc", forcefully terminates the
-	  |vimproc|.
-	Or calls |quickrun-runner.sweep()|.
-	They are handy, however, they don't care naming colisions by multiple
-	modules. The author is going to solve them in the future.
+	This is a cleaning up.  This deletes the paths registered by
+	|quickrun-session.tempname()|, and calls |quickrun-module.sweep()|.
+	Further, if it has an attribute "_vimproc", forcefully terminates the
+	|vimproc|.  This is handy, however, they don't care naming colisions
+	by multiple modules.  The author is going to solve them in the future.
 
 ------------------------------------------------------------------------------
 MODULE COMMON ATTRIBUTES		*quickrun-module-attributes*
 
 Most module attributes have default values, so you don't have to explicitly
-set unless it requires one. Of course you can overwrite the default value if
+set unless it requires one.  Of course you can overwrite the default value if
 you want.
 
-Quickrun uses a copy of a module you registered. To preserve a value among
+Quickrun uses a copy of a module you registered.  To preserve a value among
 each modules, use attributes which name begin with "_" to avoid conflicts.
 
 Below common attributes among all modules.
@@ -673,12 +694,12 @@ module.name				*quickrun-module.name*
 	Required.  Name of the module.
 
 module.config				*quickrun-module.config*
-	This is a dictionary for the module config default values. The items
-	defined in this are only available in modules. When you actually use a
-	module, session will overwrite a config.
+	This is a dictionary for the module config default values.  The items
+	defined in this are only available in modules.  When you actually use
+	a module, session will overwrite a config.
 
 module.config_order			*quickrun-module.config_order*
-	This is a list of order of the arguments of config. You can give
+	This is a list of order of the arguments of config.  You can give
 	arbitrary order of names in |quickrun-module.config|.
 
 module.available()			*quickrun-module.available()*
@@ -686,53 +707,61 @@ module.available()			*quickrun-module.available()*
 	Returns 1 if it's available; otherwise returns 0.
 
 module.validate()			*quickrun-module.validate()*
-	Validates if the module is currently available. If not, thie |:throw|s
-	the reason in String.
+	Validates if the module is currently available.  If not, this
+	|:throw|s the reason in String.
 
 module.init({session})			*quickrun-module.init()*
 	This is called in module initialization.
 
 module.sweep()				*quickrun-module.sweep()*
-	TODO:
+	This is called when the process is finished or forcefully terminated.
+	This sweeps data.
 
 ------------------------------------------------------------------------------
 RUNNER ATTRIBUTES				*quickrun-runner-attributes*
 
 runner.run({commands}, {input}, {session})	*quickrun-runner.run()*
-	Required. This is called in run-time. This runs the list of command
-	given in {commands}, and returns {exit-code}. {input} is data for
-	stdion. When this cannot finish the process at the time this uses 
-	|quickrun-session.continue()|. In the case this has to call
+	Required.  This is called in run-time.  This runs the list of command
+	given in {commands}, and returns {exit-code}.  {input} is data for
+	stdion.  When this cannot finish the process at the time this uses 
+	|quickrun-session.continue()|.  In the case this has to call
 	|quickrun-session.finish()|.
-
-runner.sweep()				*quickrun-runner.sweep()*
-	This is called when the process is finished or forcefully terminated.
-	This sweeps data.
 
 ------------------------------------------------------------------------------
 OUTPUTTER ATTRIBUTES			*quickrun-outputter-attributes*
 
 outputter.output({data}, {session})	*quickrun-outputter.output()*
-	Required. Outputs the data.
+	Required.  Outputs the data.
 
 outputter.start({session})		*quickrun-outputter.start()*
 	Called in before of startup.
 
 outputter.finish({session})		*quickrun-outputter.finish()*
-	Called in termination for finishing it. You can refer
+	Called in termination for finishing it.  You can refer
 	|quickrun-session.exit_code|.
 
 ------------------------------------------------------------------------------
 HOOK ATTRIBUTES				*quickrun-hook-attributes*
 
 hook.on_{hook-point}({session})		*quickrun-hook.on_hook-point()*
-	TODO:
+	This is called when hook invoked.  See the details in |quickrun-hook|.
 
 hook.priority({hook-point})		*quickrun-hook.priority*
-	TODO:
+	Returns the priority of a hook.  Priority is given to a small value.
+	Always returns 0 in default.
 
 hook.config.enable			*quickrun-hook.config.enable*
-	TODO:
+	When this value is 1, this hook is enabled.  Whether a hook is
+	effective.
+	This is for user mainly.
+	It is avoidable by repealing.
+	Further, you can avoid an overhead a little by disabling a hook in
+	|quickrun-module.init()|.
+
+------------------------------------------------------------------------------
+EXECUTION SEQUENCE			*quickrun-execution-sequence*
+
+TODO:
 
 
 
@@ -751,15 +780,21 @@ HOOK POINT					*quickrun-hook-point*
 
 TODO:
 
-- "ready"
+- "hook_loaded"				*quickrun-hook-point-hook_loaded*
 
-- "output"
+- "module_loaded"			*quickrun-hook-point-module_loaded*
 
-- "success"
+- "ready"				*quickrun-hook-point-ready*
 
-- "failure"
+- "output"				*quickrun-hook-point-output*
 
-- "finish"
+- "success"				*quickrun-hook-point-success*
+
+- "failure"				*quickrun-hook-point-failure*
+
+- "finish"				*quickrun-hook-point-finish*
+
+- "exit"				*quickrun-hook-point-exit*
 
 
 
