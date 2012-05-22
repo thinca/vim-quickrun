@@ -115,6 +115,22 @@ function! quickrun#module#get_kinds()
   return keys(s:modules)
 endfunction
 
+function! quickrun#module#load()
+  for kind in keys(s:templates)
+    let pat = 'autoload/quickrun/' . kind . '/*.vim'
+    for name in map(split(globpath(&runtimepath, pat), "\n"),
+    \               'fnamemodify(v:val, ":t:r")')
+      try
+        let module = quickrun#{kind}#{name}#new()
+        let module.kind = kind
+        let module.name = name
+        call quickrun#module#register(module)
+      catch /:E\%(117\|716\):/
+      endtry
+    endfor
+  endfor
+endfunction
+
 function! s:validate_module(module)
   if !has_key(a:module, 'kind')
     throw 'quickrun: A module must have a "kind" attribute.'

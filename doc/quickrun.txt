@@ -148,6 +148,10 @@ quickrun#module#get({kind} [, {name}])		*quickrun#module#get()*
 quickrun#module#get_kinds()			*quickrun#module#get_kinds()*
 	Returns a list of name of kind of module.
 
+quickrun#module#load()				*quickrun#module#load()*
+	Loads the modules on 'runtimepath'.  This is called by
+	"autoload/quickrun.vim" automatically.
+
 						*quickrun#session()*
 quickrun#session({key} [, {func-name} [, {args} ...]])
 	This is used in a module.  This fetches the current runnning session
