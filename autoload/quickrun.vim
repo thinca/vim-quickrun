@@ -395,6 +395,10 @@ function! s:Session.make_module(kind, line)
 endfunction
 
 function! s:Session.run()
+  if has_key(self, '_running')
+    throw 'quickrun: session.run() was called in running.'
+  endif
+  let self._running = 1
   call self.setup()
   call self.invoke_hook('ready')
   let exit_code = 1
@@ -531,6 +535,10 @@ function! s:Session.sweep()
     for hook in self.hooks
       call hook.sweep()
     endfor
+  endif
+
+  if has_key(self, '_running')
+    call remove(self, '_running')
   endif
 endfunction
 
