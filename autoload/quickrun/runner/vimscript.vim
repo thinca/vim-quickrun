@@ -27,11 +27,18 @@ function! s:execute(cmd)
   let save_vfile = &verbosefile
   let &verbosefile = temp
 
-  silent! execute a:cmd
+  try
+    silent execute a:cmd
+  catch
+    let error = 1
+    silent echo v:throwpoint
+    silent echo matchstr(v:exception, '^Vim\%((\w*)\)\?:\s*\zs.*')
+  finally
+    if &verbosefile ==# temp
+      let &verbosefile = save_vfile
+    endif
+  endtry
 
-  if &verbosefile ==# temp
-    let &verbosefile = save_vfile
-  endif
   if filereadable(temp)
     let result .= join(readfile(temp, 'b'), "\n")
     call delete(temp)
