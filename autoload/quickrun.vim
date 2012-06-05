@@ -183,6 +183,11 @@ let g:quickrun#default_config = {
 \   'command': 'phantomjs',
 \   'tempfile': '%{tempname()}.js',
 \ },
+\ 'jsx': {
+\   'exec': '%c --run %o %s %a',
+\   'hook/eval/template':
+\     'class _Main { static function main(args : string[]) :void { %s }}',
+\ },
 \ 'lisp': {
 \   'command': 'clisp',
 \ },
