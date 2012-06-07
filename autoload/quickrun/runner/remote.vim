@@ -92,7 +92,21 @@ endfunction
 
 function! s:make_command(runner, args)
   return join([shellescape(a:args[0])] +
-  \           map(a:args[1 :], 'a:runner.shellescape(v:val)'), ' ')
+  \           map(a:args[1 :], 's:shellescape(v:val)'), ' ')
+endfunction
+
+function! s:shellescape(str)
+  if s:is_cmd_exe()
+    return '^"' . substitute(substitute(substitute(a:str,
+    \             '[&|<>()^"%]', '^\0', 'g'),
+    \             '\\\+\ze"', '\=repeat(submatch(0), 2)', 'g'),
+    \             '\^"', '\\\0', 'g') . '^"'
+  endif
+  return shellescape(a:str)
+endfunction
+
+function! s:is_cmd_exe()
+  return &shell =~? 'cmd\.exe'
 endfunction
 
 

@@ -33,12 +33,6 @@ function! s:templates.runner.run(commands, input, session)
   throw 'quickrun: A runner should implements run()'
 endfunction
 function! s:templates.runner.shellescape(str)
-  if s:is_cmd_exe()
-    return '^"' . substitute(substitute(substitute(a:str,
-    \             '[&|<>()^"%]', '^\0', 'g'),
-    \             '\\\+\ze"', '\=repeat(submatch(0), 2)', 'g'),
-    \             '\^"', '\\\0', 'g') . '^"'
-  endif
   return shellescape(a:str)
 endfunction
 
@@ -169,10 +163,6 @@ function! s:deepextend(a, b)
     throw ''
   endif
   return a:a
-endfunction
-
-function! s:is_cmd_exe()
-  return &shell =~? 'cmd\.exe'
 endfunction
 
 
