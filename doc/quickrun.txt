@@ -765,7 +765,38 @@ hook.config.enable			*quickrun-hook.config.enable*
 ------------------------------------------------------------------------------
 EXECUTION SEQUENCE			*quickrun-execution-sequence*
 
-TODO:
+When creating a module, it is important to get to know a processing order
+inside quickrun.  The following is the execution sequence of quickrun.
+
+1.  Building a config
+    Builds a config from command line arguments and vim variables.
+    In this time, unspecified options does not exist.
+2.  Building hooks
+    Builds the hook modules.  |quickrun-module.init()| is called at this time.
+    |quickrun-session.sweep()| is called when an error occurs after this.
+3.  Execution of |quickrun-hook-point-hook_loaded|
+4.  Removes the invalid hooks
+    Removes invalid(enable option is 0) hooks from {session}.
+5.  Normalizes the config
+    - Expands |quickrun-syntax-option|.
+    - Fills some unspecified options.
+    - Creates temporary files.
+6.  Building runner/outputter
+    Builds a runner module and an outputter module.  |quickrun-module.init()|
+    is called at this time.
+7.  Execution of |quickrun-hook-point-module_loaded|
+8.  Building commands
+    Expands the value of |quickrun-option-exec| to the actual command.
+9.  Execution of |quickrun-hook-point-ready|
+10. Execution of |quickrun-outputter.start()|
+11. Execution of |quickrun-runner.run()|
+12. Execution of |quickrun-session.finish()|
+    The runner must call this if it is asynchronous execution.
+13. Execution of |quickrun-hook-point-success| / |quickrun-hook-point-failure|
+14. Execution of |quickrun-hook-point-finish|
+15. Execution of |quickrun-outputter.finish()|
+16. Execution of |quickrun-session.sweep()|
+17. Execution of |quickrun-hook-point-exit|
 
 
 
