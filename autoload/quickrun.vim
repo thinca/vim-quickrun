@@ -6,7 +6,7 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-let s:V = vital#of('quickrun').load('Data.List', 'System.File')
+let s:V = vital#of('quickrun').load('Data.List', 'System.File', 'System.Filepath')
 unlet! g:quickrun#V
 let g:quickrun#V = s:V
 lockvar! g:quickrun#V
@@ -478,6 +478,12 @@ function! s:Session.build_command(tmpl)
 
     let rest = rest[2 :]
     if symbol =~? '^[cs]$'
+      if symbol ==# 'c'
+        let value_ = s:V.System.Filepath.which(value)
+        if value_ !=# ''
+          let value = value_
+        endif
+      endif
       let mod = matchstr(rest, '^\v\zs%(\:[p8~.htre]|\:g?s(.).{-}\1.{-}\1)*')
       let value = fnamemodify(value, mod)
       if symbol =~# '\U'
