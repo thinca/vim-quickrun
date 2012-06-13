@@ -20,8 +20,8 @@ function! s:load(...) dict
   let scripts = s:_scripts()
   let debug = has_key(self, 'debug') && self.debug
   for arg in a:000
-    let [name, as] = type(arg) == type([]) ? arg[: 1] : [arg, arg]
-    let target = split(as, '\W\+')
+    let [name; as] = type(arg) == type([]) ? arg[: 1] : [arg, arg]
+    let target = split(join(as, ''), '\W\+')
     let dict = self
     while 1 <= len(target)
       let ns = remove(target, 0)
@@ -59,7 +59,13 @@ function! s:_import(name, scripts, debug)
   let target = substitute(target, '\l\zs\ze\u', '_', 'g') " OrderedSet -> Ordered_Set
   let target = substitute(target, '[/_]\zs\u', '\l\0', 'g') " Ordered_Set -> ordered_set
   let tailpath = printf('autoload/vital/%s%s.vim', s:self_version, target)
-  let paths = split(globpath(&runtimepath, tailpath, 1), "\n")
+
+  " Note: The extra argument to globpath() was added in Patch 7.2.051.
+  if v:version > 702 || v:version == 702 && has('patch51')
+    let paths = split(globpath(&runtimepath, tailpath, 1), "\n")
+  else
+    let paths = split(globpath(&runtimepath, tailpath), "\n")
+  endif
   let path = s:_unify_path(get(paths, 0, ''))
   let sid = get(a:scripts, path, 0)
   if !sid
@@ -85,9 +91,19 @@ function! s:_scripts()
   return scripts
 endfunction
 
-function! s:_unify_path(path)
-  return resolve(fnamemodify(a:path, ':p:gs?[\\/]\+?/?'))
-endfunction
+if filereadable(expand('<sfile>:r') . '.VIM')
+  function! s:_unify_path(path)
+    " Note: On windows, vim can't expand path names from 8.3 formats.
+    " So if getting full path via <sfile> and $HOME was set as 8.3 format,
+    " vital load duplicated scripts. Below's :~ avoid this issue.
+    return tolower(fnamemodify(resolve(fnamemodify(
+    \              a:path, ':p:gs?[\\/]\+?/?')), ':~'))
+  endfunction
+else
+  function! s:_unify_path(path)
+    return resolve(fnamemodify(a:path, ':p:gs?[\\/]\+?/?'))
+  endfunction
+endif
 
 function! s:_build_module(sid, debug)
   if has_key(s:loaded, a:sid)
