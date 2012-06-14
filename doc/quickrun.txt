@@ -803,33 +803,54 @@ inside quickrun.  The following is the execution sequence of quickrun.
 ==============================================================================
 HOOK						*quickrun-hook*
 
-TODO:
+You can execute Vim script on the specific point of execution by using a hook
+feature.
 
 ------------------------------------------------------------------------------
 HOOK FUNCTION					*quickrun-hook-function*
 
-TODO:
+Hook processing is performed by a hook function.  All of hook functions
+receive {session} (|quickrun-session|) and {context} as arguments.
+{context} is usually a dictionary and the value related to the hook is stored.
+You can update {session}, {config} contained at {session}, and {context} in
+hook function.
 
 ------------------------------------------------------------------------------
 HOOK POINT					*quickrun-hook-point*
 
-TODO:
+The following hook points are available by default.
 
 - "hook_loaded"				*quickrun-hook-point-hook_loaded*
+  After the hooks are loaded.  A runner and an outputter are loaded after
+  this.
 
 - "module_loaded"			*quickrun-hook-point-module_loaded*
+  After the runner and the outputter are loaded.
 
 - "ready"				*quickrun-hook-point-ready*
+  Finished the setting of all options, and before a first command is executed.
 
 - "output"				*quickrun-hook-point-output*
+  Received an output from the runner, and before passing it to the outputter.
+  Context ~
+  "data": output data
 
 - "success"				*quickrun-hook-point-success*
+  When the execution was successful.
 
 - "failure"				*quickrun-hook-point-failure*
+  When the execution failed.
+  Context ~
+  "exit_code": exit code
 
 - "finish"				*quickrun-hook-point-finish*
+  When the execution finished.  This is invoked after "success" or "failure".
 
 - "exit"				*quickrun-hook-point-exit*
+  After the post processing finished.
+
+In addition to these, a hook can be invoked to any timing by
+|quickrun-session.invoke_hook()|.
 
 
 
