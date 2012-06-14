@@ -121,6 +121,12 @@ http://github.com/thinca/vim-quickrun
 ------------------------------------------------------------------------------
 関数						*quickrun-functions*
 
+quickrun#run([{config}])			*quickrun#run()*
+	|:QuickRun| の関数版です。
+
+quickrun#new([{config}])			*quickrun#new()*
+	{session}(|quickrun-session|) を生成します。
+
 quickrun#operator({wise})			*quickrun#operator()*
 	'operatorfunc' に対して設定するための関数です。
 	例えば、 >
@@ -637,6 +643,9 @@ hook は特定のポイントで追加の処理を行うモジュールです。
 
 quickrun では 1 回の実行をセッション({session})として管理しており、モジュール
 の各関数に引数として渡されます。
+
+session.run()				*quickrun-session.make_module()*
+	実行を開始します。実行中に呼び出すとエラーになります。
 
 session.make_module({kind}, {line})	*quickrun-session.make_module()*
 	セッション中で使えるようにモジュールを生成します。

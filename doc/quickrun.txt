@@ -121,6 +121,12 @@ COMMANDS					*quickrun-commands*
 ------------------------------------------------------------------------------
 FUNCTIONS					*quickrun-functions*
 
+quickrun#run([{config}])			*quickrun#run()*
+	A function version of |:QuickRun|.
+
+quickrun#new([{config}])			*quickrun#new()*
+	Creates a {session}(|quickrun-session|).
+
 quickrun#operator({wise})			*quickrun#operator()*
 	A function for 'operatorfunc'.
 	e.g.: >
@@ -646,6 +652,9 @@ SESSION				*quickrun-session*
 
 Quickrun manages an execution as a {session}, and gives it as an argument to
 functions of a module.
+
+session.run()				*quickrun-session.make_module()*
+	Starts the execution.  An error occurs when already executed.
 
 session.make_module({kind}, {line})	*quickrun-session.make_module()*
 	Creates a module to use it in a session.
