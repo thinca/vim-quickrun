@@ -13,7 +13,7 @@ let s:outputter.config = {
 function! s:outputter.finish(session)
   try
     let errorformat = &l:errorformat
-    let &l:errorformat = self.config.errorformat
+    let &g:errorformat = self.config.errorformat
     cgetexpr self._result
     cwindow
     for winnr in range(1, winnr('$'))
@@ -24,7 +24,7 @@ function! s:outputter.finish(session)
       endif
     endfor
   finally
-    let &l:errorformat = errorformat
+    let &g:errorformat = errorformat
   endtry
 endfunction
 
