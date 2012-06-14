@@ -347,6 +347,7 @@ function! s:Session.setup()
     call self.invoke_hook('hook_loaded')
     call filter(self.hooks, 'v:val.config.enable')
     let self.config = self.normalize(self.config)
+    call self.invoke_hook('normalized')
 
     let self.runner = self.make_module('runner', self.config.runner)
     let self.outputter = self.make_module('outputter', self.config.outputter)

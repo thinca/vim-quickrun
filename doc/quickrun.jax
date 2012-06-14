@@ -779,22 +779,23 @@ hook.config.enable			*quickrun-hook.config.enable*
     config 内の |quickrun-syntax-option| を展開したり、いくつかの必要なオプ
     ションがなかった場合に補完します。ファイルが直接実行できない場合に一時ファ
     イルへ書き出す処理もここで行います。
-6.  runner/outputter の構築
+6.  |quickrun-hook-point-normalized| の実行
+7.  runner/outputter の構築
     runner モジュールと outputter モジュールを生成します。hook の時と同様に
     |quickrun-module.init()| が呼ばれます。
-7.  |quickrun-hook-point-module_loaded| の実行
-8.  コマンドの構築
+8.  |quickrun-hook-point-module_loaded| の実行
+9.  コマンドの構築
     |quickrun-option-exec| の値を実際に実行するコマンドに展開します。
-9.  |quickrun-hook-point-ready| の実行
-10. |quickrun-outputter.start()| の実行
-11. |quickrun-runner.run()| の実行
-12. |quickrun-session.finish()| の実行
+10. |quickrun-hook-point-ready| の実行
+11. |quickrun-outputter.start()| の実行
+12. |quickrun-runner.run()| の実行
+13. |quickrun-session.finish()| の実行
     非同期実行の場合は runner が直接呼び出す必要があります。
-13. |quickrun-hook-point-success| / |quickrun-hook-point-failure| の実行
-14. |quickrun-hook-point-finish| の実行
-15. |quickrun-outputter.finish()| の実行
-16. |quickrun-session.sweep()| の実行
-17. |quickrun-hook-point-exit| の実行
+14. |quickrun-hook-point-success| / |quickrun-hook-point-failure| の実行
+15. |quickrun-hook-point-finish| の実行
+16. |quickrun-outputter.finish()| の実行
+17. |quickrun-session.sweep()| の実行
+18. |quickrun-hook-point-exit| の実行
 
 
 
@@ -820,6 +821,9 @@ hook.config.enable			*quickrun-hook.config.enable*
 - "hook_loaded"				*quickrun-hook-point-hook_loaded*
   hook のロードが終わった直後です。この後に runner と outputter がロードされま
   す。
+
+- "normalized"				*quickrun-hook-point-normalized*
+  config が標準化された直後です。
 
 - "module_loaded"			*quickrun-hook-point-module_loaded*
   runner と outputter のロードが終わった直後です。

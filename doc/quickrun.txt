@@ -781,22 +781,23 @@ inside quickrun.  The following is the execution sequence of quickrun.
     - Expands |quickrun-syntax-option|.
     - Fills some unspecified options.
     - Creates temporary files.
-6.  Building runner/outputter
+6.  Execution of |quickrun-hook-point-normalized|
+7.  Building runner/outputter
     Builds a runner module and an outputter module.  |quickrun-module.init()|
     is called at this time.
-7.  Execution of |quickrun-hook-point-module_loaded|
-8.  Building commands
+8.  Execution of |quickrun-hook-point-module_loaded|
+9.  Building commands
     Expands the value of |quickrun-option-exec| to the actual command.
-9.  Execution of |quickrun-hook-point-ready|
-10. Execution of |quickrun-outputter.start()|
-11. Execution of |quickrun-runner.run()|
-12. Execution of |quickrun-session.finish()|
+10. Execution of |quickrun-hook-point-ready|
+11. Execution of |quickrun-outputter.start()|
+12. Execution of |quickrun-runner.run()|
+13. Execution of |quickrun-session.finish()|
     The runner must call this if it is asynchronous execution.
-13. Execution of |quickrun-hook-point-success| / |quickrun-hook-point-failure|
-14. Execution of |quickrun-hook-point-finish|
-15. Execution of |quickrun-outputter.finish()|
-16. Execution of |quickrun-session.sweep()|
-17. Execution of |quickrun-hook-point-exit|
+14. Execution of |quickrun-hook-point-success| / |quickrun-hook-point-failure|
+15. Execution of |quickrun-hook-point-finish|
+16. Execution of |quickrun-outputter.finish()|
+17. Execution of |quickrun-session.sweep()|
+18. Execution of |quickrun-hook-point-exit|
 
 
 
@@ -823,6 +824,9 @@ The following hook points are available by default.
 - "hook_loaded"				*quickrun-hook-point-hook_loaded*
   After the hooks are loaded.  A runner and an outputter are loaded after
   this.
+
+- "normalized"				*quickrun-hook-point-normalized*
+  After the config is normalized.
 
 - "module_loaded"			*quickrun-hook-point-module_loaded*
   After the runner and the outputter are loaded.
