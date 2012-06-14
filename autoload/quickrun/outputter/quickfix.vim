@@ -7,12 +7,12 @@ set cpo&vim
 
 let s:outputter = quickrun#outputter#buffered#new()
 let s:outputter.config = {
-\   'errorformat': '&errorformat',
+\   'errorformat': '&l:errorformat',
 \ }
 
 function! s:outputter.finish(session)
   try
-    let errorformat = &l:errorformat
+    let errorformat = &g:errorformat
     let &g:errorformat = self.config.errorformat
     cgetexpr self._result
     cwindow
