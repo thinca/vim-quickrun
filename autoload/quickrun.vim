@@ -596,16 +596,16 @@ endfunction
 
 
 " Interfaces.  {{{1
-function! quickrun#new(config)
+function! quickrun#new(...)
   let session = copy(s:Session)
-  call session.initialize(a:config)
+  call session.initialize(a:0 ? a:1 : {})
   return session
 endfunction
 
-function! quickrun#run(config)
+function! quickrun#run(...)
   call quickrun#sweep_sessions()
 
-  let session = quickrun#new(a:config)
+  let session = quickrun#new(a:0 ? a:1 : {})
 
   " for debug
   if has_key(session.base_config, 'debug')
