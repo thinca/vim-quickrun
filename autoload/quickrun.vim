@@ -262,6 +262,7 @@ let g:quickrun#default_config = {
 \ 'wsh': {
 \   'command': 'cscript',
 \   'cmdopt': '//Nologo',
+\   'hook/output_encode/encoding': '&termencoding',
 \ },
 \ 'zsh': {},
 \}
