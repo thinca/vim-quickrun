@@ -69,8 +69,9 @@ let g:quickrun#default_config = {
 \ },
 \ 'cpp/clang++': {
 \   'command': 'clang++',
-\   'exec': ['%c %o %s -o %s:p:r', '%s:p:r %a', 'rm -f %s:p:r'],
+\   'exec': ['%c %o %s -o %s:p:r', '%s:p:r %a'],
 \   'tempfile': '%{tempname()}.cpp',
+\   'hook/sweep/files': ['%S:p:r'],
 \ },
 \ 'cpp/g++': {
 \   'command': 'g++',
@@ -149,13 +150,15 @@ let g:quickrun#default_config = {
 \ },
 \ 'd/ldc': {
 \   'command': 'ldc',
-\   'exec': ['%c %o %s -o %s:p:r', '%s:p:r %a', 'rm -f %s:p:r'],
+\   'exec': ['%c %o %s -o %s:p:r', '%s:p:r %a'],
 \   'tempfile': '%{tempname()}.d',
+\   'hook/sweep/files': ['%S:p:r'],
 \ },
 \ 'd/gdc': {
 \   'command': 'gdc',
-\   'exec': ['%c %o %s -o %s:p:r', '%s:p:r %a', 'rm -f %s:p:r'],
+\   'exec': ['%c %o %s -o %s:p:r', '%s:p:r %a'],
 \   'tempfile': '%{tempname()}.d',
+\   'hook/sweep/files': ['%S:p:r'],
 \ },
 \ 'dosbatch': {
 \   'command': '',
@@ -246,20 +249,17 @@ let g:quickrun#default_config = {
 \ },
 \ 'haskell/ghc': {
 \   'command': 'ghc',
-\   'exec': [
-\     '%c %o %s -o %s:p:r',
-\     '%s:p:r %a',
-\     'rm %s:p:r %s:p:r.o %s:p:r.hi'],
+\   'exec': ['%c %o %s -o %s:p:r', '%s:p:r %a'],
 \   'cmdopt': '-v0 --make',
 \   'tempfile': '%{tempname()}.hs',
+\   'hook/sweep/files': ['%S:p:r', '%S:p:r.o', '%S:p:r.hi'],
 \ },
 \ 'haskell/ghc/core': {
 \   'command': 'ghc',
-\   'exec': [
-\     '%c %o -ddump-simpl -dsuppress-coercions %s',
-\     'rm %s:p:r %s:p:r.o %s:p:r.hi'],
+\   'exec': '%c %o -ddump-simpl -dsuppress-coercions %s',
 \   'cmdopt': '-v0 --make',
 \   'tempfile': '%{tempname()}.hs',
+\   'hook/sweep/files': ['%S:p:r', '%S:p:r.o', '%S:p:r.hi'],
 \ },
 \ 'io': {},
 \ 'java': {
@@ -355,8 +355,9 @@ let g:quickrun#default_config = {
 \ 'ruby': {'hook/eval/template': " p proc {\n%s\n}.call"},
 \ 'rust': {
 \   'command': 'rustc',
-\   'exec': ['%c %o %s -o %s:p:r', '%s:p:r %a', 'rm -f %s:p:r'],
+\   'exec': ['%c %o %s -o %s:p:r', '%s:p:r %a'],
 \   'tempfile': '%{tempname()}.rs',
+\   'hook/sweep/files': '%S:p:r',
 \ },
 \ 'scala': {
 \   'hook/output_encode/encoding': '&termencoding',
