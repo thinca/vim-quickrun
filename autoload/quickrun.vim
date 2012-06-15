@@ -143,6 +143,15 @@ let g:quickrun#default_config = {
 \   'command': 'erb',
 \   'exec': '%c %o -T - %s %a',
 \ },
+\ 'fortran': {
+\   'type': 'fortran/gfortran',
+\ },
+\ 'fortran/gfortran': {
+\   'command': 'gfortran',
+\   'exec': ['%c %o -o %s:p:r %s', '%s:p:r %a'],
+\   'tempfile': '%{tempname()}.f95',
+\   'hook/sweep/files': ['%S:p:r'],
+\ },
 \ 'go': {
 \   'type':
 \     $GOARCH ==# '386'   ? (s:is_win ? 'go/386/win' : 'go/386'):
