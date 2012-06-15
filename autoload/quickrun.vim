@@ -493,6 +493,7 @@ function! s:Session.build_command(tmpl)
         let value = command =~# '^\s*:' ? fnameescape(value)
         \                               : self.runner.shellescape(value)
       endif
+      let value = escape(value, '\@&$%')
       let rest = rest[len(mod) :]
     endif
     let result .= value
