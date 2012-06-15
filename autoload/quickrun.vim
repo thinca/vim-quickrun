@@ -1,5 +1,5 @@
 " Run commands quickly.
-" Version: 0.6.0dev
+" Version: 0.6.0
 " Author : thinca <thinca+vim@gmail.com>
 " License: zlib License
 
