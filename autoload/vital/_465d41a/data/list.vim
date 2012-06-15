@@ -3,6 +3,23 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
+function! s:pop(list)
+  return remove(a:list, -1)
+endfunction
+
+function! s:push(list, val)
+  call add(a:list, a:val)
+  return a:list
+endfunction
+
+function! s:shift(list)
+  return remove(a:list, 0)
+endfunction
+
+function! s:unshift(list, val)
+  return insert(a:list, a:val)
+endfunction
+
 " Removes duplicates from a list.
 function! s:uniq(list, ...)
   let list = a:0 ? map(copy(a:list), printf('[v:val, %s]', a:1)) : copy(a:list)
@@ -68,6 +85,25 @@ function! s:sort_by(list, expr)
   \      'a:a[1] ==# a:b[1] ? 0 : a:a[1] ># a:b[1] ? 1 : -1'), 'v:val[0]')
 endfunction
 
+" Returns a maximum value in {list} through given {expr}.
+" Returns 0 if {list} is empty.
+" v:val is used in {expr}
+function! s:max(list, expr)
+  if empty(a:list)
+    return 0
+  endif
+  let list = map(copy(a:list), a:expr)
+  return a:list[index(list, max(list))]
+endfunction
+
+" Returns a minimum value in {list} through given {expr}.
+" Returns 0 if {list} is empty.
+" v:val is used in {expr}
+" FIXME: -0x80000000 == 0x80000000
+function! s:min(list, expr)
+  return s:max(a:list, '-(' . a:expr . ')')
+endfunction
+
 " Returns List of character sequence between [a:from, a:to]
 " e.g.: s:char_range('a', 'c') returns ['a', 'b', 'c']
 function! s:char_range(from, to)
@@ -87,9 +123,9 @@ endfunction
 " Returns false otherwise.
 " NOTE: Returns false when a:index is negative number.
 function! s:has_index(list, index)
-    " Return true when negative index?
-    " let index = a:index >= 0 ? a:index : len(a:list) + a:index
-    return 0 <= a:index && a:index < len(a:list)
+  " Return true when negative index?
+  " let index = a:index >= 0 ? a:index : len(a:list) + a:index
+  return 0 <= a:index && a:index < len(a:list)
 endfunction
 
 " similar to Haskell's Data.List.span
@@ -172,8 +208,10 @@ endfunction
 
 " similar to python's zip()
 function! s:zip(...)
-    return map(range(min(map(copy(a:000), 'len(v:val)'))), "map(copy(a:000), 'v:val['.v:val.']')")
+  return map(range(min(map(copy(a:000), 'len(v:val)'))), "map(copy(a:000), 'v:val['.v:val.']')")
 endfunction
 
 
 let &cpo = s:save_cpo
+
+" vim:set et ts=2 sts=2 sw=2 tw=0:

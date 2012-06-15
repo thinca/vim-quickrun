@@ -1,20 +1,19 @@
-" quickrun: outputter: quickfix
+" quickrun: outputter/quickfix: Outputs to quickfix.
 " Author : thinca <thinca+vim@gmail.com>
-" License: Creative Commons Attribution 2.1 Japan License
-"          <http://creativecommons.org/licenses/by/2.1/jp/deed.en>
+" License: zlib License
 
 let s:save_cpo = &cpo
 set cpo&vim
 
 let s:outputter = quickrun#outputter#buffered#new()
 let s:outputter.config = {
-\   'errorformat': '&errorformat',
+\   'errorformat': '&l:errorformat',
 \ }
 
 function! s:outputter.finish(session)
   try
-    let errorformat = &l:errorformat
-    let &l:errorformat = self.config.errorformat
+    let errorformat = &g:errorformat
+    let &g:errorformat = self.config.errorformat
     cgetexpr self._result
     cwindow
     for winnr in range(1, winnr('$'))
@@ -25,7 +24,7 @@ function! s:outputter.finish(session)
       endif
     endfor
   finally
-    let &l:errorformat = errorformat
+    let &g:errorformat = errorformat
   endtry
 endfunction
 
@@ -35,3 +34,4 @@ function! quickrun#outputter#quickfix#new()
 endfunction
 
 let &cpo = s:save_cpo
+unlet s:save_cpo

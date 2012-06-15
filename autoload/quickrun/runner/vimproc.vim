@@ -1,7 +1,6 @@
-" quickrun: runner: vimproc
+" quickrun: runner/vimproc: Runs by vimproc at background.
 " Author : thinca <thinca+vim@gmail.com>
-" License: Creative Commons Attribution 2.1 Japan License
-"          <http://creativecommons.org/licenses/by/2.1/jp/deed.en>
+" License: zlib License
 
 let s:save_cpo = &cpo
 set cpo&vim
@@ -13,6 +12,7 @@ augroup END
 let s:runner = {
 \   'config': {
 \     'updatetime': 0,
+\     'sleep': 50,
 \   }
 \ }
 
@@ -31,24 +31,35 @@ function! s:runner.run(commands, input, session)
   let key = a:session.continue()
 
   " Wait a little because execution might end immediately.
-  sleep 50m
+  if self.config.sleep
+    execute 'sleep' self.config.sleep . 'm'
+  endif
   if s:receive_vimproc_result(key)
     return
   endif
   " Execution is continuing.
-  augroup plugin-quickrun-vimproc
+  augroup plugin-quickrun-runner-vimproc
     execute 'autocmd! CursorHold,CursorHoldI * call'
     \       's:receive_vimproc_result(' . string(key) . ')'
   augroup END
-  let a:session._autocmd_vimproc = 'vimproc'
+  let self._autocmd = 1
   if self.config.updatetime
-    let a:session._option_updatetime = &updatetime
+    let self._updatetime = &updatetime
     let &updatetime = self.config.updatetime
   endif
 endfunction
 
 function! s:runner.shellescape(str)
-   return "'" . substitute(a:str, '\\', '/', 'g') . "'"
+  return escape(a:str, '\"')
+endfunction
+
+function! s:runner.sweep()
+  if has_key(self, '_autocmd')
+    autocmd! plugin-quickrun-runner-vimproc
+  endif
+  if has_key(self, '_updatetime')
+    let &updatetime = self._updatetime
+  endif
 endfunction
 
 
@@ -88,3 +99,4 @@ function! quickrun#runner#vimproc#new()
 endfunction
 
 let &cpo = s:save_cpo
+unlet s:save_cpo

@@ -1,7 +1,6 @@
-" quickrun: outputter: buffered
+" quickrun: outputter/buffered: Meta outputter; Buffers the output.
 " Author : thinca <thinca+vim@gmail.com>
-" License: Creative Commons Attribution 2.1 Japan License
-"          <http://creativecommons.org/licenses/by/2.1/jp/deed.en>
+" License: zlib License
 
 let s:save_cpo = &cpo
 set cpo&vim
@@ -32,3 +31,4 @@ function! quickrun#outputter#buffered#new()
 endfunction
 
 let &cpo = s:save_cpo
+unlet s:save_cpo

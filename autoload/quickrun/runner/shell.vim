@@ -1,7 +1,6 @@
-" quickrun: runner: shell
+" quickrun: runner/shell: Runs by :! .
 " Author : thinca <thinca+vim@gmail.com>
-" License: Creative Commons Attribution 2.1 Japan License
-"          <http://creativecommons.org/licenses/by/2.1/jp/deed.en>
+" License: zlib License
 
 
 let s:save_cpo = &cpo
@@ -19,9 +18,8 @@ endfunction
 
 function! s:runner.run(commands, input, session)
   if a:input !=# ''
-    let inputfile = tempname()
+    let inputfile = a:session.tempname()
     call writefile(split(a:input, "\n", 1), inputfile, 'b')
-    let a:session._temp_input = inputfile
   endif
 
   for cmd in a:commands
@@ -67,3 +65,4 @@ function! quickrun#runner#shell#new()
 endfunction
 
 let &cpo = s:save_cpo
+unlet s:save_cpo

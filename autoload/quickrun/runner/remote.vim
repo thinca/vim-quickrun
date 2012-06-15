@@ -1,7 +1,6 @@
-" quickrun: runner: remote
+" quickrun: runner/remote: Runs in background by +clientserver feature.
 " Author : thinca <thinca+vim@gmail.com>
-" License: Creative Commons Attribution 2.1 Japan License
-"          <http://creativecommons.org/licenses/by/2.1/jp/deed.en>
+" License: zlib License
 
 let s:save_cpo = &cpo
 set cpo&vim
@@ -28,8 +27,7 @@ function! s:runner.run(commands, input, session)
   \             !empty($_) ? $_ : v:progname
 
   let key = a:session.continue()
-  let outfile = tempname()
-  let a:session._temp_result = outfile
+  let outfile = a:session.tempname()
   let readfile = printf('join(readfile(%s, 1), "\n")', string(outfile))
   let expr = printf('quickrun#session(%s, "output", %s) + ' .
   \                 'quickrun#session(%s, "finish")',
@@ -42,8 +40,7 @@ function! s:runner.run(commands, input, session)
 
   let in = a:input
   if in !=# ''
-    let inputfile = tempname()
-    let a:session._temp_input = inputfile
+    let inputfile = a:session.tempname()
     call writefile(split(in, "\n", 1), inputfile, 'b')
     let in = ' <' . self.shellescape(inputfile)
   endif
@@ -60,7 +57,7 @@ function! s:runner.run(commands, input, session)
     call map(scriptbody, 'v:val . "\r"')
   endif
   call map(scriptbody, 'g:quickrun#V.iconv(v:val, &encoding, &termencoding)')
-  let a:session._temp_script = script
+  call a:session.tempname(script)
   call writefile(scriptbody, script, 'b')
 
   let available_vimproc = globpath(&runtimepath, 'autoload/vimproc.vim') !=# ''
@@ -95,7 +92,21 @@ endfunction
 
 function! s:make_command(runner, args)
   return join([shellescape(a:args[0])] +
-  \           map(a:args[1 :], 'a:runner.shellescape(v:val)'), ' ')
+  \           map(a:args[1 :], 's:shellescape(v:val)'), ' ')
+endfunction
+
+function! s:shellescape(str)
+  if s:is_cmd_exe()
+    return '^"' . substitute(substitute(substitute(a:str,
+    \             '[&|<>()^"%]', '^\0', 'g'),
+    \             '\\\+\ze"', '\=repeat(submatch(0), 2)', 'g'),
+    \             '\^"', '\\\0', 'g') . '^"'
+  endif
+  return shellescape(a:str)
+endfunction
+
+function! s:is_cmd_exe()
+  return &shell =~? 'cmd\.exe'
 endfunction
 
 
@@ -104,3 +115,4 @@ function! quickrun#runner#remote#new()
 endfunction
 
 let &cpo = s:save_cpo
+unlet s:save_cpo

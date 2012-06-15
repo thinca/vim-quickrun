@@ -1,12 +1,11 @@
 *quickrun.txt*	コマンドを素早く実行します。
 
-Version: 0.5.1
+Version: 0.6.0dev
 Author: thinca <thinca+vim@gmail.com>
 英訳:
   * ujihisa <ujihisa at gmail com>
   * tyru <tyru.exe@gmail.com>
-License: クリエイティブ・コモンズの表示 2.1 日本ライセンス
-         <http://creativecommons.org/licenses/by/2.1/jp/>
+License: zlib License
 
 ==============================================================================
 目次						*quickrun-contents*
@@ -23,15 +22,22 @@ License: クリエイティブ・コモンズの表示 2.1 日本ライセンス
 モジュール			|quickrun-module|
   RUNNER			  |quickrun-module-runner|
   OUTPUTTER			  |quickrun-module-outputter|
+  HOOK				  |quickrun-module-hook|
 モジュールの作成		|quickrun-create-module|
   モジュールの登録		  |quickrun-register-module|
   セッション			  |quickrun-session|
   共通の属性			  |quickrun-module-attributes|
   RUNNER の属性			  |quickrun-runner-attributes|
   OUTPUTTER の属性		  |quickrun-outputter-attributes|
+  HOOK の属性			  |quickrun-hook-attributes|
+  実行順序			  |quickrun-execution-sequence|
+フック				|quickrun-hook|
+  フック関数			  |quickrun-hook-function|
+  フックポイント		  |quickrun-hook-point|
 設定例				|quickrun-examples|
 既知の問題			|quickrun-known-issues|
 更新履歴			|quickrun-changelog|
+
 
 
 ==============================================================================
@@ -115,29 +121,42 @@ http://github.com/thinca/vim-quickrun
 ------------------------------------------------------------------------------
 関数						*quickrun-functions*
 
+quickrun#run([{config}])			*quickrun#run()*
+	|:QuickRun| の関数版です。
+
+quickrun#new([{config}])			*quickrun#new()*
+	{session}(|quickrun-session|) を生成します。
+
 quickrun#operator({wise})			*quickrun#operator()*
 	'operatorfunc' に対して設定するための関数です。
 	例えば、 >
 	nnoremap <silent> <C-CR> :<C-u>set opfunc=quickrun#operator<CR>g@ip
 <	これは、<C-CR> で現在の段落(|ip|)を実行します。
 
-						*quickrun#register_module()*
-quickrun#register_module({kind}, {name}, {module})
-	{module} を登録します。詳しくは |quickrun-create-module| を参照してく
-	ださい。{module} が空の辞書の場合、登録済みのモジュールを削除します。
+						*quickrun#module#register()*
+quickrun#module#register({module} [, {overwrite}])
+	{module} を登録します。{overwrite} が与えられて 1 だった場合、登録済み
+	のモジュールを上書きします。
+	詳しくは |quickrun-create-module| を参照してください。
 
-quickrun#register_runner({name}, {runner})	*quickrun#register_runner()*
-	quickrun#register_module("runner", {name}, {runner}) の省略形です。
+quickrun#module#unregister({module})		*quickrun#module#unregister()*
+quickrun#module#unregister({kind}, {name})
+	モジュールの登録を解除します。
 
-					       *quickrun#register_outputter()*
-quickrun#register_outputter({name}, {outputter})
-	quickrun#register_module("outputter", {name}, {outputter}) の省略形で
-	す。
+quickrun#module#exists({kind}, {name})		*quickrun#module#exists()*
+	モジュールが登録されているかどうかを確認します。
 
-quickrun#get_module({kind} [, {name}])		*quickrun#get_module()*
+quickrun#module#get({kind} [, {name}])		*quickrun#module#get()*
 	登録済みのモジュールを取得します。{name} を省略した場合、登録された全
 	ての {kind} モジュールを含む辞書を返します。{name} で指定した辞書が登
 	録されていなかった場合は空の辞書を返します。
+
+quickrun#module#get_kinds()			*quickrun#module#get_kinds()*
+	モジュールの種類の名前のリストを取得します。
+
+quickrun#module#load()				*quickrun#module#load()*
+	'runtimepath' 上にあるモジュールをロードします。これは
+	"autoload/quickrun.vim" がロードされる際に自動で呼ばれます。
 
 						*quickrun#session()*
 quickrun#session({key} [, {func-name} [, {args} ...]])
@@ -149,6 +168,14 @@ quickrun#session({key} [, {func-name} [, {args} ...]])
 quickrun#sweep_sessions()			*quickrun#sweep_sessions()*
 	実行中のセッションを強制的に終了します。新しく実行を行う前に呼び出され
 	ます。実行が終わらない場合は、手動で呼び出すこともできます。
+
+
+以下の関数は非推奨です。次のバージョンで削除される予定です。
+quickrun#register_module({kind}, {name}, {module})
+quickrun#register_runner({name}, {runner})
+quickrun#register_outputter({name}, {outputter})
+quickrun#register_hook({name}, {hook})
+quickrun#get_module({kind} [, {name}])
 
 
 ------------------------------------------------------------------------------
@@ -226,31 +253,12 @@ mode					*quickrun-option-mode*
 		nnoremap <silent> <F5> :QuickRun -mode n<CR>
 		vnoremap <silent> <F5> :QuickRun -mode v<CR>
 
-output_encode (*)			*quickrun-option-output_encode*
-	出力の文字コードを変換したい場合に、"from:to" の形式で指定しま
-	す。":to" は省略できます。その場合、"from:&encoding" と解釈されます。
-	デフォルトは "&fileencoding" です。
-
-shebang					*quickrun-option-shebang*
-	0 以外を指定すると、 src の最初の行が #! で始まってた場合にその後続の
-	文字列を command として扱います。この場合、%c はエスケープ処理
-	(|quickrun-exec-format|)されません。
-	デフォルトは 1 です。
-
 tempfile (*)				*quickrun-option-tempfile*
-	ブログラムを実行する際、現在のバッファ全体を実行する以外の場合は、ソー
+	プログラムを実行する際、現在のバッファ全体を実行する以外の場合は、ソー
 	スファイルを一時ファイルに書き出して実行します。その際の一時ファイル名
 	を指定します。
 	一時ファイルは実行する度に削除されます。
 	デフォルトは "{tempname()}" です。
-
-eval					*quickrun-option-eval*
-	0 以外が指定された場合、src を eval_template に埋め込んで置き変えま
-	す。
-
-eval_template				*quickrun-option-eval_template*
-	eval が指定された際に使用されるテンプレート文字列です。テンプレート内
-	の %s が src に置き変えられます。
 
 
 ------------------------------------------------------------------------------
@@ -290,12 +298,6 @@ exec オプションの書式				*quickrun-exec-format*
 	java %S:r:gs?[/\\]?.?
 <
 コマンドに改行文字が含まれている場合は空白文字に置き換えられます。
-
-Vim のコマンドを実行する
-------------------------
-exec を展開した結果先頭の文字が ":" だった場合、Vim のコマンドとして実行されま
-す。また、この場合ファイルを指定するシンボルは |fnameescape()| でエスケープさ
-れます。
 
 複数のコマンドを指定する
 ------------------------
@@ -361,6 +363,7 @@ quickrun のいくつかの部分はモジュール化されています。モ�
 
 - runner	(|quickrun-module-runner|)
 - outputter	(|quickrun-module-outputter|)
+- hook		(|quickrun-module-hook|)
 
 モジュールは独自のオプションを持っている場合があります。モジュールのオプション
 は、通常のオプションか、モジュール名の後ろで指定します。
@@ -370,8 +373,9 @@ quickrun のいくつかの部分はモジュール化されています。モ�
 通常のオプションで指定した場合、以下の優先順位でモジュールに読み取られます。
 
 1. "{module-type}/{module-name}/{option-name}"
-2. "{module-type}/{option-name}"
-3. "{option-name}"
+2. "{module-name}/{option-name}"
+3. "{module-type}/{option-name}"
+4. "{option-name}"
 
 例えば、"outputter/buffer" モジュールに "append" オプションを指定したい場合、
 >
@@ -420,7 +424,7 @@ NOTE: "system" 以外は不安定な場合があります。
 - "shell"				*quickrun-module-runner/shell*
   |:!| を使って実行します。この runner は outputter を無視します。
   オプション ~
-  {shellcmd}		デフォルト: MS Windows の場合は 'silent !"%s" & pause'
+  shellcmd		デフォルト: MS Windows の場合は 'silent !"%s" & pause'
 				    それ以外は '!%s'
 	実行する Vim コマンドのテンプレートです。%s が exec オプションで生成さ
 	れたコマンドに置換されます。
@@ -431,7 +435,10 @@ NOTE: "system" 以外は不安定な場合があります。
   |CursorHold| と |CursorHoldI| イベントを使って検査します。50 ミリ秒以内に実
   行が終了した場合は、即座に結果を表示します。
   オプション ~
-  {updatetime}		デフォルト: 0
+  sleep			デフォルト: 50
+	実行直後に指定ミリ秒だけ待ちます。即座に終了するプログラムの場合、
+	'updatetime' による待機をする必要がなくなります。
+  updatetime		デフォルト: 0
 	一時的に 'updatetime' をこの値に変更します。0 の場合は変更しません。
 
 - "remote"				*quickrun-module-runner/remote*
@@ -443,7 +450,7 @@ NOTE: "system" 以外は不安定な場合があります。
   バックグラウンドで実行するため、コマンドが無限ループや入力待ち等で終了しな
   い場合、Vim から制御することはできないので注意してください。
   オプション ~
-  {vimproc}		デフォルト: 0
+  vimproc		デフォルト: 0
 	可能ならば |vimproc| でコマンドを実行します。これにより、実行のキャン
 	セルが可能になります。
 
@@ -452,6 +459,11 @@ NOTE: "system" 以外は不安定な場合があります。
   |python| のスレッドを利用してコマンドを非同期実行します。
   警告: これは非常に不安定です。
   警告: X11 環境では使用しないでください。Vim がクラッシュします。
+
+- "vimscript"				*quickrun-module-runner/vimscript*
+  コマンドを Vim のコマンドとして実行します。
+  |:redir| コマンドを含む Vim コマンドは実行できません。これは出力を得るために
+  |:redir| を使っているためです。|:redir| はネストできません。
 
 
 ------------------------------------------------------------------------------
@@ -462,60 +474,63 @@ outputter は結果の出力を行うモジュールです。
 
 - "buffer"				*quickrun-module-outputter/buffer*
   出力専用バッファを開いてそこへ出力します。このバッファは同じものが再利用され
-  ます。このバッファにはカスタマイズのために 'filetype' に "quickrun" が設定さ
-  れます。これが既定値です。
+  ます。
   オプション ~
-  {append}		デフォルト: 0
+  name			デフォルト: "[quickrun output]"
+	バッファ名です。
+  filetype		デフォルト: "quickrun"
+	バッファに設定される 'filetype' の値です。
+  append		デフォルト: 0
 	1 の場合は追記を行います。
-  {split}
+  split
 	デフォルト: '{winwidth(0) * 2 < winheight(0) * 5 ? "" : "vertical"}'
 	出力専用バッファを開く際の補助コマンドを指定します。バッファを開く際に
 	|:split| コマンドの前に挿入されます。
-  {into}		デフォルト: 0
+  into			デフォルト: 0
 	0 以外を指定すると、結果が出た際に出力専用バッファへカーソルを移動しま
 	す。
-  {running_mark}	デフォルト: ':-)'
+  running_mark		デフォルト: ':-)'
 	この値が空文字列でない場合、実行中にこの文字列が出力先に表示されます。
 	表示は実行完了後に削除されます。
 
 - "message"				*quickrun-module-outputter/message*
   |messages| に出力します。
   オプション ~
-  {log}			デフォルト: 0
+  log			デフォルト: 0
 	1 の場合、出力を |message-history| に記録します。
 
 - "variable"				*quickrun-module-outputter/variable*
   変数に対して出力します。環境変数やオプションに対しても出力可能です。
   オプション ~
-  {name}		デフォルト: ''
+  name			デフォルト: ''
 	出力先の変数名です。空の場合はエラーになります。
-  {append}		デフォルト: 0
+  append		デフォルト: 0
 	1 の場合は追記を行います。
 
 - "file"				*quickrun-module-outputter/file*
   ファイルに対して出力します。
   オプション ~
-  {name}		デフォルト: ''
+  name			デフォルト: ''
 	出力先のファイル名です。空の場合はエラーになります。
-  {append}		デフォルト: 0
+  append		デフォルト: 0
 	1 の場合は追記を行います。
 
 - "quickfix"				*quickrun-module-outputter/quickfix*
   |quickfix| へ出力します。
   オプション ~
-  {errorformat}		デフォルト: "&errorformat"
+  errorformat		デフォルト: "&errorformat"
 	出力を解釈するための 'errorformat' オプションの値です。
 
 - "browser"				*quickrun-module-outputter/browser*
   {|open-browser| が必要}
   |open-browser| を使って、結果をブラウザで開きます。
   オプション ~
-  {name}		デフォルト: tempname() . '.html'
+  name			デフォルト: tempname() . '.html'
 	この outputter はまず結果をファイルに書き出し、そのファイルをブラウザ
 	で開きます。その際の出力先のファイル名です。
 	デフォルト値の |tempname()| は初回ロード時に 1 度だけ呼び出され、全体
 	で固定になります。
-  {append}		デフォルト: 0
+  append		デフォルト: 0
 	1 の場合はファイルに対して追記を行います。
 
 - "buffered"				*quickrun-module-outputter/buffered*
@@ -527,7 +542,7 @@ outputter は結果の出力を行うモジュールです。
 - "multi"				*quickrun-module-outputter/multi*
   複数の outputter に対して同時に出力を行います。
   オプション ~
-  {targets}		デフォルト: []
+  targets		デフォルト: []
 	実際の出力に使う outputter のリストです。
 
 - "error"				*quickrun-module-outputter/error*
@@ -536,13 +551,74 @@ outputter は結果の出力を行うモジュールです。
   まうことがあります。
   終了を待つため、出力はバッファリングされます。
   オプション ~
-  {success}		デフォルト: "null"
+  success		デフォルト: "null"
 	実行の成功時に使う outputter です。
-  {error}		デフォルト: "null"
+  error			デフォルト: "null"
 	実行の失敗時に使う outputter です。
 
 - "null"				*quickrun-module-outputter/null*
   出力を行いません。
+
+
+------------------------------------------------------------------------------
+HOOK						*quickrun-module-hook*
+
+hook は特定のポイントで追加の処理を行うモジュールです。
+デフォルトでは以下の hook が使えます。
+
+- "cd"					*quickrun-module-hook/cd*
+  カレントディレクトリを変更して実行します。
+  NOTE: この hook は開始時に Vim 内のカレントディレクトリを変更し、終了時に復
+	元しようとします。非同期実行を使っていると、予期しない結果になるかもし
+	れません。
+  オプション ~
+  directory		デフォルト: ""
+	変更先のディレクトリです。空文字列の場合は何もしません。
+
+- "eval"				*quickrun-module-hook/eval*
+  テンプレートを使ってソースファイルの中身を変更します。例えば、
+  ソースファイル: >
+    1 + 2 * 3
+< テンプレート: >
+    print(%s);
+< となっていた場合、実際に実行されるソースファイルは >
+    print(1 + 2 * 3);
+< になります。
+  オプション ~
+  template		デフォルト: ""
+  テンプレート文字列です。テンプレート内の "%s" が元のソースファイルに置き変え
+  られます。テンプレート内で "%" を使う場合は "%%" と書きます。
+
+- "output_encode"			*quickrun-module-hook/output_encode*
+  出力の文字コードを変換します。
+  オプション ~
+  encoding		デフォルト: "&fileencoding"
+	"from:to" の形式で指定します。":to" は省略できます。その場合、
+	"from:&encoding" と解釈されます。
+
+- "shebang"				*quickrun-module-hook/shebang*
+  ソースコードの先頭の #! を探し、その後続を command オプション
+  (|quickrun-option-command|) として扱います。同時に、exec オプション
+  (|quickrun-option-exec|) 内の "%c" を "%C" に変換します。
+
+- "sweep"				*quickrun-module-hook/sweep*
+  終了時に一時ファイルを削除します。
+  オプション ~
+  files			デフォルト: []
+	削除するファイルのリストです。この値は |quickrun-exec-format| のように
+	展開されます。エスケープを避けるために大文字を指定してください。
+
+- "time"				*quickrun-module-hook/time*
+  実行時間を計測し、最後に出力します。
+  NOTE: 時間には quickrun.vim 自体のオーバーヘッドも含まれています。正確な時間
+	を期待しないでください。
+  オプション ~
+  format		デフォルト: "\n*** time: %g ***"
+	出力する文字列の書式です。|printf()| に渡されます。第2引数には計測時間
+	が |Float| で渡されます。
+  dest			デフォルト: ""
+	出力先の outputter です。空の場合はセッションの outputter へ出力しま
+	す。
 
 
 
@@ -555,9 +631,9 @@ outputter は結果の出力を行うモジュールです。
 ------------------------------------------------------------------------------
 モジュールの登録				*quickrun-register-module*
 
-モジュールは、|quickrun#register_module()| やその省略形である
+モジュールは、|quickrun#module#register()| やその省略形である
 |quickrun#register_runner()|、|quickrun#register_outputter()| を使って登録する
-ことで 使えるようになります。
+ことで使えるようになります。
 また、'runtimepath' 内に autoload/quickrun/{module-kind}/{module-name}.vim を
 作成し、autoload#quickrun#{module-kind}#{module-name}#new() 関数を作っておく
 と、その戻り値が quickrun の初回ロード時に自動的に登録されます。
@@ -568,8 +644,16 @@ outputter は結果の出力を行うモジュールです。
 quickrun では 1 回の実行をセッション({session})として管理しており、モジュール
 の各関数に引数として渡されます。
 
+session.run()				*quickrun-session.run()*
+	実行を開始します。実行中に呼び出すとエラーになります。
+
 session.make_module({kind}, {line})	*quickrun-session.make_module()*
 	セッション中で使えるようにモジュールを生成します。
+
+session.invoke_hook({point} [, {context}]) *quickrun-session.invoke_hook()*
+	フックを起動します。{context} には基本的には辞書を指定します。指定した
+	値がそのままフック関数に渡されます。指定しなかった場合は空の辞書が使わ
+	れます。
 
 session.output({data})			*quickrun-session.output()*
 	runner が出力を行う際に呼び出します。{data} はその場で outputter へ渡
@@ -577,7 +661,8 @@ session.output({data})			*quickrun-session.output()*
 
 session.continue()			*quickrun-session.continue()*
 	runner がその場で実行を完了できない時に呼び出します。{key} を返しま
-	す。|quickrun#session()| に {key} を渡すことで、実行を継続します。
+	す。|quickrun#session()| に {key} を渡すことで継続中の {session} を取
+	得できるので、これを使って実行を継続します。
 
 session.finish([{exit-code}])		*quickrun-session.finish()*
 	runner が実行が全て完了した際に呼び出します。{exit-code} が省略された
@@ -587,19 +672,17 @@ session.exit_code			*quickrun-session.exit_code*
 	実行が完了した後にのみ参照できます。|quickrun-session.finish()| で渡さ
 	れた値です。
 
+session.tempname([{name}])		*quickrun-session.tempname()*
+	|tempname()| と同様ですが、名前を記録し、|quickrun-session.sweep()| で
+	作成されたファイルやディレクトリを削除します。引数を指定するとそのパス
+	を削除するように記録します。
+
 session.sweep()				*quickrun-session.sweep()*
-	セッションの後始末を行います。セッションに対して以下の属性が設定されて
-	いた場合、それに応じた処理が行われます。
-	- "_temp_" で始まる属性があった場合、その値をファイル名としてファイル
-	  を削除します。
-	- "_option_{option-name}" という属性があった場合、オプションの値を復元
-	  します。
-	- "_autocmd_" で始まる属性があった場合、"plugin-quickrun-{value}" とい
-	  う名前のグループに属する autocmd を全て削除します。
-	- "_vimproc" という属性があった場合、その |vimproc| を強制終了します。
-	また、|quickrun-runner.sweep()| を呼び出します。
-	これらは便利ですが、今のところ複数のモジュールから使われた際の名前の衝
-	突が考慮されていません。これは将来改善される可能性があります。
+	セッションの後始末を行います。|quickrun-session.tempname()| で登録され
+	たパスを削除し、|quickrun-module.sweep()| を呼び出します。
+	また、"_vimproc" という属性があった場合、その |vimproc| を強制終了しま
+	す。これは便利ですが、今のところ複数のモジュールから使われた際の名前の
+	衝突が考慮されていません。これは将来改善される可能性があります。
 
 ------------------------------------------------------------------------------
 共通の属性				*quickrun-module-attributes*
@@ -611,6 +694,12 @@ session.sweep()				*quickrun-session.sweep()*
 ション中にモジュール毎に値を保持したい場合は、既存の属性との衝突を避けるために
 "_" で始まる属性を使用してください。
 以下は全モジュールで共通の属性です。
+
+module.kind				*quickrun-module.kind*
+	必須です。モジュールの種類です。
+
+module.name				*quickrun-module.name*
+	必須です。モジュールの名前です。
 
 module.config				*quickrun-module.config*
 	これは辞書で、このモジュールが取る config のデフォルト値です。ここで定
@@ -632,18 +721,20 @@ module.validate()			*quickrun-module.validate()*
 module.init({session})			*quickrun-module.init()*
 	モジュールの初期化時に呼び出されます。
 
+module.sweep()				*quickrun-module.sweep()*
+	実行の完了、もしくは強制終了時に呼び出されます。実行中のデータの後始末
+	を行います。
+
 ------------------------------------------------------------------------------
 RUNNER の属性				*quickrun-runner-attributes*
 
 runner.run({commands}, {input}, {session})	*quickrun-runner.run()*
-	必須です。実行時に呼び出されます。{commands} で渡されたコマンドのリス
-	トを実行 し、{exit-code} を返します。{input} は標準入力データです。
+	必須です。実行時に呼び出されます。
+	{commands} は実行するコマンドのリストです。{input} は標準入力です。
+	コマンドは順に実行され、途中で失敗した場合はそれ以降のコマンドは実行す
+	べきではありません。実行が完了したら {exit-code} を返します。
 	その場で実行を完了できない時は、|quickrun-session.continue()| を使いま
 	す。その場合、|quickrun-session.finish()| を呼び出す必要があります。
-
-runner.sweep()				*quickrun-runner.sweep()*
-	実行の完了、もしくは強制終了時に呼び出されます。実行中のデータの後始末
-	を行います。
 
 ------------------------------------------------------------------------------
 OUTPUTTER の属性			*quickrun-outputter-attributes*
@@ -651,53 +742,181 @@ OUTPUTTER の属性			*quickrun-outputter-attributes*
 outputter.output({data}, {session})	*quickrun-outputter.output()*
 	必須です。データを出力します。
 
+outputter.start({session})		*quickrun-outputter.start()*
+	実行の開始直前に呼び出されます。開始処理を行います。
+
 outputter.finish({session})		*quickrun-outputter.finish()*
 	実行の終了時に呼び出されます。終了処理を行います。
 	また、|quickrun-session.exit_code| が参照できます。
 
+------------------------------------------------------------------------------
+HOOK の属性				*quickrun-hook-attributes*
+
+					*quickrun-hook.on_hook-point()*
+hook.on_{hook-point}({session}, {context})
+	フック時に呼ばれる関数です。詳細は |quickrun-hook| を参照してくださ
+	い。
+
+hook.priority({hook-point})		*quickrun-hook.priority*
+	フックの実行順序の優先度を返します。数値が小さいほど先に実行されます。
+	デフォルトは常に 0 を返します。
+
+hook.config.enable			*quickrun-hook.config.enable*
+	フックが有効かどうかです。デフォルトは 1 (有効) です。
+	これは主にユーザが設定するためにあります。
+	また、|quickrun-module.init()| のタイミングで 0 にすることで hook を無
+	効化してその後の hook 呼び出し時のオーバーヘッドを少しだけ減らすことが
+	できます。
+
+------------------------------------------------------------------------------
+実行順序					*quickrun-execution-sequence*
+
+モジュールを作成する上で、quickrun の内部の処理順序を知ることは重要です。以下
+は quickrun のおおまかな実行順序です。
+
+1.  config の構築
+    コマンドライン引数、各種オプション変数などから config を構築します。この時
+    点では指定されなかった一部のオプションが存在していない可能性があります。
+2.  hook の構築
+    hook モジュールを生成します。この時 |quickrun-module.init()| が呼ばれま
+    す。ここ以降でエラーが発生した場合は多くの場合 |quickrun-session.sweep()|
+    が呼ばれます。ただし、非同期実行などでうまく呼ばれないかもしれません。
+3.  |quickrun-hook-point-hook_loaded| の実行
+4.  無効な hook 削除
+    この時点で enable オプションが 0 な hook は {session} から取り除かれます。
+5.  config の標準化
+    config 内の |quickrun-syntax-option| を展開したり、いくつかの必要なオプ
+    ションがなかった場合に補完します。ファイルが直接実行できない場合に一時ファ
+    イルへ書き出す処理もここで行います。
+6.  |quickrun-hook-point-normalized| の実行
+7.  runner/outputter の構築
+    runner モジュールと outputter モジュールを生成します。hook の時と同様に
+    |quickrun-module.init()| が呼ばれます。
+8.  |quickrun-hook-point-module_loaded| の実行
+9.  コマンドの構築
+    |quickrun-option-exec| の値を実際に実行するコマンドに展開します。
+10. |quickrun-hook-point-ready| の実行
+11. |quickrun-outputter.start()| の実行
+12. |quickrun-runner.run()| の実行
+13. |quickrun-session.finish()| の実行
+    非同期実行の場合は runner が直接呼び出す必要があります。
+14. |quickrun-hook-point-success| / |quickrun-hook-point-failure| の実行
+15. |quickrun-hook-point-finish| の実行
+16. |quickrun-outputter.finish()| の実行
+17. |quickrun-session.sweep()| の実行
+18. |quickrun-hook-point-exit| の実行
+
 
 
 ==============================================================================
-SETTING EXAMPLES				*quickrun-examples*
+フック						*quickrun-hook*
+
+フック機能を使うことで実行の特定のポイントで任意のコードを実行できます。
+
+------------------------------------------------------------------------------
+フック関数					*quickrun-hook-function*
+
+フックの処理はフック関数で行います。全てのフック関数は、引数として {session}
+(|quickrun-session|) と {context} を受け取ります。{context} は通常は辞書で、そ
+のフックに関係した値が格納されています。フック関数では、単純に処理をする以外に
+も {session} やその中に含まれている {config}、{context} を書き換えることが可能
+です。
+
+------------------------------------------------------------------------------
+フックポイント					*quickrun-hook-point*
+
+標準では以下のフックポイントが利用できます。
+
+- "hook_loaded"				*quickrun-hook-point-hook_loaded*
+  hook のロードが終わった直後です。この後に runner と outputter がロードされま
+  す。
+
+- "normalized"				*quickrun-hook-point-normalized*
+  config が標準化された直後です。
+
+- "module_loaded"			*quickrun-hook-point-module_loaded*
+  runner と outputter のロードが終わった直後です。
+
+- "ready"				*quickrun-hook-point-ready*
+  全てのオプションの設定が終わって、最初のコマンドが実行される前です。
+
+- "output"				*quickrun-hook-point-output*
+  runner から出力を受け取り、outputter へ渡す前です。
+  コンテキスト ~
+  "data": 出力データ
+
+- "success"				*quickrun-hook-point-success*
+  実行時が正常に完了した時です。
+
+- "failure"				*quickrun-hook-point-failure*
+  実行時にエラーが発生した時。
+  コンテキスト ~
+  "exit_code": 終了コード
+
+- "finish"				*quickrun-hook-point-finish*
+  実行が完了した時です。success/failure の後に、成功か失敗かに関わらず呼ばれま
+  す。
+
+- "exit"				*quickrun-hook-point-exit*
+  後処理が終わった後の処理の終了時です。
+
+これら以外に、モジュールが |quickrun-session.invoke_hook()| を使うことで任意の
+タイミングでフックを発生させることができます。
+
+
+
+==============================================================================
+設定例						*quickrun-examples*
 
 pandocを使用してmarkdownをhtmlにしてブラウザで開く (要|open-browser.vim|)
 
 >
-	let g:quickrun_config['markdown'] = {
+	let g:quickrun_config.markdown = {
 	      \ 'type': 'markdown/pandoc',
 	      \ 'cmdopt': '-s',
 	      \ 'outputter': 'browser'
 	      \ }
 <
 
-ただし既に以下のようにして|g:quickrun_config| が定義されていると仮定していま
+ただし既に以下のようにして |g:quickrun_config| が定義されていると仮定していま
 す。
 >
 	let g:quickrun_config = {}
 <
 
 
-
 ==============================================================================
 既知の問題					*quickrun-known-issues*
-
-- : による Vim コマンドの実行は、|quickrun-module-runner/vimproc| では動きませ
-  ん。
 
 - コマンドが複数ある場合の標準入力の扱いは runner に依存します。
 
 - 標準出力と標準エラー出力を区別できません。
   - 出力順序は runner に依存します。
 
-- |:redir| コマンドを含む Vim コマンドは実行できません。
-  - これは quickrun.vim が出力を得るために |:redir| を使っているためです。そし
-    て |:redir| はネストできません。
-  - 出力が必要ない場合は、|quickrun-module-runner/shell| を使ってください。
-
 
 
 ==============================================================================
 更新履歴					*quickrun-changelog*
+
+0.6.0	xxxx-xx-xx
+	- モジュール周りの構成を変更。
+	  - quickrun#xxx_module() => quickrun#module#xxx()
+	  - |quickrun#module#register()| の引数を変更。
+	  - |quickrun#module#unregister()| を追加。
+	  - |quickrun#module#exists()| を追加。
+	- hook モジュール(|quickrun-module-hook|)を追加。
+	- いくつかのオプションをモジュールへ移動して削除。
+	  - output_encode
+	  - shebang
+	  - eval
+	- いくつかのモジュールにオプションを追加。
+	  - |quickrun-module-runner/vimproc|
+	    - sleep
+	  - |quickrun-module-outputter/buffer|
+	    - name
+	    - filetype
+	- |quickrun-module-runner/vimscript| を追加。
+	- Vim のコマンドを実行する仕様を削除。
 
 0.5.1	2011-10-21
 	- "srcfile" オプション(|quickrun-option-srcfile|)を追加。

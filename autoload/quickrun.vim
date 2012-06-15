@@ -1,37 +1,28 @@
 " Run commands quickly.
-" Version: 0.5.1
+" Version: 0.6.0dev
 " Author : thinca <thinca+vim@gmail.com>
-" License: Creative Commons Attribution 2.1 Japan License
-"          <http://creativecommons.org/licenses/by/2.1/jp/deed.en>
+" License: zlib License
 
 let s:save_cpo = &cpo
 set cpo&vim
 
-let s:V = vital#of('quickrun').load('Data.List')
+let s:V = vital#of('quickrun').load('Data.List', 'System.File', 'System.Filepath')
 unlet! g:quickrun#V
 let g:quickrun#V = s:V
 lockvar! g:quickrun#V
 
 let s:is_win = s:V.is_windows()
 
-function! s:is_cmd_exe()
-  return &shell =~? 'cmd\.exe'
-endfunction
-
 " Default config.  " {{{1
 unlet! g:quickrun#default_config
 let g:quickrun#default_config = {
 \ '_': {
-\   'shebang': 1,
 \   'outputter': 'buffer',
 \   'runner': 'system',
 \   'cmdopt': '',
 \   'args': '',
-\   'output_encode': '&fileencoding',
 \   'tempfile'  : '%{tempname()}',
 \   'exec': '%c %o %s %a',
-\   'eval': 0,
-\   'eval_template': '%s',
 \ },
 \ 'awk': {
 \   'exec': '%c %o -f %s %a',
@@ -49,19 +40,22 @@ let g:quickrun#default_config = {
 \ },
 \ 'c/clang': {
 \   'command': 'clang',
-\   'exec': ['%c %o %s -o %s:p:r', '%s:p:r %a', 'rm -f %s:p:r'],
+\   'exec': ['%c %o %s -o %s:p:r', '%s:p:r %a'],
 \   'tempfile': '%{tempname()}.c',
+\   'hook/sweep/files': '%S:p:r',
 \ },
 \ 'c/gcc': {
 \   'command': 'gcc',
-\   'exec': ['%c %o %s -o %s:p:r', '%s:p:r %a', 'rm -f %s:p:r'],
+\   'exec': ['%c %o %s -o %s:p:r', '%s:p:r %a'],
 \   'tempfile': '%{tempname()}.c',
+\   'hook/sweep/files': '%S:p:r',
 \ },
 \ 'c/vc': {
 \   'command': 'cl',
 \   'exec': ['%c %o %s /nologo /Fo%s:p:r.obj /Fe%s:p:r.exe > nul',
-\             '%s:p:r.exe %a', 'del %s:p:r.exe %s:p:r.obj'],
+\            '%s:p:r.exe %a'],
 \   'tempfile': '%{tempname()}.c',
+\   'hook/sweep/files': ['%S:p:r.exe', '%S:p:r.obj'],
 \ },
 \ 'cpp': {
 \   'type':
@@ -80,14 +74,16 @@ let g:quickrun#default_config = {
 \ },
 \ 'cpp/g++': {
 \   'command': 'g++',
-\   'exec': ['%c %o %s -o %s:p:r', '%s:p:r %a', 'rm -f %s:p:r'],
+\   'exec': ['%c %o %s -o %s:p:r', '%s:p:r %a'],
 \   'tempfile': '%{tempname()}.cpp',
+\   'hook/sweep/files': '%S:p:r',
 \ },
 \ 'cpp/vc': {
 \   'command': 'cl',
 \   'exec': ['%c %o %s /nologo /Fo%s:p:r.obj /Fe%s:p:r.exe > nul',
-\             '%s:p:r.exe %a', 'del %s:p:r.exe %s:p:r.obj'],
+\            '%s:p:r.exe %a'],
 \   'tempfile': '%{tempname()}.cpp',
+\   'hook/sweep/files': ['%S:p:r.exe', '%S:p:r.obj'],
 \ },
 \ 'clojure': {
 \   'type': executable('jark') ? 'clojure/jark':
@@ -101,6 +97,45 @@ let g:quickrun#default_config = {
 \ 'clojure/clj': {
 \   'command': 'clj',
 \   'exec': '%c %s',
+\ },
+\ 'coffee': {},
+\ 'cs': {
+\   'type': executable('csc')  ? 'cs/csc'  :
+\           executable('dmcs') ? 'cs/dmcs' :
+\           executable('smcs') ? 'cs/smcs' :
+\           executable('gmcs') ? 'cs/gmcs' :
+\           executable('mcs') ? 'cs/mcs' : ''
+\ },
+\ 'cs/csc': {
+\   'command': 'csc',
+\   'exec': ['%c /nologo /out:%s:p:r:gs?/?\\?.exe %s:gs?/?\\?', '%s:p:r.exe %a'],
+\   'tempfile': '%{tempname()}.cs',
+\   'hook/output_encode/encoding': '&termencoding',
+\   'hook/sweep/files': ['%S:p:r.exe'],
+\ },
+\ 'cs/mcs': {
+\   'command': 'mcs',
+\   'exec': ['%c %o -out:%s:p:r.exe %s', 'mono %s:p:r.exe %a'],
+\   'tempfile': '%{tempname()}.cs',
+\   'hook/sweep/files': ['%S:p:r.exe'],
+\ },
+\ 'cs/gmcs': {
+\   'command': 'gmcs',
+\   'exec': ['%c %o -out:%s:p:r.exe %s', 'mono %s:p:r.exe %a'],
+\   'tempfile': '%{tempname()}.cs',
+\   'hook/sweep/files': ['%S:p:r.exe'],
+\ },
+\ 'cs/smcs': {
+\   'command': 'smcs',
+\   'exec': ['%c %o -out:%s:p:r.exe %s', 'mono %s:p:r.exe %a'],
+\   'tempfile': '%{tempname()}.cs',
+\   'hook/sweep/files': ['%S:p:r.exe'],
+\ },
+\ 'cs/dmcs': {
+\   'command': 'dmcs',
+\   'exec': ['%c %o -out:%s:p:r.exe %s', 'mono %s:p:r.exe %a'],
+\   'tempfile': '%{tempname()}.cs',
+\   'hook/sweep/files': ['%S:p:r.exe'],
 \ },
 \ 'd': {
 \   'type':
@@ -148,10 +183,14 @@ let g:quickrun#default_config = {
 \   'command': 'erb',
 \   'exec': '%c %o -T - %s %a',
 \ },
-\ 'rust': {
-\   'command': 'rustc',
-\   'exec': ['%c %o %s -o %s:p:r', '%s:p:r %a', 'rm -f %s:p:r'],
-\   'tempfile': '%{tempname()}.rs',
+\ 'fortran': {
+\   'type': 'fortran/gfortran',
+\ },
+\ 'fortran/gfortran': {
+\   'command': 'gfortran',
+\   'exec': ['%c %o -o %s:p:r %s', '%s:p:r %a'],
+\   'tempfile': '%{tempname()}.f95',
+\   'hook/sweep/files': ['%S:p:r'],
 \ },
 \ 'go': {
 \   'type':
@@ -162,28 +201,29 @@ let g:quickrun#default_config = {
 \     executable('go') ? (s:is_win ? 'go/go/win' : 'go/go'): '',
 \ },
 \ 'go/386': {
-\   'exec': ['8g %o -o %s:p:r.8 %s', '8l -o %s:p:r %s:p:r.8',
-\            '%s:p:r %a', 'rm -f %s:p:r'],
+\   'exec': ['8g %o -o %s:p:r.8 %s', '8l -o %s:p:r %s:p:r.8', '%s:p:r %a'],
 \   'tempfile': '%{tempname()}.go',
-\   'output_encode': 'utf-8',
+\   'hook/output_encode/encoding': 'utf-8',
+\   'hook/sweep/files': '%S:p:r',
 \ },
 \ 'go/386/win': {
 \   'exec': ['8g %o -o %s:p:r.8 %s', '8l -o %s:p:r.exe %s:p:r.8',
-\            '%s:p:r.exe %a', 'del /F %s:p:r.exe'],
+\            '%s:p:r.exe %a'],
 \   'tempfile': '%{tempname()}.go',
-\   'output_encode': 'utf-8',
+\   'hook/output_encode/encoding': 'utf-8',
+\   'hook/sweep/files': '%S:p:r.exe',
 \ },
 \ 'go/amd64': {
-\   'exec': ['6g %o -o %s:p:r.6 %s', '6l -o %s:p:r %s:p:r.6',
-\            '%s:p:r %a', 'rm -f %s:p:r'],
+\   'exec': ['6g %o -o %s:p:r.6 %s', '6l -o %s:p:r %s:p:r.6', '%s:p:r %a'],
 \   'tempfile': '%{tempname()}.go',
-\   'output_encode': 'utf-8',
+\   'hook/output_encode/encoding': 'utf-8',
+\   'hook/sweep/files': '%S:p:r',
 \ },
 \ 'go/arm': {
-\   'exec': ['5g %o -o %s:p:r.5 %s', '5l -o %s:p:r %s:p:r.5',
-\            '%s:p:r %a', 'rm -f %s:p:r'],
+\   'exec': ['5g %o -o %s:p:r.5 %s', '5l -o %s:p:r %s:p:r.5', '%s:p:r %a'],
 \   'tempfile': '%{tempname()}.go',
-\   'output_encode': 'utf-8',
+\   'hook/output_encode/encoding': 'utf-8',
+\   'hook/sweep/files': '%S:p:r',
 \ },
 \ 'go/go': {
 \   'exec': ['cd %s:p:h \&\& go run %s:p:t'],
@@ -202,7 +242,7 @@ let g:quickrun#default_config = {
 \ 'haskell/runghc': {
 \   'command': 'runghc',
 \   'tempfile': '%{tempname()}.hs',
-\   'eval_template': 'main = print $ %s',
+\   'hook/eval/template': 'main = print \$ %s',
 \ },
 \ 'haskell/ghc': {
 \   'command': 'ghc',
@@ -223,8 +263,9 @@ let g:quickrun#default_config = {
 \ },
 \ 'io': {},
 \ 'java': {
-\   'exec': ['javac %o %s', '%c %s:t:r %a', ':call delete("%S:t:r.class")'],
-\   'output_encode': '&termencoding',
+\   'exec': ['javac %o %s', '%c %s:t:r %a'],
+\   'hook/output_encode/encoding': '&termencoding',
+\   'hook/sweep/files': '%S:p:r.class',
 \ },
 \ 'javascript': {
 \   'type': executable('js') ? 'javascript/spidermonkey':
@@ -260,6 +301,11 @@ let g:quickrun#default_config = {
 \   'command': 'phantomjs',
 \   'tempfile': '%{tempname()}.js',
 \ },
+\ 'jsx': {
+\   'exec': '%c --run %o %s %a',
+\   'hook/eval/template':
+\     'class _Main { static function main(args : string[]) :void { %s }}',
+\ },
 \ 'lisp': {
 \   'command': 'clisp',
 \ },
@@ -293,22 +339,27 @@ let g:quickrun#default_config = {
 \ },
 \ 'ocaml': {},
 \ 'perl': {
-\   'eval_template': join([
+\   'hook/eval/template': join([
 \     'use Data::Dumper',
-\     '$Data::Dumper::Terse = 1',
-\     '$Data::Dumper::Indent = 0',
+\     '\$Data::Dumper::Terse = 1',
+\     '\$Data::Dumper::Indent = 0',
 \     'print Dumper eval{%s}'], ';')
 \ },
-\ 'perl6': {'eval_template': '{%s}().perl.print'},
-\ 'python': {'eval_template': 'print(%s)'},
+\ 'perl6': {'hook/eval/template': '{%s}().perl.print'},
+\ 'python': {'hook/eval/template': 'print(%s)'},
 \ 'php': {},
 \ 'r': {
 \   'command': 'R',
 \   'exec': '%c %o --no-save --slave %a < %s',
 \ },
-\ 'ruby': {'eval_template': " p proc {\n%s\n}.call"},
+\ 'ruby': {'hook/eval/template': " p proc {\n%s\n}.call"},
+\ 'rust': {
+\   'command': 'rustc',
+\   'exec': ['%c %o %s -o %s:p:r', '%s:p:r %a', 'rm -f %s:p:r'],
+\   'tempfile': '%{tempname()}.rs',
+\ },
 \ 'scala': {
-\   'output_encode': '&termencoding',
+\   'hook/output_encode/encoding': '&termencoding',
 \ },
 \ 'scheme': {
 \   'type': executable('gosh')     ? 'scheme/gauche':
@@ -317,7 +368,7 @@ let g:quickrun#default_config = {
 \ 'scheme/gauche': {
 \   'command': 'gosh',
 \   'exec': '%c %o %s:p %a',
-\   'eval_template': '(display (begin %s))',
+\   'hook/eval/template': '(display (begin %s))',
 \ },
 \ 'scheme/mzscheme': {
 \   'command': 'mzscheme',
@@ -328,110 +379,84 @@ let g:quickrun#default_config = {
 \ 'vim': {
 \   'command': ':source',
 \   'exec': '%C %s',
-\   'eval_template': "echo %s",
-\   'runner': 'system',
+\   'hook/eval/template': "echo %s",
+\   'runner': 'vimscript',
 \ },
 \ 'wsh': {
 \   'command': 'cscript',
 \   'cmdopt': '//Nologo',
+\   'hook/output_encode/encoding': '&termencoding',
 \ },
 \ 'zsh': {},
 \}
 lockvar! g:quickrun#default_config
 
 
-" Modules.  {{{1
-" Template of module.  {{{2
-let s:module = {'config': {}, 'config_order': []}
-function! s:module.available()
-  try
-    call self.validate()
-  catch
-    return 0
-  endtry
-  return 1
-endfunction
-function! s:module.validate()
-endfunction
-function! s:module.build(configs)
-  for config in a:configs
-    if type(config) == type({})
-      for name in keys(self.config)
-        for conf in [self.kind . '/' . self.name . '/' . name,
-        \            self.kind . '/' . name,
-        \            name]
-          if has_key(config, conf)
-            let self.config[name] = config[conf]
-            break
-          endif
-        endfor
-      endfor
-    elseif type(config) == type('') && config !=# ''
-      call self.parse_option(config)
-    endif
-    unlet config
-  endfor
-endfunction
-function! s:module.parse_option(argline)
-  let sep = a:argline[0]
-  let args = split(a:argline[1:], '\V' . escape(sep, '\'))
-  let order = copy(self.config_order)
-  for arg in args
-    let name = matchstr(arg, '^\w\+\ze=')
-    if !empty(name)
-      let value = matchstr(arg, '^\w\+=\zs.*')
-    elseif len(self.config) == 1
-      let [name, value] = [keys(self.config)[0], arg]
-    elseif !empty(order)
-      let name = remove(order, 0)
-      let value = arg
-    endif
-    if empty(name)
-      throw 'could not parse the option: ' . arg
-    endif
-    if !has_key(self.config, name)
-      throw 'unknown option: ' . name
-    endif
-    if type(self.config[name]) == type([])
-      call add(self.config[name], value)
-    else
-      let self.config[name] = value
-    endif
-  endfor
-endfunction
-function! s:module.init(session)
-endfunction
-
-" Template of runner.  {{{2
-let s:runner = copy(s:module)
-function! s:runner.run(commands, input, session)
-  throw 'quickrun: A runner should implements run()'
-endfunction
-function! s:runner.sweep()
-endfunction
-function! s:runner.shellescape(str)
-  if s:is_cmd_exe()
-    return '^"' . substitute(substitute(substitute(a:str,
-    \             '[&|<>()^"%]', '^\0', 'g'),
-    \             '\\\+\ze"', '\=repeat(submatch(0), 2)', 'g'),
-    \             '\^"', '\\\0', 'g') . '^"'
-  endif
-  return shellescape(a:str)
-endfunction
-
-" Template of outputter.  {{{2
-let s:outputter = copy(s:module)
-function! s:outputter.output(data, session)
-  throw 'quickrun: An outputter should implements output()'
-endfunction
-function! s:outputter.finish(session)
-endfunction
-
-
 let s:Session = {}  " {{{1
 " Initialize of instance.
 function! s:Session.initialize(config)
-  let self.config = s:normalize(a:config)
+  let self.base_config = s:build_config(a:config)
+endfunction
+
+" The option is appropriately set referring to default options.
+function! s:Session.normalize(config)
+  let config = a:config
+  if has_key(config, 'input')
+    let input = quickrun#expand(config.input)
+    try
+      let config.input = input[0] ==# '=' ? input[1:]
+      \                                  : join(readfile(input, 'b'), "\n")
+    catch
+      throw 'quickrun: Can not treat input: ' . v:exception
+    endtry
+  else
+    let config.input = ''
+  endif
+
+  let config.command = get(config, 'command', config.type)
+
+  if has_key(config, 'srcfile')
+    let config.srcfile = quickrun#expand(expand(config.srcfile))
+  elseif !has_key(config, 'src')
+    if filereadable(expand('%:p')) &&
+    \  !has_key(config, 'region') && !&modified
+      " Use file in direct.
+      let config.srcfile = expand('%:p')
+    else
+      let config.region = get(config, 'region', {
+      \   'first': [1, 0, 0],
+      \   'last':  [line('$'), 0, 0],
+      \   'wise': 'V',
+      \ })
+      " Executes on the temporary file.
+      let body = s:get_region(config.region)
+
+      let body = s:V.iconv(body, &encoding, &fileencoding)
+
+      if &l:fileformat ==# 'mac'
+        let body = substitute(body, "\n", "\r", 'g')
+      elseif &l:fileformat ==# 'dos'
+        if !&l:binary
+          let body .= "\n"
+        endif
+        let body = substitute(body, "\n", "\r\n", 'g')
+      endif
+
+      let config.src = body
+    endif
+  endif
+
+  if !has_key(config, 'srcfile')
+    let fname = quickrun#expand(config.tempfile)
+    call self.tempname(fname)
+    call writefile(split(config.src, "\n", 1), fname, 'b')
+    let config.srcfile = fname
+  endif
+
+  for opt in ['cmdopt', 'args']
+    let config[opt] = quickrun#expand(config[opt])
+  endfor
+  return config
 endfunction
 
 function! s:Session.setup()
@@ -439,13 +464,22 @@ function! s:Session.setup()
     if has_key(self, 'exit_code')
       call remove(self, 'exit_code')
     endif
+    let self.config = deepcopy(self.base_config)
+
+    let self.hooks = map(quickrun#module#get('hook'),
+    \                    'self.make_module("hook", v:val.name)')
+    call self.invoke_hook('hook_loaded')
+    call filter(self.hooks, 'v:val.config.enable')
+    let self.config = self.normalize(self.config)
+    call self.invoke_hook('normalized')
+
     let self.runner = self.make_module('runner', self.config.runner)
     let self.outputter = self.make_module('outputter', self.config.outputter)
+    call self.invoke_hook('module_loaded')
 
-    let source_name = self.get_source_name()
     let exec = get(self.config, 'exec', '')
     let commands = type(exec) == type([]) ? copy(exec) : [exec]
-    call filter(map(commands, 'self.build_command(source_name, v:val)'),
+    call filter(map(commands, 'self.build_command(v:val)'),
     \           'v:val =~# "\\S"')
     let self.commands = commands
   catch /^quickrun:/
@@ -467,12 +501,7 @@ function! s:Session.make_module(kind, line)
     let args = [arg]
   endif
 
-  if !has_key(s:modules[a:kind], name)
-    throw printf('quickrun: Specified %s is not registered: %s',
-    \            a:kind, name)
-  endif
-
-  let module = deepcopy(s:modules[a:kind][name])
+  let module = deepcopy(quickrun#module#get(a:kind, name))
 
   try
     call module.validate()
@@ -483,7 +512,7 @@ function! s:Session.make_module(kind, line)
   endtry
 
   try
-    call module.build([self.config] + args)
+    call s:build_module(module, [self.config] + args)
     call map(module.config, 'quickrun#expand(v:val)')
     call module.init(self)
   catch
@@ -496,9 +525,15 @@ function! s:Session.make_module(kind, line)
 endfunction
 
 function! s:Session.run()
+  if has_key(self, '_running')
+    throw 'quickrun: session.run() was called in running.'
+  endif
+  let self._running = 1
   call self.setup()
+  call self.invoke_hook('ready')
   let exit_code = 1
   try
+    call self.outputter.start(self)
     let exit_code = self.runner.run(self.commands, self.config.input, self)
   finally
     if !has_key(self, '_continue_key')
@@ -513,43 +548,40 @@ function! s:Session.continue()
 endfunction
 
 function! s:Session.output(data)
-  if a:data !=# ''
-    let data = a:data
-    if get(self.config, 'output_encode', '') !=# ''
-      let enc = split(self.config.output_encode, '[^[:alnum:]-_]')
-      if len(enc) == 1
-        let enc += [&encoding]
-      endif
-      if len(enc) == 2
-        let [from, to] = enc
-        let data = s:V.iconv(data, from, to)
-      endif
-    endif
-    call self.outputter.output(data, self)
+  let context = {'data': a:data}
+  call self.invoke_hook('output', context)
+  if context.data !=# ''
+    call self.outputter.output(context.data, self)
   endif
 endfunction
 
 function! s:Session.finish(...)
   if !has_key(self, 'exit_code')
     let self.exit_code = a:0 ? a:1 : 0
+    if self.exit_code == 0
+      call self.invoke_hook('success')
+    else
+      call self.invoke_hook('failure', {'exit_code': self.exit_code})
+    endif
+    call self.invoke_hook('finish')
     call self.outputter.finish(self)
     call self.sweep()
+    call self.invoke_hook('exit')
   endif
 endfunction
 
 " Build a command to execute it from options.
-function! s:Session.build_command(source_name, tmpl)
+" XXX: Undocumented yet.  This is used by core modules only.
+function! s:Session.build_command(tmpl)
   let config = self.config
-  let shebang = config.shebang ? s:detect_shebang(a:source_name) : ''
-  let command = shebang !=# '' ? shebang : config.command
+  let command = config.command
   let rule = {
   \  'c': command,
-  \  's': a:source_name,
+  \  's': config.srcfile,
   \  'o': config.cmdopt,
   \  'a': config.args,
   \  '%': '%',
   \}
-  let is_file = '[' . (shebang !=# '' ? 's' : 'cs') . ']'
   let rest = a:tmpl
   let result = ''
   while 1
@@ -570,13 +602,20 @@ function! s:Session.build_command(source_name, tmpl)
     endif
 
     let rest = rest[2 :]
-    if symbol =~? is_file
+    if symbol =~? '^[cs]$'
+      if symbol ==# 'c'
+        let value_ = s:V.System.Filepath.which(value)
+        if value_ !=# ''
+          let value = value_
+        endif
+      endif
       let mod = matchstr(rest, '^\v\zs%(\:[p8~.htre]|\:g?s(.).{-}\1.{-}\1)*')
       let value = fnamemodify(value, mod)
       if symbol =~# '\U'
         let value = command =~# '^\s*:' ? fnameescape(value)
         \                               : self.runner.shellescape(value)
       endif
+      let value = escape(value, '\@&$%')
       let rest = rest[len(mod) :]
     endif
     let result .= value
@@ -584,46 +623,27 @@ function! s:Session.build_command(source_name, tmpl)
   return substitute(quickrun#expand(result), '[\r\n]\+', ' ', 'g')
 endfunction
 
-" Return the source file name.
-" Output to a temporary file if self.config.src is string.
-function! s:Session.get_source_name()
-  if !has_key(self.config, 'srcfile')
-    if exists('self.config.src')
-      let fname = quickrun#expand(self.config.tempfile)
-      let self._temp_source = fname
-      call writefile(split(self.config.src, "\n", 1), fname, 'b')
-      let self.config.srcfile = fname
-    else
-      let self.config.srcfile = expand('%:p')
-    endif
+function! s:Session.tempname(...)
+  let name = a:0 ? a:1 : tempname()
+  if !has_key(self, '_temp_names')
+    let self._temp_names = []
   endif
-  return self.config.srcfile
+  call add(self._temp_names, name)
+  return name
 endfunction
 
 " Sweep the session.
 function! s:Session.sweep()
   " Remove temporary files.
-  for file in filter(keys(self), 'v:val =~# "^_temp"')
-    if filewritable(self[file])
-      call delete(self[file])
-    endif
-    call remove(self, file)
-  endfor
-
-  " Restore options.
-  for opt in filter(keys(self), 'v:val =~# "^_option_"')
-    let optname = matchstr(opt, '^_option_\zs.*')
-    if exists('+' . optname)
-      execute 'let'  '&' . optname '= self[opt]'
-    endif
-    call remove(self, opt)
-  endfor
-
-  " Delete autocmds.
-  for cmd in filter(keys(self), 'v:val =~# "^_autocmd_"')
-    execute 'autocmd!' 'plugin-quickrun-' . self[cmd]
-    call remove(self, cmd)
-  endfor
+  if has_key(self, '_temp_names')
+    for name in self._temp_names
+      if filewritable(name)
+        call delete(name)
+      elseif isdirectory(name)
+        call s:V.System.File.rmdir(name)
+      endif
+    endfor
+  endif
 
   " Sweep the execution of vimproc.
   if has_key(self, '_vimproc')
@@ -645,6 +665,29 @@ function! s:Session.sweep()
   if has_key(self, 'runner')
     call self.runner.sweep()
   endif
+  if has_key(self, 'outputter')
+    call self.outputter.sweep()
+  endif
+  if has_key(self, 'hooks')
+    for hook in self.hooks
+      call hook.sweep()
+    endfor
+  endif
+
+  if has_key(self, '_running')
+    call remove(self, '_running')
+  endif
+endfunction
+
+function! s:Session.invoke_hook(point, ...)
+  let context = a:0 ? a:1 : {}
+  let func = 'on_' . a:point
+  let pri = printf('v:val.priority(%s)', string(a:point))
+  for hook in s:V.Data.List.sort_by(self.hooks, pri)
+    if has_key(hook, func)
+      call hook[func](self, context)
+    endif
+  endfor
 endfunction
 
 
@@ -678,20 +721,20 @@ endfunction
 
 
 " Interfaces.  {{{1
-function! quickrun#new(config)
+function! quickrun#new(...)
   let session = copy(s:Session)
-  call session.initialize(a:config)
+  call session.initialize(a:0 ? a:1 : {})
   return session
 endfunction
 
-function! quickrun#run(config)
+function! quickrun#run(...)
   call quickrun#sweep_sessions()
 
-  let session = quickrun#new(a:config)
+  let session = quickrun#new(a:0 ? a:1 : {})
 
   " for debug
-  if has_key(session.config, 'debug')
-    let g:{matchstr(session.config.debug, '\h\w*')} = session
+  if has_key(session.base_config, 'debug')
+    let g:{matchstr(session.base_config.debug, '\h\w*')} = session
   endif
 
   call session.run()
@@ -732,18 +775,17 @@ endfunction
 function! quickrun#complete(lead, cmd, pos)
   let line = split(a:cmd[:a:pos - 1], '', 1)
   let head = line[-1]
+  let kinds = quickrun#module#get_kinds()
   if 2 <= len(line) && line[-2] =~# '^-'
     " a value of option.
     let opt = line[-2][1:]
     if opt !=# 'type'
       let list = []
-      if opt ==# 'shebang'
-        let list = ['0', '1']
-      elseif opt ==# 'mode'
+      if opt ==# 'mode'
         let list = ['n', 'v']
-      elseif opt ==# 'runner' || opt ==# 'outputter'
-        let list = keys(filter(copy(s:modules[opt]),
-        \                      'v:val.available()'))
+      elseif 0 <= index(kinds, opt)
+        let list = map(filter(quickrun#module#get(opt),
+        \                     'v:val.available()'), 'v:val.name')
       endif
       return filter(list, 'v:val =~# "^".a:lead')
     endif
@@ -751,14 +793,14 @@ function! quickrun#complete(lead, cmd, pos)
   elseif head =~# '^-'
     " a name of option.
     let list = ['type', 'src', 'srcfile', 'input', 'runner', 'outputter',
-    \ 'command', 'exec', 'cmdopt', 'args', 'tempfile', 'shebang', 'eval',
-    \ 'mode', 'output_encode', 'eval_template']
+    \ 'command', 'exec', 'cmdopt', 'args', 'tempfile', 'mode']
     let mod_options = {}
-    for kind in ['runner', 'outputter']
-      for module in filter(values(s:modules[kind]), 'v:val.available()')
+    for kind in kinds
+      for module in filter(quickrun#module#get(kind), 'v:val.available()')
         for opt in keys(module.config)
           let mod_options[opt] = 1
           let mod_options[kind . '/' . opt] = 1
+          let mod_options[module.name . '/' . opt] = 1
           let mod_options[kind . '/' . module.name . '/' . opt] = 1
         endfor
       endfor
@@ -936,8 +978,7 @@ function! s:to_config(config)
   return a:config
 endfunction
 
-" The option is appropriately set referring to default options.
-function! s:normalize(config)
+function! s:build_config(config)
   let config = s:to_config(a:config)
   if !has_key(config, 'mode')
     let config.mode = histget(':') =~# "^'<,'>\\s*Q\\%[uickRun]" ? 'v' : 'n'
@@ -977,70 +1018,62 @@ function! s:normalize(config)
       call extend(config, new_config, 'keep')
     endif
   endfor
-
-  if has_key(config, 'input')
-    let input = quickrun#expand(config.input)
-    try
-      let config.input = input[0] ==# '=' ? input[1:]
-      \                                  : join(readfile(input, 'b'), "\n")
-    catch
-      throw 'quickrun: Can not treat input: ' . v:exception
-    endtry
-  else
-    let config.input = ''
-  endif
-
-  let config.command = get(config, 'command', config.type)
-
-  if has_key(config, 'srcfile')
-    let config.srcfile = quickrun#expand(expand(config.srcfile))
-  elseif has_key(config, 'src')
-    if config.eval
-      let config.src = printf(config.eval_template, config.src)
-    endif
-  else
-    if !config.eval && filereadable(expand('%:p')) &&
-    \  !has_key(config, 'region') && !&modified
-      " Use file in direct.
-      let config.srcfile = expand('%:p')
-    else
-      let config.region = get(config, 'region', {
-      \   'first': [1, 0, 0],
-      \   'last':  [line('$'), 0, 0],
-      \   'wise': 'V',
-      \ })
-      " Executes on the temporary file.
-      let body = s:get_region(config.region)
-
-      if config.eval
-        let body = printf(config.eval_template, body)
-      endif
-
-      let body = s:V.iconv(body, &encoding, &fileencoding)
-
-      if &l:fileformat ==# 'mac'
-        let body = substitute(body, "\n", "\r", 'g')
-      elseif &l:fileformat ==# 'dos'
-        if !&l:binary
-          let body .= "\n"
-        endif
-        let body = substitute(body, "\n", "\r\n", 'g')
-      endif
-
-      let config.src = body
-    endif
-  endif
-
-  for opt in ['cmdopt', 'args', 'output_encode']
-    let config[opt] = quickrun#expand(config[opt])
-  endfor
   return config
 endfunction
 
-" Detect the shebang, and return the shebang command if it exists.
-function! s:detect_shebang(file)
-  let line = get(readfile(a:file, 0, 1), 0, '')
-  return line =~# '^#!' ? line[2:] : ''
+function! s:build_module(module, configs)
+  for config in a:configs
+    if type(config) == type({})
+      for name in keys(a:module.config)
+        for conf in [a:module.kind . '/' . a:module.name . '/' . name,
+        \            a:module.name . '/' . name,
+        \            a:module.kind . '/' . name,
+        \            name]
+          if has_key(config, conf)
+            let val = config[conf]
+            if s:V.is_list(a:module.config[name])
+              let a:module.config[name] += s:V.is_list(val) ? val : [val]
+            else
+              let a:module.config[name] = val
+            endif
+            unlet val
+            break
+          endif
+        endfor
+      endfor
+    elseif type(config) == type('') && config !=# ''
+      call s:parse_module_option(a:module, config)
+    endif
+    unlet config
+  endfor
+endfunction
+
+function! s:parse_module_option(module, argline)
+  let sep = a:argline[0]
+  let args = split(a:argline[1:], '\V' . escape(sep, '\'))
+  let order = copy(a:module.config_order)
+  for arg in args
+    let name = matchstr(arg, '^\w\+\ze=')
+    if !empty(name)
+      let value = matchstr(arg, '^\w\+=\zs.*')
+    elseif len(a:module.config) == 1
+      let [name, value] = [keys(a:module.config)[0], arg]
+    elseif !empty(order)
+      let name = remove(order, 0)
+      let value = arg
+    endif
+    if empty(name)
+      throw 'could not parse the option: ' . arg
+    endif
+    if !has_key(a:module.config, name)
+      throw 'unknown option: ' . name
+    endif
+    if type(a:module.config[name]) == type([])
+      call add(a:module.config[name], value)
+    else
+      let a:module.config[name] = value
+    endif
+  endfor
 endfunction
 
 " Get the text of specified region.
@@ -1085,60 +1118,28 @@ function! s:get_region(region)
 endfunction
 
 
-
-" Module system.  {{{1
-let s:modules = {
-\   'runner': {},
-\   'outputter': {},
-\ }
-
+" Wrapper functions for compatibility.  {{{1
 function! quickrun#register_runner(name, runner)
   return quickrun#register_module('runner', a:name, a:runner)
 endfunction
-
 function! quickrun#register_outputter(name, outputter)
   return quickrun#register_module('outputter', a:name, a:outputter)
 endfunction
-
-function! quickrun#register_module(kind, name, module)
-  if !has_key(s:modules, a:kind)
-    throw 'quickrun: Unknown kind of module: ' . a:kind
-  endif
-  if empty(a:module)
-    if has_key(s:modules[a:kind], a:name)
-      call remove(s:modules[a:kind], a:name)
-    endif
-    return
-  endif
-  let module = extend(deepcopy(s:{a:kind}), a:module)
-  let module.kind = a:kind
-  let module.name = a:name
-  let s:modules[a:kind][a:name] = module
+function! quickrun#register_hook(name, hook)
+  return quickrun#register_module('hook', a:name, a:hook)
 endfunction
-
+function! quickrun#register_module(kind, name, module)
+  return quickrun#module#register(
+  \        extend(a:module, {'kind': a:kind, 'name': a:name}, 'keep'))
+endfunction
 function! quickrun#get_module(kind, ...)
-  if a:0
-    return get(get(s:modules, a:kind, {}), a:1, {})
-  endif
-  return copy(get(s:modules, a:kind, {}))
+  return call('quickrun#module#get', [a:kind] + a:000)
 endfunction
 
 
 " Register the default modules.  {{{1
-function! s:register_defaults(kind)
-  let pat = 'autoload/quickrun/' . a:kind . '/*.vim'
-  for name in map(split(globpath(&runtimepath, pat), "\n"),
-  \               'fnamemodify(v:val, ":t:r")')
-    try
-      let module = quickrun#{a:kind}#{name}#new()
-      call quickrun#register_module(a:kind, name, module)
-    catch /:E\%(117\|716\):/
-    endtry
-  endfor
-endfunction
-
-call s:register_defaults('runner')
-call s:register_defaults('outputter')
+call quickrun#module#load()
 
 
 let &cpo = s:save_cpo
+unlet s:save_cpo
