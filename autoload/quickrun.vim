@@ -93,6 +93,44 @@ let g:quickrun#default_config = {
 \   'exec': '%c %s',
 \ },
 \ 'coffee': {},
+\ 'cs': {
+\   'type': executable('csc')  ? 'cs/csc'  :
+\           executable('dmcs') ? 'cs/dmcs' :
+\           executable('smcs') ? 'cs/smcs' :
+\           executable('gmcs') ? 'cs/gmcs' :
+\           executable('mcs') ? 'cs/mcs' : ''
+\ },
+\ 'cs/csc': {
+\   'command': 'csc',
+\   'exec': ['%c /nologo /out:%s:p:r:gs?/?\\?.exe %s:gs?/?\\?', '%s:p:r.exe %a'],
+\   'tempfile': '%{tempname()}.cs',
+\   'hook/output_encode/encoding': '&termencoding',
+\   'hook/sweep/files': ['%S:p:r.exe'],
+\ },
+\ 'cs/mcs': {
+\   'command': 'mcs',
+\   'exec': ['%c %o -out:%s:p:r.exe %s', 'mono %s:p:r.exe %a'],
+\   'tempfile': '%{tempname()}.cs',
+\   'hook/sweep/files': ['%S:p:r.exe'],
+\ },
+\ 'cs/gmcs': {
+\   'command': 'gmcs',
+\   'exec': ['%c %o -out:%s:p:r.exe %s', 'mono %s:p:r.exe %a'],
+\   'tempfile': '%{tempname()}.cs',
+\   'hook/sweep/files': ['%S:p:r.exe'],
+\ },
+\ 'cs/smcs': {
+\   'command': 'smcs',
+\   'exec': ['%c %o -out:%s:p:r.exe %s', 'mono %s:p:r.exe %a'],
+\   'tempfile': '%{tempname()}.cs',
+\   'hook/sweep/files': ['%S:p:r.exe'],
+\ },
+\ 'cs/dmcs': {
+\   'command': 'dmcs',
+\   'exec': ['%c %o -out:%s:p:r.exe %s', 'mono %s:p:r.exe %a'],
+\   'tempfile': '%{tempname()}.cs',
+\   'hook/sweep/files': ['%S:p:r.exe'],
+\ },
 \ 'dosbatch': {
 \   'command': '',
 \   'exec': 'call %s %a',
