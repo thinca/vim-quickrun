@@ -653,7 +653,7 @@ SESSION				*quickrun-session*
 Quickrun manages an execution as a {session}, and gives it as an argument to
 functions of a module.
 
-session.run()				*quickrun-session.make_module()*
+session.run()				*quickrun-session.run()*
 	Starts the execution.  An error occurs when already executed.
 
 session.make_module({kind}, {line})	*quickrun-session.make_module()*

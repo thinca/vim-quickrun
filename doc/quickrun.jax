@@ -644,7 +644,7 @@ hook は特定のポイントで追加の処理を行うモジュールです。
 quickrun では 1 回の実行をセッション({session})として管理しており、モジュール
 の各関数に引数として渡されます。
 
-session.run()				*quickrun-session.make_module()*
+session.run()				*quickrun-session.run()*
 	実行を開始します。実行中に呼び出すとエラーになります。
 
 session.make_module({kind}, {line})	*quickrun-session.make_module()*
