@@ -50,7 +50,7 @@ function! s:runner.run(commands, input, session)
 endfunction
 
 function! s:runner.shellescape(str)
-  return escape(a:str, '\"')
+  return '"' . escape(a:str, '\"') . '"'
 endfunction
 
 function! s:runner.sweep()
