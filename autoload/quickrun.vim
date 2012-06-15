@@ -92,6 +92,7 @@ let g:quickrun#default_config = {
 \   'command': 'clj',
 \   'exec': '%c %s',
 \ },
+\ 'coffee': {},
 \ 'dosbatch': {
 \   'command': '',
 \   'exec': 'call %s %a',
