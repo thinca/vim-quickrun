@@ -685,7 +685,7 @@ function! s:Session.invoke_hook(point, ...)
   let func = 'on_' . a:point
   let pri = printf('v:val.priority(%s)', string(a:point))
   for hook in s:V.Data.List.sort_by(self.hooks, pri)
-    if has_key(hook, func)
+    if has_key(hook, func) && s:V.is_funcref(hook[func])
       call hook[func](self, context)
     endif
   endfor
