@@ -12,10 +12,9 @@ let s:hook = {
 \ }
 
 function! s:hook.init(session)
+  let self._cd = ''
   if self.config.directory ==# ''
     let self.config.enable = 0
-  else
-    let self._cd = ''
   endif
 endfunction
 
