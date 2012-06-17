@@ -489,7 +489,7 @@ function! s:Session.setup()
   catch
     call self.sweep()
     throw join(['quickrun: Error occurred in setup():',
-    \           v:errmsg, v:exception, v:throwpoint], "\n")
+    \           v:exception, v:throwpoint], "\n")
   endtry
 endfunction
 
