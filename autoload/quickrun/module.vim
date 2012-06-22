@@ -6,8 +6,6 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-let s:modules = {}
-
 " Templates.  {{{1
 let s:templates = {}
 " Template of module.  {{{2
@@ -52,6 +50,8 @@ function! s:templates.hook.priority(point)
   return 0
 endfunction
 let s:templates.hook.config.enable = 1
+
+let s:modules = map(copy(s:templates), '{}')
 
 
 " functions.  {{{1
