@@ -127,6 +127,9 @@ quickrun#run([{config}])			*quickrun#run()*
 quickrun#new([{config}])			*quickrun#new()*
 	{session}(|quickrun-session|) を生成します。
 
+quickrun#config({line})				*quickrun#config()*
+	|:QuickRun| の引数文字列から {config} を生成します。
+
 quickrun#operator({wise})			*quickrun#operator()*
 	'operatorfunc' に対して設定するための関数です。
 	例えば、 >

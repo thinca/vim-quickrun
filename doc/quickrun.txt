@@ -127,6 +127,9 @@ quickrun#run([{config}])			*quickrun#run()*
 quickrun#new([{config}])			*quickrun#new()*
 	Creates a {session}(|quickrun-session|).
 
+quickrun#config({line})				*quickrun#config()*
+	Creates {config} from argument line of |:QuickRun|.
+
 quickrun#operator({wise})			*quickrun#operator()*
 	A function for 'operatorfunc'.
 	e.g.: >
