@@ -157,7 +157,7 @@ quickrun#module#get({kind} [, {name}])		*quickrun#module#get()*
 quickrun#module#get_kinds()			*quickrun#module#get_kinds()*
 	モジュールの種類の名前のリストを取得します。
 
-quickrun#module#load()				*quickrun#module#load()*
+quickrun#module#load([{overwrite}])		*quickrun#module#load()*
 	'runtimepath' 上にあるモジュールをロードします。これは
 	"autoload/quickrun.vim" がロードされる際に自動で呼ばれます。
 
