@@ -65,11 +65,9 @@ function! s:outputter.finish(session)
   execute self._line
   silent normal! zt
   let is_closed = 0
-  if self.config.close_on_empty
-    if line('$') == 1 && getline(1) =~ '^\s*$'
-      quit
-      let is_closed = 1
-    endif
+  if self.config.close_on_empty && line('$') == 1 && getline(1) =~ '^\s*$'
+    quit
+    let is_closed = 1
   endif
   if !is_closed && !self.config.into
     execute bufwinnr(self._source_bufnr) 'wincmd w'
