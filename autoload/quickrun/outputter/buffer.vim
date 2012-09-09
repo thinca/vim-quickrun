@@ -13,6 +13,7 @@ let s:outputter = {
 \     'split': '%{winwidth(0) * 2 < winheight(0) * 5 ? "" : "vertical"}',
 \     'into': 0,
 \     'running_mark': ':-)',
+\     'close_on_empty': 0,
 \   }
 \ }
 
@@ -65,10 +66,22 @@ function! s:outputter.finish(session)
   call s:open_result_window(self.config)
   execute self._line
   silent normal! zt
-  if !self.config.into
+  let is_closed = 0
+  if self.config.close_on_empty
+    if line('$') == 1 && getline(1) =~ '^\s*$'
+      quit
+      let is_closed = 1
+    endif
+  endif
+  if !is_closed && !self.config.into
     execute winnr 'wincmd w'
   endif
   redraw
+  if is_closed
+      echohl MoreMsg
+      echom "[QuickRun] Empty Output"
+      echohl NONE
+  endif
 endfunction
 
 
