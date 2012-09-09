@@ -77,7 +77,7 @@ function! s:outputter.finish(session)
   redraw
   if is_closed
     echohl MoreMsg
-    echomsg "[QuickRun] Empty Output"
+    echomsg "quickrun: outputter/buffer: Empty output."
     echohl NONE
   endif
 endfunction
