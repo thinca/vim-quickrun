@@ -506,7 +506,7 @@ available by default.
   running_mark		Default: ':-)'
 	If this value is not an empty string, |quickrun| displays this string
 	to output buffer while it's running.
-  close_on_empty			Default: 0
+  close_on_empty	Default: 0
 	Automatically close outputter buffer if empty
 
 - "message"				*quickrun-module-outputter/message*
