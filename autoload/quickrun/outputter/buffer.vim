@@ -13,26 +13,26 @@ let s:outputter = {
 \     'split': '%{winwidth(0) * 2 < winheight(0) * 5 ? "" : "vertical"}',
 \     'into': 0,
 \     'running_mark': ':-)',
+\     'close_on_empty': 0,
 \   }
 \ }
 
 function! s:outputter.init(session)
   let self._append = self.config.append
   let self._line = 0
+  let self._source_bufnr = bufnr('%')
 endfunction
 
 function! s:outputter.start(session)
-  let winnr = winnr()
   call s:open_result_window(self.config)
   if !self._append
     silent % delete _
   endif
   call s:set_running_mark(self.config.running_mark)
-  execute winnr 'wincmd w'
+  execute bufwinnr(self._source_bufnr) 'wincmd w'
 endfunction
 
 function! s:outputter.output(data, session)
-  let winnr = winnr()
   call s:open_result_window(self.config)
   if self._line == 0
     let self._line = line('$')
@@ -55,20 +55,31 @@ function! s:outputter.output(data, session)
     silent 1 delete _
   endif
   call s:set_running_mark(self.config.running_mark)
-  execute winnr 'wincmd w'
+  execute bufwinnr(self._source_bufnr) 'wincmd w'
   redraw
 endfunction
 
 function! s:outputter.finish(session)
-  let winnr = winnr()
 
   call s:open_result_window(self.config)
   execute self._line
   silent normal! zt
-  if !self.config.into
-    execute winnr 'wincmd w'
+  let is_closed = 0
+  if self.config.close_on_empty
+    if line('$') == 1 && getline(1) =~ '^\s*$'
+      quit
+      let is_closed = 1
+    endif
+  endif
+  if !is_closed && !self.config.into
+    execute bufwinnr(self._source_bufnr) 'wincmd w'
   endif
   redraw
+  if is_closed
+      echohl MoreMsg
+      echom "[QuickRun] Empty Output"
+      echohl NONE
+  endif
 endfunction
 
 
