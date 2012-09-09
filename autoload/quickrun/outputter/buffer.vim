@@ -20,20 +20,19 @@ let s:outputter = {
 function! s:outputter.init(session)
   let self._append = self.config.append
   let self._line = 0
+  let self._source_bufnr = bufnr('%')
 endfunction
 
 function! s:outputter.start(session)
-  let winnr = winnr()
   call s:open_result_window(self.config)
   if !self._append
     silent % delete _
   endif
   call s:set_running_mark(self.config.running_mark)
-  execute winnr 'wincmd w'
+  execute bufwinnr(self._source_bufnr) 'wincmd w'
 endfunction
 
 function! s:outputter.output(data, session)
-  let winnr = winnr()
   call s:open_result_window(self.config)
   if self._line == 0
     let self._line = line('$')
@@ -56,12 +55,11 @@ function! s:outputter.output(data, session)
     silent 1 delete _
   endif
   call s:set_running_mark(self.config.running_mark)
-  execute winnr 'wincmd w'
+  execute bufwinnr(self._source_bufnr) 'wincmd w'
   redraw
 endfunction
 
 function! s:outputter.finish(session)
-  let winnr = winnr()
 
   call s:open_result_window(self.config)
   execute self._line
@@ -74,7 +72,7 @@ function! s:outputter.finish(session)
     endif
   endif
   if !is_closed && !self.config.into
-    execute winnr 'wincmd w'
+    execute bufwinnr(self._source_bufnr) 'wincmd w'
   endif
   redraw
   if is_closed
