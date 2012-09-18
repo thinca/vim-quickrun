@@ -495,6 +495,8 @@ outputter は結果の出力を行うモジュールです。
   running_mark		デフォルト: ':-)'
 	この値が空文字列でない場合、実行中にこの文字列が出力先に表示されます。
 	表示は実行完了後に削除されます。
+  close_on_empty	Default: 0
+	終了時にバッファが空だった場合、自動的にバッファを閉じます。
 
 - "message"				*quickrun-module-outputter/message*
   |messages| に出力します。
