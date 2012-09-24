@@ -721,6 +721,10 @@ function! quickrun#sweep_sessions()
   call map(keys(s:sessions), 's:dispose_session(v:val)')
 endfunction
 
+function! quickrun#is_running()
+  return !empty(s:sessions)
+endfunction
+
 
 " Interfaces.  {{{1
 function! quickrun#new(...)
