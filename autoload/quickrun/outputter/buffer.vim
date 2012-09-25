@@ -20,19 +20,22 @@ let s:outputter = {
 function! s:outputter.init(session)
   let self._append = self.config.append
   let self._line = 0
-  let self._source_bufnr = bufnr('%')
 endfunction
 
 function! s:outputter.start(session)
+  let winnr = winnr()
+  let wincount = winnr('$')
   call s:open_result_window(self.config)
   if !self._append
     silent % delete _
   endif
   call s:set_running_mark(self.config.running_mark)
-  execute bufwinnr(self._source_bufnr) 'wincmd w'
+  call s:back_to_previous_window(winnr, wincount)
 endfunction
 
 function! s:outputter.output(data, session)
+  let winnr = winnr()
+  let wincount = winnr('$')
   call s:open_result_window(self.config)
   if self._line == 0
     let self._line = line('$')
@@ -55,11 +58,13 @@ function! s:outputter.output(data, session)
     silent 1 delete _
   endif
   call s:set_running_mark(self.config.running_mark)
-  execute bufwinnr(self._source_bufnr) 'wincmd w'
+  call s:back_to_previous_window(winnr, wincount)
   redraw
 endfunction
 
 function! s:outputter.finish(session)
+  let winnr = winnr()
+  let wincount = winnr('$')
 
   call s:open_result_window(self.config)
   execute self._line
@@ -70,7 +75,7 @@ function! s:outputter.finish(session)
     let is_closed = 1
   endif
   if !is_closed && !self.config.into
-    execute bufwinnr(self._source_bufnr) 'wincmd w'
+    call s:back_to_previous_window(winnr, wincount)
   endif
   redraw
   if is_closed
@@ -101,6 +106,14 @@ function! s:open_result_window(config)
   if exists('b:quickrun_running_mark')
     silent undo
     unlet b:quickrun_running_mark
+  endif
+endfunction
+
+function! s:back_to_previous_window(prev_nr, prev_count)
+  if a:prev_count == winnr('$')
+    execute a:prev_nr 'wincmd w'
+  else
+    wincmd p
   endif
 endfunction
 
