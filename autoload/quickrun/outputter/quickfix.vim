@@ -7,8 +7,19 @@ set cpo&vim
 
 let s:outputter = quickrun#outputter#buffered#new()
 let s:outputter.config = {
-\   'errorformat': '&l:errorformat',
+\   'errorformat': '',
 \ }
+
+let s:outputter.init_buffered = s:outputter.init
+
+function! s:outputter.init(session)
+  call self.init_buffered(a:session)
+  let self.config.errorformat
+\    = !empty(self.config.errorformat) ? self.config.errorformat
+\    : !empty(&l:errorformat)          ? &l:errorformat
+\    : &g:errorformat
+endfunction
+
 
 function! s:outputter.finish(session)
   try
