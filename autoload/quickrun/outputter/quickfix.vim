@@ -10,9 +10,10 @@ let s:outputter.config = {
 \   'errorformat': '',
 \ }
 
+let s:outputter.init_buffered = s:outputter.init
 
 function! s:outputter.init(session)
-  call call(quickrun#outputter#buffered#new().init, [a:session], self)
+  call self.init_buffered(a:session)
   let self.config.errorformat
 \    = !empty(self.config.errorformat) ? self.config.errorformat
 \    : !empty(&l:errorformat)          ? &l:errorformat
