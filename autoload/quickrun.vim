@@ -378,7 +378,11 @@ let g:quickrun#default_config = {
 \ },
 \ 'sed': {},
 \ 'sh': {},
-\ 'typescript': {'command': 'tsc', 'cmdopt': '--exec'},
+\ 'typescript': {
+\   'command': 'tsc',
+\   'cmdopt': '--exec',
+\   'tempfile': '%{tempname()}.ts',
+\ },
 \ 'vim': {
 \   'command': ':source',
 \   'exec': '%C %s',
