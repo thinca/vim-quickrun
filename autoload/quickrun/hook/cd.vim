@@ -21,12 +21,13 @@ endfunction
 function! s:hook.on_ready(session, context)
   let self._cd = getcwd()
   let self._localdir = haslocaldir()
+  let directory = a:session.build_command(self.config.directory)
   if self._localdir
     let self._id = {}
     let w:quickrun_hook_cd = self._id
-    lcd `=self.config.directory`
+    lcd `=directory`
   else
-    cd `=self.config.directory`
+    cd `=directory`
   endif
   if self._cd ==# getcwd()
     " CD wasn't changed.

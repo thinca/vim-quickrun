@@ -589,6 +589,7 @@ hooks are available by default.
   Option ~
   directory		Default: ""
 	Directory to change.  Does nothing if this is an empty string.
+	This value is expanded by |quickrun-exec-format|.
 
 - "eval"				*quickrun-module-hook/eval*
   Changes the contents of source file by a template.  For example:
