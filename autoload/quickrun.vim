@@ -229,7 +229,7 @@ let g:quickrun#default_config = {
 \   'hook/sweep/files': '%S:p:r',
 \ },
 \ 'go/go': {
-\   'exec': ['cd %s:p:h \&\& go run %s:p:t'],
+\   'exec': ['sh -c "cd %s:p:h \&\& go run %s:p:t"'],
 \   'tempfile': '%{tempname()}.go',
 \   'output_encode': 'utf-8',
 \ },
