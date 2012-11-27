@@ -319,6 +319,7 @@ let g:quickrun#default_config = {
 \           executable('bluecloth') ? 'markdown/bluecloth':
 \           executable('redcarpet') ? 'markdown/redcarpet':
 \           executable('pandoc') ? 'markdown/pandoc': '',
+\           executable('markdown_py') ? 'markdown/markdown_py': '',
 \ },
 \ 'markdown/Markdown.pl': {
 \   'command': 'Markdown.pl',
@@ -336,6 +337,9 @@ let g:quickrun#default_config = {
 \ },
 \ 'markdown/redcarpet': {
 \   'command': 'redcarpet',
+\ },
+\ 'markdown/markdown_py': {
+\   'command': 'markdown_py',
 \ },
 \ 'ocaml': {},
 \ 'perl': {
