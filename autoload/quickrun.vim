@@ -318,7 +318,7 @@ let g:quickrun#default_config = {
 \           executable('kramdown') ? 'markdown/kramdown':
 \           executable('bluecloth') ? 'markdown/bluecloth':
 \           executable('redcarpet') ? 'markdown/redcarpet':
-\           executable('pandoc') ? 'markdown/pandoc': '',
+\           executable('pandoc') ? 'markdown/pandoc':
 \           executable('markdown_py') ? 'markdown/markdown_py': '',
 \ },
 \ 'markdown/Markdown.pl': {
