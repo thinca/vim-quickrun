@@ -196,48 +196,10 @@ let g:quickrun#default_config = {
 \   'hook/sweep/files': ['%S:p:r'],
 \ },
 \ 'go': {
-\   'type':
-\     executable('8g') || executable('6g') || executable('5g') ?
-\     $GOARCH ==# '386'   ? (s:is_win ? 'go/386/win' : 'go/386'):
-\     $GOARCH ==# 'amd64' ? 'go/amd64':
-\     $GOARCH ==# 'arm'   ? 'go/arm': '' :
-\     executable('go') ? (s:is_win ? 'go/go/win' : 'go/go'): '',
-\ },
-\ 'go/386': {
-\   'exec': ['8g %o -o %s:p:r.8 %s', '8l -o %s:p:r %s:p:r.8', '%s:p:r %a'],
-\   'tempfile': '%{tempname()}.go',
-\   'hook/output_encode/encoding': 'utf-8',
-\   'hook/sweep/files': '%S:p:r',
-\ },
-\ 'go/386/win': {
-\   'exec': ['8g %o -o %s:p:r.8 %s', '8l -o %s:p:r.exe %s:p:r.8',
-\            '%s:p:r.exe %a'],
-\   'tempfile': '%{tempname()}.go',
-\   'hook/output_encode/encoding': 'utf-8',
-\   'hook/sweep/files': '%S:p:r.exe',
-\ },
-\ 'go/amd64': {
-\   'exec': ['6g %o -o %s:p:r.6 %s', '6l -o %s:p:r %s:p:r.6', '%s:p:r %a'],
-\   'tempfile': '%{tempname()}.go',
-\   'hook/output_encode/encoding': 'utf-8',
-\   'hook/sweep/files': '%S:p:r',
-\ },
-\ 'go/arm': {
-\   'exec': ['5g %o -o %s:p:r.5 %s', '5l -o %s:p:r %s:p:r.5', '%s:p:r %a'],
-\   'tempfile': '%{tempname()}.go',
-\   'hook/output_encode/encoding': 'utf-8',
-\   'hook/sweep/files': '%S:p:r',
-\ },
-\ 'go/go': {
 \   'exec': 'go run %s:p:t',
 \   'tempfile': '%{tempname()}.go',
-\   'output_encode': 'utf-8',
+\   'hook/output_encode/encoding': 'utf-8',
 \   'hook/cd/directory': '%S:p:h',
-\ },
-\ 'go/go/win': {
-\   'exec': ['cmd /c (cd %s:p:h ^\& go run %s:p:t)'],
-\   'tempfile': '%{tempname()}.go',
-\   'output_encode': 'utf-8',
 \ },
 \ 'groovy': {
 \   'cmdopt': '-c %{&fenc==#""?&enc:&fenc}'
