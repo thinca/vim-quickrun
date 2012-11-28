@@ -196,7 +196,8 @@ let g:quickrun#default_config = {
 \   'hook/sweep/files': ['%S:p:r'],
 \ },
 \ 'go': {
-\   'exec': 'go run %s:p:t',
+\   'command': 'go',
+\   'exec': '%c run %s:p:t',
 \   'tempfile': '%{tempname()}.go',
 \   'hook/output_encode/encoding': 'utf-8',
 \   'hook/cd/directory': '%S:p:h',
