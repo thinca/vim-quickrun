@@ -197,7 +197,7 @@ let g:quickrun#default_config = {
 \ },
 \ 'go': {
 \   'command': 'go',
-\   'exec': '%c run %s:p:t',
+\   'exec': '%c run %s:p:t %a',
 \   'tempfile': '%{tempname()}.go',
 \   'hook/output_encode/encoding': 'utf-8',
 \   'hook/cd/directory': '%S:p:h',
