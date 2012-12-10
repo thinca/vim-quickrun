@@ -498,6 +498,10 @@ outputter は結果の出力を行うモジュールです。
   close_on_empty	Default: 0
 	終了時にバッファが空だった場合、自動的にバッファを閉じます。
 
+  フック ~
+  outputter_buffer_opened
+	出力バッファが開いた時。
+
 - "message"				*quickrun-module-outputter/message*
   |messages| に出力します。
   オプション ~

@@ -509,6 +509,10 @@ available by default.
   close_on_empty	Default: 0
 	Automatically close outputter buffer if empty.
 
+  Hook ~
+  outputter_buffer_opened
+	When the output buffer is opened.
+
 - "message"				*quickrun-module-outputter/message*
   Outputs on |messages|.
   Option ~
