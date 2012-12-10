@@ -25,7 +25,7 @@ endfunction
 function! s:outputter.start(session)
   let winnr = winnr()
   let wincount = winnr('$')
-  call s:open_result_window(self.config)
+  call s:open_result_window(self.config, a:session)
   if !self._append
     silent % delete _
   endif
@@ -36,7 +36,7 @@ endfunction
 function! s:outputter.output(data, session)
   let winnr = winnr()
   let wincount = winnr('$')
-  call s:open_result_window(self.config)
+  call s:open_result_window(self.config, a:session)
   if self._line == 0
     let self._line = line('$')
   endif
@@ -66,7 +66,7 @@ function! s:outputter.finish(session)
   let winnr = winnr()
   let wincount = winnr('$')
 
-  call s:open_result_window(self.config)
+  call s:open_result_window(self.config, a:session)
   execute self._line
   silent normal! zt
   let is_closed = 0
@@ -86,19 +86,25 @@ function! s:outputter.finish(session)
 endfunction
 
 
-function! s:open_result_window(config)
+function! s:open_result_window(config, session)
   let sp = a:config.split
   let sname = s:escape_file_pattern(a:config.name)
+  let opened = 0
   if !bufexists(a:config.name)
     execute sp 'split'
     edit `=a:config.name`
     nnoremap <buffer> q <C-w>c
     setlocal bufhidden=hide buftype=nofile noswapfile nobuflisted
+    let opened = 1
   elseif bufwinnr(sname) != -1
     execute bufwinnr(sname) 'wincmd w'
   else
     execute sp 'split'
     execute 'buffer' bufnr(sname)
+    let opened = 1
+  endif
+  if opened
+    call a:session.invoke_hook('outputter_buffer_opened')
   endif
   if &l:filetype !=# a:config.filetype
     let &l:filetype = a:config.filetype
