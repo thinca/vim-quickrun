@@ -421,30 +421,30 @@ runner はプログラムを実行するモジュールです。
 デフォルトでは以下の runner が使えます。
 NOTE: "system" 以外は不安定な場合があります。
 
-- "system"				*quickrun-module-runner/system*
+- "runner/system"				*quickrun-module-runner/system*
   |system()| を使って実行します。これが既定値です。
 
-- "shell"				*quickrun-module-runner/shell*
+- "runner/shell"				*quickrun-module-runner/shell*
   |:!| を使って実行します。この runner は outputter を無視します。
   オプション ~
-  shellcmd		デフォルト: MS Windows の場合は 'silent !"%s" & pause'
+  runner/shell/shellcmd		デフォルト: MS Windows の場合は 'silent !"%s" & pause'
 				    それ以外は '!%s'
 	実行する Vim コマンドのテンプレートです。%s が exec オプションで生成さ
 	れたコマンドに置換されます。
 
-- "vimproc"				*quickrun-module-runner/vimproc*
+- "runner/vimproc"				*quickrun-module-runner/vimproc*
   {|vimproc| が必要}
   |vimproc| を使ってコマンドをバックグラウンドで実行します。実行の完了を
   |CursorHold| と |CursorHoldI| イベントを使って検査します。50 ミリ秒以内に実
   行が終了した場合は、即座に結果を表示します。
   オプション ~
-  sleep			デフォルト: 50
+  runner/vimproc/sleep			デフォルト: 50
 	実行直後に指定ミリ秒だけ待ちます。即座に終了するプログラムの場合、
 	'updatetime' による待機をする必要がなくなります。
-  updatetime		デフォルト: 0
+  runner/vimproc/updatetime		デフォルト: 0
 	一時的に 'updatetime' をこの値に変更します。0 の場合は変更しません。
 
-- "remote"				*quickrun-module-runner/remote*
+- "runner/remote"				*quickrun-module-runner/remote*
   {|+clientserver| が必要}
   コマンドをバックグラウンドで実行し、終了を |+clientserver| 機能を利用して通
   知し結果を表示します。
@@ -453,17 +453,17 @@ NOTE: "system" 以外は不安定な場合があります。
   バックグラウンドで実行するため、コマンドが無限ループや入力待ち等で終了しな
   い場合、Vim から制御することはできないので注意してください。
   オプション ~
-  vimproc		デフォルト: 0
+  runner/remote/vimproc		デフォルト: 0
 	可能ならば |vimproc| でコマンドを実行します。これにより、実行のキャン
 	セルが可能になります。
 
-- "python"				*quickrun-module-runner/python*
+- "runner/python"				*quickrun-module-runner/python*
   {|+python| が必要}
   |python| のスレッドを利用してコマンドを非同期実行します。
   警告: これは非常に不安定です。
   警告: X11 環境では使用しないでください。Vim がクラッシュします。
 
-- "vimscript"				*quickrun-module-runner/vimscript*
+- "runner/vimscript"				*quickrun-module-runner/vimscript*
   コマンドを Vim のコマンドとして実行します。
   |:redir| コマンドを含む Vim コマンドは実行できません。これは出力を得るために
   |:redir| を使っているためです。|:redir| はネストできません。
@@ -475,97 +475,97 @@ OUTPUTTER					*quickrun-module-outputter*
 outputter は結果の出力を行うモジュールです。
 デフォルトでは以下の outputter が使えます。
 
-- "buffer"				*quickrun-module-outputter/buffer*
+- "outputter/buffer"				*quickrun-module-outputter/buffer*
   出力専用バッファを開いてそこへ出力します。このバッファは同じものが再利用され
   ます。
   オプション ~
-  name			デフォルト: "[quickrun output]"
+  outputter/buffer/name			デフォルト: "[quickrun output]"
 	バッファ名です。
-  filetype		デフォルト: "quickrun"
+  outputter/buffer/filetype		デフォルト: "quickrun"
 	バッファに設定される 'filetype' の値です。
-  append		デフォルト: 0
+  outputter/buffer/append		デフォルト: 0
 	1 の場合は追記を行います。
-  split
+  outputter/buffer/split
 	デフォルト: '{winwidth(0) * 2 < winheight(0) * 5 ? "" : "vertical"}'
 	出力専用バッファを開く際の補助コマンドを指定します。バッファを開く際に
 	|:split| コマンドの前に挿入されます。
-  into			デフォルト: 0
+  outputter/buffer/into			デフォルト: 0
 	0 以外を指定すると、結果が出た際に出力専用バッファへカーソルを移動しま
 	す。
-  running_mark		デフォルト: ':-)'
+  outputter/buffer/running_mark		デフォルト: ':-)'
 	この値が空文字列でない場合、実行中にこの文字列が出力先に表示されます。
 	表示は実行完了後に削除されます。
-  close_on_empty	Default: 0
+  outputter/buffer/close_on_empty	Default: 0
 	終了時にバッファが空だった場合、自動的にバッファを閉じます。
 
   フック ~
   outputter_buffer_opened
 	出力バッファが開いた時。
 
-- "message"				*quickrun-module-outputter/message*
+- "outputter/message"				*quickrun-module-outputter/message*
   |messages| に出力します。
   オプション ~
-  log			デフォルト: 0
+  outputter/message/log			デフォルト: 0
 	1 の場合、出力を |message-history| に記録します。
 
-- "variable"				*quickrun-module-outputter/variable*
+- "outputter/variable"				*quickrun-module-outputter/variable*
   変数に対して出力します。環境変数やオプションに対しても出力可能です。
   オプション ~
-  name			デフォルト: ''
+  outputter/variable/name			デフォルト: ''
 	出力先の変数名です。空の場合はエラーになります。
-  append		デフォルト: 0
+  outputter/variable/append		デフォルト: 0
 	1 の場合は追記を行います。
 
-- "file"				*quickrun-module-outputter/file*
+- "outputter/file"				*quickrun-module-outputter/file*
   ファイルに対して出力します。
   オプション ~
-  name			デフォルト: ''
+  outputter/file/name			デフォルト: ''
 	出力先のファイル名です。空の場合はエラーになります。
-  append		デフォルト: 0
+  outputter/file/append		デフォルト: 0
 	1 の場合は追記を行います。
 
-- "quickfix"				*quickrun-module-outputter/quickfix*
+- "outputter/quickfix"				*quickrun-module-outputter/quickfix*
   |quickfix| へ出力します。
   オプション ~
-  errorformat		デフォルト: "&errorformat"
+  outputter/quickfix/errorformat		デフォルト: "&errorformat"
 	出力を解釈するための 'errorformat' オプションの値です。
 
-- "browser"				*quickrun-module-outputter/browser*
+- "outputter/browser"				*quickrun-module-outputter/browser*
   {|open-browser| が必要}
   |open-browser| を使って、結果をブラウザで開きます。
   オプション ~
-  name			デフォルト: tempname() . '.html'
+  outputter/browser/name			デフォルト: tempname() . '.html'
 	この outputter はまず結果をファイルに書き出し、そのファイルをブラウザ
 	で開きます。その際の出力先のファイル名です。
 	デフォルト値の |tempname()| は初回ロード時に 1 度だけ呼び出され、全体
 	で固定になります。
-  append		デフォルト: 0
+  outputter/browser/append		デフォルト: 0
 	1 の場合はファイルに対して追記を行います。
 
-- "buffered"				*quickrun-module-outputter/buffered*
+- "outputter/buffered"				*quickrun-module-outputter/buffered*
   出力をバッファリングして、最後に一度に出力します。
   オプション ~
-  {target}		デフォルト: ''
+  outputter/buffered/target		デフォルト: ''
 	実際の出力に使う outputter です。
 
-- "multi"				*quickrun-module-outputter/multi*
+- "outputter/multi"				*quickrun-module-outputter/multi*
   複数の outputter に対して同時に出力を行います。
   オプション ~
-  targets		デフォルト: []
+  outputter/multi/targets		デフォルト: []
 	実際の出力に使う outputter のリストです。
 
-- "error"				*quickrun-module-outputter/error*
+- "outputter/error"				*quickrun-module-outputter/error*
   実行が正常終了した場合とそうでない場合で outputter を変えます。終了コードが
   0 の場合を正常終了とします。ただし、runner によっては常に正常終了となってし
   まうことがあります。
   終了を待つため、出力はバッファリングされます。
   オプション ~
-  success		デフォルト: "null"
+  outputter/error/success		デフォルト: "null"
 	実行の成功時に使う outputter です。
-  error			デフォルト: "null"
+  outputter/error/error			デフォルト: "null"
 	実行の失敗時に使う outputter です。
 
-- "null"				*quickrun-module-outputter/null*
+- "outputter/null"				*quickrun-module-outputter/null*
   出力を行いません。
 
 
@@ -575,17 +575,17 @@ HOOK						*quickrun-module-hook*
 hook は特定のポイントで追加の処理を行うモジュールです。
 デフォルトでは以下の hook が使えます。
 
-- "cd"					*quickrun-module-hook/cd*
+- "hook/cd"					*quickrun-module-hook/cd*
   カレントディレクトリを変更して実行します。
   NOTE: この hook は開始時に Vim 内のカレントディレクトリを変更し、終了時に復
 	元しようとします。非同期実行を使っていると、予期しない結果になるかもし
 	れません。
   オプション ~
-  directory		デフォルト: ""
+  hook/cd/directory		デフォルト: ""
 	変更先のディレクトリです。空文字列の場合は何もしません。
 	この値は |quickrun-exec-format| のように展開されます。
 
-- "eval"				*quickrun-module-hook/eval*
+- "hook/eval"				*quickrun-module-hook/eval*
   テンプレートを使ってソースファイルの中身を変更します。例えば、
   ソースファイル: >
     1 + 2 * 3
@@ -595,38 +595,38 @@ hook は特定のポイントで追加の処理を行うモジュールです。
     print(1 + 2 * 3);
 < になります。
   オプション ~
-  template		デフォルト: ""
+  hook/eval/template		デフォルト: ""
   テンプレート文字列です。テンプレート内の "%s" が元のソースファイルに置き変え
   られます。テンプレート内で "%" を使う場合は "%%" と書きます。
 
-- "output_encode"			*quickrun-module-hook/output_encode*
+- "hook/output_encode"			*quickrun-module-hook/output_encode*
   出力の文字コードを変換します。
   オプション ~
-  encoding		デフォルト: "&fileencoding"
+  hook/output_encode/encoding		デフォルト: "&fileencoding"
 	"from:to" の形式で指定します。":to" は省略できます。その場合、
 	"from:&encoding" と解釈されます。
 
-- "shebang"				*quickrun-module-hook/shebang*
+- "hook/shebang"				*quickrun-module-hook/shebang*
   ソースコードの先頭の #! を探し、その後続を command オプション
   (|quickrun-option-command|) として扱います。同時に、exec オプション
   (|quickrun-option-exec|) 内の "%c" を "%C" に変換します。
 
-- "sweep"				*quickrun-module-hook/sweep*
+- "hook/sweep"				*quickrun-module-hook/sweep*
   終了時に一時ファイルを削除します。
   オプション ~
-  files			デフォルト: []
+  hook/sweep/files			デフォルト: []
 	削除するファイルのリストです。この値は |quickrun-exec-format| のように
 	展開されます。エスケープを避けるために大文字を指定してください。
 
-- "time"				*quickrun-module-hook/time*
+- "hook/time"				*quickrun-module-hook/time*
   実行時間を計測し、最後に出力します。
   NOTE: 時間には quickrun.vim 自体のオーバーヘッドも含まれています。正確な時間
 	を期待しないでください。
   オプション ~
-  format		デフォルト: "\n*** time: %g ***"
+  hook/time/format		デフォルト: "\n*** time: %g ***"
 	出力する文字列の書式です。|printf()| に渡されます。第2引数には計測時間
 	が |Float| で渡されます。
-  dest			デフォルト: ""
+  hook/time/dest			デフォルト: ""
 	出力先の outputter です。空の場合はセッションの outputter へ出力しま
 	す。
 
