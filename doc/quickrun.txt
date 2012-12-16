@@ -432,30 +432,30 @@ RUNNER						*quickrun-module-runner*
 Runner is a module to run a program.  The following runners are available by
 default.  NOTE: Everything except for "system" can be unstable.
 
-- "system"				*quickrun-module-runner/system*
+- "runner/system"				*quickrun-module-runner/system*
   Runs by |system()|.  This is the default.
 
-- "shell"				*quickrun-module-runner/shell*
+- "runner/shell"				*quickrun-module-runner/shell*
   Runs by |:!|.  This ignores given outputter.
   Option ~
-  shellcmd		Default: 'silent !"%s" & pause' for MS Windows
+  runner/shell/shellcmd		Default: 'silent !"%s" & pause' for MS Windows
 				    Otherwise '!%s'
 	The template of the Vim command to run.  This replaces %s to the
 	command given in exec option.
 
-- "vimproc"				*quickrun-module-runner/vimproc*
+- "runner/vimproc"				*quickrun-module-runner/vimproc*
   {Requirement: |vimproc|}
   Runs by |vimproc| at background.  This checks if the process completed with
   using |CursorHold| |CursorHoldI| events.  If the process completed within 50
   millisecond, it shows the result immediately.
   Option ~
-  sleep			Default: 50
+  runner/vimproc/sleep			Default: 50
 	Waits specified times in millisecond.  This is useful to avoid polling
 	by 'updatetime' when program will stop immediately.
-  updatetime		Default: 0
+  runner/vimproc/updatetime		Default: 0
 	Changes 'updatetime' to the value temporary.  Stays same if this is 0.
 
-- "remote"				*quickrun-module-runner/remote*
+- "runner/remote"				*quickrun-module-runner/remote*
   {Requirement: |+clientserver|}
   Runs in background and fetches the result by |+clientserver| feature.
   This requires |v:servername| to be set.  If Vim doesn't, run it with
@@ -464,17 +464,17 @@ default.  NOTE: Everything except for "system" can be unstable.
   Note that Vim cannot control the process when it doesn't terminate due to
   infinite loop or to wait for input since it runs in background.
   Option ~
-  vimproc		Default: 0
+  runner/remote/vimproc		Default: 0
 	Runs by |vimproc| if it's available.  You can cancel the process after
 	it ran.
 
-- "python"				*quickrun-module-runner/python*
+- "runner/python"				*quickrun-module-runner/python*
   {Requirement: |+python|}
   Runs by |python| thread asynchronously.
   WARNING: This is absolutely unstable.
   WARNING: Don't use this on X11.  Vim crashes.
 
-- "vimscript"				*quickrun-module-runner/vimscript*
+- "runner/vimscript"				*quickrun-module-runner/vimscript*
   Runs commands as Vim commands.
   Vim command that contains |:redir| command can not run.  This gets the
   output of vim script by |:redir| command.  And, |:redir| can not nest.
@@ -486,96 +486,96 @@ OUTPUTTER					*quickrun-module-outputter*
 Outputter is a module to output the result.  The following outputters are
 available by default.
 
-- "buffer"				*quickrun-module-outputter/buffer*
+- "outputter/buffer"				*quickrun-module-outputter/buffer*
   quickrun opens output buffer and displays to the output buffer.  If output
   buffer already exists, quickrun uses it.
   Option ~
-  name			Default: "[quickrun output]"
+  outputter/buffer/name			Default: "[quickrun output]"
 	The buffer name.
-  filetype		Default: "quickrun"
+  outputter/buffer/filetype		Default: "quickrun"
 	Sets this value to 'filetype' of the buffer.
-  append		Default: 0
+  outputter/buffer/append		Default: 0
 	Appends if it's 1.
-  split
+  outputter/buffer/split
 	Default: '{winwidth(0) * 2 < winheight(0) * 5 ? "" : "vertical"}'
 
 	Specifies a sub-command to open a buffer for the output.  |quickrun|
 	inserts this before |:split| command when it opens a buffer.
-  into			Default: 0
+  outputter/buffer/into			Default: 0
 	Moves cursor to the output buffer if this isn't 0.
-  running_mark		Default: ':-)'
+  outputter/buffer/running_mark		Default: ':-)'
 	If this value is not an empty string, |quickrun| displays this string
 	to output buffer while it's running.
-  close_on_empty	Default: 0
+  outputter/buffer/close_on_empty	Default: 0
 	Automatically close outputter buffer if empty.
 
   Hook ~
   outputter_buffer_opened
 	When the output buffer is opened.
 
-- "message"				*quickrun-module-outputter/message*
+- "outputter/message"				*quickrun-module-outputter/message*
   Outputs on |messages|.
   Option ~
-  log			Default: 0
+  outputter/message/log			Default: 0
 	Outputs on |message-history| is it's 1.
 
-- "variable"				*quickrun-module-outputter/variable*
+- "outputter/variable"				*quickrun-module-outputter/variable*
   Outputs on a variable.  You also can let it output on an environment
   variable or an option.
   Option ~
-  name			Default: ''
+  outputter/variable/name			Default: ''
 	The name of the variable to output.  Causes an error if it's empty.
-  append		Default: 0
+  outputter/variable/append		Default: 0
 	Appends if it's 1.
 
-- "file"				*quickrun-module-outputter/file*
+- "outputter/file"				*quickrun-module-outputter/file*
   Outputs on a file.
   Option ~
-  name			Default: ''
+  outputter/file/name			Default: ''
 	The file name where to output.  Causea an error if it's empty.
-  append		Default: 0
+  outputter/file/append		Default: 0
 	Appends if it's 1.
 
-- "quickfix"				*quickrun-module-outputter/quickfix*
+- "outputter/quickfix"				*quickrun-module-outputter/quickfix*
   Outputs on |quickfix|.
   Option ~
-  errorformat		Default: "&errorformat"
+  outputter/quickfix/errorformat		Default: "&errorformat"
 	'errorformat' option to parse the output.
 
-- "browser"				*quickrun-module-outputter/browser*
+- "outputter/browser"				*quickrun-module-outputter/browser*
   {Requires |open-browser|}
   Opens the output on browser, using |open-browser|.
   Option ~
-  name			Default: tempname() . '.html'
+  outputter/browser/name			Default: tempname() . '.html'
 	The name of the filename; outputs the result on a file first then open
 	the file on your browser.  The default value, |tempname()|, is called
 	only at once and the same result will be used since the second time.
-  append		Default: 0
+  outputter/browser/append		Default: 0
 	Appends if it's 1.
 
-- "buffered"				*quickrun-module-outputter/buffered*
+- "outputter/buffered"				*quickrun-module-outputter/buffered*
   Buffers the output, and shows the whole result at once finally.
   Option ~
-  target		Default: ''
+  outputter/buffered/target		Default: ''
 	The outputter to show the result.
 
-- "multi"				*quickrun-module-outputter/multi*
+- "outputter/multi"				*quickrun-module-outputter/multi*
   Outputs multiple outputters at the same time.
   Option ~
-  targets		Default: []
+  outputter/multi/targets		Default: []
 	A list of outputters to output.
 
-- "error"				*quickrun-module-outputter/error*
+- "outputter/error"				*quickrun-module-outputter/error*
   Switches where to output based on the exit status; 0 means success.  Note
   that some runners only can give success.
   This buffers because this waits the process terminates.
   Option ~
-  success		Default: "null"
+  outputter/error/success		Default: "null"
 	The outputter when it succeeded.
-  error			Default: "null"
+  outputter/error/error			Default: "null"
 	The outputter when it failed.
 
-- "null"				*quickrun-module-outputter/null*
+- "outputter/null"				*quickrun-module-outputter/null*
   No outputs.
 
 
@@ -585,17 +585,17 @@ HOOK						*quickrun-module-hook*
 Hook is a module to do additional process in specific points.  The following
 hooks are available by default.
 
-- "cd"					*quickrun-module-hook/cd*
+- "hook/cd"					*quickrun-module-hook/cd*
   Executes on specified directory.
   NOTE: This hook changes the current directory, and tries to restore it when
   finished.  An unexpected result may be brought when asynchronous execution
   is being used.
   Option ~
-  directory		Default: ""
+  hook/cd/directory		Default: ""
 	Directory to change.  Does nothing if this is an empty string.
 	This value is expanded by |quickrun-exec-format|.
 
-- "eval"				*quickrun-module-hook/eval*
+- "hook/eval"				*quickrun-module-hook/eval*
   Changes the contents of source file by a template.  For example:
   source file: >
     1 + 2 * 3
@@ -604,38 +604,38 @@ hooks are available by default.
 < In this case, the source file actually used is: >
     print(1 + 2 * 3);
 < Option ~
-  template		Default: ""
+  hook/eval/template		Default: ""
   A string of template.  "%s" is replaced by original source file.
   This rule is same as |printf()|.
 
-- "output_encode"			*quickrun-module-hook/output_encode*
+- "hook/output_encode"			*quickrun-module-hook/output_encode*
   Converts encoding of the output.
   Option ~
-  encoding		Default: "&fileencoding"
+  hook/output_encode/encoding		Default: "&fileencoding"
 	Specifies in the form of "from:to".  ":to" is omitable.
 	In this case, it is interpreted as "from:&encoding".
 
-- "shebang"				*quickrun-module-hook/shebang*
+- "hook/shebang"				*quickrun-module-hook/shebang*
   Searches "#!" in the head of source file, and treats the following of it as
   command option(|quickrun-option-command|).  At the same time, converts "%c"
   in exec option(|quickrun-option-exec|) into "%C".
 
-- "sweep"				*quickrun-module-hook/sweep*
+- "hook/sweep"				*quickrun-module-hook/sweep*
   Sweeps the temporary files at the end of session.
   Option ~
-  files			Default: []
+  hook/sweep/files			Default: []
 	A list of files to remove.  This value is expanded by
 	|quickrun-exec-format|.  Please use upper case to avoid escaping.
 
-- "time"				*quickrun-module-hook/time*
+- "hook/time"				*quickrun-module-hook/time*
   Measures the execution time and outputs to the end.
   NOTE: The time includes the overhead of quickrun.vim.  Don't expect exact
 	time.
   Option ~
-  format		Default: "\n*** time: %g ***"
+  hook/time/format		Default: "\n*** time: %g ***"
 	Format of output string.  This is passed to |printf()|.
 	Measured time is passed to the 2nd argument by |Float|.
-  dest			Default: ""
+  hook/time/dest			Default: ""
 	An outputter for outputting a result.  If this is empty, outputs to
 	the outputter of the session.
 
