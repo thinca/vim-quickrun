@@ -70,6 +70,7 @@ function! s:runner.run(commands, input, session)
   else
     if s:is_win
       if 703 <= v:version && has('patch203')
+      \ || 703 < v:version
         silent! execute '!start /b' script
       else
         silent! execute '!start /min' script
