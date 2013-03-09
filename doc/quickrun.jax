@@ -641,9 +641,8 @@ hook は特定のポイントで追加の処理を行うモジュールです。
 ------------------------------------------------------------------------------
 モジュールの登録				*quickrun-register-module*
 
-モジュールは、|quickrun#module#register()| やその省略形である
-|quickrun#register_runner()|、|quickrun#register_outputter()| を使って登録する
-ことで使えるようになります。
+モジュールは、|quickrun#module#register()| を使って登録することで使えるように
+なります。
 また、'runtimepath' 内に autoload/quickrun/{module-kind}/{module-name}.vim を
 作成し、autoload#quickrun#{module-kind}#{module-name}#new() 関数を作っておく
 と、その戻り値が quickrun の初回ロード時に自動的に登録されます。

@@ -650,15 +650,14 @@ what's the problem? You can use the module after registering it.
 ------------------------------------------------------------------------------
 REGISTER MODULE				*quickrun-register-module*
 
-You use a module with registering by |quickrun#module#register()| or its
-handier version |quickrun#register_runner()| and
-|quickrun#register_outputter()|.  You can also register a module automatically
-by making autoload#quickrun#{module-kind}#{module-name}#new() function in
+You use a module with registering by |quickrun#module#register()|.
+You can also register a module automatically by making
+autoload#quickrun#{module-kind}#{module-name}#new() function in
 autoload/quickrun/{module-kind}/{module-name}.vim in 'runtimepath'.  That'll
 be loaded when quickrun is loaded for the first time in the process.
 
 ------------------------------------------------------------------------------
-SESSION				*quickrun-session*
+SESSION					*quickrun-session*
 
 Quickrun manages an execution as a {session}, and gives it as an argument to
 functions of a module.
