@@ -907,6 +907,9 @@ pandocを使用してmarkdownをhtmlにしてブラウザで開く (要|open-bro
 ==============================================================================
 更新履歴					*quickrun-changelog*
 
+0.6.1dev	2013-03-19
+	- デフォルトの設定に sql を追加 (Added default config for sql)
+
 0.6.0	2012-06-16
 	- モジュール周りの構成を変更。
 	  - quickrun#xxx_module() => quickrun#module#xxx()

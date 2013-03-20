@@ -346,6 +346,13 @@ let g:quickrun#default_config = {
 \ },
 \ 'sed': {},
 \ 'sh': {},
+\ 'sql': {
+\   'type': executable('psql') ? 'sql/postgres' : '',
+\ },
+\ 'sql/postgres': {
+\   'command': 'psql',
+\   'exec': ['%c %o -f %s'],
+\ },
 \ 'typescript': {
 \   'command': 'tsc',
 \   'cmdopt': '--exec',
