@@ -163,7 +163,7 @@ quickrun#module#load([{overwrite}])		*quickrun#module#load()*
 
 						*quickrun#session()*
 quickrun#session({key} [, {func-name} [, {args} ...]])
-	This is used in a module.  This fetches the current runnning session
+	This is used in a module.  This fetches the current running session
 	if you skipped {func-name}.  This calls the session function with
 	arguments {args} if you specified {func-name}.
 
@@ -195,7 +195,7 @@ KEY MAPPINGS					*quickrun-key-mappings*
 <
 
 					*g:quickrun_no_default_key_mappings*
-Following key mapings will NOT be defined if it's already mapped,
+Following key mappings will NOT be defined if it's already mapped,
 or |g:quickrun_no_default_key_mappings| has been set to 1.
 
 {lhs}			{rhs}
@@ -384,7 +384,7 @@ normal option or as a postfix of the module.
 
 Specifying an option as a normal option
 --------------------------
-A module reads options with the following prioitized order when you specified
+A module reads options with the following prioritized order when you specified
 an option as a normal option.
 
 1. "{module-type}/{module-name}/{option-name}"
@@ -402,7 +402,7 @@ or,
 	:QuickRun -outputter/buffer/append 1
 <
 Furthermore the following way is also available, whereas if there is a more
-prioitized option then that'll be prioitized.
+prioritized option then that'll be prioritized.
 >
 	:QuickRun -append 1
 <
@@ -532,7 +532,7 @@ available by default.
   Outputs on a file.
   Option ~
   outputter/file/name			Default: ''
-	The file name where to output.  Causea an error if it's empty.
+	The file name where to output.  Cause an error if it's empty.
   outputter/file/append		Default: 0
 	Appends if it's 1.
 
@@ -612,7 +612,7 @@ hooks are available by default.
   Converts encoding of the output.
   Option ~
   hook/output_encode/encoding		Default: "&fileencoding"
-	Specifies in the form of "from:to".  ":to" is omitable.
+	Specifies in the form of "from:to".  ":to" is omittable.
 	In this case, it is interpreted as "from:&encoding".
 
 - "hook/shebang"				*quickrun-module-hook/shebang*
@@ -694,7 +694,7 @@ session.sweep()				*quickrun-session.sweep()*
 	This is a cleaning up.  This deletes the paths registered by
 	|quickrun-session.tempname()|, and calls |quickrun-module.sweep()|.
 	Further, if it has an attribute "_vimproc", forcefully terminates the
-	|vimproc|.  This is handy, however, they don't care naming colisions
+	|vimproc|.  This is handy, however, they don't care naming collisions
 	by multiple modules.  The author is going to solve them in the future.
 
 ------------------------------------------------------------------------------
@@ -725,7 +725,7 @@ module.config_order			*quickrun-module.config_order*
 	arbitrary order of names in |quickrun-module.config|.
 
 module.available()			*quickrun-module.available()*
-	Checks if the module is avaiable, using |quickrun-module.validate()|.
+	Checks if the module is available, using |quickrun-module.validate()|.
 	Returns 1 if it's available; otherwise returns 0.
 
 module.validate()			*quickrun-module.validate()*
