@@ -14,6 +14,7 @@ let s:outputter = {
 \     'into': 0,
 \     'running_mark': ':-)',
 \     'close_on_empty': 0,
+\     'ansi_escape': 0,
 \   }
 \ }
 
@@ -73,6 +74,15 @@ function! s:outputter.finish(session)
   if self.config.close_on_empty && line('$') == 1 && getline(1) =~ '^\s*$'
     quit
     let is_closed = 1
+  endif
+  if !is_closed && self.config.ansi_escape
+    if self.config.ansi_escape != 0 && !exists(":AnsiEsc")
+      echohl ErrorMsg
+      echomsg "quickrun: outputter/buffer: AnsiEsc plugin is reqired for ansi esacpe."
+      echohl NONE
+    else
+      AnsiEsc
+    endif
   endif
   if !is_closed && !self.config.into
     call s:back_to_previous_window(winnr, wincount)
