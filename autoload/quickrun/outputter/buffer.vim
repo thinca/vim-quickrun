@@ -73,6 +73,8 @@ function! s:outputter.finish(session)
   if self.config.close_on_empty && line('$') == 1 && getline(1) =~ '^\s*$'
     quit
     let is_closed = 1
+  else
+    let a:session.outputter.bufnr = bufnr('%')
   endif
   if !is_closed && !self.config.into
     call s:back_to_previous_window(winnr, wincount)
