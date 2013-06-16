@@ -455,6 +455,25 @@ default.  NOTE: Everything except for "system" can be unstable.
   runner/vimproc/updatetime		Default: 0
 	Changes 'updatetime' to the value temporary.  Stays same if this is 0.
 
+- "runner/process_manager"	*quickrun-module-runner/process_manager*
+  {Requirement: |vimproc|}
+  Runs by |vimproc| and |Vital.ProcessManager| at background, and reuses the
+  process you spawned for next executions.  This is handy for some tools such
+  as REPL of a programming languages which is slow to start; e.g. programing
+  language implementations on JVM. This checks if the process completed with
+  using |CursorHold| |CursorHoldI| events as well as "runner/vimproc". 
+
+  Options including command and cmdarg require configurations like other
+  runners. However, this runner ignores exec option on purpose and behaves as
+  if you give "%c %o" to skip "%s" -- the source file.  Specify load option
+  described below for source file related stuff.
+
+  Option ~
+  runner/process_manager/load			Default: "load %s"
+	TODO
+  runner/process_manager/prompt			Default: ">>> "
+	TODO
+
 - "runner/remote"				*quickrun-module-runner/remote*
   {Requirement: |+clientserver|}
   Runs in background and fetches the result by |+clientserver| feature.
