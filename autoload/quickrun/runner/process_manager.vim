@@ -5,7 +5,6 @@
 "   * if a run stalled, next run will wait. It should cancel previous one
 "   automatically.
 "   * kill interface doesn't exist yet (related to the previous issue)
-"   * embed vital; don't use vital#of('vital')
 
 let s:save_cpo = &cpo
 set cpo&vim
@@ -16,6 +15,8 @@ let s:runner = {
 \     'prompt': '>>> ',
 \   }
 \ }
+
+let s:P = vital#of('quickrun').import('ProcessManager')
 
 augroup plugin-quickrun-process-manager
 augroup END
@@ -43,8 +44,6 @@ function! s:runner.run(commands, input, session)
     let &updatetime = 50
   endif
 endfunction
-
-let s:P = vital#of('vital').import('ProcessManager')
 
 function! s:execute(session, prompt, message)
   let type = a:session.config.type
