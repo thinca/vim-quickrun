@@ -444,6 +444,32 @@ NOTE: "system" 以外は不安定な場合があります。
   runner/vimproc/updatetime		デフォルト: 0
 	一時的に 'updatetime' をこの値に変更します。0 の場合は変更しません。
 
+- "runner/process_manager"	*quickrun-module-runner/process_manager*
+  {|vimproc| が必要}
+  |vimproc| と|Vital.ProcessManager|を使ってコマンドをバックグラウンドで実行
+  し、かつ二回目以降の実行は、そのプロセスを再利用します。初回起動が遅いプログ
+  ラミング言語処理系付属REPL、たとえばJVM上で動作する言語処理系などで便利です。
+  各実行の完了を "runner/vimproc"同様、|CursorHold| と |CursorHoldI| イベント
+  を使って検査します。
+
+  オプションのcommandとcmdargなどは他のrunnerと同じような指定を要求します。た
+  だし、このrunnerはexecオプションを意図的に無視し、"%c %o"と指定したのと同様
+  に振る舞います。これは"%s"つまりソースファイルの指定を省略するためです。ソー
+  スファイルに関する設定はexecではなく後述するloadに設定してください。
+
+  オプション ~
+  runner/process_manager/load			デフォルト: "load %s"
+	起動した外部コマンドのstdinの書き込む、編集中ファイルを読み込み実行さ
+	せるための書式を指定します。%sは|quickrun-exec-format|のように、ソース
+	ファイル名に置換されます。たとえばこの値が"(load \"%s\")"で編集中ファ
+	イル名が"/home/ujihisa/a.clj"ならば、quickrunはcommandオプションによっ
+	て起動されたプロセスに対し"(load \"/home/ujihisa/a.clj\")\n"という文字
+	列を書き込みます。
+  runner/process_manager/prompt			デフォルト: ">>> "
+	一度の試行の終了を把握するためのとっかかりとして使用する正規表現です。
+	暗黙のうちに先頭に^がつきます。なお、各試行における最後にマッチした部
+	分の文字列はquickrunの結果に出力されません。
+
 - "runner/remote"				*quickrun-module-runner/remote*
   {|+clientserver| が必要}
   コマンドをバックグラウンドで実行し、終了を |+clientserver| 機能を利用して通
@@ -909,6 +935,7 @@ pandocを使用してmarkdownをhtmlにしてブラウザで開く (要|open-bro
 
 0.6.1dev	2013-03-19
 	- デフォルトの設定に sql を追加 (Added default config for sql)
+	- runner/process_manager を追加 (Thanks ujihisa!)
 
 0.6.0	2012-06-16
 	- モジュール周りの構成を変更。

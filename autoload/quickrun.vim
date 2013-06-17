@@ -99,6 +99,12 @@ let g:quickrun#default_config = {
 \   'command': 'clj',
 \   'exec': '%c %s',
 \ },
+\ 'clojure/process_manager': {
+\   'command': 'clojure-1.5',
+\   'runner': 'process_manager',
+\   'runner/process_manager/load': '(load-file "%s")',
+\   'runner/process_manager/prompt': 'user=> ',
+\ },
 \ 'coffee': {},
 \ 'cs': {
 \   'type': executable('csc')  ? 'cs/csc'  :
@@ -330,6 +336,13 @@ let g:quickrun#default_config = {
 \ 'scala': {
 \   'cmdopt': '-Dfile.encoding=' . &termencoding,
 \   'hook/output_encode/encoding': '&termencoding',
+\ },
+\ 'scala/process_manager': {
+\   'command': 'scala',
+\   'cmdopt': '-nc',
+\   'runner': 'process_manager',
+\   'runner/process_manager/load': ':load %s',
+\   'runner/process_manager/prompt': 'scala> ',
 \ },
 \ 'scheme': {
 \   'type': executable('gosh')     ? 'scheme/gauche':
