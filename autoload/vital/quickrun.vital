@@ -5,4 +5,3 @@ System.File
 System.Filepath
 Prelude
 ProcessManager
-Data.String
