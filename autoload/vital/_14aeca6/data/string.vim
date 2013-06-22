@@ -160,6 +160,11 @@ function! s:chop(str) "{{{
   return substitute(a:str, '.$', '', '')
 endfunction "}}}
 
+" Remove last \r,\n,\r\n from a:str.
+function! s:chomp(str) "{{{
+  return substitute(a:str, '\%(\r\n\|[\r\n]\)$', '', '')
+endfunction "}}}
+
 " wrap() and its internal functions
 " * _split_by_wcswidth_once()
 " * _split_by_wcswidth()
