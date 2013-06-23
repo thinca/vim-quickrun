@@ -17,7 +17,6 @@ let s:runner = {
 \ }
 
 let s:P = g:quickrun#V.import('ProcessManager')
-"let s:P = vital#of('vital').import('ProcessManager')
 
 augroup plugin-quickrun-process-manager
 augroup END
