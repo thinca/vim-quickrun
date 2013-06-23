@@ -55,11 +55,16 @@ function! s:concat(list)
 endfunction
 
 " Flattens a list.
-function! s:flatten(list)
+function! s:flatten(list, ...)
+  let limit = a:0 > 0 ? a:1 : -1
   let list = []
+  if limit == 0
+    return a:list
+  endif
+  let limit -= 1
   for Value in a:list
     if type(Value) == type([])
-      let list += s:flatten(Value)
+      let list += s:flatten(Value, limit)
     else
       call add(list, Value)
     endif

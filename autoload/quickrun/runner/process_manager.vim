@@ -22,7 +22,9 @@ augroup plugin-quickrun-process-manager
 augroup END
 
 function! s:runner.run(commands, input, session)
+  let type = a:session.config.type
   let [out, err, t] = s:execute(
+        \ type,
         \ a:session,
         \ a:session.runner.config.prompt,
         \ substitute(
@@ -33,6 +35,9 @@ function! s:runner.run(commands, input, session)
   call a:session.output(out . (err ==# '' ? '' : printf('!!!%s!!!', err)))
   if t ==# 'matched'
     return 0
+  elseif t ==# 'inactive'
+    call s:P.stop(type)
+    return s:runner.run(a:commands, a:input, a:session)
   else " 'timedout'
     let key = a:session.continue()
     augroup plugin-quickrun-process-manager
@@ -45,18 +50,17 @@ function! s:runner.run(commands, input, session)
   endif
 endfunction
 
-function! s:execute(session, prompt, message)
-  let type = a:session.config.type
+function! s:execute(type, session, prompt, message)
   let cmd = printf("%s %s", a:session.config.command, a:session.config.cmdopt)
   let cmd = g:quickrun#V.iconv(cmd, &encoding, &termencoding)
-  let t = s:P.touch(type, cmd)
+  let t = s:P.touch(a:type, cmd)
   if t ==# 'new'
-    call s:P.read_wait(type, 5.0, [a:prompt])
+    call s:P.read_wait(a:type, 5.0, [a:prompt])
   endif
   if a:message !=# ''
-    call s:P.writeln(type, a:message)
+    call s:P.writeln(a:type, a:message)
   endif
-  return s:P.read(type, [a:prompt])
+  return s:P.read(a:type, [a:prompt])
 endfunction
 
 function! s:receive(key)
