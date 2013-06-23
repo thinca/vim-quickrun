@@ -9,6 +9,10 @@ function! s:_vital_loaded(V)
   let s:S = s:V.import('Data.String')
 endfunction
 
+function! s:_vital_depends()
+  return ['Data.String']
+endfunction
+
 function! s:is_available()
   return s:V.has_vimproc()
 endfunction
@@ -17,14 +21,14 @@ function! s:touch(name, cmd)
   if has_key(s:_processes, a:name)
     return 'existing'
   else
-    let p = vimproc#popen3(a:cmd)
+    let p = vimproc#pgroup_open(a:cmd)
     let s:_processes[a:name] = p
     return 'new'
   endif
 endfunction
 
 function! s:new(cmd)
-  let p = vimproc#popen3(a:cmd)
+  let p = vimproc#pgroup_open(a:cmd)
   let s:_processes_i += 1
   let s:_processes[s:_processes_i] = p
   return s:_processes_i
@@ -33,7 +37,8 @@ endfunction
 function! s:stop(i)
   let p = s:_processes[a:i]
   call p.kill(9)
-  unlet s:_processes[s:_processes_i]
+  " call p.waitpid()
+  unlet s:_processes[a:i]
 endfunction
 
 function! s:read(i, endpatterns)
@@ -43,6 +48,9 @@ endfunction
 function! s:read_wait(i, wait, endpatterns)
   if !has_key(s:_processes, a:i)
     throw printf("ProcessManager doesn't know about %s", a:i)
+  endif
+  if s:status(a:i) ==# 'inactive'
+    return ['', '', 'inactive']
   endif
 
   let p = s:_processes[a:i]
@@ -72,9 +80,14 @@ function! s:write(i, str)
   if !has_key(s:_processes, a:i)
     throw printf("ProcessManager doesn't know about %s", a:i)
   endif
+  if s:status(a:i) ==# 'inactive'
+    return 'inactive'
+  endif
 
   let p = s:_processes[a:i]
   call p.stdin.write(a:str)
+
+  return 'active'
 endfunction
 
 function! s:writeln(i, str)
@@ -85,15 +98,13 @@ function! s:status(i)
   if !has_key(s:_processes, a:i)
     throw printf("ProcessManager doesn't know about %s", a:i)
   endif
-
   let p = s:_processes[a:i]
-  let stat= p.kill(0)
+  " vimproc.kill isn't to stop but to ask for the current state.
+  return p.kill(0) ? 'inactive' : 'active'
+endfunction
 
-  if stat
-    return 'active'
-  endif
-
-  return 'inactive'
+function! s:debug_processes()
+  return s:_processes
 endfunction
 
 let &cpo = s:save_cpo
