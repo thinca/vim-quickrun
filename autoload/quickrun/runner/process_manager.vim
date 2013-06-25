@@ -21,6 +21,12 @@ let s:P = g:quickrun#V.import('ProcessManager')
 augroup plugin-quickrun-process-manager
 augroup END
 
+function! s:runner.validate()
+  if !s:P.is_available()
+    throw 'Needs vimproc.'
+  else
+endfunction
+
 function! s:runner.run(commands, input, session)
   let type = a:session.config.type
   let [out, err, t] = s:execute(
