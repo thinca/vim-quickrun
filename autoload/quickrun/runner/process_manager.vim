@@ -24,7 +24,7 @@ augroup END
 function! s:runner.validate()
   if !s:P.is_available()
     throw 'Needs vimproc.'
-  else
+  endif
 endfunction
 
 function! s:runner.run(commands, input, session)
@@ -43,7 +43,8 @@ function! s:runner.run(commands, input, session)
     return 0
   elseif t ==# 'inactive'
     call s:P.stop(type)
-    return s:runner.run(a:commands, a:input, a:session)
+    call a:session.output('!!!process is inactive. try again.!!!')
+    return 0
   else " 'timedout'
     let key = a:session.continue()
     augroup plugin-quickrun-process-manager
@@ -62,6 +63,8 @@ function! s:execute(type, session, prompt, message)
   let t = s:P.touch(a:type, cmd)
   if t ==# 'new'
     call s:P.read_wait(a:type, 5.0, [a:prompt])
+  elseif t ==# 'inactive'
+    return ['', '', 'inactive']
   endif
   if a:message !=# ''
     call s:P.writeln(a:type, a:message)
@@ -71,6 +74,12 @@ endfunction
 
 function! s:receive(key)
   let session = quickrun#session(a:key)
+
+  " enable this when vim got crazy.
+  " if !has_key(session, 'config')
+  "   return
+  " endif
+
   let [out, err, t] = s:P.read(session.config.type, [session.runner.config.prompt])
   call session.output(out . (err ==# '' ? '' : printf('!!!%s!!!', err)))
   if t ==# 'matched'
