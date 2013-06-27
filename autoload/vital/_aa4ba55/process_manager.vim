@@ -1,7 +1,7 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-let s:_processes_i = -1
+let s:_auto_label = -1
 let s:_processes = {}
 
 function! s:_vital_loaded(V)
@@ -21,17 +21,17 @@ function! s:touch(name, cmd)
   if has_key(s:_processes, a:name)
     return 'existing'
   else
-    let p = vimproc#pgroup_open(a:cmd)
+    let p = vimproc#popen3(a:cmd)
     let s:_processes[a:name] = p
     return 'new'
   endif
 endfunction
 
 function! s:new(cmd)
-  let p = vimproc#pgroup_open(a:cmd)
-  let s:_processes_i += 1
-  let s:_processes[s:_processes_i] = p
-  return s:_processes_i
+  let p = vimproc#popen3(a:cmd)
+  let s:_auto_label += 1
+  let s:_processes[s:_auto_label] = p
+  return s:_auto_label
 endfunction
 
 function! s:stop(i)
@@ -100,7 +100,11 @@ function! s:status(i)
   endif
   let p = s:_processes[a:i]
   " vimproc.kill isn't to stop but to ask for the current state.
-  return p.kill(0) ? 'inactive' : 'active'
+  " return p.kill(0) ? 'inactive' : 'active'
+  " ... checkpid() checks if the process is running AND does waitpid() in C, 
+  " so it solves zombie processes.
+  return get(p.checkpid(), 0, '') ==# 'run' ?
+        \ 'active' : 'inactive'
 endfunction
 
 function! s:debug_processes()
