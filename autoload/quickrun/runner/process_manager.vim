@@ -75,11 +75,6 @@ endfunction
 function! s:receive(key)
   let session = quickrun#session(a:key)
 
-  " enable this when vim got crazy.
-  " if !has_key(session, 'config')
-  "   return
-  " endif
-
   let [out, err, t] = s:P.read(session.config.type, [session.runner.config.prompt])
   call session.output(out . (err ==# '' ? '' : printf('!!!%s!!!', err)))
   if t ==# 'matched'
