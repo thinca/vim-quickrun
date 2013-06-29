@@ -185,6 +185,9 @@ let g:quickrun#default_config = {
 \   'command': 'dart',
 \   'tempfile': '%{tempname()}.dart',
 \ },
+\ 'elixir': {
+\   'command': 'elixir',
+\ },
 \ 'erlang': {
 \   'command': 'escript',
 \ },
