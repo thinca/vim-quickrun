@@ -71,8 +71,8 @@ endfunction
 
 function! quickrun#module#unregister(...)
   if a:0 && type(a:1) == type({})
-    let kind = get(a:module, 'kind', '')
-    let name = get(a:module, 'name', '')
+    let kind = get(a:1, 'kind', '')
+    let name = get(a:1, 'name', '')
   elseif 2 <= a:0
     let kind = a:1
     let name = a:2
