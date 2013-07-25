@@ -71,7 +71,7 @@ function! s:outputter.finish(session)
   silent normal! zt
   let is_closed = 0
   if self.config.close_on_empty && line('$') == 1 && getline(1) =~ '^\s*$'
-    quit
+    silent quit!
     let is_closed = 1
   endif
   if !is_closed && !self.config.into
