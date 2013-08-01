@@ -8,6 +8,7 @@ set cpo&vim
 let s:outputter = quickrun#outputter#buffered#new()
 let s:outputter.config = {
 \   'errorformat': '',
+\   'open_cmd': 'cwindow',
 \ }
 
 let s:outputter.init_buffered = s:outputter.init
@@ -26,7 +27,7 @@ function! s:outputter.finish(session)
     let errorformat = &g:errorformat
     let &g:errorformat = self.config.errorformat
     cgetexpr self._result
-    cwindow
+    execute self.config.open_cmd
     for winnr in range(1, winnr('$'))
       if getwinvar(winnr, '&buftype') ==# 'quickfix'
         call setwinvar(winnr, 'quickfix_title', 'quickrun: ' .
