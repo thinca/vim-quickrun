@@ -936,8 +936,10 @@ function! quickrun#config(config)
       unlet c
     endfor
     return config
+  elseif type(a:config) == type({})
+    return deepcopy(a:config)
   endif
-  return a:config
+  throw 'quickrun: Unsupported config type: ' . type(a:config)
 endfunction
 
 
