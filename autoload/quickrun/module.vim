@@ -28,7 +28,7 @@ endfunction
 " Template of runner.  {{{2
 let s:templates.runner = deepcopy(s:module)
 function! s:templates.runner.run(commands, input, session)
-  throw 'quickrun: A runner should implements run()'
+  throw 'quickrun: A runner must implement run()'
 endfunction
 function! s:templates.runner.shellescape(str)
   return shellescape(a:str)
@@ -39,7 +39,7 @@ let s:templates.outputter = deepcopy(s:module)
 function! s:templates.outputter.start(session)
 endfunction
 function! s:templates.outputter.output(data, session)
-  throw 'quickrun: An outputter should implements output()'
+  throw 'quickrun: An outputter must implement output()'
 endfunction
 function! s:templates.outputter.finish(session)
 endfunction
