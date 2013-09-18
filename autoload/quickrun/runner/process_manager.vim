@@ -32,12 +32,8 @@ function! s:runner.run(commands, input, session)
   let [out, err, t] = s:execute(
         \ type,
         \ a:session,
-        \ a:session.runner.config.prompt,
-        \ substitute(
-        \   a:session.runner.config.load,
-        \   '%s',
-        \   a:session.config.srcfile,
-        \   'g'))
+        \ self.config.prompt,
+        \ a:session.build_command(self.config.load))
   call a:session.output(out . (err ==# '' ? '' : printf('!!!%s!!!', err)))
   if t ==# 'matched'
     return 0
