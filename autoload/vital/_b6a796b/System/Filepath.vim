@@ -107,7 +107,7 @@ endfunction
 " Check if the path is absolute path.
 if s:is_windows
   function! s:is_absolute(path)
-    return a:path =~? '^[a-z]:[/\]'
+    return a:path =~? '^[a-z]:[/\\]'
   endfunction
 else
   function! s:is_absolute(path)
