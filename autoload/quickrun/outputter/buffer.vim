@@ -23,19 +23,15 @@ function! s:outputter.init(session)
 endfunction
 
 function! s:outputter.start(session)
-  let winnr = winnr()
-  let wincount = winnr('$')
   call s:open_result_window(self.config, a:session)
   if !self._append
     silent % delete _
   endif
   call s:set_running_mark(self.config.running_mark)
-  call s:back_to_previous_window(winnr, wincount)
+  call s:back_to_previous_window()
 endfunction
 
 function! s:outputter.output(data, session)
-  let winnr = winnr()
-  let wincount = winnr('$')
   call s:open_result_window(self.config, a:session)
   if self._line == 0
     let self._line = line('$')
@@ -58,27 +54,21 @@ function! s:outputter.output(data, session)
     silent 1 delete _
   endif
   call s:set_running_mark(self.config.running_mark)
-  call s:back_to_previous_window(winnr, wincount)
+  call s:back_to_previous_window()
   redraw
 endfunction
 
 function! s:outputter.finish(session)
-  let winnr = winnr()
-  let wincount = winnr('$')
-
   call s:open_result_window(self.config, a:session)
   execute self._line
   silent normal! zt
-  let is_closed = 0
-  if self.config.close_on_empty && line('$') == 1 && getline(1) =~ '^\s*$'
-    quit
-    let is_closed = 1
+  let closed = self.config.close_on_empty && s:is_empty_buffer()
+  if closed
+    close
   endif
-  if !is_closed && !self.config.into
-    call s:back_to_previous_window(winnr, wincount)
-  endif
+  call s:back_to_previous_window(!closed && self.config.into)
   redraw
-  if is_closed
+  if closed
     echohl MoreMsg
     echomsg "quickrun: outputter/buffer: Empty output."
     echohl NONE
@@ -87,6 +77,7 @@ endfunction
 
 
 function! s:open_result_window(config, session)
+  let w:quickrun_outputter_buffer_prevwin = 1
   let sp = a:config.split
   let sname = s:escape_file_pattern(a:config.name)
   let opened = 0
@@ -115,12 +106,20 @@ function! s:open_result_window(config, session)
   endif
 endfunction
 
-function! s:back_to_previous_window(prev_nr, prev_count)
-  if a:prev_count == winnr('$')
-    execute a:prev_nr 'wincmd w'
-  else
-    wincmd p
-  endif
+function! s:back_to_previous_window(...)
+  let sweep_only = a:0 && a:1
+  for tabnr in range(1, tabpagenr('$'))
+    for winnr in range(1, tabpagewinnr(tabnr, '$'))
+      let vars = gettabwinvar(tabnr, winnr, '')
+      if has_key(vars, 'quickrun_outputter_buffer_prevwin')
+        if !sweep_only
+          call s:jump_to_window(tabnr, winnr)
+        endif
+        call remove(vars, 'quickrun_outputter_buffer_prevwin')
+        return
+      endif
+    endfor
+  endfor
 endfunction
 
 function! s:set_running_mark(mark)
@@ -128,6 +127,19 @@ function! s:set_running_mark(mark)
     let &undolevels = &undolevels  " split the undo block
     silent $ put =a:mark
     let b:quickrun_running_mark = 1
+  endif
+endfunction
+
+function! s:is_empty_buffer()
+  return line('$') == 1 && getline(1) =~ '^\s*$'
+endfunction
+
+function! s:jump_to_window(tabnr, winnr)
+  if tabpagenr() != a:tabnr
+    execute 'tabnext' a:tabnr
+  endif
+  if winnr() != a:winnr
+    execute a:winnr 'wincmd w'
   endif
 endfunction
 
