@@ -102,7 +102,7 @@ let g:quickrun#default_config = {
 \ 'clojure/process_manager': {
 \   'command': 'clojure-1.5',
 \   'runner': 'process_manager',
-\   'runner/process_manager/load': '(load-file "%s")',
+\   'runner/process_manager/load': '(load-file "%S")',
 \   'runner/process_manager/prompt': 'user=> ',
 \ },
 \ 'coffee': {},
@@ -354,7 +354,7 @@ let g:quickrun#default_config = {
 \   'command': 'scala',
 \   'cmdopt': '-nc',
 \   'runner': 'process_manager',
-\   'runner/process_manager/load': ':load %s',
+\   'runner/process_manager/load': ':load %S',
 \   'runner/process_manager/prompt': 'scala> ',
 \ },
 \ 'scheme': {
