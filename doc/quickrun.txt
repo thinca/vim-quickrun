@@ -267,7 +267,7 @@ tempfile (*)				*quickrun-option-tempfile*
 			lines.
 			This value is template for its filename.
 			Temporary file will be removed after execute.
-			Default value is "{tempname()}".
+			Default value is "%{tempname()}".
 
 
 ------------------------------------------------------------------------------
