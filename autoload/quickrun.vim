@@ -421,6 +421,8 @@ function! s:Session.normalize(config)
     let config.input = ''
   endif
 
+  let exec = get(config, 'exec', '')
+  let config.exec = type(exec) == type([]) ? exec : [exec]
   let config.command = get(config, 'command', config.type)
 
   if has_key(config, 'srcfile')
@@ -485,8 +487,7 @@ function! s:Session.setup()
     let self.outputter = self.make_module('outputter', self.config.outputter)
     call self.invoke_hook('module_loaded')
 
-    let exec = get(self.config, 'exec', '')
-    let commands = type(exec) == type([]) ? copy(exec) : [exec]
+    let commands = copy(self.config.exec)
     call filter(map(commands, 'self.build_command(v:val)'),
     \           'v:val =~# "\\S"')
     let self.commands = commands
