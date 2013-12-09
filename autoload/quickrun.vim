@@ -324,6 +324,11 @@ let g:quickrun#default_config = {
 \ 'markdown/markdown_py': {
 \   'command': 'markdown_py',
 \ },
+\ 'nimrod': {
+\		'command': 'nimrod',
+\		'exec': '%c %o %s %a',
+\		'cmdopt': 'c -r',
+\	},
 \ 'ocaml': {},
 \ 'perl': {
 \   'hook/eval/template': join([
