@@ -38,7 +38,7 @@ function! s:runner.run(commands, input, session)
   if t ==# 'matched'
     return 0
   elseif t ==# 'inactive'
-    call s:P.stop(type)
+    call s:P.kill(type)
     call a:session.output('!!!process is inactive. try again.!!!')
     return 0
   else " 'timedout'
