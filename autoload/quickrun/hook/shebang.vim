@@ -11,9 +11,12 @@ function! s:hook.on_module_loaded(session, context)
   let line = get(readfile(a:session.config.srcfile, 0, 1), 0, '')
   if line =~# '^#!'
     let a:session.config.command = line[2 :]
-    let a:session.config.exec =
-    \   substitute(a:session.config.exec, '%\@<!%c', '%C', 'g')
+    call map(a:session.config.exec, 's:replace_cmd(v:val)')
   endif
+endfunction
+
+function! s:replace_cmd(cmd)
+  return substitute(a:cmd, '%\@<!%c', '%C', 'g')
 endfunction
 
 function! quickrun#hook#shebang#new()
