@@ -296,6 +296,11 @@ let g:quickrun#default_config = {
 \   'command': 'llvm-as %s -o=- | lli - %a',
 \ },
 \ 'lua': {},
+\ 'lua/vim': {
+\   'command': ':luafile',
+\   'exec': '%C %s',
+\   'runner': 'vimscript',
+\ },
 \ 'markdown': {
 \   'type': executable('Markdown.pl') ? 'markdown/Markdown.pl':
 \           executable('kramdown') ? 'markdown/kramdown':
