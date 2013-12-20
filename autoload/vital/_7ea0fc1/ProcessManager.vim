@@ -1,7 +1,6 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-let s:_auto_label = -1
 let s:_processes = {}
 
 function! s:_vital_loaded(V)
@@ -25,13 +24,6 @@ function! s:touch(name, cmd)
     let s:_processes[a:name] = p
     return 'new'
   endif
-endfunction
-
-function! s:new(cmd)
-  let p = vimproc#popen3(a:cmd)
-  let s:_auto_label += 1
-  let s:_processes[s:_auto_label] = p
-  return s:_auto_label
 endfunction
 
 function! s:stop(i)

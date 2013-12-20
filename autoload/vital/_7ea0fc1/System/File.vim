@@ -99,7 +99,7 @@ else
 endif
 
 " Move a file.
-" Implemented by pure vimscript.
+" Implemented by pure Vim script.
 function! s:move_vim(src, dest) "{{{
   return !rename(a:src, a:dest)
 endfunction "}}}
@@ -153,7 +153,7 @@ else
 endif
 
 " Copy a file.
-" Implemented by pure vimscript.
+" Implemented by pure Vim script.
 function! s:copy_vim(src, dest) "{{{
   let ret = writefile(readfile(a:src, "b"), a:dest, "b")
   if ret == -1
