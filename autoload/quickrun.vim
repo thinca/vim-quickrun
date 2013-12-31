@@ -344,6 +344,13 @@ let g:quickrun#default_config = {
 \ 'perl6': {'hook/eval/template': '{%s}().perl.print'},
 \ 'python': {'hook/eval/template': 'print(%s)'},
 \ 'php': {},
+\ 'ps1': {
+\   'exec': '%c %o -File %s %a',
+\   'command': 'powershell.exe',
+\   'cmdopt': '-ExecutionPolicy RemoteSigned',
+\   'tempfile': '%{tempname()}.ps1',
+\   'hook/output_encode/encoding': '&termencoding',
+\ },
 \ 'r': {
 \   'command': 'R',
 \   'exec': '%c %o --no-save --slave %a < %s',
