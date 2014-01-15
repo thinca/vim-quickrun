@@ -356,6 +356,20 @@ let g:quickrun#default_config = {
 \   'exec': '%c %o --no-save --slave %a < %s',
 \ },
 \ 'ruby': {'hook/eval/template': " p proc {\n%s\n}.call"},
+\ 'ruby/irb': {
+\   'command': 'irb',
+\   'exec': '%c %o --simple-prompt',
+\   'runner': 'process_manager',
+\   'runner/process_manager/load': "load '%s'",
+\   'runner/process_manager/prompt': '>> ',
+\ },
+\ 'ruby/pry': {
+\   'command': 'pry',
+\   'exec': '%c %o --no-color --simple-prompt',
+\   'runner': 'process_manager',
+\   'runner/process_manager/load': "load '%s'",
+\   'runner/process_manager/prompt': '>> ',
+\ },
 \ 'rust': {
 \   'command': 'rustc',
 \   'exec': ['%c %o %s -o %s:p:r', '%s:p:r %a'],
