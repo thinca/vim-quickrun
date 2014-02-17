@@ -144,6 +144,12 @@ let g:quickrun#default_config = {
 \   'tempfile': '%{tempname()}.cs',
 \   'hook/sweep/files': ['%S:p:r.exe'],
 \ },
+\ 'crystal': {
+\   'command': 'crystal',
+\   'exec': ['%c %s', '%s:p:r %a'],
+\   'tempfile': '%{tempname()}.cr',
+\   'hook/sweep/files': '%S:p:r',
+\ },
 \ 'd': {
 \   'type':
 \     executable('rdmd')           ? 'd/rdmd' :
