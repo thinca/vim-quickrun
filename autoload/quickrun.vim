@@ -57,6 +57,26 @@ let g:quickrun#default_config = {
 \   'tempfile': '%{tempname()}.c',
 \   'hook/sweep/files': ['%S:p:r.exe', '%S:p:r.obj'],
 \ },
+\ 'clojure': {
+\   'type': executable('jark') ? 'clojure/jark':
+\           executable('clj') ? 'clojure/clj':
+\           '',
+\ },
+\ 'clojure/jark': {
+\   'command': 'jark',
+\   'exec': '%c ns load %s',
+\ },
+\ 'clojure/clj': {
+\   'command': 'clj',
+\   'exec': '%c %s',
+\ },
+\ 'clojure/process_manager': {
+\   'command': 'clojure-1.5',
+\   'runner': 'process_manager',
+\   'runner/process_manager/load': '(load-file "%S")',
+\   'runner/process_manager/prompt': 'user=> ',
+\ },
+\ 'coffee': {},
 \ 'cpp': {
 \   'type':
 \     s:is_win && executable('cl') ? 'cpp/vc'  :
@@ -86,26 +106,12 @@ let g:quickrun#default_config = {
 \   'tempfile': '%{tempname()}.cpp',
 \   'hook/sweep/files': ['%S:p:r.exe', '%S:p:r.obj'],
 \ },
-\ 'clojure': {
-\   'type': executable('jark') ? 'clojure/jark':
-\           executable('clj') ? 'clojure/clj':
-\           '',
+\ 'crystal': {
+\   'command': 'crystal',
+\   'exec': ['%c %s', '%s:p:r %a'],
+\   'tempfile': '%{tempname()}.cr',
+\   'hook/sweep/files': '%S:p:r',
 \ },
-\ 'clojure/jark': {
-\   'command': 'jark',
-\   'exec': '%c ns load %s',
-\ },
-\ 'clojure/clj': {
-\   'command': 'clj',
-\   'exec': '%c %s',
-\ },
-\ 'clojure/process_manager': {
-\   'command': 'clojure-1.5',
-\   'runner': 'process_manager',
-\   'runner/process_manager/load': '(load-file "%S")',
-\   'runner/process_manager/prompt': 'user=> ',
-\ },
-\ 'coffee': {},
 \ 'cs': {
 \   'type': executable('csc')  ? 'cs/csc'  :
 \           executable('dmcs') ? 'cs/dmcs' :
@@ -143,12 +149,6 @@ let g:quickrun#default_config = {
 \   'exec': ['%c %o -out:%s:p:r.exe %s', 'mono %s:p:r.exe %a'],
 \   'tempfile': '%{tempname()}.cs',
 \   'hook/sweep/files': ['%S:p:r.exe'],
-\ },
-\ 'crystal': {
-\   'command': 'crystal',
-\   'exec': ['%c %s', '%s:p:r %a'],
-\   'tempfile': '%{tempname()}.cr',
-\   'hook/sweep/files': '%S:p:r',
 \ },
 \ 'd': {
 \   'type':
