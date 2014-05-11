@@ -417,7 +417,7 @@ let g:quickrun#default_config = {
 \ },
 \ 'typescript': {
 \   'command': 'tsc',
-\   'cmdopt': '--exec',
+\   'exec': ['%c --target es5 --module commonjs %o %s', 'node %s:r.js'],
 \   'tempfile': '%{tempname()}.ts',
 \ },
 \ 'vim': {
