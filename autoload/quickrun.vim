@@ -71,7 +71,7 @@ let g:quickrun#default_config = {
 \   'exec': '%c %s',
 \ },
 \ 'clojure/process_manager': {
-\   'command': 'clojure-1.5',
+\   'command': 'clojure-1.6',
 \   'runner': 'process_manager',
 \   'runner/process_manager/load': '(load-file "%S")',
 \   'runner/process_manager/prompt': 'user=> ',
