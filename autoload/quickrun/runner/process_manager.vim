@@ -18,6 +18,9 @@ let s:runner = {
 
 let s:P = g:quickrun#V.import('ProcessManager')
 
+" The filetype of currently-ruuning process
+let s:processing_type = ''
+
 augroup plugin-quickrun-process-manager
 augroup END
 
@@ -29,27 +32,51 @@ endfunction
 
 function! s:runner.run(commands, input, session)
   let type = a:session.config.type
+
+  if s:processing_type !=# ''
+    call a:session.output('!!!Hey wait.. Cancelling previous request. Try again after a while!!!')
+    let [_, _, t] = s:P.read(s:processing_type, [self.config.prompt])
+    if t ==# 'matched'
+      let s:processing_type = ''
+    endif
+    return 0
+  endif
+  let s:processing_type = type
+
+  let message = a:session.build_command(self.config.load)
   let [out, err, t] = s:execute(
         \ type,
         \ a:session,
         \ self.config.prompt,
-        \ a:session.build_command(self.config.load))
+        \ message)
   call a:session.output(out . (err ==# '' ? '' : printf('!!!%s!!!', err)))
   if t ==# 'matched'
+    let s:processing_type = ''
     return 0
   elseif t ==# 'inactive'
     call s:P.kill(type)
     call a:session.output('!!!process is inactive. try again.!!!')
+    let s:processing_type = ''
     return 0
-  else " 'timedout'
+  elseif t ==# 'timedout' || t ==# 'preparing'
     let key = a:session.continue()
     augroup plugin-quickrun-process-manager
       execute 'autocmd! CursorHold,CursorHoldI * call'
       \       's:receive(' . string(key) . ')'
     augroup END
+    if t ==# 'preparing'
+      let self.phase = 'preparing'
+      let self._message = message
+    else
+      let self.phase = 'ready'
+    endif
     let self._autocmd = 1
     let self._updatetime = &updatetime
     let &updatetime = 50
+  else
+    call a:session.output(printf('Must not happen. t: %s', t))
+    let s:processing_type = ''
+    return 0
   endif
 endfunction
 
@@ -58,28 +85,52 @@ function! s:execute(type, session, prompt, message)
   let cmd = g:quickrun#V.iconv(cmd, &encoding, &termencoding)
   let t = s:P.touch(a:type, cmd)
   if t ==# 'new'
-    call s:P.read_wait(a:type, 5.0, [a:prompt])
+    return ['', '', 'preparing']
   elseif t ==# 'inactive'
     return ['', '', 'inactive']
+  elseif t ==# 'existing'
+    if a:message !=# ''
+      call s:P.writeln(a:type, a:message)
+    endif
+    return s:P.read(a:type, [a:prompt])
+  else
+    throw 'Must not happen -- bug in ProcessManager.'
   endif
-  if a:message !=# ''
-    call s:P.writeln(a:type, a:message)
-  endif
-  return s:P.read(a:type, [a:prompt])
 endfunction
 
 function! s:receive(key)
-  let session = quickrun#session(a:key)
-
-  let [out, err, t] = s:P.read(session.config.type, [session.runner.config.prompt])
-  call session.output(out . (err ==# '' ? '' : printf('!!!%s!!!', err)))
-  if t ==# 'matched'
-    call session.finish(1)
-    return 1
-  else " 'timedout'
-    call feedkeys(mode() ==# 'i' ? "\<C-g>\<ESC>" : "g\<ESC>", 'n')
+  if s:_is_cmdwin()
     return 0
   endif
+
+  let session = quickrun#session(a:key)
+  if session.runner.phase == 'ready'
+    let [out, err, t] = s:P.read(session.config.type, [session.runner.config.prompt])
+    call session.output(out . (err ==# '' ? '' : printf('!!!%s!!!', err)))
+    if t ==# 'matched'
+      call session.finish(1)
+      let s:processing_type = ''
+      return 1
+    else " 'timedout'
+      " nop
+    endif
+  elseif session.runner.phase == 'preparing'
+    let [out, err, t] = s:P.read(session.config.type, [session.runner.config.prompt])
+    if t ==# 'matched'
+      let session.runner.phase = 'ready'
+      call s:P.writeln(session.config.type, session.runner._message)
+      unlet session.runner._message
+    else
+      " silently ignore preparation outputs
+    endif
+  else
+    call session.output(printf(
+          \ 'Must not happen -- it should be unreachable. phase: %s',
+          \ session.runner.phase))
+  endif
+
+  call feedkeys(mode() ==# 'i' ? "\<C-g>\<ESC>" : "g\<ESC>", 'n')
+  return 0
 endfunction
 
 function! s:runner.sweep()
@@ -93,6 +144,16 @@ endfunction
 
 function! quickrun#runner#process_manager#new()
   return deepcopy(s:runner)
+endfunction
+
+function! quickrun#runner#process_manager#kill()
+  call s:P.kill(s:processing_type)
+  let s:processing_type = ''
+endfunction
+
+" TODO use vital's
+function! s:_is_cmdwin()
+  return bufname('%') ==# '[Command Line]'
 endfunction
 
 let &cpo = s:save_cpo
