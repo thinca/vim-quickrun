@@ -472,8 +472,8 @@ default.  NOTE: Everything except for "system" can be unstable.
   runner/process_manager/load			Default: "load %s"
 	Specifies a code with placeholder to write to the stdin of an external
 	command to load and run the file you are editing. |quickrun| will
-	replace %s with the source file like |quickrun-exec-format| does. For
-	example if the value is "(load \"%s\")" and the current file you are
+	replace %s and %S with the source file like |quickrun-exec-format| does. For
+	example if the value is "(load \"%S\")" and the current file you are
 	editing is "/home/ujihisa/a.clj", |quickrun| writes
 	"(load \"/home/ujihisa/a.clj\")\n" to the process it ran based on
 	command option.
