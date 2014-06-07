@@ -415,6 +415,15 @@ let g:quickrun#default_config = {
 \   'command': 'psql',
 \   'exec': ['%c %o -f %s'],
 \ },
+\ 'swift': {
+\   'type' : executable('xcrun') ? 'swift/apple' : '',
+\ },
+\ 'swift/apple': {
+\   'command': 'xcrun',
+\   'exec': ['%c swift %s', '%s:p:r %a'],
+\   'tempfile': '%{tempname()}.swift',
+\   'hook/sweep/files': '%S:p:r',
+\ },
 \ 'typescript': {
 \   'command': 'tsc',
 \   'exec': ['%c --target es5 --module commonjs %o %s', 'node %s:r.js'],
