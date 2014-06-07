@@ -41,7 +41,6 @@ function! s:runner.run(commands, input, session)
     endif
     return 0
   endif
-  let s:processing_type = type
 
   let message = a:session.build_command(self.config.load)
   let [out, err, t] = s:execute(
@@ -73,6 +72,7 @@ function! s:runner.run(commands, input, session)
     let self._autocmd = 1
     let self._updatetime = &updatetime
     let &updatetime = 50
+    let s:processing_type = type
   else
     call a:session.output(printf('Must not happen. t: %s', t))
     let s:processing_type = ''
