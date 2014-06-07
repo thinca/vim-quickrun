@@ -242,7 +242,7 @@ let g:quickrun#default_config = {
 \ },
 \ 'io': {},
 \ 'java': {
-\   'exec': ['javac %o %s', '%c %s:t:r %a'],
+\   'exec': ['javac %o -d %s:p:h %s', '%c -cp %s:p:h %s:t:r %a'],
 \   'hook/output_encode/encoding': '&termencoding',
 \   'hook/sweep/files': '%S:p:r.class',
 \ },
