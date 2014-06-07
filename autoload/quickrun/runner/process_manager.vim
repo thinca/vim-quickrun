@@ -50,12 +50,10 @@ function! s:runner.run(commands, input, session)
         \ message)
   call a:session.output(out . (err ==# '' ? '' : printf('!!!%s!!!', err)))
   if t ==# 'matched'
-    let s:processing_type = ''
     return 0
   elseif t ==# 'inactive'
     call s:P.kill(type)
     call a:session.output('!!!process is inactive. try again.!!!')
-    let s:processing_type = ''
     return 0
   elseif t ==# 'timedout' || t ==# 'preparing'
     let key = a:session.continue()
@@ -75,7 +73,6 @@ function! s:runner.run(commands, input, session)
     let s:processing_type = type
   else
     call a:session.output(printf('Must not happen. t: %s', t))
-    let s:processing_type = ''
     return 0
   endif
 endfunction
