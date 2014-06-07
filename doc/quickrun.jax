@@ -460,8 +460,8 @@ NOTE: "system" 以外は不安定な場合があります。
   オプション ~
   runner/process_manager/load			デフォルト: "load %s"
 	起動した外部コマンドのstdinの書き込む、編集中ファイルを読み込み実行さ
-	せるための書式を指定します。%sは|quickrun-exec-format|のように、ソース
-	ファイル名に置換されます。たとえばこの値が"(load \"%s\")"で編集中ファ
+	せるための書式を指定します。%sまたは%Sは|quickrun-exec-format|のように、ソース
+	ファイル名に置換されます。たとえばこの値が"(load \"%S\")"で編集中ファ
 	イル名が"/home/ujihisa/a.clj"ならば、|quickrun|はcommandオプションによ
 	って起動されたプロセスに対し"(load \"/home/ujihisa/a.clj\")\n"という文
 	字列を書き込みます。
