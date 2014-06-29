@@ -299,7 +299,7 @@ let g:quickrun#default_config = {
 \   'command': 'clisp',
 \ },
 \ 'llvm': {
-\   'command': 'llvm-as %s -o=- | lli - %a',
+\   'exec' : 'llvm-as %s:p -o=- | lli - %a',
 \ },
 \ 'lua': {},
 \ 'lua/vim': {
