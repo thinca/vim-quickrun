@@ -432,10 +432,10 @@ RUNNER						*quickrun-module-runner*
 Runner is a module to run a program.  The following runners are available by
 default.  NOTE: Everything except for "system" can be unstable.
 
-- "runner/system"				*quickrun-module-runner/system*
+- "runner/system"			*quickrun-module-runner/system*
   Runs by |system()|.  This is the default.
 
-- "runner/shell"				*quickrun-module-runner/shell*
+- "runner/shell"			*quickrun-module-runner/shell*
   Runs by |:!|.  This ignores given outputter.
   Option ~
   runner/shell/shellcmd		Default: 'silent !"%s" & pause' for MS Windows
@@ -443,7 +443,7 @@ default.  NOTE: Everything except for "system" can be unstable.
 	The template of the Vim command to run.  This replaces %s to the
 	command given in exec option.
 
-- "runner/vimproc"				*quickrun-module-runner/vimproc*
+- "runner/vimproc"			*quickrun-module-runner/vimproc*
   {Requirement: |vimproc|}
   Runs by |vimproc| at background.  This checks if the process completed with
   using |CursorHold| |CursorHoldI| events.  If the process completed within 50
@@ -472,15 +472,15 @@ default.  NOTE: Everything except for "system" can be unstable.
   runner/process_manager/load			Default: "load %s"
 	Specifies a code with placeholder to write to the stdin of an external
 	command to load and run the file you are editing. |quickrun| will
-	replace %s and %S with the source file like |quickrun-exec-format| does. For
-	example if the value is "(load \"%S\")" and the current file you are
-	editing is "/home/ujihisa/a.clj", |quickrun| writes
+	replace %s and %S with the source file like |quickrun-exec-format|
+	does. For example if the value is "(load \"%S\")" and the current file
+	you are editing is "/home/ujihisa/a.clj", |quickrun| writes
 	"(load \"/home/ujihisa/a.clj\")\n" to the process it ran based on
 	command option.
   runner/process_manager/prompt			Default: ">>> "
 	TODO
 
-- "runner/remote"				*quickrun-module-runner/remote*
+- "runner/remote"			*quickrun-module-runner/remote*
   {Requirement: |+clientserver|}
   Runs in background and fetches the result by |+clientserver| feature.
   This requires |v:servername| to be set.  If Vim doesn't, run it with
@@ -493,13 +493,13 @@ default.  NOTE: Everything except for "system" can be unstable.
 	Runs by |vimproc| if it's available.  You can cancel the process after
 	it ran.
 
-- "runner/python"				*quickrun-module-runner/python*
+- "runner/python"			*quickrun-module-runner/python*
   {Requirement: |+python|}
   Runs by |python| thread asynchronously.
   WARNING: This is absolutely unstable.
   WARNING: Don't use this on X11.  Vim crashes.
 
-- "runner/vimscript"				*quickrun-module-runner/vimscript*
+- "runner/vimscript"			*quickrun-module-runner/vimscript*
   Runs commands as Vim commands.
   Vim command that contains |:redir| command can not run.  This gets the
   output of vim script by |:redir| command.  And, |:redir| can not nest.
@@ -511,7 +511,7 @@ OUTPUTTER					*quickrun-module-outputter*
 Outputter is a module to output the result.  The following outputters are
 available by default.
 
-- "outputter/buffer"				*quickrun-module-outputter/buffer*
+- "outputter/buffer"			*quickrun-module-outputter/buffer*
   quickrun opens output buffer and displays to the output buffer.  If output
   buffer already exists, quickrun uses it.
   Option ~
@@ -538,13 +538,13 @@ available by default.
   outputter_buffer_opened
 	When the output buffer is opened.
 
-- "outputter/message"				*quickrun-module-outputter/message*
+- "outputter/message"			*quickrun-module-outputter/message*
   Outputs on |messages|.
   Option ~
   outputter/message/log			Default: 0
 	Outputs on |message-history| is it's 1.
 
-- "outputter/variable"				*quickrun-module-outputter/variable*
+- "outputter/variable"			*quickrun-module-outputter/variable*
   Outputs on a variable.  You also can let it output on an environment
   variable or an option.
   Option ~
@@ -553,7 +553,7 @@ available by default.
   outputter/variable/append		Default: 0
 	Appends if it's 1.
 
-- "outputter/file"				*quickrun-module-outputter/file*
+- "outputter/file"			*quickrun-module-outputter/file*
   Outputs on a file.
   Option ~
   outputter/file/name			Default: ''
@@ -561,13 +561,13 @@ available by default.
   outputter/file/append		Default: 0
 	Appends if it's 1.
 
-- "outputter/quickfix"				*quickrun-module-outputter/quickfix*
+- "outputter/quickfix"			*quickrun-module-outputter/quickfix*
   Outputs on |quickfix|.
   Option ~
   outputter/quickfix/errorformat		Default: "&errorformat"
 	'errorformat' option to parse the output.
 
-- "outputter/browser"				*quickrun-module-outputter/browser*
+- "outputter/browser"			*quickrun-module-outputter/browser*
   {Requires |open-browser|}
   Opens the output on browser, using |open-browser|.
   Option ~
@@ -578,19 +578,19 @@ available by default.
   outputter/browser/append		Default: 0
 	Appends if it's 1.
 
-- "outputter/buffered"				*quickrun-module-outputter/buffered*
+- "outputter/buffered"			*quickrun-module-outputter/buffered*
   Buffers the output, and shows the whole result at once finally.
   Option ~
   outputter/buffered/target		Default: ''
 	The outputter to show the result.
 
-- "outputter/multi"				*quickrun-module-outputter/multi*
+- "outputter/multi"			*quickrun-module-outputter/multi*
   Outputs multiple outputters at the same time.
   Option ~
   outputter/multi/targets		Default: []
 	A list of outputters to output.
 
-- "outputter/error"				*quickrun-module-outputter/error*
+- "outputter/error"			*quickrun-module-outputter/error*
   Switches where to output based on the exit status; 0 means success.  Note
   that some runners only can give success.
   This buffers because this waits the process terminates.
@@ -600,7 +600,7 @@ available by default.
   outputter/error/error			Default: "null"
 	The outputter when it failed.
 
-- "outputter/null"				*quickrun-module-outputter/null*
+- "outputter/null"			*quickrun-module-outputter/null*
   No outputs.
 
 
