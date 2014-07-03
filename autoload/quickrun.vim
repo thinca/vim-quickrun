@@ -636,7 +636,7 @@ function! s:Session.build_command(tmpl)
   \  'a': config.args,
   \  '%': '%',
   \}
-  let rest = a:tmpl
+  let rest = quickrun#expand(a:tmpl)
   let result = ''
   while 1
     let pos = match(rest, '%')
@@ -674,7 +674,7 @@ function! s:Session.build_command(tmpl)
     endif
     let result .= value
   endwhile
-  return substitute(quickrun#expand(result), '[\r\n]\+', ' ', 'g')
+  return substitute(result, '[\r\n]\+', ' ', 'g')
 endfunction
 
 function! s:Session.tempname(...)
