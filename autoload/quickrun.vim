@@ -72,9 +72,10 @@ let g:quickrun#default_config = {
 \ },
 \ 'clojure/process_manager': {
 \   'command': 'clojure-1.6',
+\   'cmdopt': '-e ''(clojure.main/repl :prompt #(print "\nquickrun/pm=> "))''',
 \   'runner': 'process_manager',
 \   'runner/process_manager/load': '(load-file "%S")',
-\   'runner/process_manager/prompt': 'user=> ',
+\   'runner/process_manager/prompt': 'quickrun/pm=> ',
 \ },
 \ 'coffee': {},
 \ 'cpp': {
