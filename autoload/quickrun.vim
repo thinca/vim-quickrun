@@ -534,7 +534,7 @@ function! s:Session.setup()
     call self.invoke_hook('module_loaded')
 
     let commands = copy(self.config.exec)
-    call filter(map(commands, 'self.build_command(v:val)'),
+    call filter(map(commands, 'self.build_command(quickrun#expand(v:val))'),
     \           'v:val =~# "\\S"')
     let self.commands = commands
   catch /^quickrun:/
@@ -637,7 +637,7 @@ function! s:Session.build_command(tmpl)
   \  'a': config.args,
   \  '%': '%',
   \}
-  let rest = quickrun#expand(a:tmpl)
+  let rest = a:tmpl
   let result = ''
   while 1
     let pos = match(rest, '%')
