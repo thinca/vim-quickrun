@@ -56,7 +56,7 @@ function! s:runner.run(commands, input, session)
     call insert(scriptbody, '@echo off')
     call map(scriptbody, 'v:val . "\r"')
   endif
-  call map(scriptbody, 'g:quickrun#V.iconv(v:val, &encoding, &termencoding)')
+  call map(scriptbody, 'g:quickrun#V.Process.iconv(v:val, &encoding, &termencoding)')
   call a:session.tempname(script)
   call writefile(scriptbody, script, 'b')
 

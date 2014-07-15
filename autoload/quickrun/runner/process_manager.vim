@@ -79,7 +79,7 @@ endfunction
 
 function! s:execute(type, session, prompt, message)
   let cmd = printf("%s %s", a:session.config.command, a:session.config.cmdopt)
-  let cmd = g:quickrun#V.iconv(cmd, &encoding, &termencoding)
+  let cmd = g:quickrun#V.Process.iconv(cmd, &encoding, &termencoding)
   let t = s:P.touch(a:type, cmd)
   if t ==# 'new'
     return ['', '', 'preparing']

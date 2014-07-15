@@ -6,12 +6,18 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-let s:V = vital#of('quickrun').load('Data.List', 'System.File', 'System.Filepath')
+let s:V = vital#of('quickrun').load(
+\   'Data.List',
+\   'System.File',
+\   'System.Filepath',
+\   'Vim.Message',
+\   'Process',
+\   'Prelude')
 unlet! g:quickrun#V
 let g:quickrun#V = s:V
 lockvar! g:quickrun#V
 
-let s:is_win = s:V.is_windows()
+let s:is_win = s:V.Prelude.is_windows()
 
 " Default config.  " {{{1
 unlet! g:quickrun#default_config
@@ -487,7 +493,7 @@ function! s:Session.normalize(config)
       " Executes on the temporary file.
       let body = s:get_region(config.region)
 
-      let body = s:V.iconv(body, &encoding, &fileencoding)
+      let body = s:V.Process.iconv(body, &encoding, &fileencoding)
 
       if &l:fileformat ==# 'mac'
         let body = substitute(body, "\n", "\r", 'g')
@@ -741,7 +747,7 @@ function! s:Session.invoke_hook(point, ...)
   let hooks = s:V.Data.List.sort_by(hooks, 'v:val[1]')
   let hooks = map(hooks, 'v:val[0]')
   for hook in hooks
-    if has_key(hook, func) && s:V.is_funcref(hook[func])
+    if has_key(hook, func) && s:V.Prelude.is_funcref(hook[func])
       call call(hook[func], [self, context], hook)
     endif
   endfor
@@ -836,7 +842,7 @@ function! quickrun#command(config, use_range, line1, line2)
     endif
     call quickrun#run([config, a:config])
   catch /^quickrun:/
-    call s:V.print_error(v:exception)
+    call s:V.Vim.Message.error(v:exception)
   endtry
 endfunction
 
@@ -1102,8 +1108,8 @@ function! s:build_module(module, configs)
         \            name]
           if has_key(config, conf)
             let val = config[conf]
-            if s:V.is_list(a:module.config[name])
-              let a:module.config[name] += s:V.is_list(val) ? val : [val]
+            if s:V.Prelude.is_list(a:module.config[name])
+              let a:module.config[name] += s:V.Prelude.is_list(val) ? val : [val]
             else
               let a:module.config[name] = val
             endif

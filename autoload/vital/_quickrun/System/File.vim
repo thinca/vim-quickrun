@@ -9,6 +9,10 @@ let s:is_cygwin = has('win32unix')
 let s:is_mac = !s:is_windows && !s:is_cygwin
       \ && (has('mac') || has('macunix') || has('gui_macvim') ||
       \   (!isdirectory('/proc') && executable('sw_vers')))
+" As of 7.4.122, the system()'s 1st argument is converted internally by Vim.
+" Note that Patch 7.4.122 does not convert system()'s 2nd argument and
+" return-value. We must convert them manually.
+let s:need_trans = v:version < 704 || (v:version == 704 && !has('patch122'))
 
 " Open a file.
 function! s:open(filename) "{{{
@@ -17,7 +21,9 @@ function! s:open(filename) "{{{
   " Detect desktop environment.
   if s:is_windows
     " For URI only.
-    let filename = iconv(filename, &encoding, 'char')
+    if s:need_trans
+      let filename = iconv(filename, &encoding, 'char')
+    endif
     silent execute '!start rundll32 url.dll,FileProtocolHandler' filename
   elseif s:is_cygwin
     " Cygwin.
@@ -52,8 +58,10 @@ endfunction "}}}
 
 " Move a file.
 " Dispatch s:move_exe() or s:move_vim().
+" FIXME: Currently s:move_vim() does not support
+" moving a directory.
 function! s:move(src, dest) "{{{
-  if s:_has_move_exe()
+  if s:_has_move_exe() || isdirectory(a:src)
     return s:move_exe(a:src, a:dest)
   else
     return s:move_vim(a:src, a:dest)
@@ -80,16 +88,25 @@ if s:is_unix
   function! s:move_exe(src, dest)
     if !s:_has_move_exe() | return 0 | endif
     let [src, dest] = [a:src, a:dest]
-    silent execute '!mv' shellescape(src) shellescape(dest)
+    call system('mv ' . shellescape(src) . ' ' . shellescape(dest))
     return !v:shell_error
   endfunction
 elseif s:is_windows
   function! s:move_exe(src, dest)
     if !s:_has_move_exe() | return 0 | endif
     let [src, dest] = [a:src, a:dest]
-    let src  = substitute(src, '/', '\', 'g')
-    let dest = substitute(dest, '/', '\', 'g')
-    silent execute '!cmd /c move' src dest
+    " Normalize successive slashes to one slash.
+    let src  = substitute(src, '[/\\]\+', '\', 'g')
+    let dest = substitute(dest, '[/\\]\+', '\', 'g')
+    " src must not have trailing '\'.
+    let src  = substitute(src, '\\$', '', 'g')
+    " All characters must be encoded to system encoding.
+    if s:need_trans
+      let src  = iconv(src, &encoding, 'char')
+      let dest = iconv(dest, &encoding, 'char')
+    endif
+    let cmd_exe = (&shell =~? 'cmd\.exe$' ? '' : 'cmd /c ')
+    call system(cmd_exe . 'move /y ' . src  . ' ' . dest)
     return !v:shell_error
   endfunction
 else
@@ -99,7 +116,7 @@ else
 endif
 
 " Move a file.
-" Implemented by pure vimscript.
+" Implemented by pure Vim script.
 function! s:move_vim(src, dest) "{{{
   return !rename(a:src, a:dest)
 endfunction "}}}
@@ -134,7 +151,7 @@ if s:is_unix
   function! s:copy_exe(src, dest)
     if !s:_has_copy_exe() | return 0 | endif
     let [src, dest] = [a:src, a:dest]
-    silent execute '!cp' shellescape(src) shellescape(dest)
+    call system('cp ' . shellescape(src) . ' ' . shellescape(dest))
     return !v:shell_error
   endfunction
 elseif s:is_windows
@@ -143,7 +160,8 @@ elseif s:is_windows
     let [src, dest] = [a:src, a:dest]
     let src  = substitute(src, '/', '\', 'g')
     let dest = substitute(dest, '/', '\', 'g')
-    silent execute '!cmd /c copy' src dest
+    let cmd_exe = (&shell =~? 'cmd\.exe$' ? '' : 'cmd /c ')
+    call system(cmd_exe . 'copy /y ' . src . ' ' . dest)
     return !v:shell_error
   endfunction
 else
@@ -153,7 +171,7 @@ else
 endif
 
 " Copy a file.
-" Implemented by pure vimscript.
+" Implemented by pure Vim script.
 function! s:copy_vim(src, dest) "{{{
   let ret = writefile(readfile(a:src, "b"), a:dest, "b")
   if ret == -1
@@ -166,7 +184,11 @@ endfunction "}}}
 " Returns true if success.
 " Returns false if failure.
 function! s:mkdir_nothrow(...) "{{{
-  silent! return call('mkdir', a:000)
+  try
+    return call('mkdir', a:000)
+  catch
+    return 0
+  endtry
 endfunction "}}}
 
 
@@ -178,7 +200,8 @@ if s:is_unix
     let cmd .= flags =~# 'f' && cmd ==# 'rm -r' ? ' -f' : ''
     let ret = system(cmd . ' ' . shellescape(a:path))
     if v:shell_error
-      throw substitute(iconv(ret, 'char', &encoding), '\n', '', 'g')
+      let ret = iconv(ret, 'char', &encoding)
+      throw substitute(ret, '\n', '', 'g')
     endif
   endfunction
 
@@ -196,12 +219,13 @@ elseif s:is_windows
       let ret = system(cmd . ' "' . a:path . '"')
     endif
     if v:shell_error
-      throw substitute(iconv(ret, 'char', &encoding), '\n', '', 'g')
+      let ret = iconv(ret, 'char', &encoding)
+      throw substitute(ret, '\n', '', 'g')
     endif
   endfunction
 
 else
-  function! s:rmdir(path, ...)
+  function! s:rmdir(...)
     throw 'vital: System.File.rmdir(): your platform is not supported'
   endfunction
 endif

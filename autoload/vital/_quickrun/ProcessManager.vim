@@ -1,20 +1,20 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-let s:_auto_label = -1
 let s:_processes = {}
 
 function! s:_vital_loaded(V)
   let s:V = a:V
   let s:S = s:V.import('Data.String')
+  let s:P = s:V.import('Process')
 endfunction
 
 function! s:_vital_depends()
-  return ['Data.String']
+  return ['Data.String', 'Process']
 endfunction
 
 function! s:is_available()
-  return s:V.has_vimproc()
+  return s:P.has_vimproc()
 endfunction
 
 function! s:touch(name, cmd)
@@ -25,18 +25,6 @@ function! s:touch(name, cmd)
     let s:_processes[a:name] = p
     return 'new'
   endif
-endfunction
-
-function! s:new(cmd)
-  let p = vimproc#popen3(a:cmd)
-  let s:_auto_label += 1
-  let s:_processes[s:_auto_label] = p
-  return s:_auto_label
-endfunction
-
-function! s:stop(i)
-  echomsg "Vital.ProcessManager.stop() is deprecated! Please use kill() or term() instead."
-  return s:kill(a:i)
 endfunction
 
 function! s:_stop(i, ...)
@@ -118,8 +106,9 @@ function! s:status(i)
   " return p.kill(0) ? 'inactive' : 'active'
   " ... checkpid() checks if the process is running AND does waitpid() in C,
   " so it solves zombie processes.
-  return get(p.checkpid(), 0, '') ==# 'run' ?
-        \ 'active' : 'inactive'
+  return get(p.checkpid(), 0, '') ==# 'run'
+        \ ? 'active'
+        \ : 'inactive'
 endfunction
 
 function! s:debug_processes()

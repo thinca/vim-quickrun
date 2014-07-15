@@ -1,7 +1,10 @@
-0ebe83b
+quickrun
+439e6d2
 
 Data.List
 System.File
 System.Filepath
 Prelude
 ProcessManager
+Process
+Vim.Message
