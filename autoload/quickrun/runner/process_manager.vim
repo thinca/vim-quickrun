@@ -47,17 +47,17 @@ function! s:runner.run(commands, input, session)
   call s:P.touch(type, cmd)
   let state = s:P.state(type)
   if state ==# 'undefined' || state ==# 'inactive'
-    let [out, err, t] = ['', '', 'preparing']
+    let t = 'preparing'
   elseif state ==# 'idle'
     if message !=# ''
       call s:P.writeln(type, message)
     endif
     let [out, err, t] = s:P.read(type, [self.config.prompt])
+    call a:session.output(out . (err ==# '' ? '' : printf('!!!%s!!!', err)))
   else " 'reading' is already checked
     throw 'Must not happen -- bug in ProcessManager.'
   endif
 
-  call a:session.output(out . (err ==# '' ? '' : printf('!!!%s!!!', err)))
   if t ==# 'matched'
     return 0
   elseif t ==# 'inactive'
