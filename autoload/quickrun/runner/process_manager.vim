@@ -18,8 +18,8 @@ let s:runner = {
 
 let s:P = g:quickrun#V.import('ProcessManager')
 
-" The filetype of currently-ruuning process
-let s:processing_type = ''
+" The filetype of the process you ran last time
+let s:last_process_type = ''
 
 augroup plugin-quickrun-process-manager
 augroup END
@@ -33,22 +33,33 @@ endfunction
 function! s:runner.run(commands, input, session)
   let type = a:session.config.type
 
-  if s:processing_type !=# ''
-    call a:session.output('!!!Hey wait.. Cancelling previous request. Try again after a while!!!')
-    let [_, _, t] = s:P.read(s:processing_type, [self.config.prompt])
-    if t ==# 'matched'
-      let s:processing_type = ''
-    endif
+  let message = a:session.build_command(self.config.load)
+  if message ==# ''
     return 0
   endif
 
-  let message = a:session.build_command(self.config.load)
-  let [out, err, t] = s:execute(
-        \ type,
-        \ a:session,
-        \ self.config.prompt,
-        \ message)
-  call a:session.output(out . (err ==# '' ? '' : printf('!!!%s!!!', err)))
+  if s:last_process_type !=# '' && s:P.state(s:last_process_type) == 'reading'
+    call a:session.output('!!!Hey wait.. Cancelling previous request. Try again!!!')
+    call s:P.kill(s:last_process_type)
+    return 0
+  endif
+
+  let s:last_process_type = type
+
+  let cmd = printf("%s %s", a:session.config.command, a:session.config.cmdopt)
+  let cmd = g:quickrun#V.Process.iconv(cmd, &encoding, &termencoding)
+  call s:P.touch(type, cmd)
+  let state = s:P.state(type)
+  if state ==# 'undefined' || state ==# 'inactive'
+    let t = 'preparing'
+  elseif state ==# 'idle'
+    call s:P.writeln(type, message)
+    let [out, err, t] = s:P.read(type, [self.config.prompt])
+    call a:session.output(out . (err ==# '' ? '' : printf('!!!%s!!!', err)))
+  else " 'reading' is already checked
+    throw 'Must not happen -- bug in ProcessManager.'
+  endif
+
   if t ==# 'matched'
     return 0
   elseif t ==# 'inactive'
@@ -70,28 +81,9 @@ function! s:runner.run(commands, input, session)
     let self._autocmd = 1
     let self._updatetime = &updatetime
     let &updatetime = 50
-    let s:processing_type = type
   else
     call a:session.output(printf('Must not happen. t: %s', t))
     return 0
-  endif
-endfunction
-
-function! s:execute(type, session, prompt, message)
-  let cmd = printf("%s %s", a:session.config.command, a:session.config.cmdopt)
-  let cmd = g:quickrun#V.Process.iconv(cmd, &encoding, &termencoding)
-  let t = s:P.touch(a:type, cmd)
-  if t ==# 'new'
-    return ['', '', 'preparing']
-  elseif t ==# 'inactive'
-    return ['', '', 'inactive']
-  elseif t ==# 'existing'
-    if a:message !=# ''
-      call s:P.writeln(a:type, a:message)
-    endif
-    return s:P.read(a:type, [a:prompt])
-  else
-    throw 'Must not happen -- bug in ProcessManager.'
   endif
 endfunction
 
@@ -106,7 +98,6 @@ function! s:receive(key)
     call session.output(out . (err ==# '' ? '' : printf('!!!%s!!!', err)))
     if t ==# 'matched'
       call session.finish(1)
-      let s:processing_type = ''
       return 1
     else " 'timedout'
       " nop
@@ -144,8 +135,7 @@ function! quickrun#runner#process_manager#new()
 endfunction
 
 function! quickrun#runner#process_manager#kill()
-  call s:P.kill(s:processing_type)
-  let s:processing_type = ''
+  call s:P.kill(s:last_process_type)
 endfunction
 
 " TODO use vital's
