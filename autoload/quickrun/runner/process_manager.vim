@@ -83,8 +83,6 @@ function! s:execute(type, session, prompt, message)
   let t = s:P.touch(a:type, cmd)
   if t ==# 'new'
     return ['', '', 'preparing']
-  elseif t ==# 'inactive'
-    return ['', '', 'inactive']
   elseif t ==# 'existing'
     if a:message !=# ''
       call s:P.writeln(a:type, a:message)
