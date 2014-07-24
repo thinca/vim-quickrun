@@ -64,8 +64,9 @@ function! s:runner.run(commands, input, session)
     return 0
   elseif t ==# 'inactive'
     call s:P.kill(type)
-    call a:session.output('!!!process is inactive. try again.!!!')
-    return 0
+    call g:quickrun#V.Vim.Message.warn('process is inactive. Restarting...')
+    call a:session.finish()
+    return a:session.run()
   elseif t ==# 'timedout' || t ==# 'preparing'
     let key = a:session.continue()
     augroup plugin-quickrun-process-manager
