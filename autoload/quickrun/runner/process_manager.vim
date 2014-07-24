@@ -33,6 +33,11 @@ endfunction
 function! s:runner.run(commands, input, session)
   let type = a:session.config.type
 
+  let message = a:session.build_command(self.config.load)
+  if message ==# ''
+    return 0
+  endif
+
   if s:last_process_type !=# '' && s:P.state(s:last_process_type) == 'reading'
     call a:session.output('!!!Hey wait.. Cancelling previous request. Try again after a while!!!')
     call s:P.read(s:last_process_type, [self.config.prompt])
@@ -41,7 +46,6 @@ function! s:runner.run(commands, input, session)
 
   let s:last_process_type = type
 
-  let message = a:session.build_command(self.config.load)
   let cmd = printf("%s %s", a:session.config.command, a:session.config.cmdopt)
   let cmd = g:quickrun#V.Process.iconv(cmd, &encoding, &termencoding)
   call s:P.touch(type, cmd)
@@ -49,9 +53,7 @@ function! s:runner.run(commands, input, session)
   if state ==# 'undefined' || state ==# 'inactive'
     let t = 'preparing'
   elseif state ==# 'idle'
-    if message !=# ''
-      call s:P.writeln(type, message)
-    endif
+    call s:P.writeln(type, message)
     let [out, err, t] = s:P.read(type, [self.config.prompt])
     call a:session.output(out . (err ==# '' ? '' : printf('!!!%s!!!', err)))
   else " 'reading' is already checked
