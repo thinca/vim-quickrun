@@ -44,11 +44,21 @@ function! s:runner.run(commands, input, session)
   let s:last_process_type = type
 
   let message = a:session.build_command(self.config.load)
-  let [out, err, t] = s:execute(
-        \ type,
-        \ a:session,
-        \ self.config.prompt,
-        \ message)
+  let cmd = printf("%s %s", a:session.config.command, a:session.config.cmdopt)
+  let cmd = g:quickrun#V.Process.iconv(cmd, &encoding, &termencoding)
+  call s:P.touch(type, cmd)
+  let state = s:P.state(type)
+  if state ==# 'undefined' || state ==# 'inactive'
+    let [out, err, t] = ['', '', 'preparing']
+  elseif state ==# 'idle'
+    if message !=# ''
+      call s:P.writeln(type, message)
+    endif
+    let [out, err, t] = s:P.read(type, [self.config.prompt])
+  else " 'reading' is already checked
+    throw 'Must not happen -- bug in ProcessManager.'
+  endif
+
   call a:session.output(out . (err ==# '' ? '' : printf('!!!%s!!!', err)))
   if t ==# 'matched'
     return 0
@@ -74,22 +84,6 @@ function! s:runner.run(commands, input, session)
   else
     call a:session.output(printf('Must not happen. t: %s', t))
     return 0
-  endif
-endfunction
-
-function! s:execute(type, session, prompt, message)
-  let cmd = printf("%s %s", a:session.config.command, a:session.config.cmdopt)
-  let cmd = g:quickrun#V.Process.iconv(cmd, &encoding, &termencoding)
-  let t = s:P.touch(a:type, cmd)
-  if t ==# 'new'
-    return ['', '', 'preparing']
-  elseif t ==# 'existing'
-    if a:message !=# ''
-      call s:P.writeln(a:type, a:message)
-    endif
-    return s:P.read(a:type, [a:prompt])
-  else
-    throw 'Must not happen -- bug in ProcessManager.'
   endif
 endfunction
 
