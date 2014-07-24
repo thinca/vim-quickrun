@@ -39,8 +39,8 @@ function! s:runner.run(commands, input, session)
   endif
 
   if s:last_process_type !=# '' && s:P.state(s:last_process_type) == 'reading'
-    call a:session.output('!!!Hey wait.. Cancelling previous request. Try again after a while!!!')
-    call s:P.read(s:last_process_type, [self.config.prompt])
+    call a:session.output('!!!Hey wait.. Cancelling previous request. Try again!!!')
+    call s:P.kill(s:last_process_type)
     return 0
   endif
 
