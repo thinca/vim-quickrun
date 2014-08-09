@@ -91,7 +91,7 @@ COMMANDS					*quickrun-commands*
 
 						*:QuickRun*
 :[range]QuickRun [{type}] [<{input}] [>[>][{output}]] [-option value]...
-	Execute program with misc. options.
+	Execute program with options.
 	See |quickrun-options| for supported options.
 	Options are pairs of names, values like:
 >
@@ -110,7 +110,7 @@ COMMANDS					*quickrun-commands*
 	>>{output} is abbreviation to -append 1 -output {output}
 
 	|:Quickrun| can take |:range|.
-	if it was not given, |:QuickRun| treats whole lines.
+	If it was not given, |:QuickRun| treats whole lines.
 	If you specify '<,'> and do not specify -mode
 	(|quickrun-option-mode|), target is selected text in visual mode.  And
 	|blockwise-visual| also works.  But when |:QuickRun| is executed from
@@ -253,7 +253,7 @@ runner					*quickrun-option-runner*
 			|quickrun-module-runner|.
 
 mode					*quickrun-option-mode*
-			This value is one of n, v, o .
+			This value is one of "n", "v", "o".
 			This changes behavior of getting the range text.
 			Normally this is automatically set by quickrun.
 			But you need to care this value
@@ -366,8 +366,8 @@ Here is the order to have higher priorities.
 6. |g:quickrun#default_config|'s '_'
 
 If you set {type} with 1 or 2, it will be loaded by 3 and 4.
-In addition, if you set {type} with 3 or 4, {type} is overwrote and reload the
-current (3 or 4) config.  Note infinite loop.
+In addition, if you set {type} with 3 or 4, {type} will overwrite and reload
+the current (3 or 4) config.  Note infinite loop.
 
 
 ==============================================================================
@@ -447,10 +447,10 @@ default.  NOTE: Everything except for "system" can be unstable.
   {Requirement: |vimproc|}
   Runs by |vimproc| at background.  This checks if the process completed with
   using |CursorHold| |CursorHoldI| events.  If the process completed within 50
-  millisecond, it shows the result immediately.
+  milliseconds, it shows the result immediately.
   Option ~
   runner/vimproc/sleep			Default: 50
-	Waits specified times in millisecond.  This is useful to avoid polling
+	Waits specified times in milliseconds.  This is useful to avoid polling
 	by 'updatetime' when program will stop immediately.
   runner/vimproc/updatetime		Default: 0
 	Changes 'updatetime' to the value temporary.  Stays same if this is 0.
