@@ -445,9 +445,7 @@ let g:quickrun#default_config = {
 \ },
 \ 'swift/apple': {
 \   'command': 'xcrun',
-\   'exec': ['%c swift %s', '%s:p:r %a'],
-\   'tempfile': '%{tempname()}.swift',
-\   'hook/sweep/files': '%S:p:r',
+\   'exec': ['%c swift %s'],
 \ },
 \ 'typescript': {
 \   'command': 'tsc',
