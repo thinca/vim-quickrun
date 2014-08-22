@@ -347,6 +347,10 @@ let g:quickrun#default_config = {
 \   'hook/sweep/files': '%S:p:r',
 \ },
 \ 'ocaml': {},
+\ 'fsharp': {
+\   'command': 'fsharpi',
+\   'cmdopt': '--nologo',
+\ },
 \ 'perl': {
 \   'hook/eval/template': join([
 \     'use Data::Dumper',
