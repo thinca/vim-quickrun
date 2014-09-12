@@ -218,8 +218,22 @@ let g:quickrun#default_config = {
 \   'hook/sweep/files': ['%S:p:r'],
 \ },
 \ 'fsharp': {
-\   'command': 'fsharpi',
+\   'type': executable('fsharpc') ? 'fsharp/mono' :
+\           executable('fsc') ? 'fsharp/vs' : '',
+\ },
+\ 'fsharp/mono': {
+\   'exec': ['%c %o --out:%s:p:r.exe %s', 'mono %s:p:r.exe %a'],
+\   'command': 'fsharpc',
 \   'cmdopt': '--nologo',
+\   'hook/sweep/files': '%S:p:r.exe',
+\   'tempfile': '%{fnamemodify(tempname(), ":r")}.fs',
+\ },
+\ 'fsharp/vs': {
+\   'exec': ['%c %o --out:%s:p:r.exe %s', '%s:p:r.exe %a'],
+\   'command': 'fsc',
+\   'cmdopt': '--nologo',
+\   'hook/sweep/files': '%S:p:r.exe',
+\   'tempfile': '%{fnamemodify(tempname(), ":r")}.fs',
 \ },
 \ 'go': {
 \   'command': 'go',
