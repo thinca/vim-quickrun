@@ -1113,6 +1113,18 @@ function! s:build_config(config)
       call extend(config, new_config, 'keep')
     endif
   endfor
+
+  if config.type ==# ''
+    if empty(&filetype)
+      let l:ft=input('quickrun: filetype is not set, enter it here: ')
+      if !empty(l:ft)
+        exec 'set filetype='.l:ft
+        "try again
+        return s:build_config(a:config)
+      endif
+    endif
+  endif
+
   return config
 endfunction
 
