@@ -217,6 +217,10 @@ let g:quickrun#default_config = {
 \   'tempfile': '%{tempname()}.f95',
 \   'hook/sweep/files': ['%S:p:r'],
 \ },
+\ 'fsharp': {
+\   'command': 'fsharpi',
+\   'cmdopt': '--nologo',
+\ },
 \ 'go': {
 \   'command': 'go',
 \   'exec': '%c run %s:p:t %a',
@@ -347,10 +351,6 @@ let g:quickrun#default_config = {
 \   'hook/sweep/files': '%S:p:r',
 \ },
 \ 'ocaml': {},
-\ 'fsharp': {
-\   'command': 'fsharpi',
-\   'cmdopt': '--nologo',
-\ },
 \ 'perl': {
 \   'hook/eval/template': join([
 \     'use Data::Dumper',
