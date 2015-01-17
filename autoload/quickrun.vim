@@ -361,7 +361,7 @@ let g:quickrun#default_config = {
 \   'command': 'markdown_py',
 \ },
 \ 'nim': {
-\   'cmdopt': 'compile --run',
+\   'cmdopt': 'compile --run --verbosity:0',
 \   'hook/sweep/files': '%S:p:r',
 \ },
 \ 'ocaml': {},
