@@ -360,7 +360,7 @@ let g:quickrun#default_config = {
 \ 'markdown/markdown_py': {
 \   'command': 'markdown_py',
 \ },
-\ 'nimrod': {
+\ 'nim': {
 \   'cmdopt': 'compile --run',
 \   'hook/sweep/files': '%S:p:r',
 \ },
