@@ -363,6 +363,7 @@ let g:quickrun#default_config = {
 \ 'nim': {
 \   'cmdopt': 'compile --run --verbosity:0',
 \   'hook/sweep/files': '%S:p:r',
+\   'tempfile': '%{substitute(tempname(), ''/\(\d\+\)$'', ''nim\1'', '''')}.nim'
 \ },
 \ 'ocaml': {},
 \ 'perl': {
