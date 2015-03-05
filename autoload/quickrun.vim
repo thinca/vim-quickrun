@@ -312,10 +312,10 @@ let g:quickrun#default_config = {
 \ },
 \ 'kotlin': {
 \   'exec': [
-\     'kotlinc-jvm %s -jar %s:p:r.jar',
-\     'java -Xbootclasspath/a:%%{fnamemodify(' .
-\       'g:quickrun#V.System.Filepath.which("kotlinc-jvm"), ":h")}' .
-\       '/../lib/kotlin-runtime.jar -jar %s:p:r.jar'
+\     'kotlinc-jvm %s -d %s:p:r.jar',
+\     'java -Xbootclasspath/a:%{shellescape(fnamemodify(' .
+\       'fnamemodify(g:quickrun#V.System.Filepath.which("kotlinc-jvm"), ":h") . "/../lib/kotlin-runtime.jar", ":p"))}' .
+\       ' -jar %s:p:r.jar'
 \   ],
 \   'tempfile': '%{tempname()}.kt',
 \   'hook/sweep/files': ['%S:p:r.jar'],
