@@ -118,7 +118,8 @@ function! s:receive(key)
           \ session.runner.phase))
   endif
 
-  call feedkeys(mode() ==# 'i' ? "\<C-g>\<ESC>" : "g\<ESC>", 'n')
+  let input = mode() =~# '[iR]' ? "\<C-r>\<ESC>" : "g\<ESC>" . v:count
+  call feedkeys(input, 'n')
   return 0
 endfunction
 
