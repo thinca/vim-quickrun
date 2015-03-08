@@ -77,8 +77,7 @@ function! s:receive_vimproc_result(key)
     endif
 
     if !(vimproc.stdout.eof && vimproc.stderr.eof)
-      let input = mode() =~# '[iR]' ? "\<C-r>\<ESC>" : "g\<ESC>" . v:count
-      call feedkeys(input, 'n')
+      call quickrun#trigger_keys()
       return 0
     endif
   catch

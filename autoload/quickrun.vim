@@ -1011,6 +1011,15 @@ function! quickrun#config(config)
   throw 'quickrun: Unsupported config type: ' . type(a:config)
 endfunction
 
+function! quickrun#trigger_keys() abort
+  if mode() =~# '[iR]'
+    let input = "\<C-r>\<ESC>"
+  else
+    let input = "g\<ESC>" . (0 < v:count ? v:count : '')
+  endif
+  call feedkeys(input, 'n')
+endfunction
+
 
 " Misc functions.  {{{1
 function! s:parse_argline(argline)
