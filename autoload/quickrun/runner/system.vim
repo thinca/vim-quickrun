@@ -7,7 +7,7 @@ set cpo&vim
 
 let s:runner = {}
 
-function! s:runner.run(commands, input, session)
+function! s:runner.run(commands, input, session) abort
   let code = 0
   for cmd in a:commands
     let [result, code] = s:execute(cmd, a:input)
@@ -19,7 +19,7 @@ function! s:runner.run(commands, input, session)
   return code
 endfunction
 
-function! s:execute(cmd, input)
+function! s:execute(cmd, input) abort
   if a:cmd =~# '^\s*:'
     " A vim command.
     try
@@ -50,7 +50,7 @@ function! s:execute(cmd, input)
 endfunction
 
 
-function! quickrun#runner#system#new()
+function! quickrun#runner#system#new() abort
   return deepcopy(s:runner)
 endfunction
 

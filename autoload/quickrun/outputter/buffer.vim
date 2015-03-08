@@ -17,12 +17,12 @@ let s:outputter = {
 \   }
 \ }
 
-function! s:outputter.init(session)
+function! s:outputter.init(session) abort
   let self._append = self.config.append
   let self._line = 0
 endfunction
 
-function! s:outputter.start(session)
+function! s:outputter.start(session) abort
   call s:open_result_window(self.config, a:session)
   if !self._append
     silent % delete _
@@ -31,7 +31,7 @@ function! s:outputter.start(session)
   call s:back_to_previous_window()
 endfunction
 
-function! s:outputter.output(data, session)
+function! s:outputter.output(data, session) abort
   call s:open_result_window(self.config, a:session)
   if self._line == 0
     let self._line = line('$')
@@ -58,7 +58,7 @@ function! s:outputter.output(data, session)
   redraw
 endfunction
 
-function! s:outputter.finish(session)
+function! s:outputter.finish(session) abort
   call s:open_result_window(self.config, a:session)
   execute self._line
   silent normal! zt
@@ -70,13 +70,13 @@ function! s:outputter.finish(session)
   redraw
   if closed
     echohl MoreMsg
-    echomsg "quickrun: outputter/buffer: Empty output."
+    echomsg 'quickrun: outputter/buffer: Empty output.'
     echohl NONE
   endif
 endfunction
 
 
-function! s:open_result_window(config, session)
+function! s:open_result_window(config, session) abort
   let w:quickrun_outputter_buffer_prevwin = 1
   let sp = a:config.split
   let sname = s:escape_file_pattern(a:config.name)
@@ -106,7 +106,7 @@ function! s:open_result_window(config, session)
   endif
 endfunction
 
-function! s:back_to_previous_window(...)
+function! s:back_to_previous_window(...) abort
   let sweep_only = a:0 && a:1
   for tabnr in range(1, tabpagenr('$'))
     for winnr in range(1, tabpagewinnr(tabnr, '$'))
@@ -122,7 +122,7 @@ function! s:back_to_previous_window(...)
   endfor
 endfunction
 
-function! s:set_running_mark(mark)
+function! s:set_running_mark(mark) abort
   if a:mark !=# '' && !exists('b:quickrun_running_mark')
     let &undolevels = &undolevels  " split the undo block
     silent $ put =a:mark
@@ -130,11 +130,11 @@ function! s:set_running_mark(mark)
   endif
 endfunction
 
-function! s:is_empty_buffer()
-  return line('$') == 1 && getline(1) =~ '^\s*$'
+function! s:is_empty_buffer() abort
+  return line('$') == 1 && getline(1) =~# '^\s*$'
 endfunction
 
-function! s:jump_to_window(tabnr, winnr)
+function! s:jump_to_window(tabnr, winnr) abort
   if tabpagenr() != a:tabnr
     execute 'tabnext' a:tabnr
   endif
@@ -143,12 +143,12 @@ function! s:jump_to_window(tabnr, winnr)
   endif
 endfunction
 
-function! s:escape_file_pattern(pat)
-  return join(map(split(a:pat, '\zs'), '"[".v:val."]"'), '')
+function! s:escape_file_pattern(pat) abort
+  return join(map(split(a:pat, '\zs'), '"[" . v:val . "]"'), '')
 endfunction
 
 
-function! quickrun#outputter#buffer#new()
+function! quickrun#outputter#buffer#new() abort
   return deepcopy(s:outputter)
 endfunction
 

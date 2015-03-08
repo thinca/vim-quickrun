@@ -13,9 +13,9 @@ let s:outputter = {
 \   'config_order': ['name', 'append'],
 \ }
 
-function! s:outputter.init(session)
+function! s:outputter.init(session) abort
   let name = self.config.name
-  if name is ''
+  if name is# ''
     throw 'Specify the variable name.'
   endif
   if name !~# '\W'
@@ -28,19 +28,19 @@ function! s:outputter.init(session)
   let self._size = 0
 endfunction
 
-function! s:outputter.output(data, session)
+function! s:outputter.output(data, session) abort
   execute 'let' self._name self._assign 'a:data'
   let self._assign = '.='
   let self._size += len(a:data)
 endfunction
 
-function! s:outputter.finish(session)
+function! s:outputter.finish(session) abort
   echo printf('Output to variable "%s" (%d bytes)',
   \           self.config.name, self._size)
 endfunction
 
 
-function! quickrun#outputter#variable#new()
+function! quickrun#outputter#variable#new() abort
   return deepcopy(s:outputter)
 endfunction
 

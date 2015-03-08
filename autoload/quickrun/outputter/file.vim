@@ -13,9 +13,9 @@ let s:outputter = {
 \   'config_order': ['name', 'append'],
 \ }
 
-function! s:outputter.init(session)
+function! s:outputter.init(session) abort
   let file = self.config.name
-  if file is ''
+  if file is# ''
     throw 'Specify the file.'
   endif
   if isdirectory(file)
@@ -28,19 +28,19 @@ function! s:outputter.init(session)
   let self._size = 0
 endfunction
 
-function! s:outputter.output(data, session)
+function! s:outputter.output(data, session) abort
   execute 'redir >> ' . self._file
   silent! echon a:data
   redir END
   let self._size += len(a:data)
 endfunction
 
-function! s:outputter.finish(session)
+function! s:outputter.finish(session) abort
   echo printf('Output to "%s" (%d bytes)', self.config.name, self._size)
 endfunction
 
 
-function! quickrun#outputter#file#new()
+function! quickrun#outputter#file#new() abort
   return deepcopy(s:outputter)
 endfunction
 

@@ -471,12 +471,12 @@ lockvar! g:quickrun#default_config
 
 let s:Session = {}  " {{{1
 " Initialize of instance.
-function! s:Session.initialize(config)
+function! s:Session.initialize(config) abort
   let self.base_config = s:build_config(a:config)
 endfunction
 
 " The option is appropriately set referring to default options.
-function! s:Session.normalize(config)
+function! s:Session.normalize(config) abort
   let config = a:config
   if has_key(config, 'input')
     let input = quickrun#expand(config.input)
@@ -538,7 +538,7 @@ function! s:Session.normalize(config)
   return config
 endfunction
 
-function! s:Session.setup()
+function! s:Session.setup() abort
   try
     if has_key(self, 'exit_code')
       call remove(self, 'exit_code')
@@ -570,7 +570,7 @@ function! s:Session.setup()
   endtry
 endfunction
 
-function! s:Session.make_module(kind, line)
+function! s:Session.make_module(kind, line) abort
   let name = ''
   if type(a:line) == type([]) && !empty([])
     let [name; args] = a:line
@@ -602,7 +602,7 @@ function! s:Session.make_module(kind, line)
   return module
 endfunction
 
-function! s:Session.run()
+function! s:Session.run() abort
   if has_key(self, '_running')
     throw 'quickrun: session.run() was called in running.'
   endif
@@ -620,12 +620,12 @@ function! s:Session.run()
   endtry
 endfunction
 
-function! s:Session.continue()
+function! s:Session.continue() abort
   let self._continue_key = s:save_session(self)
   return self._continue_key
 endfunction
 
-function! s:Session.output(data)
+function! s:Session.output(data) abort
   let context = {'data': a:data}
   call self.invoke_hook('output', context)
   if context.data !=# ''
@@ -633,7 +633,7 @@ function! s:Session.output(data)
   endif
 endfunction
 
-function! s:Session.finish(...)
+function! s:Session.finish(...) abort
   if !has_key(self, 'exit_code')
     let self.exit_code = a:0 ? a:1 : 0
     if self.exit_code == 0
@@ -650,7 +650,7 @@ endfunction
 
 " Build a command to execute it from options.
 " XXX: Undocumented yet.  This is used by core modules only.
-function! s:Session.build_command(tmpl)
+function! s:Session.build_command(tmpl) abort
   let config = self.config
   let command = config.command
   let rule = {
@@ -700,7 +700,7 @@ function! s:Session.build_command(tmpl)
   return substitute(result, '[\r\n]\+', ' ', 'g')
 endfunction
 
-function! s:Session.tempname(...)
+function! s:Session.tempname(...) abort
   let name = a:0 ? a:1 : tempname()
   if !has_key(self, '_temp_names')
     let self._temp_names = []
@@ -710,7 +710,7 @@ function! s:Session.tempname(...)
 endfunction
 
 " Sweep the session.
-function! s:Session.sweep()
+function! s:Session.sweep() abort
   " Remove temporary files.
   if has_key(self, '_temp_names')
     for name in self._temp_names
@@ -756,7 +756,7 @@ function! s:Session.sweep()
   endif
 endfunction
 
-function! s:Session.invoke_hook(point, ...)
+function! s:Session.invoke_hook(point, ...) abort
   let context = a:0 ? a:1 : {}
   let func = 'on_' . a:point
   let hooks = copy(self.hooks)
@@ -770,7 +770,7 @@ function! s:Session.invoke_hook(point, ...)
   endfor
 endfunction
 
-function! s:get_hook_priority(hook, point)
+function! s:get_hook_priority(hook, point) abort
   try
     return a:hook.priority(a:point) - 0
   catch
@@ -781,14 +781,14 @@ endfunction
 
 let s:sessions = {}  " Store for sessions.
 
-function! s:save_session(session)
+function! s:save_session(session) abort
   let key = has('reltime') ? reltimestr(reltime()) : string(localtime())
   let s:sessions[key] = a:session
   return key
 endfunction
 
 " Call a function of a session by key.
-function! quickrun#session(key, ...)
+function! quickrun#session(key, ...) abort
   let session = get(s:sessions, a:key, {})
   if a:0 && !empty(session)
     return call(session[a:1], a:000[1 :], session)
@@ -796,30 +796,30 @@ function! quickrun#session(key, ...)
   return session
 endfunction
 
-function! s:dispose_session(key)
+function! s:dispose_session(key) abort
   if has_key(s:sessions, a:key)
     let session = remove(s:sessions, a:key)
     call session.sweep()
   endif
 endfunction
 
-function! quickrun#sweep_sessions()
+function! quickrun#sweep_sessions() abort
   call map(keys(s:sessions), 's:dispose_session(v:val)')
 endfunction
 
-function! quickrun#is_running()
+function! quickrun#is_running() abort
   return !empty(s:sessions)
 endfunction
 
 
 " Interfaces.  {{{1
-function! quickrun#new(...)
+function! quickrun#new(...) abort
   let session = copy(s:Session)
   call session.initialize(a:0 ? a:1 : {})
   return session
 endfunction
 
-function! quickrun#run(...)
+function! quickrun#run(...) abort
   call quickrun#sweep_sessions()
 
   let session = quickrun#new(a:0 ? a:1 : {})
@@ -833,7 +833,7 @@ function! quickrun#run(...)
 endfunction
 
 " function for |g@|.
-function! quickrun#operator(wise)
+function! quickrun#operator(wise) abort
   let wise = {
   \ 'line': 'V',
   \ 'char': 'v',
@@ -847,7 +847,7 @@ function! quickrun#operator(wise)
 endfunction
 
 " function for main command.
-function! quickrun#command(config, use_range, line1, line2)
+function! quickrun#command(config, use_range, line1, line2) abort
   try
     let config = {}
     if a:use_range
@@ -864,7 +864,7 @@ function! quickrun#command(config, use_range, line1, line2)
 endfunction
 
 " completion function for main command.
-function! quickrun#complete(lead, cmd, pos)
+function! quickrun#complete(lead, cmd, pos) abort
   let line = split(a:cmd[:a:pos - 1], '', 1)
   let head = line[-1]
   let kinds = quickrun#module#get_kinds()
@@ -919,7 +919,7 @@ endfunction
 " - $ENV_NAME ${ENV_NAME}
 " - %{expr}
 " Escape by \ if you does not want to expand.
-function! quickrun#expand(input)
+function! quickrun#expand(input) abort
   if type(a:input) == type([]) || type(a:input) == type({})
     return map(copy(a:input), 'quickrun#expand(v:val)')
   elseif type(a:input) != type('')
@@ -974,7 +974,7 @@ function! quickrun#expand(input)
 endfunction
 
 " Execute commands by expr.  This is used by remote_expr()
-function! quickrun#execute(cmd)
+function! quickrun#execute(cmd) abort
   let result = ''
   let temp = tempname()
   try
@@ -995,7 +995,7 @@ function! quickrun#execute(cmd)
 endfunction
 
 " Converts a string as argline or a list of config to config object.
-function! quickrun#config(config)
+function! quickrun#config(config) abort
   if type(a:config) == type('')
     return s:build_config_from_arglist(s:parse_argline(a:config))
   elseif type(a:config) == type([])
@@ -1022,7 +1022,7 @@ endfunction
 
 
 " Misc functions.  {{{1
-function! s:parse_argline(argline)
+function! s:parse_argline(argline) abort
   " foo 'bar buz' "hoge \"huga"
   " => ['foo', 'bar buz', 'hoge "huga']
   " TODO: More improve.
@@ -1047,7 +1047,7 @@ function! s:parse_argline(argline)
   return arglist
 endfunction
 
-function! s:build_config_from_arglist(arglist)
+function! s:build_config_from_arglist(arglist) abort
   let config = {}
   let option = ''
   for arg in a:arglist
@@ -1081,7 +1081,7 @@ function! s:build_config_from_arglist(arglist)
   return config
 endfunction
 
-function! s:build_config(config)
+function! s:build_config(config) abort
   let config = quickrun#config(a:config)
   if !has_key(config, 'mode')
     let config.mode = histget(':') =~# "^'<,'>\\s*Q\\%[uickRun]" ? 'v' : 'n'
@@ -1094,7 +1094,7 @@ function! s:build_config(config)
     \ }
   endif
 
-  let type = {"type": &filetype}
+  let type = {'type': &filetype}
   for c in [
   \ 'b:quickrun_config',
   \ 'type',
@@ -1124,7 +1124,7 @@ function! s:build_config(config)
   return config
 endfunction
 
-function! s:build_module(module, configs)
+function! s:build_module(module, configs) abort
   for config in a:configs
     if type(config) == type({})
       for name in keys(a:module.config)
@@ -1151,7 +1151,7 @@ function! s:build_module(module, configs)
   endfor
 endfunction
 
-function! s:parse_module_option(module, argline)
+function! s:parse_module_option(module, argline) abort
   let sep = a:argline[0]
   let args = split(a:argline[1:], '\V' . escape(sep, '\'))
   let order = copy(a:module.config_order)
@@ -1186,7 +1186,7 @@ endfunction
 "   'wise': 'v' / 'V' / "\<C-v>",
 "   'selection': 'inclusive' / 'exclusive' / 'old'
 " }
-function! s:get_region(region)
+function! s:get_region(region) abort
   let wise = get(a:region, 'wise', 'V')
   if wise ==# 'V'
     return join(getline(a:region.first[0], a:region.last[0]), "\n")
@@ -1222,20 +1222,20 @@ endfunction
 
 
 " Wrapper functions for compatibility.  {{{1
-function! quickrun#register_runner(name, runner)
+function! quickrun#register_runner(name, runner) abort
   return quickrun#register_module('runner', a:name, a:runner)
 endfunction
-function! quickrun#register_outputter(name, outputter)
+function! quickrun#register_outputter(name, outputter) abort
   return quickrun#register_module('outputter', a:name, a:outputter)
 endfunction
-function! quickrun#register_hook(name, hook)
+function! quickrun#register_hook(name, hook) abort
   return quickrun#register_module('hook', a:name, a:hook)
 endfunction
-function! quickrun#register_module(kind, name, module)
+function! quickrun#register_module(kind, name, module) abort
   return quickrun#module#register(
   \        extend(a:module, {'kind': a:kind, 'name': a:name}, 'keep'))
 endfunction
-function! quickrun#get_module(kind, ...)
+function! quickrun#get_module(kind, ...) abort
   return call('quickrun#module#get', [a:kind] + a:000)
 endfunction
 

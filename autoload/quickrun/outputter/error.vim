@@ -12,7 +12,7 @@ let s:outputter.config = {
 \ }
 let s:outputter.config_order = ['success', 'error']
 
-function! s:outputter.finish(session)
+function! s:outputter.finish(session) abort
   let outputter = a:session.make_module('outputter',
   \   self.config[a:session.exit_code ? 'error' : 'success'])
   call outputter.start(a:session)
@@ -21,7 +21,7 @@ function! s:outputter.finish(session)
 endfunction
 
 
-function! quickrun#outputter#error#new()
+function! quickrun#outputter#error#new() abort
   return deepcopy(s:outputter)
 endfunction
 

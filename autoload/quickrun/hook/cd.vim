@@ -11,14 +11,14 @@ let s:hook = {
 \   },
 \ }
 
-function! s:hook.init(session)
+function! s:hook.init(session) abort
   let self._cd = ''
   if self.config.directory ==# ''
     let self.config.enable = 0
   endif
 endfunction
 
-function! s:hook.on_ready(session, context)
+function! s:hook.on_ready(session, context) abort
   let self._cd = getcwd()
   let self._localdir = haslocaldir()
   let directory = a:session.build_command(self.config.directory)
@@ -35,7 +35,7 @@ function! s:hook.on_ready(session, context)
   endif
 endfunction
 
-function! s:hook.sweep()
+function! s:hook.sweep() abort
   if self._cd ==# ''
     return
   endif
@@ -70,12 +70,12 @@ function! s:hook.sweep()
   endif
 endfunction
 
-function! s:move_tabwin(tab, win)
+function! s:move_tabwin(tab, win) abort
   execute 'tabnext' a:tab
   execute a:win 'wincmd w'
 endfunction
 
-function! quickrun#hook#cd#new()
+function! quickrun#hook#cd#new() abort
   return deepcopy(s:hook)
 endfunction
 

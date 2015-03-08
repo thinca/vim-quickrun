@@ -13,17 +13,17 @@ let s:hook = {
 \   },
 \ }
 
-function! s:hook.init(session)
+function! s:hook.init(session) abort
   if self.config.enable && !empty(self.config.dest)
     let self._outputter = a:session.make_module('outputter', self.config.dest)
   endif
 endfunction
 
-function! s:hook.on_ready(session, context)
+function! s:hook.on_ready(session, context) abort
   let self._start = reltime()
 endfunction
 
-function! s:hook.on_finish(session, context)
+function! s:hook.on_finish(session, context) abort
   let self._end = reltime()
   let time = str2float(reltimestr(reltime(self._start, self._end)))
   let text = printf(self.config.format, time)
@@ -35,7 +35,7 @@ function! s:hook.on_finish(session, context)
   endif
 endfunction
 
-function! quickrun#hook#time#new()
+function! quickrun#hook#time#new() abort
   return deepcopy(s:hook)
 endfunction
 

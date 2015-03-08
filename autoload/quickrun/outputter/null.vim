@@ -7,11 +7,11 @@ set cpo&vim
 
 let s:outputter = {}
 
-function! s:outputter.output(data, session)
+function! s:outputter.output(data, session) abort
 endfunction
 
 
-function! quickrun#outputter#null#new()
+function! quickrun#outputter#null#new() abort
   return deepcopy(s:outputter)
 endfunction
 

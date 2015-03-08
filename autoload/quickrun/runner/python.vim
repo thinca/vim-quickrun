@@ -81,7 +81,7 @@ endif
 
 let s:runner = {}
 
-function! s:runner.validate()
+function! s:runner.validate() abort
   if !has('python')
     throw 'Needs +python feature.'
   elseif !s:python_loaded
@@ -89,7 +89,7 @@ function! s:runner.validate()
   endif
 endfunction
 
-function! s:runner.run(commands, input, session)
+function! s:runner.run(commands, input, session) abort
   let key = string(a:session.continue())
   python QuickRun(vim.eval('a:commands'),
   \               vim.eval('key'),
@@ -97,7 +97,7 @@ function! s:runner.run(commands, input, session)
 endfunction
 
 
-function! quickrun#runner#python#new()
+function! quickrun#runner#python#new() abort
   return deepcopy(s:runner)
 endfunction
 

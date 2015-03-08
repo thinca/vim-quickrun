@@ -9,11 +9,11 @@ let s:outputter = {
 \   'config': {'log': 0},
 \ }
 
-function! s:outputter.init(session)
+function! s:outputter.init(session) abort
   let self._buf = ''
 endfunction
 
-function! s:outputter.output(data, session)
+function! s:outputter.output(data, session) abort
   if !self.config.log
     echon a:data
     return
@@ -26,14 +26,14 @@ function! s:outputter.output(data, session)
   endfor
 endfunction
 
-function! s:outputter.finish(session)
+function! s:outputter.finish(session) abort
   if self.config.log && self._buf !=# ''
     echomsg self._buf
   endif
 endfunction
 
 
-function! quickrun#outputter#message#new()
+function! quickrun#outputter#message#new() abort
   return deepcopy(s:outputter)
 endfunction
 

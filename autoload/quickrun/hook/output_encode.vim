@@ -11,7 +11,7 @@ let s:hook = {
 \   },
 \ }
 
-function! s:hook.init(session)
+function! s:hook.init(session) abort
   let enc = split(self.config.encoding, '[^[:alnum:]-_]')
   if len(enc) is 1
     let enc += [&encoding]
@@ -23,11 +23,11 @@ function! s:hook.init(session)
   endif
 endfunction
 
-function! s:hook.on_output(session, context)
+function! s:hook.on_output(session, context) abort
   let a:context.data = iconv(a:context.data, self._from, self._to)
 endfunction
 
-function! quickrun#hook#output_encode#new()
+function! quickrun#hook#output_encode#new() abort
   return deepcopy(s:hook)
 endfunction
 

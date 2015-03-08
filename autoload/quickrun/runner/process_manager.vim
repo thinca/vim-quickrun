@@ -24,13 +24,13 @@ let s:last_process_type = ''
 augroup plugin-quickrun-process-manager
 augroup END
 
-function! s:runner.validate()
+function! s:runner.validate() abort
   if !s:P.is_available()
     throw 'Needs vimproc.'
   endif
 endfunction
 
-function! s:runner.run(commands, input, session)
+function! s:runner.run(commands, input, session) abort
   let type = a:session.config.type
 
   let message = a:session.build_command(self.config.load)
@@ -38,7 +38,7 @@ function! s:runner.run(commands, input, session)
     return 0
   endif
 
-  if s:last_process_type !=# '' && s:P.state(s:last_process_type) == 'reading'
+  if s:last_process_type !=# '' && s:P.state(s:last_process_type) ==# 'reading'
     call a:session.output('!!!Hey wait.. Cancelling previous request. Try again!!!')
     call s:P.kill(s:last_process_type)
     return 0
@@ -46,7 +46,7 @@ function! s:runner.run(commands, input, session)
 
   let s:last_process_type = type
 
-  let cmd = printf("%s %s", a:session.config.command, a:session.config.cmdopt)
+  let cmd = printf('%s %s', a:session.config.command, a:session.config.cmdopt)
   let cmd = g:quickrun#V.Process.iconv(cmd, &encoding, &termencoding)
   call s:P.touch(type, cmd)
   let state = s:P.state(type)
@@ -88,13 +88,13 @@ function! s:runner.run(commands, input, session)
   endif
 endfunction
 
-function! s:receive(key)
+function! s:receive(key) abort
   if s:_is_cmdwin()
     return 0
   endif
 
   let session = quickrun#session(a:key)
-  if session.runner.phase == 'ready'
+  if session.runner.phase ==# 'ready'
     let [out, err, t] = s:P.read(session.config.type, [session.runner.config.prompt])
     call session.output(out . (err ==# '' ? '' : printf('!!!%s!!!', err)))
     if t ==# 'matched'
@@ -103,7 +103,7 @@ function! s:receive(key)
     else " 'timedout'
       " nop
     endif
-  elseif session.runner.phase == 'preparing'
+  elseif session.runner.phase ==# 'preparing'
     let [out, err, t] = s:P.read(session.config.type, [session.runner.config.prompt])
     if t ==# 'matched'
       let session.runner.phase = 'ready'
@@ -122,7 +122,7 @@ function! s:receive(key)
   return 0
 endfunction
 
-function! s:runner.sweep()
+function! s:runner.sweep() abort
   if has_key(self, '_autocmd')
     autocmd! plugin-quickrun-process-manager
   endif
@@ -131,16 +131,16 @@ function! s:runner.sweep()
   endif
 endfunction
 
-function! quickrun#runner#process_manager#new()
+function! quickrun#runner#process_manager#new() abort
   return deepcopy(s:runner)
 endfunction
 
-function! quickrun#runner#process_manager#kill()
+function! quickrun#runner#process_manager#kill() abort
   call s:P.kill(s:last_process_type)
 endfunction
 
 " TODO use vital's
-function! s:_is_cmdwin()
+function! s:_is_cmdwin() abort
   return bufname('%') ==# '[Command Line]'
 endfunction
 
