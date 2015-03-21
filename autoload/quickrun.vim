@@ -409,7 +409,6 @@ let g:quickrun#default_config = {
 \   'hook/sweep/files': '%S:p:r',
 \ },
 \ 'scala': {
-\   'cmdopt': '-Dfile.encoding=' . &termencoding,
 \   'hook/output_encode/encoding': '&termencoding',
 \ },
 \ 'scala/process_manager': {
