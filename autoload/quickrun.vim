@@ -321,6 +321,19 @@ let g:quickrun#default_config = {
 \   'hook/sweep/files': ['%S:p:r.jar'],
 \ },
 \ 'lisp': {
+\   'type' : executable('sbcl') ? 'lisp/sbcl':
+\            executable('ccl') ? 'lisp/ccl':
+\            executable('clisp') ? 'lisp/clisp': '',
+\ },
+\ 'lisp/sbcl': {
+\   'command': 'sbcl',
+\   'cmdopt': '--script',
+\ },
+\ 'lisp/ccl': {
+\   'command': 'ccl',
+\   'exec': '%c -l %s -e "(ccl:quit)"',
+\ },
+\ 'lisp/clisp': {
 \   'command': 'clisp',
 \ },
 \ 'llvm': {
