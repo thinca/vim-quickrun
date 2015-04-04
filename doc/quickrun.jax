@@ -472,6 +472,9 @@ NOTE: "system" 以外は不安定な場合があります。
 	暗黙のうちに先頭に "^" がつきます。なお、各試行における最後にマッチし
 	た部分の文字列は quickrun の結果に出力されません。
 
+- "runner/concurrent_process"	*quickrun-module-runner/concurrent_process*
+  {|vimproc| が必要}
+  TODO
 - "runner/remote"			*quickrun-module-runner/remote*
   {|+clientserver| が必要}
   コマンドをバックグラウンドで実行し、終了を |+clientserver| 機能を利用して通

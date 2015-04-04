@@ -480,6 +480,10 @@ default.  NOTE: Everything except for "system" can be unstable.
   runner/process_manager/prompt			Default: ">>> "
 	TODO
 
+- "runner/concurrent_process"	*quickrun-module-runner/concurrent_process*
+  {Requirement: |vimproc|}
+  TODO
+
 - "runner/remote"			*quickrun-module-runner/remote*
   {Requirement: |+clientserver|}
   Runs in background and fetches the result by |+clientserver| feature.
