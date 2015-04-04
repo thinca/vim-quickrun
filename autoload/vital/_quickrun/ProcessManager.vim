@@ -3,21 +3,21 @@ set cpo&vim
 
 let s:_processes = {}
 
-function! s:_vital_loaded(V)
+function! s:_vital_loaded(V) abort
   let s:V = a:V
   let s:S = s:V.import('Data.String')
   let s:P = s:V.import('Process')
 endfunction
 
-function! s:_vital_depends()
+function! s:_vital_depends() abort
   return ['Data.String', 'Process']
 endfunction
 
-function! s:is_available()
+function! s:is_available() abort
   return s:P.has_vimproc()
 endfunction
 
-function! s:touch(name, cmd)
+function! s:touch(name, cmd) abort
   if has_key(s:_processes, a:name)
     return 'existing'
   else
@@ -27,29 +27,31 @@ function! s:touch(name, cmd)
   endif
 endfunction
 
-function! s:_stop(i, ...)
+function! s:_stop(i, ...) abort
   let p = s:_processes[a:i]
   call p.kill(get(a:000, 0, 0) ? g:vimproc#SIGKILL : g:vimproc#SIGTERM)
   " call p.waitpid()
   unlet s:_processes[a:i]
-  unlet s:state[a:i]
+  if has_key(s:state, a:i)
+    unlet s:state[a:i]
+  endif
 endfunction
 
-function! s:term(i)
+function! s:term(i) abort
   return s:_stop(a:i, 0)
 endfunction
 
-function! s:kill(i)
+function! s:kill(i) abort
   return s:_stop(a:i, 1)
 endfunction
 
-function! s:read(i, endpatterns)
+function! s:read(i, endpatterns) abort
   return s:read_wait(a:i, 0.05, a:endpatterns)
 endfunction
 
 let s:state = {}
 
-function! s:read_wait(i, wait, endpatterns)
+function! s:read_wait(i, wait, endpatterns) abort
   if !has_key(s:_processes, a:i)
     throw printf("ProcessManager doesn't know about %s", a:i)
   endif
@@ -85,11 +87,11 @@ function! s:read_wait(i, wait, endpatterns)
   endwhile
 endfunction
 
-function! s:state(i)
+function! s:state(i) abort
   return get(s:state, a:i, 'undefined')
 endfunction
 
-function! s:write(i, str)
+function! s:write(i, str) abort
   if !has_key(s:_processes, a:i)
     throw printf("ProcessManager doesn't know about %s", a:i)
   endif
@@ -103,11 +105,11 @@ function! s:write(i, str)
   return 'active'
 endfunction
 
-function! s:writeln(i, str)
+function! s:writeln(i, str) abort
   return s:write(a:i, a:str . "\n")
 endfunction
 
-function! s:status(i)
+function! s:status(i) abort
   if !has_key(s:_processes, a:i)
     throw printf("ProcessManager doesn't know about %s", a:i)
   endif
@@ -121,7 +123,7 @@ function! s:status(i)
         \ : 'inactive'
 endfunction
 
-function! s:debug_processes()
+function! s:debug_processes() abort
   return s:_processes
 endfunction
 
