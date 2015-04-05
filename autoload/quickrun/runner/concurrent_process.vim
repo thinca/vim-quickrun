@@ -1,10 +1,6 @@
 " quickrun: runner/concurrent_process: Runs by Vital.ConcurrentProcess
 " Author:  ujihisa <ujihisa at gmail com>
 " License: zlib License
-" Known issues:
-"   * if a run stalled, next run will wait. It should cancel previous one
-"     automatically.
-"   * kill interface doesn't exist yet (related to the issue above)
 
 let s:save_cpo = &cpo
 set cpo&vim
