@@ -57,7 +57,8 @@ function! s:runner.run(commands, input, session) abort
           \ ['*read*', 'x', self.config.prompt]])
   endif
 
-  let a:session._label = label
+  let a:session._cmd = cmd
+  let a:session._prompt = self.config.prompt
   let key = a:session.continue()
   augroup plugin-quickrun-concurrent-process
     execute 'autocmd! CursorHold,CursorHoldI * call'
@@ -74,7 +75,7 @@ function! s:receive(key) abort
   endif
 
   let session = quickrun#session(a:key)
-  let label = session._label
+  let label = s:CP.of(session._cmd, '', [['*read*', '_', session._prompt]])
   let [out, err] = s:CP.consume(label, 'x')
   call session.output(out . (err ==# '' ? '' : printf('!!!%s!!!', err)))
   if s:CP.is_done(label, 'x')
@@ -100,12 +101,13 @@ function! quickrun#runner#concurrent_process#new() abort
 endfunction
 
 function! quickrun#runner#concurrent_process#kill() abort
-  let label = get(s:session, '_label', '')
-  if label
-    call s:CP.shutdown(label)
-  else
-    call s:M.error("Could not find label")
-  endif
+  " TODO
+  " let label = s:of(get(s:session, '_label', '')
+  " if label
+  "   call s:CP.shutdown(label)
+  " else
+  "   call s:M.error("Could not find label")
+  " endif
 endfunction
 
 " TODO use vital's
