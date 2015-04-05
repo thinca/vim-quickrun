@@ -47,9 +47,14 @@ function! s:runner.run(commands, input, session) abort
           \ ['*writeln*', message],
           \ ['*read*', 'x', self.config.prompt]])
   else
-    call s:M.warn("Previous process was still running. It's terminated now, so try again.")
     call s:CP.shutdown(label)
-    return 0
+    call s:M.warn("Previous process was still running. Restarted.")
+    " TODO be dry
+    let label = s:CP.of(cmd, '', [
+          \ ['*read*', '_', self.config.prompt]])
+    call s:CP.queue(label, [
+          \ ['*writeln*', message],
+          \ ['*read*', 'x', self.config.prompt]])
   endif
 
   let a:session._label = label
