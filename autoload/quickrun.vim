@@ -83,6 +83,13 @@ let g:quickrun#default_config = {
 \   'runner/process_manager/load': '(load-file "%S")',
 \   'runner/process_manager/prompt': 'quickrun/pm=> ',
 \ },
+\ 'clojure/concurrent_process': {
+\   'command': 'clojure-1.6',
+\   'cmdopt': '-e ''(clojure.main/repl :prompt #(print "\nquickrun/cp=> "))''',
+\   'runner': 'concurrent_process',
+\   'runner/concurrent_process/load': '(load-file "%S")',
+\   'runner/concurrent_process/prompt': 'quickrun/cp=> ',
+\ },
 \ 'coffee': {},
 \ 'cpp': {
 \   'type':
@@ -430,6 +437,13 @@ let g:quickrun#default_config = {
 \   'runner': 'process_manager',
 \   'runner/process_manager/load': ':load %S',
 \   'runner/process_manager/prompt': 'scala> ',
+\ },
+\ 'scala/concurrent_process': {
+\   'command': 'scala',
+\   'cmdopt': '-nc',
+\   'runner': 'concurrent_process',
+\   'runner/concurrent_process/load': ':load %S',
+\   'runner/concurrent_process/prompt': 'scala> ',
 \ },
 \ 'scheme': {
 \   'type': executable('gosh')     ? 'scheme/gauche':

@@ -456,12 +456,24 @@ default.  NOTE: Everything except for "system" can be unstable.
 	Changes 'updatetime' to the value temporary.  Stays same if this is 0.
 
 - "runner/process_manager"	*quickrun-module-runner/process_manager*
+  (DEPRECATED) Same as |quickrun-module-runner/concurrent_process| it runs
+  process at background and reuses it. The difference between this and
+  concurrent_process is the lower layer library what they are using.
+
+  Option ~
+  runner/process_manager/load			Default: "load %s"
+  runner/process_manager/prompt			Default: ">>> "
+  Refer the ones at concurrent_process. They have compatibility so that you
+  can toggle which one to use just by changing these names.
+
+- "runner/concurrent_process"	*quickrun-module-runner/concurrent_process*
   {Requirement: |vimproc|}
-  Runs by |vimproc| and |Vital.ProcessManager| at background, and reuses the
-  process you spawned for next executions.  This is handy for some tools such
-  as REPL of a programming languages which is slow to start; e.g. programing
-  language implementations on JVM. This checks if the process completed with
-  using |CursorHold| |CursorHoldI| events as well as "runner/vimproc". 
+  Runs by |vimproc| and |Vital.ConcurrentProcess| at background, and reuses
+  the process you spawned for next executions.  This is handy for some tools
+  such as REPL of a programming languages which is slow to start; e.g.
+  programing language implementations on JVM. This checks if the process
+  completed with using |CursorHold| |CursorHoldI| events as well as
+  "runner/vimproc".
 
   Options including command and cmdarg require configurations like other
   runners. However, this runner ignores exec option on purpose and behaves as
@@ -469,7 +481,7 @@ default.  NOTE: Everything except for "system" can be unstable.
   described below for source file related stuff.
 
   Option ~
-  runner/process_manager/load			Default: "load %s"
+  runner/concurrent_process/load			Default: "load %s"
 	Specifies a code with placeholder to write to the stdin of an external
 	command to load and run the file you are editing. |quickrun| will
 	replace %s and %S with the source file like |quickrun-exec-format|
@@ -477,7 +489,7 @@ default.  NOTE: Everything except for "system" can be unstable.
 	you are editing is "/home/ujihisa/a.clj", |quickrun| writes
 	"(load \"/home/ujihisa/a.clj\")\n" to the process it ran based on
 	command option.
-  runner/process_manager/prompt			Default: ">>> "
+  runner/concurrent_process/prompt			Default: ">>> "
 	TODO
 
 - "runner/remote"			*quickrun-module-runner/remote*

@@ -446,8 +446,19 @@ NOTE: "system" 以外は不安定な場合があります。
 	一時的に 'updatetime' をこの値に変更します。0 の場合は変更しません。
 
 - "runner/process_manager"	*quickrun-module-runner/process_manager*
+  (非推奨) |quickrun-module-runner/concurrent_process| と同様、プロセスをばっ
+  バックグラウンドで実行し、かつそれを再利用します。concurrent_processとの違い
+  は使用する下位ライブラリです。
+
+  オプション ~
+  runner/process_manager/load			デフォルト: "load %s"
+  runner/process_manager/prompt			デフォルト: ">>> "
+  いずれもconcurrent_process側を参照してください。両者の間には互換性があり、名
+  前を変えるだけで動作します。
+
+- "runner/concurrent_process"	*quickrun-module-runner/concurrent_process*
   {|vimproc| が必要}
-  |vimproc| と|Vital.ProcessManager|を使ってコマンドをバックグラウンドで実行
+  |vimproc| と|Vital.ConcurrentProcess|を使ってコマンドをバックグラウンドで実行
   し、かつ二回目以降の実行は、そのプロセスを再利用します。初回起動が遅いプログ
   ラミング言語処理系付属 REPL、たとえば JVM 上で動作する言語処理系などで便利で
   す。
@@ -460,14 +471,14 @@ NOTE: "system" 以外は不安定な場合があります。
   スファイルに関する設定はexecではなく後述するloadに設定してください。
 
   オプション ~
-  runner/process_manager/load			デフォルト: "load %s"
+  runner/concurrent_process/load			デフォルト: "load %s"
 	起動した外部コマンドの stdin の書き込む、編集中ファイルを読み込み実行
 	させるための書式を指定します。%s または %S は |quickrun-exec-format|
 	のように、ソースファイル名に置換されます。たとえばこの値が
 	"(load \"%S\")" で編集中ファイル名が "/home/ujihisa/a.clj" ならば、
 	|quickrun| は command オプションによって起動されたプロセスに対し
 	"(load \"/home/ujihisa/a.clj\")\n" という文字列を書き込みます。
-  runner/process_manager/prompt			デフォルト: ">>> "
+  runner/concurrent_process/prompt			デフォルト: ">>> "
 	一度の試行の終了を把握するためのとっかかりとして使用する正規表現です。
 	暗黙のうちに先頭に "^" がつきます。なお、各試行における最後にマッチし
 	た部分の文字列は quickrun の結果に出力されません。

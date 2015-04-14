@@ -1,5 +1,5 @@
 quickrun
-8982bf2
+dcfe5f7
 
 Data.List
 System.File
@@ -8,3 +8,4 @@ Prelude
 ProcessManager
 Process
 Vim.Message
+ConcurrentProcess
