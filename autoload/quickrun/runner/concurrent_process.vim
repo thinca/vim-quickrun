@@ -45,7 +45,7 @@ function! s:runner.run(commands, input, session) abort
   else
     call s:CP.shutdown(label)
     call s:M.warn("Previous process was still running. Restarted.")
-    " TODO be dry
+    " TODO be dry, or use ConcurrentProcess' new feature
     let label = s:CP.of(cmd, '', [
           \ ['*read*', '_', self.config.prompt]])
     call s:CP.queue(label, [
@@ -96,17 +96,7 @@ function! quickrun#runner#concurrent_process#new() abort
   return deepcopy(s:runner)
 endfunction
 
-function! quickrun#runner#concurrent_process#kill() abort
-  " TODO
-  " let label = s:of(get(s:session, '_label', '')
-  " if label
-  "   call s:CP.shutdown(label)
-  " else
-  "   call s:M.error("Could not find label")
-  " endif
-endfunction
-
-" TODO use vital's
+" TODO use vital's, if you include Vim.Buffer eventually
 function! s:_is_cmdwin() abort
   return bufname('%') ==# '[Command Line]'
 endfunction
