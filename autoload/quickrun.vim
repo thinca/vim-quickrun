@@ -122,9 +122,9 @@ let g:quickrun#default_config = {
 \ },
 \ 'crystal': {
 \   'command': 'crystal',
-\   'exec': ['%c %s', '%s:p:r %a'],
+\   'cmdopt': '--no-color',
+\   'exec': '%c run %o %s -- %a',
 \   'tempfile': '%{tempname()}.cr',
-\   'hook/sweep/files': '%S:p:r',
 \ },
 \ 'cs': {
 \   'type': executable('csc')  ? 'cs/csc'  :
