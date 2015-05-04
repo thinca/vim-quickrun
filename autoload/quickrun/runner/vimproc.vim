@@ -13,8 +13,10 @@ let s:runner = {
 \   'config': {
 \     'updatetime': 0,
 \     'sleep': 50,
+\     'read_timeout': 65535,
 \   }
 \ }
+let s:bufsize = 65535
 
 function! s:runner.validate() abort
   if globpath(&runtimepath, 'autoload/vimproc.vim') ==# ''
@@ -34,13 +36,13 @@ function! s:runner.run(commands, input, session) abort
   if self.config.sleep
     execute 'sleep' self.config.sleep . 'm'
   endif
-  if s:receive_vimproc_result(key)
+  if s:receive_vimproc_result(key, self.config.read_timeout)
     return
   endif
   " Execution is continuing.
   augroup plugin-quickrun-runner-vimproc
     execute 'autocmd! CursorHold,CursorHoldI * call'
-    \       's:receive_vimproc_result(' . string(key) . ')'
+    \       's:receive_vimproc_result(' . string(key) . ', ' . string(self.config.read_timeout) . ')'
   augroup END
   let self._autocmd = 1
   if self.config.updatetime
@@ -63,17 +65,17 @@ function! s:runner.sweep() abort
 endfunction
 
 
-function! s:receive_vimproc_result(key) abort
+function! s:receive_vimproc_result(key, read_timeout) abort
   let session = quickrun#session(a:key)
 
   let vimproc = session._vimproc
 
   try
     if !vimproc.stdout.eof
-      call session.output(vimproc.stdout.read())
+      call session.output(vimproc.stdout.read(s:bufsize, a:read_timeout))
     endif
     if !vimproc.stderr.eof
-      call session.output(vimproc.stderr.read())
+      call session.output(vimproc.stderr.read(s:bufsize, a:read_timeout))
     endif
 
     if !(vimproc.stdout.eof && vimproc.stderr.eof)
