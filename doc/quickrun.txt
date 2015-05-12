@@ -782,7 +782,7 @@ RUNNER ATTRIBUTES				*quickrun-runner-attributes*
 runner.run({commands}, {input}, {session})	*quickrun-runner.run()*
 	Required.  This is called in run-time.  This runs the list of command
 	given in {commands}, and returns {exit-code}.  {input} is data for
-	stdion.  When this cannot finish the process at the time this uses 
+	stdin.  When this cannot finish the process at the time this uses 
 	|quickrun-session.continue()|.  In the case this has to call
 	|quickrun-session.finish()|.
 
