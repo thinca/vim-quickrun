@@ -428,6 +428,10 @@ let g:quickrun#default_config = {
 \   'tempfile': '%{tempname()}.rs',
 \   'hook/sweep/files': '%S:p:r',
 \ },
+\ 'rust/cargo': {
+\   'command': 'cargo',
+\   'exec': '%c run %o',
+\ },
 \ 'scala': {
 \   'hook/output_encode/encoding': '&termencoding',
 \ },
