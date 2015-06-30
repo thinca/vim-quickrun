@@ -16,7 +16,7 @@ let s:runner = {
 \     'read_timeout': 65535,
 \   }
 \ }
-let s:bufsize = 65535
+let s:bufsize = -1
 
 function! s:runner.validate() abort
   if globpath(&runtimepath, 'autoload/vimproc.vim') ==# ''
