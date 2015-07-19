@@ -482,6 +482,7 @@ let g:quickrun#default_config = {
 \   'command': 'tsc',
 \   'exec': ['%c --target es5 --module commonjs %o %s', 'node %s:r.js'],
 \   'tempfile': '%{tempname()}.ts',
+\   'hook/sweep/files': ['%S:p:r.js'],
 \ },
 \ 'vim': {
 \   'command': ':source',
