@@ -465,11 +465,16 @@ let g:quickrun#default_config = {
 \ 'sed': {},
 \ 'sh': {},
 \ 'sql': {
-\   'type': executable('psql') ? 'sql/postgres' : '',
+\   'type': executable('psql') ? 'sql/postgres' :
+\           executable('mysql') ? 'sql/mysql' : '',
 \ },
 \ 'sql/postgres': {
 \   'command': 'psql',
 \   'exec': ['%c %o -f %s'],
+\ },
+\ 'sql/mysql': {
+\   'command': 'mysql',
+\   'exec': ['%c %o < %s'],
 \ },
 \ 'swift': {
 \   'type' : executable('xcrun') ? 'swift/apple' : '',
