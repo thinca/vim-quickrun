@@ -13,7 +13,7 @@ let s:runner = {
 \   'config': {
 \     'updatetime': 0,
 \     'sleep': 50,
-\     'read_timeout': 65535,
+\     'read_timeout': 100,
 \   }
 \ }
 let s:bufsize = -1
