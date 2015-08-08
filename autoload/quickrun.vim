@@ -215,6 +215,9 @@ let g:quickrun#default_config = {
 \   'command': 'erb',
 \   'exec': '%c %o -T - %s %a',
 \ },
+\ 'fish': {
+\   'command': 'fish',
+\ },
 \ 'fortran': {
 \   'type': 'fortran/gfortran',
 \ },
