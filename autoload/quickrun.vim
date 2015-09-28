@@ -469,7 +469,8 @@ let g:quickrun#default_config = {
 \ 'sh': {},
 \ 'sql': {
 \   'type': executable('psql') ? 'sql/postgres' :
-\           executable('mysql') ? 'sql/mysql' : '',
+\           executable('mysql') ? 'sql/mysql' :
+\           executable('sqlite3') ? 'sql/sqlite3' : '',
 \ },
 \ 'sql/postgres': {
 \   'command': 'psql',
@@ -477,6 +478,10 @@ let g:quickrun#default_config = {
 \ },
 \ 'sql/mysql': {
 \   'command': 'mysql',
+\   'exec': ['%c %o < %s'],
+\ },
+\ 'sql/sqlite3': {
+\   'command': 'sqlite3',
 \   'exec': ['%c %o < %s'],
 \ },
 \ 'swift': {
