@@ -187,8 +187,9 @@ let g:quickrun#default_config = {
 \   'hook/sweep/files': ['%S:p:r'],
 \ },
 \ 'dosbatch': {
-\   'command': '',
-\   'exec': 'call %s %a',
+\   'command': 'cmd',
+\   'exec': '%c /c "call %s %a"',
+\   'hook/output_encode/encoding': 'cp932',
 \   'tempfile': '%{tempname()}.bat',
 \ },
 \ 'dart': {
