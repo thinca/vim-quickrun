@@ -356,6 +356,11 @@ let g:quickrun#default_config = {
 \   'exec': '%C %s',
 \   'runner': 'vimscript',
 \ },
+\ 'lua/redis': {
+\   'command': 'redis-cli',
+\   'exec': '%c --eval %s %a',
+\   'tempfile': '%{tempname()}.lua'
+\ },
 \ 'markdown': {
 \   'type': executable('Markdown.pl') ? 'markdown/Markdown.pl':
 \           executable('kramdown') ? 'markdown/kramdown':
