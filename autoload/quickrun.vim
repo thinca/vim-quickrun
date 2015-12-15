@@ -497,6 +497,10 @@ let g:quickrun#default_config = {
 \   'command': 'xcrun',
 \   'exec': ['%c swift %s'],
 \ },
+\ 'tmux': {
+\   'command': 'tmux',
+\   'exec': ['%c source-file %s:p'],
+\ },
 \ 'typescript': {
 \   'command': 'tsc',
 \   'exec': ['%c --target es5 --module commonjs %o %s', 'node %s:r.js'],
