@@ -444,6 +444,8 @@ NOTE: "system" 以外は不安定な場合があります。
 	'updatetime' による待機をする必要がなくなります。
   runner/vimproc/updatetime		デフォルト: 0
 	一時的に 'updatetime' をこの値に変更します。0 の場合は変更しません。
+  runner/vimproc/read_timeout		デフォルト: 100
+	1 度の読み込みにかける時間(ミリ秒)です。
 
 - "runner/process_manager"	*quickrun-module-runner/process_manager*
   (非推奨) |quickrun-module-runner/concurrent_process| と同様、プロセスをバッ

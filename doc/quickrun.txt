@@ -454,6 +454,8 @@ default.  NOTE: Everything except for "system" can be unstable.
 	by 'updatetime' when program will stop immediately.
   runner/vimproc/updatetime		Default: 0
 	Changes 'updatetime' to the value temporary.  Stays same if this is 0.
+  runner/vimproc/read_timeout		Default: 100
+	The time to read at one time. (milliseconds)
 
 - "runner/process_manager"	*quickrun-module-runner/process_manager*
   (DEPRECATED) Same as |quickrun-module-runner/concurrent_process| it runs
