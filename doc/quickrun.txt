@@ -578,8 +578,10 @@ available by default.
 - "outputter/quickfix"			*quickrun-module-outputter/quickfix*
   Outputs on |quickfix|.
   Option ~
-  outputter/quickfix/errorformat		Default: "&errorformat"
+  outputter/quickfix/errorformat	Default: "&errorformat"
 	'errorformat' option to parse the output.
+  outputter/quickfix/open_cmd		Default: "cwindow"
+	The command to open |quickfix-window|.
 
 - "outputter/browser"			*quickrun-module-outputter/browser*
   {Requires |open-browser|}

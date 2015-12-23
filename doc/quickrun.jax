@@ -568,8 +568,10 @@ outputter は結果の出力を行うモジュールです。
 - "outputter/quickfix"			*quickrun-module-outputter/quickfix*
   |quickfix| へ出力します。
   オプション ~
-  outputter/quickfix/errorformat		デフォルト: "&errorformat"
+  outputter/quickfix/errorformat	デフォルト: "&errorformat"
 	出力を解釈するための 'errorformat' オプションの値です。
+  outputter/quickfix/open_cmd		デフォルト: "cwindow"
+	|quickfix-window| を開くためのコマンドです。
 
 - "outputter/browser"			*quickrun-module-outputter/browser*
   {|open-browser| が必要}
