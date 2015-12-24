@@ -611,7 +611,7 @@ function! s:Session.setup() abort
     call self.invoke_hook('module_loaded')
 
     let commands = copy(self.config.exec)
-    call filter(map(commands, 'self.build_command(quickrun#expand(v:val))'),
+    call filter(map(commands, 'self.build_command(v:val)'),
     \           'v:val =~# "\\S"')
     let self.commands = commands
   catch /^quickrun:/
@@ -727,7 +727,7 @@ function! s:Session.build_command(tmpl) abort
     endif
 
     let symbol = rest[1]
-    let value = get(rule, tolower(symbol), '')
+    let value = get(rule, tolower(symbol), '%' . symbol)
 
     if symbol ==? 'c' && value ==# ''
       throw 'quickrun: "command" option is empty.'
@@ -751,7 +751,8 @@ function! s:Session.build_command(tmpl) abort
     endif
     let result .= value
   endwhile
-  return substitute(result, '[\r\n]\+', ' ', 'g')
+  let result = substitute(result, '[\r\n]\+', ' ', 'g')
+  return quickrun#expand(result)
 endfunction
 
 function! s:Session.tempname(...) abort
