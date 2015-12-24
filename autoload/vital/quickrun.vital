@@ -1,5 +1,5 @@
 quickrun
-dcfe5f7
+536046c6f928ad6162141089d3d6e94f58101653
 
 Data.List
 System.File
@@ -9,3 +9,4 @@ ProcessManager
 Process
 Vim.Message
 ConcurrentProcess
+Vim.ViewTracer

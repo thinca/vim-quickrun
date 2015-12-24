@@ -53,7 +53,7 @@ let s:state = {}
 
 function! s:read_wait(i, wait, endpatterns) abort
   if !has_key(s:_processes, a:i)
-    throw printf("ProcessManager doesn't know about %s", a:i)
+    throw printf("vital: ProcessManager: doesn't know about %s", a:i)
   endif
 
   let p = s:_processes[a:i]
@@ -93,7 +93,7 @@ endfunction
 
 function! s:write(i, str) abort
   if !has_key(s:_processes, a:i)
-    throw printf("ProcessManager doesn't know about %s", a:i)
+    throw printf("vital: ProcessManager: doesn't know about %s", a:i)
   endif
   if s:status(a:i) ==# 'inactive'
     return 'inactive'
@@ -111,7 +111,7 @@ endfunction
 
 function! s:status(i) abort
   if !has_key(s:_processes, a:i)
-    throw printf("ProcessManager doesn't know about %s", a:i)
+    throw printf("vital: ProcessManager: doesn't know about %s", a:i)
   endif
   let p = s:_processes[a:i]
   " vimproc.kill isn't to stop but to ask for the current state.
