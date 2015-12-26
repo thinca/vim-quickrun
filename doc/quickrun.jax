@@ -446,9 +446,9 @@ NOTE: "system" 以外は不安定な場合があります。
 	一時的に 'updatetime' をこの値に変更します。0 の場合は変更しません。
 
 - "runner/process_manager"	*quickrun-module-runner/process_manager*
-  (非推奨) |quickrun-module-runner/concurrent_process| と同様、プロセスをばっ
-  バックグラウンドで実行し、かつそれを再利用します。concurrent_processとの違い
-  は使用する下位ライブラリです。
+  (非推奨) |quickrun-module-runner/concurrent_process| と同様、プロセスをバッ
+  クグラウンドで実行し、かつそれを再利用します。concurrent_processとの違いは使
+  用する下位ライブラリです。
 
   オプション ~
   runner/process_manager/load			デフォルト: "load %s"
