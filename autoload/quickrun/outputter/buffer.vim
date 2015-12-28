@@ -5,6 +5,8 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
+let s:VT = g:quickrun#V.import('Vim.ViewTracer')
+
 let s:outputter = {
 \   'config': {
 \     'name': '[quickrun output]',
@@ -23,15 +25,17 @@ function! s:outputter.init(session) abort
 endfunction
 
 function! s:outputter.start(session) abort
+  let prev_window = s:VT.trace_window()
   call s:open_result_window(self.config, a:session)
   if !self._append
     silent % delete _
   endif
   call s:set_running_mark(self.config.running_mark)
-  call s:back_to_previous_window()
+  call s:VT.jump(prev_window)
 endfunction
 
 function! s:outputter.output(data, session) abort
+  let prev_window = s:VT.trace_window()
   call s:open_result_window(self.config, a:session)
   if self._line == 0
     let self._line = line('$')
@@ -54,11 +58,12 @@ function! s:outputter.output(data, session) abort
     silent 1 delete _
   endif
   call s:set_running_mark(self.config.running_mark)
-  call s:back_to_previous_window()
+  call s:VT.jump(prev_window)
   redraw
 endfunction
 
 function! s:outputter.finish(session) abort
+  let prev_window = s:VT.trace_window()
   call s:open_result_window(self.config, a:session)
   execute self._line
   silent normal! zt
@@ -66,7 +71,9 @@ function! s:outputter.finish(session) abort
   if closed
     close
   endif
-  call s:back_to_previous_window(!closed && self.config.into)
+  if closed || !self.config.into
+    call s:VT.jump(prev_window)
+  endif
   redraw
   if closed
     echohl MoreMsg
@@ -77,7 +84,6 @@ endfunction
 
 
 function! s:open_result_window(config, session) abort
-  let w:quickrun_outputter_buffer_prevwin = 1
   let sp = a:config.split
   let sname = s:escape_file_pattern(a:config.name)
   let opened = 0
@@ -106,22 +112,6 @@ function! s:open_result_window(config, session) abort
   endif
 endfunction
 
-function! s:back_to_previous_window(...) abort
-  let sweep_only = a:0 && a:1
-  for tabnr in range(1, tabpagenr('$'))
-    for winnr in range(1, tabpagewinnr(tabnr, '$'))
-      let vars = gettabwinvar(tabnr, winnr, '')
-      if has_key(vars, 'quickrun_outputter_buffer_prevwin')
-        if !sweep_only
-          call s:jump_to_window(tabnr, winnr)
-        endif
-        call remove(vars, 'quickrun_outputter_buffer_prevwin')
-        return
-      endif
-    endfor
-  endfor
-endfunction
-
 function! s:set_running_mark(mark) abort
   if a:mark !=# '' && !exists('b:quickrun_running_mark')
     let &undolevels = &undolevels  " split the undo block
@@ -132,15 +122,6 @@ endfunction
 
 function! s:is_empty_buffer() abort
   return line('$') == 1 && getline(1) =~# '^\s*$'
-endfunction
-
-function! s:jump_to_window(tabnr, winnr) abort
-  if tabpagenr() != a:tabnr
-    execute 'tabnext' a:tabnr
-  endif
-  if winnr() != a:winnr
-    execute a:winnr 'wincmd w'
-  endif
 endfunction
 
 function! s:escape_file_pattern(pat) abort
