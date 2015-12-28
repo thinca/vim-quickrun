@@ -29,15 +29,15 @@ function! s:outputter.finish(session) abort
   try
     let errorformat = &g:errorformat
     let &g:errorformat = self.config.errorformat
-    cgetexpr self._result
     let win = s:VT.trace_window()
+    let result_list = self._apply_result(self._result)
     execute self.config.open_cmd
     if &buftype ==# 'quickfix'
       let w:quickfix_title = 'quickrun: ' .  join(a:session.commands, ' && ')
     endif
-    let result_empty = len(getqflist()) == 0
+    let result_empty = len(result_list) == 0
     if result_empty
-      cclose
+      call self._close_window()
     endif
     if result_empty || !self.config.into
       call s:VT.jump(win)
@@ -45,6 +45,15 @@ function! s:outputter.finish(session) abort
   finally
     let &g:errorformat = errorformat
   endtry
+endfunction
+
+function! s:outputter._apply_result(expr) abort
+  cgetexpr a:expr
+  return getqflist()
+endfunction
+
+function! s:outputter._close_window() abort
+  cclose
 endfunction
 
 
