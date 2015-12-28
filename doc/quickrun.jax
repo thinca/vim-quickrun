@@ -754,6 +754,11 @@ session.sweep()				*quickrun-session.sweep()*
 	す。これは便利ですが、今のところ複数のモジュールから使われた際の名前の
 	衝突が考慮されていません。これは将来改善される可能性があります。
 
+session.config				*quickrun-session.config*
+	|quickrun-options| の辞書です。|quickrun-hook-point-normalized| のタイ
+	ミングから、標準化された config が利用できます。全てのオプションの値が
+	入っているとは限りません。
+
 ------------------------------------------------------------------------------
 共通の属性				*quickrun-module-attributes*
 

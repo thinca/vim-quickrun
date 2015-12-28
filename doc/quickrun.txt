@@ -754,6 +754,11 @@ session.sweep()				*quickrun-session.sweep()*
 	|vimproc|.  This is handy, however, they don't care naming collisions
 	by multiple modules.  The author is going to solve them in the future.
 
+session.config				*quickrun-session.config*
+	|quickrun-options| as an dictionary.  You available the normalized
+	config from |quickrun-hook-point-normalized|.  Note that all options
+	may be not available.
+
 ------------------------------------------------------------------------------
 MODULE COMMON ATTRIBUTES		*quickrun-module-attributes*
 
