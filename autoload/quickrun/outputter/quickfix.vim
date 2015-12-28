@@ -22,6 +22,7 @@ function! s:outputter.init(session) abort
 \    = !empty(self.config.errorformat) ? self.config.errorformat
 \    : !empty(&l:errorformat)          ? &l:errorformat
 \    : &g:errorformat
+  let self._target_window = s:VT.trace_window()
 endfunction
 
 
@@ -29,7 +30,8 @@ function! s:outputter.finish(session) abort
   try
     let errorformat = &g:errorformat
     let &g:errorformat = self.config.errorformat
-    let win = s:VT.trace_window()
+    let current_window = s:VT.trace_window()
+    call s:VT.jump(self._target_window)
     let result_list = self._apply_result(self._result)
     execute self.config.open_cmd
     if &buftype ==# 'quickfix'
@@ -39,8 +41,9 @@ function! s:outputter.finish(session) abort
     if result_empty
       call self._close_window()
     endif
-    if result_empty || !self.config.into
-      call s:VT.jump(win)
+    call s:VT.jump(self._target_window)
+    if !self.config.into
+      call s:VT.jump(current_window)
     endif
   finally
     let &g:errorformat = errorformat
