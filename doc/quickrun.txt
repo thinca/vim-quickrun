@@ -587,6 +587,18 @@ available by default.
   outputter/quickfix/into		Default: 0
 	Moves cursor to the |quickfix-window| if this isn't 0.
 
+- "outputter/loclist"			*quickrun-module-outputter/loclist*
+  Outputs on |location-list|.
+  Option ~
+  outputter/loclist/errorformat	Default: "&errorformat"
+	'errorformat' option to parse the output.
+  outputter/loclist/open_cmd		Default: "copen"
+	The command to open |location-list-window|.
+	The window is closed automatically when the result is empty.
+	You shouldn't use "cwindow".  Some features don't work well.
+  outputter/loclist/into		Default: 0
+	Moves cursor to the |location-list-window| if this isn't 0.
+
 - "outputter/browser"			*quickrun-module-outputter/browser*
   {Requires |open-browser|}
   Opens the output on browser, using |open-browser|.

@@ -578,6 +578,19 @@ outputter は結果の出力を行うモジュールです。
 	0 以外を指定すると、結果が出た際に |quickfix-window| へカーソルを移動
 	します。
 
+- "outputter/loclist"			*quickrun-module-outputter/loclist*
+  |location-list| へ出力します。
+  オプション ~
+  outputter/loclist/errorformat	デフォルト: "&errorformat"
+	出力を解釈するための 'errorformat' オプションの値です。
+  outputter/loclist/open_cmd		デフォルト: "copen"
+	|location-list-window| を開くためのコマンドです。
+	結果が空だった場合は自動で閉じられます。
+	"cwindow" は使わないでください。いくつかの機能がうまく動作しません。
+  outputter/loclist/into		デフォルト: 0
+	0 以外を指定すると、結果が出た際に |location-list-window| へカーソルを
+	移動します。
+
 - "outputter/browser"			*quickrun-module-outputter/browser*
   {|open-browser| が必要}
   |open-browser| を使って、結果をブラウザで開きます。
