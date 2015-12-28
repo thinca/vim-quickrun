@@ -580,8 +580,12 @@ available by default.
   Option ~
   outputter/quickfix/errorformat	Default: "&errorformat"
 	'errorformat' option to parse the output.
-  outputter/quickfix/open_cmd		Default: "cwindow"
+  outputter/quickfix/open_cmd		Default: "copen"
 	The command to open |quickfix-window|.
+	The window is closed automatically when the result is empty.
+	You shouldn't use "cwindow".  Some features don't work well.
+  outputter/quickfix/into		Default: 0
+	Moves cursor to the |quickfix-window| if this isn't 0.
 
 - "outputter/browser"			*quickrun-module-outputter/browser*
   {Requires |open-browser|}
