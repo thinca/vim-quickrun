@@ -412,6 +412,10 @@ let g:quickrun#default_config = {
 \   'tempfile': '%{tempname()}.ps1',
 \   'hook/output_encode/encoding': '&termencoding',
 \ },
+\ 'xquery': {
+\   'command': 'zorba',
+\   'exec': '%c %o %s %a',
+\ },
 \ 'r': {
 \   'command': 'R',
 \   'exec': '%c %o --no-save --slave %a < %s',
