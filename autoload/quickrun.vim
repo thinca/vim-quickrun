@@ -74,7 +74,7 @@ let g:quickrun#default_config = {
 \ },
 \ 'clojure/clj': {
 \   'command': 'clj',
-\   'exec': '%c %s',
+\   'exec': '%c %s %a',
 \ },
 \ 'clojure/process_manager': {
 \   'command': 'clojure-1.6',
