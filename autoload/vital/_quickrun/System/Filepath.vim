@@ -12,6 +12,7 @@ let s:is_cygwin = has('win32unix')
 let s:is_mac = !s:is_windows && !s:is_cygwin
       \ && (has('mac') || has('macunix') || has('gui_macvim') ||
       \   (!isdirectory('/proc') && executable('sw_vers')))
+let s:is_case_tolerant = filereadable(expand('<sfile>:r') . '.VIM')
 
 " Get the directory separator.
 function! s:separator() abort
@@ -32,7 +33,7 @@ function! s:path_extensions() abort
         let pathext = $PATHEXT
       else
         " get default PATHEXT
-        let pathext = matchstr(system('set pathext'), '^pathext=\zs.*\ze\n', 'i')
+        let pathext = matchstr(system('set pathext'), '\C^pathext=\zs.*\ze\n', 'i')
       endif
       let s:path_extensions = map(split(pathext, s:path_separator), 'tolower(v:val)')
     elseif s:is_cygwin
@@ -77,7 +78,7 @@ else
             let full = glob(substitute(
             \               toupper(full), '\u:\@!', '[\0\L\0]', 'g'), 1)
           endif
-          if full != ''
+          if full !=# ''
             return full
           endif
         endif
@@ -133,7 +134,7 @@ function! s:dirname(path) abort
   let orig = a:path
 
   let path = s:remove_last_separator(path)
-  if path == ''
+  if path ==# ''
     return orig    " root directory
   endif
 
@@ -149,7 +150,7 @@ function! s:basename(path) abort
   let orig = a:path
 
   let path = s:remove_last_separator(path)
-  if path == ''
+  if path ==# ''
     return orig    " root directory
   endif
 
@@ -160,14 +161,13 @@ endfunction
 " Remove the separator at the end of a:path.
 function! s:remove_last_separator(path) abort
   let sep = s:separator()
-  let pat = (sep == '\' ? '\\' : '/') . '\+$'
+  let pat = escape(sep, '\') . '\+$'
   return substitute(a:path, pat, '', '')
 endfunction
 
 
 " Return true if filesystem ignores alphabetic case of a filename.
 " Return false otherwise.
-let s:is_case_tolerant = filereadable(expand('<sfile>:r') . '.VIM')
 function! s:is_case_tolerant() abort
   return s:is_case_tolerant
 endfunction
@@ -213,11 +213,35 @@ else
   endfunction
 endif
 
-function! s:is_root_directory(path) abort
-  if a:path ==# '/'
+if s:is_windows
+  function! s:is_root_directory(path) abort
+    return a:path =~# '^[a-zA-Z]:[/\\]$'
+  endfunction
+else
+  function! s:is_root_directory(path) abort
+    return a:path ==# '/'
+  endfunction
+endif
+
+function! s:contains(path, base) abort
+  if a:path ==# '' || a:base ==# ''
+    return 0
+  endif
+  let pathlist = s:split(a:path)
+  let baselist = s:split(a:base)
+  let pathlistlen = len(pathlist)
+  let baselistlen = len(baselist)
+  if pathlistlen < baselistlen
+    return 0
+  endif
+  if baselistlen == 0
     return 1
   endif
-  return (has('win32') || has('win64')) && a:path =~ '^[a-zA-Z]:[/\\]$'
+  if s:is_case_tolerant
+    call map(pathlist, 'tolower(v:val)')
+    call map(baselist, 'tolower(v:val)')
+  endif
+  return pathlist[: baselistlen - 1] ==# baselist
 endfunction
 
 let &cpo = s:save_cpo

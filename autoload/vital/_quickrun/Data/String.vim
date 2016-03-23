@@ -59,7 +59,7 @@ function! s:common_head(strs) abort
   endif
   let strs = len == 2 ? a:strs : sort(copy(a:strs))
   let pat = substitute(strs[0], '.', '\="[" . escape(submatch(0), "^\\") . "]"', 'g')
-  return pat == '' ? '' : matchstr(strs[-1], '\C^\%[' . pat . ']')
+  return pat ==# '' ? '' : matchstr(strs[-1], '\C^\%[' . pat . ']')
 endfunction
 
 " Split to two elements of List. ([left, right])
@@ -208,7 +208,7 @@ function! s:nr2byte(nr) abort
 endfunction
 
 function! s:nr2enc_char(charcode) abort
-  if &encoding == 'utf-8'
+  if &encoding ==# 'utf-8'
     return nr2char(a:charcode)
   endif
   let char = s:nr2byte(a:charcode)
@@ -220,7 +220,7 @@ endfunction
 
 function! s:nr2hex(nr) abort
   let n = a:nr
-  let r = ""
+  let r = ''
   while n
     let r = '0123456789ABCDEF'[n % 16] . r
     let n = n / 16
@@ -371,7 +371,7 @@ function! s:split_by_displaywidth(expr, width, float, is_wrap) abort
 
   let text = ''
   while cs_index < len(cs)
-    if cs[cs_index] is "\n"
+    if cs[cs_index] is# "\n"
       let text = s:padding_by_displaywidth(text, a:width, a:float)
       let lines += [text]
       let text = ''
@@ -392,7 +392,7 @@ function! s:split_by_displaywidth(expr, width, float, is_wrap) abort
         if a:is_wrap
           if a:width < w
             if a:width < strdisplaywidth(cs[cs_index])
-              while get(cs, cs_index, "\n") isnot "\n"
+              while get(cs, cs_index, "\n") isnot# "\n"
                 let cs_index += 1
               endwhile
               continue
@@ -401,7 +401,7 @@ function! s:split_by_displaywidth(expr, width, float, is_wrap) abort
             endif
           endif
         else
-          while get(cs, cs_index, "\n") isnot "\n"
+          while get(cs, cs_index, "\n") isnot# "\n"
             let cs_index += 1
           endwhile
           continue

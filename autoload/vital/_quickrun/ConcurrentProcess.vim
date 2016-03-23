@@ -167,7 +167,7 @@ function! s:tick(label) abort
     call s:tick(a:label)
   else
     " must not happen
-    throw "ConcurrentProcess: must not happen"
+    throw 'ConcurrentProcess: must not happen'
   endif
 endfunction
 
@@ -175,6 +175,7 @@ endfunction
 function! s:consume_all_blocking(label, varname, timeout_sec) abort
   let start = reltime()
   while 1
+    call s:tick(a:label)
     if s:is_done(a:label, a:varname)
       return s:consume(a:label, a:varname) + [0] " 0 as 'Did not timed out'
     elseif reltime(start)[0] >= a:timeout_sec
@@ -197,11 +198,9 @@ function! s:consume(label, varname) abort
 endfunction
 
 function! s:is_done(label, rname) abort
-  call s:tick(a:label)
-
   let reads = filter(
         \ copy(s:_process_info[a:label].queries),
-        \ 'v:val[0] ==# "*read*" || v:val[0] ==# "*read-all*"')
+        \ "v:val[0] ==# '*read*' || v:val[0] ==# '*read-all*'")
   return s:L.all(
         \ printf('v:val[1] !=# %s', string(a:rname)),
         \ reads)
@@ -236,7 +235,7 @@ function! s:log_dump(label) abort
   for [stdin, stdout, stderr] in s:_process_info[a:label].logs
     echon stdin
     echon stdout
-    if stderr
+    if stderr !=# ''
       echon printf('!!!%s!!!', stderr)
     endif
   endfor
