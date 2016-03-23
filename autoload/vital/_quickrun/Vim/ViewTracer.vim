@@ -81,7 +81,7 @@ elseif has('patch-7.4.434')
   " This Bug is fixed in 7.4.834.
   function! s:_gettabdict(tabnr) abort
     let dict = gettabvar(a:tabnr, '')
-    return dict is '' ? gettabvar(a:tabnr, '') : dict
+    return dict is# '' ? gettabvar(a:tabnr, '') : dict
   endfunction
 else
   " Before Vim 7.4.434, gettabvar() doesn't return

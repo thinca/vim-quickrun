@@ -15,7 +15,7 @@ let s:is_mac = !s:is_windows && !s:is_cygwin
 let s:need_trans = v:version < 704 || (v:version == 704 && !has('patch122'))
 
 " Open a file.
-function! s:open(filename) abort "{{{
+function! s:open(filename) abort
   let filename = fnamemodify(a:filename, ':p')
 
   " Detect desktop environment.
@@ -56,22 +56,22 @@ function! s:open(filename) abort "{{{
           \ shellescape(filename)))
   else
     " Give up.
-    throw 'Not supported.'
+    throw 'vital: System.File: open(): Not supported.'
   endif
-endfunction "}}}
+endfunction
 
 
 " Move a file.
 " Dispatch s:move_exe() or s:move_vim().
 " FIXME: Currently s:move_vim() does not support
 " moving a directory.
-function! s:move(src, dest) abort "{{{
+function! s:move(src, dest) abort
   if s:_has_move_exe() || isdirectory(a:src)
     return s:move_exe(a:src, a:dest)
   else
     return s:move_vim(a:src, a:dest)
   endif
-endfunction "}}}
+endfunction
 
 if s:is_unix
   function! s:_has_move_exe() abort
@@ -83,7 +83,7 @@ elseif s:is_windows
   endfunction
 else
   function! s:_has_move_exe() abort
-    throw 'vital: System.File._has_move_exe(): your platform is not supported'
+    throw 'vital: System.File: _has_move_exe(): your platform is not supported'
   endfunction
 endif
 
@@ -116,25 +116,25 @@ elseif s:is_windows
   endfunction
 else
   function! s:move_exe() abort
-    throw 'vital: System.File.move_exe(): your platform is not supported'
+    throw 'vital: System.File: move_exe(): your platform is not supported'
   endfunction
 endif
 
 " Move a file.
 " Implemented by pure Vim script.
-function! s:move_vim(src, dest) abort "{{{
+function! s:move_vim(src, dest) abort
   return !rename(a:src, a:dest)
-endfunction "}}}
+endfunction
 
 " Copy a file.
 " Dispatch s:copy_exe() or s:copy_vim().
-function! s:copy(src, dest) abort "{{{
+function! s:copy(src, dest) abort
   if s:_has_copy_exe()
     return s:copy_exe(a:src, a:dest)
   else
     return s:copy_vim(a:src, a:dest)
   endif
-endfunction "}}}
+endfunction
 
 if s:is_unix
   function! s:_has_copy_exe() abort
@@ -146,7 +146,7 @@ elseif s:is_windows
   endfunction
 else
   function! s:_has_copy_exe() abort
-    throw 'vital: System.File._has_copy_exe(): your platform is not supported'
+    throw 'vital: System.File: _has_copy_exe(): your platform is not supported'
   endfunction
 endif
 
@@ -171,51 +171,59 @@ elseif s:is_windows
   endfunction
 else
   function! s:copy_exe() abort
-    throw 'vital: System.File.copy_exe(): your platform is not supported'
+    throw 'vital: System.File: copy_exe(): your platform is not supported'
   endfunction
 endif
 
 " Copy a file.
 " Implemented by pure Vim script.
-function! s:copy_vim(src, dest) abort "{{{
-  let ret = writefile(readfile(a:src, "b"), a:dest, "b")
+function! s:copy_vim(src, dest) abort
+  let ret = writefile(readfile(a:src, 'b'), a:dest, 'b')
   if ret == -1
     return 0
   endif
   return 1
-endfunction "}}}
+endfunction
 
 " mkdir() but does not throw an exception.
 " Returns true if success.
 " Returns false if failure.
-function! s:mkdir_nothrow(...) abort "{{{
+function! s:mkdir_nothrow(...) abort
   try
     return call('mkdir', a:000)
   catch
     return 0
   endtry
-endfunction "}}}
+endfunction
 
 
 " Delete a file/directory.
-if s:is_unix
+if has('patch-7.4.1128')
   function! s:rmdir(path, ...) abort
     let flags = a:0 ? a:1 : ''
-    let cmd = flags =~# 'r' ? 'rm -r' : 'rmdir'
-    let cmd .= flags =~# 'f' && cmd ==# 'rm -r' ? ' -f' : ''
+    let delete_flags = flags =~# 'r' ? 'rf' : 'd'
+    let result = delete(a:path, delete_flags)
+    if result == -1
+      throw 'vital: System.File: rmdir(): cannot delete "' . a:path . '"'
+    endif
+  endfunction
+
+elseif s:is_unix
+  function! s:rmdir(path, ...) abort
+    let flags = a:0 ? a:1 : ''
+    let cmd = flags =~# 'r' ? 'rm -rf' : 'rmdir'
     let ret = system(cmd . ' ' . shellescape(a:path))
     if v:shell_error
       let ret = iconv(ret, 'char', &encoding)
-      throw substitute(ret, '\n', '', 'g')
+      throw 'vital: System.File: rmdir(): ' . substitute(ret, '\n', '', 'g')
     endif
   endfunction
 
 elseif s:is_windows
   function! s:rmdir(path, ...) abort
     let flags = a:0 ? a:1 : ''
-    if &shell =~? "sh$"
-      let cmd = flags =~# 'r' ? 'rm -r' : 'rmdir'
-      let cmd .= flags =~# 'f' && cmd ==# 'rm -r' ? ' -f' : ''
+    if &shell =~? 'sh$'
+      let cmd = flags =~# 'r' ? 'rm -rf' : 'rmdir'
       let ret = system(cmd . ' ' . shellescape(a:path))
     else
       " 'f' flag does not make sense.
@@ -225,13 +233,13 @@ elseif s:is_windows
     endif
     if v:shell_error
       let ret = iconv(ret, 'char', &encoding)
-      throw substitute(ret, '\n', '', 'g')
+      throw 'vital: System.File: rmdir(): ' . substitute(ret, '\n', '', 'g')
     endif
   endfunction
 
 else
   function! s:rmdir(...) abort
-    throw 'vital: System.File.rmdir(): your platform is not supported'
+    throw 'vital: System.File: rmdir(): your platform is not supported'
   endfunction
 endif
 
