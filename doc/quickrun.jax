@@ -172,6 +172,10 @@ quickrun#sweep_sessions()			*quickrun#sweep_sessions()*
 	実行中のセッションを強制的に終了します。新しく実行を行う前に呼び出され
 	ます。実行が終わらない場合は、手動で呼び出すこともできます。
 
+quickrun#is_running()				*quickrun#is_running()*
+	いずれかのセッションが実行中かどうかを調べます。実行中の場合は非 0 を
+	返します。
+
 
 以下の関数は非推奨です。次のバージョンで削除される予定です。
 quickrun#register_module({kind}, {name}, {module})

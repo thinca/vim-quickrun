@@ -171,6 +171,9 @@ quickrun#sweep_sessions()			*quickrun#sweep_sessions()*
 	Stops the sessions under execution.  This is called before new
 	execution.  When execution doesn't end, you can call this by manually.
 
+quickrun#is_running()				*quickrun#is_running()*
+	Checks any session is running.  Returns non-zero when running.
+
 
 The following functions are deprecated.  These will be removed at next
 version.
