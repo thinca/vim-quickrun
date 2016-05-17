@@ -595,7 +595,7 @@ available by default.
   Option ~
   outputter/loclist/errorformat	Default: "&errorformat"
 	'errorformat' option to parse the output.
-  outputter/loclist/open_cmd		Default: "copen"
+  outputter/loclist/open_cmd		Default: "lopen"
 	The command to open |location-list-window|.
 	The window is closed automatically when the result is empty.
 	You shouldn't use "cwindow".  Some features don't work well.

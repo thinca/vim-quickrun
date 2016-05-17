@@ -587,7 +587,7 @@ outputter は結果の出力を行うモジュールです。
   オプション ~
   outputter/loclist/errorformat	デフォルト: "&errorformat"
 	出力を解釈するための 'errorformat' オプションの値です。
-  outputter/loclist/open_cmd		デフォルト: "copen"
+  outputter/loclist/open_cmd		デフォルト: "lopen"
 	|location-list-window| を開くためのコマンドです。
 	結果が空だった場合は自動で閉じられます。
 	"cwindow" は使わないでください。いくつかの機能がうまく動作しません。
