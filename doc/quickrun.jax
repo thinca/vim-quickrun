@@ -1,6 +1,6 @@
 *quickrun.txt*	コマンドを素早く実行します。
 
-Version: 0.6.0
+Version: 0.7.0
 Author: thinca <thinca+vim@gmail.com>
 英訳:
   * ujihisa <ujihisa at gmail com>
@@ -966,9 +966,10 @@ pandocを使用してmarkdownをhtmlにしてブラウザで開く (要|open-bro
 ==============================================================================
 更新履歴					*quickrun-changelog*
 
-0.6.1dev	2013-03-19
-	- デフォルトの設定に sql を追加 (Added default config for sql)
-	- runner/process_manager を追加 (Thanks ujihisa!)
+0.7.0	2016-07-02
+	- 多くのデフォルトの設定の追加および改善。
+	- runner/concurrent_process を追加。 (Thanks ujihisa!)
+	- outputter/loclist を追加。
 
 0.6.0	2012-06-16
 	- モジュール周りの構成を変更。
