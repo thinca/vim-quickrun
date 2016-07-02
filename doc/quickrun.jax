@@ -451,17 +451,6 @@ NOTE: "system" 以外は不安定な場合があります。
   runner/vimproc/read_timeout		デフォルト: 100
 	1 度の読み込みにかける時間(ミリ秒)です。
 
-- "runner/process_manager"	*quickrun-module-runner/process_manager*
-  (非推奨) |quickrun-module-runner/concurrent_process| と同様、プロセスをバッ
-  クグラウンドで実行し、かつそれを再利用します。concurrent_processとの違いは使
-  用する下位ライブラリです。
-
-  オプション ~
-  runner/process_manager/load			デフォルト: "load %s"
-  runner/process_manager/prompt			デフォルト: ">>> "
-  いずれもconcurrent_process側を参照してください。両者の間には互換性があり、名
-  前を変えるだけで動作します。
-
 - "runner/concurrent_process"	*quickrun-module-runner/concurrent_process*
   {|vimproc| が必要}
   |vimproc| と|Vital.ConcurrentProcess|を使ってコマンドをバックグラウンドで実行
