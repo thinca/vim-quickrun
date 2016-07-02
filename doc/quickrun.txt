@@ -587,7 +587,7 @@ available by default.
   outputter/loclist/open_cmd		Default: "lopen"
 	The command to open |location-list-window|.
 	The window is closed automatically when the result is empty.
-	You shouldn't use "cwindow".  Some features don't work well.
+	You shouldn't use "lwindow".  Some features don't work well.
   outputter/loclist/into		Default: 0
 	Moves cursor to the |location-list-window| if this isn't 0.
 

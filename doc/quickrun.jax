@@ -579,7 +579,7 @@ outputter は結果の出力を行うモジュールです。
   outputter/loclist/open_cmd		デフォルト: "lopen"
 	|location-list-window| を開くためのコマンドです。
 	結果が空だった場合は自動で閉じられます。
-	"cwindow" は使わないでください。いくつかの機能がうまく動作しません。
+	"lwindow" は使わないでください。いくつかの機能がうまく動作しません。
   outputter/loclist/into		デフォルト: 0
 	0 以外を指定すると、結果が出た際に |location-list-window| へカーソルを
 	移動します。
