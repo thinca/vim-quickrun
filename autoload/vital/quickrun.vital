@@ -5,7 +5,6 @@ Data.List
 System.File
 System.Filepath
 Prelude
-ProcessManager
 Process
 Vim.Message
 ConcurrentProcess
