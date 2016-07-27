@@ -97,7 +97,11 @@ function! s:receive_vimproc_result(key, read_timeout, pipe_status_index) abort
   let status = vimproc.waitpid()[1]
   if has_key(vimproc, 'pipe_status')
     let session.pipe_status = map(copy(vimproc.pipe_status), 'v:val[1]')
-    let status = get(session.pipe_status, a:pipe_status_index, status)
+    if string(a:pipe_status_index) ==# string('pipefail')
+      let status = get(filter(copy(session.pipe_status), 'v:val'), -1, 0)
+    else
+      let status = get(session.pipe_status, a:pipe_status_index, status)
+    endif
   endif
   call session.finish(status)
   return 1
