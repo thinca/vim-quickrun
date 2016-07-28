@@ -8,6 +8,7 @@ set cpo&vim
 let s:hook = {
 \   'config': {
 \     'encoding': '&fileencoding',
+\     'fileformat': 0,
 \   },
 \ }
 
@@ -19,12 +20,22 @@ function! s:hook.init(session) abort
   if len(enc) is 2 && enc[0] !=# '' && enc[1] !=# '' && enc[0] !=# enc[1]
     let [self._from, self._to] = enc
   else
+    let [self._from, self._to] = ['', '']
+  endif
+  if self._from ==# '' && !self.config.fileformat
     let self.config.enable = 0
   endif
 endfunction
 
 function! s:hook.on_output(session, context) abort
-  let a:context.data = iconv(a:context.data, self._from, self._to)
+  let data = a:context.data
+  if self._from !=# ''
+    let data = iconv(data, self._from, self._to)
+  endif
+  if self.config.fileformat
+    let data = substitute(data, '\r\n\?', '\n', 'g')
+  endif
+  let a:context.data = data
 endfunction
 
 function! quickrun#hook#output_encode#new() abort
