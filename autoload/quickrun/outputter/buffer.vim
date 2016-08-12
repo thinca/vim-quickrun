@@ -90,7 +90,7 @@ function! s:open_result_window(config, session) abort
   if !bufexists(a:config.name)
     execute sp 'split'
     edit `=a:config.name`
-    nnoremap <buffer> q <C-w>c
+    nnoremap <buffer> q <C-w>q
     setlocal bufhidden=hide buftype=nofile noswapfile nobuflisted
     let opened = 1
   elseif bufwinnr(sname) != -1
