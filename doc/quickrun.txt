@@ -505,6 +505,17 @@ default.  NOTE: Everything except for "system" can be unstable.
   WARNING: This is absolutely unstable.
   WARNING: Don't use this on X11.  Vim crashes.
 
+- "runner/job"				*quickrun-module-runner/job*
+  {Experimental}
+  {Requirement: |+job|}
+  Runs via |job| feature.
+  Option ~
+  runner/job/interval		Default: 0
+	job feature checks about every 10 seconds for jobs that ended
+	(|job-exit_cb|).
+	When this value is not 0, this checks the end of job every specified
+	time in milliseconds by |timer|.
+
 - "runner/vimscript"			*quickrun-module-runner/vimscript*
   Runs commands as Vim commands.
   Vim command that contains |:redir| command can not run.  This gets the

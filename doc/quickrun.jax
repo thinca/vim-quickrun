@@ -497,6 +497,17 @@ NOTE: "system" 以外は不安定な場合があります。
   警告: これは非常に不安定です。
   警告: X11 環境では使用しないでください。Vim がクラッシュします。
 
+- "runner/job"				*quickrun-module-runner/job*
+  {実験的な機能}
+  {|+job| が必要}
+  |job| の機能を使ってコマンドを非同期実行します。
+  オプション ~
+  runner/job/interval		デフォルト: 0
+	job 機能は、10 秒毎に job の終了をチェックします(|job-exit_cb|)。この
+	オプションに 0 以外を設定すると、|timer| を使って指定した時間毎に終了
+	をチェックします。
+	単位はミリ秒です。
+
 - "runner/vimscript"			*quickrun-module-runner/vimscript*
   コマンドを Vim のコマンドとして実行します。
   |:redir| コマンドを含む Vim コマンドは実行できません。これは出力を得るために
@@ -965,6 +976,9 @@ pandocを使用してmarkdownをhtmlにしてブラウザで開く (要|open-bro
 
 ==============================================================================
 更新履歴					*quickrun-changelog*
+
+dev
+	- |quickrun-module-runner/job| を追加。
 
 0.7.0	2016-07-02
 	- 多くのデフォルトの設定の追加および改善。
