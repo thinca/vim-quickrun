@@ -1279,25 +1279,6 @@ function! s:get_region(region) abort
 endfunction
 
 
-" Wrapper functions for compatibility.  {{{1
-function! quickrun#register_runner(name, runner) abort
-  return quickrun#register_module('runner', a:name, a:runner)
-endfunction
-function! quickrun#register_outputter(name, outputter) abort
-  return quickrun#register_module('outputter', a:name, a:outputter)
-endfunction
-function! quickrun#register_hook(name, hook) abort
-  return quickrun#register_module('hook', a:name, a:hook)
-endfunction
-function! quickrun#register_module(kind, name, module) abort
-  return quickrun#module#register(
-  \        extend(a:module, {'kind': a:kind, 'name': a:name}, 'keep'))
-endfunction
-function! quickrun#get_module(kind, ...) abort
-  return call('quickrun#module#get', [a:kind] + a:000)
-endfunction
-
-
 " Register the default modules.  {{{1
 call quickrun#module#load()
 

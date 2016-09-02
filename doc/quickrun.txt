@@ -175,15 +175,6 @@ quickrun#is_running()				*quickrun#is_running()*
 	Checks any session is running.  Returns non-zero when running.
 
 
-The following functions are deprecated.  These will be removed at next
-version.
-quickrun#register_module({kind}, {name}, {module})
-quickrun#register_runner({name}, {runner})
-quickrun#register_outputter({name}, {outputter})
-quickrun#register_hook({name}, {hook})
-quickrun#get_module({kind} [, {name}])
-
-
 ------------------------------------------------------------------------------
 KEY MAPPINGS					*quickrun-key-mappings*
 

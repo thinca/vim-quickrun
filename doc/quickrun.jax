@@ -177,14 +177,6 @@ quickrun#is_running()				*quickrun#is_running()*
 	返します。
 
 
-以下の関数は非推奨です。次のバージョンで削除される予定です。
-quickrun#register_module({kind}, {name}, {module})
-quickrun#register_runner({name}, {runner})
-quickrun#register_outputter({name}, {outputter})
-quickrun#register_hook({name}, {hook})
-quickrun#get_module({kind} [, {name}])
-
-
 ------------------------------------------------------------------------------
 キーマッピング					*quickrun-key-mappings*
 
@@ -979,6 +971,7 @@ pandocを使用してmarkdownをhtmlにしてブラウザで開く (要|open-bro
 
 dev
 	- |quickrun-module-runner/job| を追加。
+	- 古い関数を削除。
 
 0.7.0	2016-07-02
 	- 多くのデフォルトの設定の追加および改善。
