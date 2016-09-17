@@ -446,7 +446,9 @@ let g:quickrun#default_config = {
 \   'exec': '%c run %o',
 \ },
 \ 'scala': {
+\   'exec': ['scalac %o -d %s:p:h %s', '%c -cp %s:p:h %s:t:r %a'],
 \   'hook/output_encode/encoding': '&termencoding',
+\   'hook/sweep/files': '%S:p:r.class',
 \ },
 \ 'scala/process_manager': {
 \   'command': 'scala',
