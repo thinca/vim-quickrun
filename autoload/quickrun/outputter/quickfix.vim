@@ -41,8 +41,7 @@ function! s:outputter.finish(session) abort
     if result_empty
       call self._close_window()
     endif
-    call s:VT.jump(self._target_window)
-    if !self.config.into
+    if result_empty || !self.config.into
       call s:VT.jump(current_window)
     endif
   finally
