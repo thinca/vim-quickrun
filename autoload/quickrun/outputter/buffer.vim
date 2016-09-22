@@ -22,6 +22,8 @@ let s:outputter = {
 function! s:outputter.init(session) abort
   let self._append = self.config.append
   let self._line = 0
+  let self._crlf = 0
+  let self._lf = 0
 endfunction
 
 function! s:outputter.start(session) abort
@@ -29,6 +31,7 @@ function! s:outputter.start(session) abort
   call s:open_result_window(self.config, a:session)
   if !self._append
     silent % delete _
+    setlocal fileformat=unix
   endif
   call s:set_running_mark(self.config.running_mark)
   call s:VT.jump(prev_window)
@@ -37,26 +40,37 @@ endfunction
 function! s:outputter.output(data, session) abort
   let prev_window = s:VT.trace_window()
   call s:open_result_window(self.config, a:session)
-  if self._line == 0
-    let self._line = line('$')
-  endif
+
   let oneline = line('$') == 1
   let data = getline('$') . a:data
   silent $ delete _
-  if data =~# '\n$'
-    " :put command do not insert the last line.
-    let data .= "\n"
+
+  if self._line == 0
+    let self._line = line('$') + (oneline ? 0 : 1)
+    if 2 <= self._line
+      let self._crlf = &l:fileformat ==# 'dos' || search("\r$", 'wn')
+      let self._lf = &l:fileformat ==# 'unix' && search("[^\r]$", 'wn')
+    endif
   endif
 
-  " XXX 'fileformat' of a new buffer depends on 'fileformats'.
+  let self._crlf = self._crlf || a:data =~# "\r\n"
+  let self._lf = self._lf || a:data =~# "[^\r]\n"
+
+  call s:normalize_fileformat(self._crlf, self._lf)
+
   if &l:fileformat ==# 'dos'
     let data = substitute(data, "\r\n", "\n", 'g')
   endif
 
+  if data =~# '\n$'
+    " :put command do not insert the last line.
+    let data .= "\n"
+  endif
   silent $ put = data
   if oneline
     silent 1 delete _
   endif
+
   call s:set_running_mark(self.config.running_mark)
   call s:VT.jump(prev_window)
   redraw
@@ -92,6 +106,7 @@ function! s:open_result_window(config, session) abort
     edit `=a:config.name`
     nnoremap <buffer> q <C-w>c
     setlocal bufhidden=hide buftype=nofile noswapfile nobuflisted
+    setlocal fileformat=unix
     let opened = 1
   elseif bufwinnr(sname) != -1
     execute bufwinnr(sname) 'wincmd w'
@@ -109,6 +124,18 @@ function! s:open_result_window(config, session) abort
   if exists('b:quickrun_running_mark')
     silent undo
     unlet b:quickrun_running_mark
+  endif
+endfunction
+
+function! s:normalize_fileformat(crlf, lf) abort
+  " XXX Do not care `fileformat=mac`
+  if &l:fileformat ==# 'unix' && a:crlf && !a:lf
+    setlocal fileformat=dos
+  elseif &l:fileformat ==# 'dos' && a:lf
+    setlocal fileformat=unix
+    for lnum in range(1, line('$'))
+      call setline(lnum, getline(lnum) . "\r")
+    endfor
   endif
 endfunction
 
