@@ -502,10 +502,11 @@ default.  NOTE: Everything except for "system" can be unstable.
   Runs via |job| feature.
   Option ~
   runner/job/interval		Default: 0
-	job feature checks about every 10 seconds for jobs that ended
-	(|job-exit_cb|).
+	Before Vim 8.0.0036, job feature checks about every 10 seconds for
+	jobs that ended (|job-exit_cb|).
 	When this value is not 0, this checks the end of job every specified
 	time in milliseconds by |timer|.
+	This option may be unnecessary when you use Vim 8.0.0036 or later.
 
 - "runner/vimscript"			*quickrun-module-runner/vimscript*
   Runs commands as Vim commands.
