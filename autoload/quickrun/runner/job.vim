@@ -28,6 +28,7 @@ function! s:runner.run(commands, input, session) abort
   let options = {
   \   'mode': 'raw',
   \   'callback': self._job_cb,
+  \   'close_cb': self._job_close_cb,
   \   'exit_cb': self._job_exit_cb,
   \ }
   if a:input ==# ''
@@ -63,8 +64,20 @@ function! s:runner._job_cb(channel, message) abort
   call quickrun#session(self._key, 'output', a:message)
 endfunction
 
+function! s:runner._job_close_cb(channel) abort
+  if has_key(self, '_job_exited')
+    call quickrun#session(self._key, 'finish', self._job_exited)
+  else
+    let self._job_exited = 0
+  endif
+endfunction
+
 function! s:runner._job_exit_cb(job, exit_status) abort
-  call quickrun#session(self._key, 'finish', a:exit_status)
+  if has_key(self, '_job_exited')
+    call quickrun#session(self._key, 'finish', a:exit_status)
+  else
+    let self._job_exited = a:exit_status
+  endif
 endfunction
 
 function! s:runner._timer_cb(timer) abort
