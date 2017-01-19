@@ -188,7 +188,7 @@ let g:quickrun#default_config = {
 \ },
 \ 'dosbatch': {
 \   'command': 'cmd',
-\   'exec': '%c /c "call %s %a"',
+\   'exec': '%c /c %s %a',
 \   'hook/output_encode/encoding': 'cp932',
 \   'tempfile': '%{tempname()}.bat',
 \ },
