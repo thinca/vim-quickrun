@@ -31,21 +31,18 @@ endfunction
 
 function! s:sweep() abort
   if has_key(self, '_job')
-    call jobstop(self.job)
+    call jobstop(self._job)
   endif
 endfunction
 
 function! s:_job_cb(channel, message) abort
-  " echomsg a:channel a:message s:runner
-  " let ss = quickrun#session(s:runner._key, 'output', a:message)
   let session = quickrun#session(s:runner._key)
   call session.output(join(a:message, "\n"))
-  " call quickrun#session.output(a:message)
 endfunction
 
 function! s:_job_exit_cb(channel, exit_status) abort
   let session = quickrun#session(s:runner._key)
-  call session.finish()
+  call session.finish(a:exit_status)
 endfunction
 
 function! quickrun#runner#jobstart#new() abort
