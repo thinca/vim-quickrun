@@ -23,7 +23,7 @@ endfunction
 
 function! s:runner.run(commands, input, session) abort
   let command = join(a:commands, ' && ')
-  let cmd_arg = s:is_win ? ['cmd.exe', '/c', command]
+  let cmd_arg = s:is_win ? printf('cmd.exe /c (%s)', command)
   \                      : ['sh', '-c', command]
   let options = {
   \   'mode': 'raw',
