@@ -9,3 +9,4 @@ Process
 Vim.Message
 ConcurrentProcess
 Vim.ViewTracer
+Vim.Buffer
