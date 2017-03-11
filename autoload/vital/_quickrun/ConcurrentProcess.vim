@@ -182,7 +182,7 @@ function! s:tick(label) abort
     call s:tick(a:label)
   else
     " must not happen
-    throw 'ConcurrentProcess: must not happen'
+    throw 'vital: ConcurrentProcess: must not happen'
   endif
 endfunction
 
