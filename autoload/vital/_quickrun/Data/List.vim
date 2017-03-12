@@ -3,13 +3,13 @@
 " Do not mofidify the code nor insert new lines before '" ___vital___'
 if v:version > 703 || v:version == 703 && has('patch1170')
   function! vital#_quickrun#Data#List#import() abort
-    return map({'combinations': '', 'and': '', 'sort_by': '', 'foldr1': '', 'sort': '', 'flatten': '', 'has_index': '', 'find_indices': '', 'any': '', 'unshift': '', 'span': '', 'pop': '', 'binary_search': '', 'uniq_by': '', 'or': '', 'all': '', 'zip': '', 'find_last_index': '', 'find': '', 'partition': '', 'map_accum': '', 'permutations': '', 'break': '', 'max_by': '', 'foldl': '', 'foldr': '', 'find_index': '', 'group_by': '', 'take_while': '', 'conj': '', 'push': '', 'char_range': '', 'cons': '', 'foldl1': '', 'intersect': '', 'concat': '', 'shift': '', 'clear': '', 'has_common_items': '', 'product': '', 'zip_fill': '', 'uniq': '', 'has': '', 'min_by': '', 'with_index': ''},  'function("s:" . v:key)')
+    return map({'combinations': '', 'and': '', 'sort_by': '', 'foldr1': '', 'sort': '', 'flatten': '', 'has_index': '', 'find_indices': '', 'any': '', 'unshift': '', 'span': '', 'pop': '', 'binary_search': '', 'uniq_by': '', 'or': '', 'all': '', 'zip': '', 'find_last_index': '', 'find': '', 'partition': '', 'shift': '', 'permutations': '', 'break': '', 'max_by': '', 'foldl': '', 'foldr': '', 'find_index': '', 'drop_while': '', 'group_by': '', 'take_while': '', 'conj': '', 'push': '', 'char_range': '', 'cons': '', 'foldl1': '', 'intersect': '', 'concat': '', 'map_accum': '', 'clear': '', 'has_common_items': '', 'product': '', 'zip_fill': '', 'uniq': '', 'has': '', 'min_by': '', 'with_index': ''},  'function("s:" . v:key)')
   endfunction
 else
   function! s:_SID() abort
     return matchstr(expand('<sfile>'), '<SNR>\zs\d\+\ze__SID$')
   endfunction
-  execute join(['function! vital#_quickrun#Data#List#import() abort', printf("return map({'combinations': '', 'and': '', 'sort_by': '', 'foldr1': '', 'sort': '', 'flatten': '', 'has_index': '', 'find_indices': '', 'any': '', 'unshift': '', 'span': '', 'pop': '', 'binary_search': '', 'uniq_by': '', 'or': '', 'all': '', 'zip': '', 'find_last_index': '', 'find': '', 'partition': '', 'map_accum': '', 'permutations': '', 'break': '', 'max_by': '', 'foldl': '', 'foldr': '', 'find_index': '', 'group_by': '', 'take_while': '', 'conj': '', 'push': '', 'char_range': '', 'cons': '', 'foldl1': '', 'intersect': '', 'concat': '', 'shift': '', 'clear': '', 'has_common_items': '', 'product': '', 'zip_fill': '', 'uniq': '', 'has': '', 'min_by': '', 'with_index': ''}, \"function('<SNR>%s_' . v:key)\")", s:_SID()), 'endfunction'], "\n")
+  execute join(['function! vital#_quickrun#Data#List#import() abort', printf("return map({'combinations': '', 'and': '', 'sort_by': '', 'foldr1': '', 'sort': '', 'flatten': '', 'has_index': '', 'find_indices': '', 'any': '', 'unshift': '', 'span': '', 'pop': '', 'binary_search': '', 'uniq_by': '', 'or': '', 'all': '', 'zip': '', 'find_last_index': '', 'find': '', 'partition': '', 'shift': '', 'permutations': '', 'break': '', 'max_by': '', 'foldl': '', 'foldr': '', 'find_index': '', 'drop_while': '', 'group_by': '', 'take_while': '', 'conj': '', 'push': '', 'char_range': '', 'cons': '', 'foldl1': '', 'intersect': '', 'concat': '', 'map_accum': '', 'clear': '', 'has_common_items': '', 'product': '', 'zip_fill': '', 'uniq': '', 'has': '', 'min_by': '', 'with_index': ''}, \"function('<SNR>%s_' . v:key)\")", s:_SID()), 'endfunction'], "\n")
   delfunction s:_SID
 endif
 " ___vital___
@@ -186,6 +186,11 @@ endfunction
 " similar to Haskell's Data.List.takeWhile
 function! s:take_while(f, xs) abort
   return s:span(a:f, a:xs)[0]
+endfunction
+
+" similar to Haskell's Data.List.dropWhile
+function! s:drop_while(f, xs) abort
+  return s:span(a:f, a:xs)[1]
 endfunction
 
 " similar to Haskell's Data.List.partition
@@ -439,7 +444,7 @@ function! s:combinations(list, r) abort
   if a:r > len(a:list)
     return []
   elseif a:r < 0
-    throw 'vital: Data:List: {r} must be non-negative integer'
+    throw 'vital: Data.List: {r} must be non-negative integer'
   endif
   let n = len(a:list)
   let result = []

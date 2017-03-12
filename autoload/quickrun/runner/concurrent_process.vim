@@ -13,6 +13,7 @@ let s:runner = {
 \ }
 
 let s:M = g:quickrun#V.import('Vim.Message')
+let s:B = g:quickrun#V.import('Vim.Buffer')
 let s:CP = g:quickrun#V.import('ConcurrentProcess')
 
 augroup plugin-quickrun-concurrent-process
@@ -66,7 +67,7 @@ function! s:runner.run(commands, input, session) abort
 endfunction
 
 function! s:receive(key) abort
-  if s:_is_cmdwin()
+  if s:B.is_cmdwin()
     return 0
   endif
 
@@ -94,11 +95,6 @@ endfunction
 
 function! quickrun#runner#concurrent_process#new() abort
   return deepcopy(s:runner)
-endfunction
-
-" TODO use vital's, if you include Vim.Buffer eventually
-function! s:_is_cmdwin() abort
-  return bufname('%') ==# '[Command Line]'
 endfunction
 
 let &cpo = s:save_cpo
