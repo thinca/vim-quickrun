@@ -76,13 +76,6 @@ let g:quickrun#default_config = {
 \   'command': 'clj',
 \   'exec': '%c %s %a',
 \ },
-\ 'clojure/process_manager': {
-\   'command': 'clojure-1.6',
-\   'cmdopt': '-e ''(clojure.main/repl :prompt #(print "\nquickrun/pm=> "))''',
-\   'runner': 'process_manager',
-\   'runner/process_manager/load': '(load-file "%S")',
-\   'runner/process_manager/prompt': 'quickrun/pm=> ',
-\ },
 \ 'clojure/concurrent_process': {
 \   'command': 'clojure-1.6',
 \   'cmdopt': '-e ''(clojure.main/repl :prompt #(print "\nquickrun/cp=> "))''',
@@ -426,17 +419,17 @@ let g:quickrun#default_config = {
 \ 'ruby': {'hook/eval/template': " p proc {\n%s\n}.call"},
 \ 'ruby/irb': {
 \   'command': 'irb',
-\   'exec': '%c %o --simple-prompt',
-\   'runner': 'process_manager',
-\   'runner/process_manager/load': "load '%s'",
-\   'runner/process_manager/prompt': '>> ',
+\   'cmdopt': '--simple-prompt',
+\   'runner': 'concurrent_process',
+\   'runner/concurrent_process/load': "load %s",
+\   'runner/concurrent_process/prompt': '>> ',
 \ },
 \ 'ruby/pry': {
 \   'command': 'pry',
-\   'exec': '%c %o --no-color --simple-prompt',
-\   'runner': 'process_manager',
-\   'runner/process_manager/load': "load '%s'",
-\   'runner/process_manager/prompt': '>> ',
+\   'cmdopt': '--no-color --simple-prompt',
+\   'runner': 'concurrent_process',
+\   'runner/concurrent_process/load': "load %s",
+\   'runner/concurrent_process/prompt': '>> ',
 \ },
 \ 'rust': {
 \   'command': 'rustc',
@@ -452,13 +445,6 @@ let g:quickrun#default_config = {
 \   'exec': ['scalac %o -d %s:p:h %s', '%c -cp %s:p:h %s:t:r %a'],
 \   'hook/output_encode/encoding': '&termencoding',
 \   'hook/sweep/files': '%S:p:r.class',
-\ },
-\ 'scala/process_manager': {
-\   'command': 'scala',
-\   'cmdopt': '-nc',
-\   'runner': 'process_manager',
-\   'runner/process_manager/load': ':load %S',
-\   'runner/process_manager/prompt': 'scala> ',
 \ },
 \ 'scala/concurrent_process': {
 \   'command': 'scala',
