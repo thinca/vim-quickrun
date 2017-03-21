@@ -320,6 +320,14 @@ let g:quickrun#default_config = {
 \    'tempfile': '%{tempname()}.kt',
 \    'hook/sweep/files': '%S:p:r.jar'
 \ },
+\ 'kotlin/concurrent_process': {
+\   'command': 'kotlinc-jvm',
+\   'exec': '%c',
+\   'tempfile': '%{tempname()}.kt',
+\   'runner': 'concurrent_process',
+\   'runner/concurrent_process/load': ':load %S',
+\   'runner/concurrent_process/prompt': '>>> ',
+\ },
 \ 'lisp': {
 \   'type' : executable('sbcl') ? 'lisp/sbcl':
 \            executable('ccl') ? 'lisp/ccl':
