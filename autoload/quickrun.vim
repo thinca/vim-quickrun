@@ -322,14 +322,10 @@ let g:quickrun#default_config = {
 \     'class _Main { static function main(args : string[]) :void { %s }}',
 \ },
 \ 'kotlin': {
-\   'exec': [
-\     'kotlinc-jvm %s -d %s:p:r.jar',
-\     'java -Xbootclasspath/a:%{shellescape(fnamemodify(' .
-\       'fnamemodify(g:quickrun#V.System.Filepath.which("kotlinc-jvm"), ":h") . "/../lib/kotlin-runtime.jar", ":p"))}' .
-\       ' -jar %s:p:r.jar'
-\   ],
-\   'tempfile': '%{tempname()}.kt',
-\   'hook/sweep/files': ['%S:p:r.jar'],
+\    'command': 'java',
+\    'exec': ['kotlinc %o %s -include-runtime -d %s:p:r.jar', '%c -jar %s:p:r.jar'],
+\    'tempfile': '%{tempname()}.kt',
+\    'hook/sweep/files': '%S:p:r.jar'
 \ },
 \ 'lisp': {
 \   'type' : executable('sbcl') ? 'lisp/sbcl':
