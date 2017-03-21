@@ -76,13 +76,6 @@ let g:quickrun#default_config = {
 \   'command': 'clj',
 \   'exec': '%c %s %a',
 \ },
-\ 'clojure/process_manager': {
-\   'command': 'clojure-1.6',
-\   'cmdopt': '-e ''(clojure.main/repl :prompt #(print "\nquickrun/pm=> "))''',
-\   'runner': 'process_manager',
-\   'runner/process_manager/load': '(load-file "%S")',
-\   'runner/process_manager/prompt': 'quickrun/pm=> ',
-\ },
 \ 'clojure/concurrent_process': {
 \   'command': 'clojure-1.6',
 \   'cmdopt': '-e ''(clojure.main/repl :prompt #(print "\nquickrun/cp=> "))''',
@@ -452,13 +445,6 @@ let g:quickrun#default_config = {
 \   'exec': ['scalac %o -d %s:p:h %s', '%c -cp %s:p:h %s:t:r %a'],
 \   'hook/output_encode/encoding': '&termencoding',
 \   'hook/sweep/files': '%S:p:r.class',
-\ },
-\ 'scala/process_manager': {
-\   'command': 'scala',
-\   'cmdopt': '-nc',
-\   'runner': 'process_manager',
-\   'runner/process_manager/load': ':load %S',
-\   'runner/process_manager/prompt': 'scala> ',
 \ },
 \ 'scala/concurrent_process': {
 \   'command': 'scala',
