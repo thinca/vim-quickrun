@@ -715,7 +715,8 @@ function! s:Session.build_command(tmpl) abort
   \  's': config.srcfile,
   \  'o': config.cmdopt,
   \  'a': config.args,
-  \  '%': '%',
+  \  '%': '\%',
+  \  '{': '%{',
   \}
   let rest = a:tmpl
   let result = ''
