@@ -443,11 +443,13 @@ let g:quickrun#default_config = {
 \   'command': 'rustc',
 \   'exec': ['%c %o %s -o %s:p:r', '%s:p:r %a'],
 \   'tempfile': '%{tempname()}.rs',
+\   'hook/shebang/enable': 0,
 \   'hook/sweep/files': '%S:p:r',
 \ },
 \ 'rust/cargo': {
 \   'command': 'cargo',
 \   'exec': '%c run %o',
+\   'hook/shebang/enable': 0,
 \ },
 \ 'scala': {
 \   'exec': ['scalac %o -d %s:p:h %s', '%c -cp %s:p:h %s:t:r %a'],
