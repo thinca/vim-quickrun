@@ -186,7 +186,6 @@ KEY MAPPINGS					*quickrun-key-mappings*
 			Execute and display the result for current buffer.
 			This is normally same as |:QuickRun|
 			without arguments.
-<
 
 					*g:quickrun_no_default_key_mappings*
 Following key mappings will NOT be defined if it's already mapped,
