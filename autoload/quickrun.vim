@@ -269,6 +269,11 @@ let g:quickrun#default_config = {
 \   'tempfile': '%{tempname()}.hs',
 \   'hook/sweep/files': ['%S:p:r', '%S:p:r.o', '%S:p:r.hi'],
 \ },
+\ 'eta': {
+\   'command': 'eta',
+\   'exec': ['%c %s', 'java -jar RunMain.jar'],
+\   'tempfile': '%{tempname()}.hs',
+\ },
 \ 'io': {},
 \ 'java': {
 \   'exec': ['javac %o -d %s:p:h %s', '%c -cp %s:p:h %s:t:r %a'],
