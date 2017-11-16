@@ -209,6 +209,12 @@ let g:quickrun#default_config = {
 \   'command': 'erb',
 \   'exec': '%c %o -T - %s %a',
 \ },
+\ 'eta': {
+\   'command': 'eta',
+\   'exec': ['%c %s', 'java -jar %s:h/Run%s:t:r.jar'],
+\   'tempfile': '%{tempname()}.hs',
+\   'hook/sweep/files': ['%S:p:h/Run%S:t:r.jar', '%S:p:r.jar', '%S:p:r.hi'],
+\ },
 \ 'fish': {
 \   'command': 'fish',
 \ },
@@ -268,12 +274,6 @@ let g:quickrun#default_config = {
 \   'cmdopt': '-v0 --make',
 \   'tempfile': '%{tempname()}.hs',
 \   'hook/sweep/files': ['%S:p:r', '%S:p:r.o', '%S:p:r.hi'],
-\ },
-\ 'eta': {
-\   'command': 'eta',
-\   'exec': ['%c %s', 'java -jar %s:h/Run%s:t:r.jar'],
-\   'tempfile': '%{tempname()}.hs',
-\   'hook/sweep/files': ['%S:p:h/Run%S:t:r.jar', '%S:p:r.jar', '%S:p:r.hi'],
 \ },
 \ 'io': {},
 \ 'java': {
