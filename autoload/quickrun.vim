@@ -435,14 +435,14 @@ let g:quickrun#default_config = {
 \   'command': 'irb',
 \   'cmdopt': '--simple-prompt',
 \   'runner': 'concurrent_process',
-\   'runner/concurrent_process/load': "load %s",
+\   'runner/concurrent_process/load': 'load %s',
 \   'runner/concurrent_process/prompt': '>> ',
 \ },
 \ 'ruby/pry': {
 \   'command': 'pry',
 \   'cmdopt': '--no-color --simple-prompt',
 \   'runner': 'concurrent_process',
-\   'runner/concurrent_process/load': "load %s",
+\   'runner/concurrent_process/load': 'load %s',
 \   'runner/concurrent_process/prompt': '>> ',
 \ },
 \ 'rust': {
@@ -521,7 +521,7 @@ let g:quickrun#default_config = {
 \ 'vim': {
 \   'command': ':source',
 \   'exec': '%C %s',
-\   'hook/eval/template': "echo %s",
+\   'hook/eval/template': 'echo %s',
 \   'runner': 'vimscript',
 \ },
 \ 'wsh': {
