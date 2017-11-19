@@ -535,7 +535,7 @@ outputter は結果の出力を行うモジュールです。
   outputter/buffer/append		デフォルト: 0
 	1 の場合は追記を行います。
   outputter/buffer/split
-	デフォルト: '{winwidth(0) * 2 < winheight(0) * 5 ? "" : "vertical"}'
+	デフォルト: '%{winwidth(0) * 2 < winheight(0) * 5 ? "" : "vertical"}'
 	出力専用バッファを開く際の補助コマンドを指定します。バッファを開く際に
 	|:split| コマンドの前に挿入されます。
   outputter/buffer/into			デフォルト: 0

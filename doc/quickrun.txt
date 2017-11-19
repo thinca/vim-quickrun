@@ -542,7 +542,7 @@ available by default.
   outputter/buffer/append		Default: 0
 	Appends if it's 1.
   outputter/buffer/split
-	Default: '{winwidth(0) * 2 < winheight(0) * 5 ? "" : "vertical"}'
+	Default: '%{winwidth(0) * 2 < winheight(0) * 5 ? "" : "vertical"}'
 
 	Specifies a sub-command to open a buffer for the output.  |quickrun|
 	inserts this before |:split| command when it opens a buffer.
