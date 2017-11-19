@@ -5,6 +5,7 @@
 let s:is_win = g:quickrun#V.Prelude.is_windows()
 let s:runner = {
 \   'config': {
+\     'pty': 0,
 \     'interval': 0,
 \   }
 \ }
@@ -30,6 +31,7 @@ function! s:runner.run(commands, input, session) abort
   \   'callback': self._job_cb,
   \   'close_cb': self._job_close_cb,
   \   'exit_cb': self._job_exit_cb,
+  \   'pty': self.config.pty,
   \ }
   if a:input ==# ''
     let options.in_io = 'null'

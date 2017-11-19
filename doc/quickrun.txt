@@ -500,6 +500,8 @@ default.  NOTE: Everything except for "system" can be unstable.
   {Requirement: |+job|}
   Runs via |job| feature.
   Option ~
+  runner/job/pty		Default: 0
+	Specifies a value of pty to pass to |job_start()|.
   runner/job/interval		Default: 0
 	Before Vim 8.0.0036, job feature checks about every 10 seconds for
 	jobs that ended (|job-exit_cb|).
