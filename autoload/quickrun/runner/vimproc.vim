@@ -6,7 +6,7 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 " Create augroup.
-augroup plugin-quickrun-vimproc
+augroup plugin-quickrun-runner-vimproc
 augroup END
 
 let s:runner = {
