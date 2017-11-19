@@ -944,7 +944,7 @@ function! quickrun#complete(lead, cmd, pos) abort
         let list = map(filter(quickrun#module#get(opt),
         \                     'v:val.available()'), 'v:val.name')
       endif
-      return filter(list, 'v:val =~# "^".a:lead')
+      return filter(list, 'v:val =~# "^" . a:lead')
     endif
 
   elseif head =~# '^-'
