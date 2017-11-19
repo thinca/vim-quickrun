@@ -507,6 +507,16 @@ default.  NOTE: Everything except for "system" can be unstable.
 	time in milliseconds by |timer|.
 	This option may be unnecessary when you use Vim 8.0.0036 or later.
 
+- "runner/terminal"			*quickrun-module-runner/terminal*
+  {Experimental}
+  {Requirement: |+terminal|}
+  Runs commands in terminal window via |terminal| feature.
+  Option ~
+  runner/terminal/opener	Default: "new"
+  An Ex command to open a terminal window.
+  runner/terminal/into		Default: 0
+  Moves cursor to the terminal window if this isn't 0.
+
 - "runner/vimscript"			*quickrun-module-runner/vimscript*
   Runs commands as Vim commands.
   Vim command that contains |:redir| command can not run.  This gets the
