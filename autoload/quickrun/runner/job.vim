@@ -31,8 +31,10 @@ function! s:runner.run(commands, input, session) abort
   \   'callback': self._job_cb,
   \   'close_cb': self._job_close_cb,
   \   'exit_cb': self._job_exit_cb,
-  \   'pty': self.config.pty,
   \ }
+  if has('patch-8.0.0744')
+    let options.pty = self.config.pty
+  endif
   if a:input ==# ''
     let options.in_io = 'null'
   endif
