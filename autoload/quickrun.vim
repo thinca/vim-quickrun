@@ -6,7 +6,7 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-let s:V = vital#of('quickrun').load(
+let s:V = vital#quickrun#new().load(
 \   'Data.List',
 \   'System.File',
 \   'System.Filepath',
