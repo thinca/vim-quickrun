@@ -30,12 +30,14 @@ CREATE MODULE			|quickrun-create-module|
   RUNNER ATTRIBUTES		  |quickrun-runner-attributes|
   OUTPUTTER ATTRIBUTES		  |quickrun-outputter-attributes|
   HOOK ATTRIBUTES		  |quickrun-hook-attributes|
+  EXECUTION SEQUENCE		  |quickrun-execution-sequence|
 HOOK				|quickrun-hook|
   HOOK FUNCTION			  |quickrun-hook-function|
   HOOK POINT			  |quickrun-hook-point|
 SETTING EXAMPLES		|quickrun-examples|
 KNOWN ISSUES			|quickrun-known-issues|
 CHANGELOG			|quickrun-changelog|
+
 
 
 ==============================================================================
