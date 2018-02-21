@@ -275,6 +275,12 @@ let g:quickrun#default_config = {
 \   'tempfile': '%{tempname()}.hs',
 \   'hook/sweep/files': ['%S:p:r', '%S:p:r.o', '%S:p:r.hi'],
 \ },
+\ 'idris': {
+\   'command': 'idris',
+\   'exec': ['%c %o %s --output %s:p:r', '%s:p:r %a'],
+\   'tempfile': '%{tempname()}.idr',
+\   'hook/sweep/files': ['%S:p:r', '%S:p:r.ibc'],
+\ },
 \ 'io': {},
 \ 'java': {
 \   'exec': ['javac %o -d %s:p:h %s', '%c -cp %s:p:h %s:t:r %a'],
