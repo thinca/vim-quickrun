@@ -33,6 +33,9 @@ function! s:outputter.finish(session) abort
     let current_window = s:VT.trace_window()
     call s:VT.jump(self._target_window)
     let result_list = self._apply_result(self._result)
+    if self._fix_result_list(a:session, result_list)
+      call self._apply_result_list(result_list)
+    endif
     execute self.config.open_cmd
     if &buftype ==# 'quickfix'
       let w:quickfix_title = 'quickrun: ' .  join(a:session.commands, ' && ')
@@ -49,9 +52,32 @@ function! s:outputter.finish(session) abort
   endtry
 endfunction
 
+function! s:outputter._fix_result_list(session, result_list) abort
+  let region = get(a:session.config, 'region', {})
+  let srcfile = get(a:session.config, 'srcfile', '')
+  if empty(region) || srcfile ==# ''
+    return 0
+  endif
+  let fixed = 0
+  let bufnr = bufnr('%')
+  let loffset = region.first[0] - 1
+  for row in a:result_list
+    if bufname(row.bufnr) ==# srcfile
+      let row.bufnr = bufnr
+      let row.lnum += loffset
+      let fixed = 1
+    endif
+  endfor
+  return fixed
+endfunction
+
 function! s:outputter._apply_result(expr) abort
   cgetexpr a:expr
   return getqflist()
+endfunction
+
+function! s:outputter._apply_result_list(result_list) abort
+  call setqflist(a:result_list)
 endfunction
 
 function! s:outputter._close_window() abort
