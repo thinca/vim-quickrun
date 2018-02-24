@@ -21,7 +21,7 @@ endfunction
 function! s:hook.on_module_loaded(session, context) abort
   let src = join(readfile(a:session.config.srcfile, 'b'), "\n")
   let new_src = printf(self.config.template, src)
-  let srcfile = a:session.tempname()
+  let srcfile = a:session.tempname(quickrun#expand(a:session.config.tempfile))
   if writefile(split(new_src, "\n", 1), srcfile, 'b') == 0
     let a:session.config.srcfile = srcfile
   endif
