@@ -583,12 +583,13 @@ function! s:Session.normalize(config) abort
 
       let body = s:V.Process.iconv(body, &encoding, &fileencoding)
 
+      if !&l:binary &&
+      \  (!exists('&fixendofline') || &l:fixendofline || &l:endofline)
+        let body .= "\n"
+      endif
       if &l:fileformat ==# 'mac'
         let body = substitute(body, "\n", "\r", 'g')
       elseif &l:fileformat ==# 'dos'
-        if !&l:binary
-          let body .= "\n"
-        endif
         let body = substitute(body, "\n", "\r\n", 'g')
       endif
 
