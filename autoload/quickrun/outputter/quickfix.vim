@@ -23,6 +23,7 @@ function! s:outputter.init(session) abort
 \    : !empty(&l:errorformat)          ? &l:errorformat
 \    : &g:errorformat
   let self._target_window = s:VT.trace_window()
+  let self._target_buf = bufnr('%')
 endfunction
 
 
@@ -59,11 +60,10 @@ function! s:outputter._fix_result_list(session, result_list) abort
     return 0
   endif
   let fixed = 0
-  let bufnr = bufnr('%')
   let loffset = region.first[0] - 1
   for row in a:result_list
     if bufname(row.bufnr) ==# srcfile
-      let row.bufnr = bufnr
+      let row.bufnr = self._target_buf
       let row.lnum += loffset
       let fixed = 1
     endif
