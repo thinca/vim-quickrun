@@ -674,11 +674,13 @@ hooks are available by default.
   This rule is same as |printf()|.
 
 - "hook/output_encode"			*quickrun-module-hook/output_encode*
-  Converts encoding of the output.
+  Converts encoding and end-of-line of the output.
   Option ~
   hook/output_encode/encoding		Default: "&fileencoding"
 	Specifies in the form of "from:to".  ":to" is omittable.
 	In this case, it is interpreted as "from:&encoding".
+  hook/output_encode/fileformat		Default: 0
+	Convert end-of-line to Unix if this isn't 0.
 
 - "hook/shebang"				*quickrun-module-hook/shebang*
   Searches "#!" in the head of source file, and treats the following of it as

@@ -669,11 +669,13 @@ hook は特定のポイントで追加の処理を行うモジュールです。
   られます。テンプレート内で "%" を使う場合は "%%" と書きます。
 
 - "hook/output_encode"			*quickrun-module-hook/output_encode*
-  出力の文字コードを変換します。
+  出力の文字コードと改行を変換します。
   オプション ~
   hook/output_encode/encoding		デフォルト: "&fileencoding"
 	"from:to" の形式で指定します。":to" は省略できます。その場合、
 	"from:&encoding" と解釈されます。
+  hook/output_encode/fileformat		デフォルト: 0
+	0 以外を指定すると、出力の改行を Unix 形式に変換します。
 
 - "hook/shebang"			*quickrun-module-hook/shebang*
   ソースコードの先頭の #! を探し、その後続を command オプション
