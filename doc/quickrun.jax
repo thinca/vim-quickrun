@@ -458,14 +458,14 @@ NOTE: "system" 以外は不安定な場合があります。
   スファイルに関する設定はexecではなく後述するloadに設定してください。
 
   オプション ~
-  runner/concurrent_process/load			デフォルト: "load %s"
+  runner/concurrent_process/load	デフォルト: "load %s"
 	起動した外部コマンドの stdin の書き込む、編集中ファイルを読み込み実行
 	させるための書式を指定します。%s または %S は |quickrun-exec-format|
 	のように、ソースファイル名に置換されます。たとえばこの値が
 	"(load \"%S\")" で編集中ファイル名が "/home/ujihisa/a.clj" ならば、
 	|quickrun| は command オプションによって起動されたプロセスに対し
 	"(load \"/home/ujihisa/a.clj\")\n" という文字列を書き込みます。
-  runner/concurrent_process/prompt			デフォルト: ">>> "
+  runner/concurrent_process/prompt	デフォルト: ">>> "
 	一度の試行の終了を把握するためのとっかかりとして使用する正規表現です。
 	暗黙のうちに先頭に "^" がつきます。なお、各試行における最後にマッチし
 	た部分の文字列は quickrun の結果に出力されません。
@@ -479,7 +479,7 @@ NOTE: "system" 以外は不安定な場合があります。
   バックグラウンドで実行するため、コマンドが無限ループや入力待ち等で終了しな
   い場合、Vim から制御することはできないので注意してください。
   オプション ~
-  runner/remote/vimproc		デフォルト: 0
+  runner/remote/vimproc			デフォルト: 0
 	可能ならば |vimproc| でコマンドを実行します。これにより、実行のキャン
 	セルが可能になります。
 
@@ -494,9 +494,9 @@ NOTE: "system" 以外は不安定な場合があります。
   {|+job| が必要}
   |job| の機能を使ってコマンドを非同期実行します。
   オプション ~
-  runner/job/pty		デフォルト: 0
+  runner/job/pty			デフォルト: 0
 	|job_start()| に渡す pty の値を指定します。
-  runner/job/interval		デフォルト: 0
+  runner/job/interval			デフォルト: 0
 	Vim 8.0.0036 以前は、job 機能は、10 秒毎に job の終了をチェックします
 	(|job-exit_cb|)。このオプションに 0 以外を設定すると、|timer| を
 	使って指定した時間毎に終了をチェックします。単位はミリ秒です。
@@ -507,10 +507,10 @@ NOTE: "system" 以外は不安定な場合があります。
   {|+terminal| が必要}
   |terminal| の機能を使ってコマンドを端末ウィンドウで実行します。
   オプション ~
-  runner/terminal/opener	デフォルト: "new"
-  ターミナルウィンドウを開くための Ex コマンドです。
-  runner/terminal/into		デフォルト: 0
-  0 以外を指定すると、開いたターミナルウィンドウに移動します。
+  runner/terminal/opener		デフォルト: "new"
+	ターミナルウィンドウを開くための Ex コマンドです。
+  runner/terminal/into			デフォルト: 0
+	0 以外を指定すると、開いたターミナルウィンドウに移動します。
 
 - "runner/vimscript"			*quickrun-module-runner/vimscript*
   コマンドを Vim のコマンドとして実行します。
@@ -560,7 +560,7 @@ outputter は結果の出力を行うモジュールです。
 - "outputter/variable"			*quickrun-module-outputter/variable*
   変数に対して出力します。環境変数やオプションに対しても出力可能です。
   オプション ~
-  outputter/variable/name			デフォルト: ''
+  outputter/variable/name		デフォルト: ''
 	出力先の変数名です。空の場合はエラーになります。
   outputter/variable/append		デフォルト: 0
 	1 の場合は追記を行います。
@@ -570,7 +570,7 @@ outputter は結果の出力を行うモジュールです。
   オプション ~
   outputter/file/name			デフォルト: ''
 	出力先のファイル名です。空の場合はエラーになります。
-  outputter/file/append		デフォルト: 0
+  outputter/file/append			デフォルト: 0
 	1 の場合は追記を行います。
 
 - "outputter/quickfix"			*quickrun-module-outputter/quickfix*
@@ -589,7 +589,7 @@ outputter は結果の出力を行うモジュールです。
 - "outputter/loclist"			*quickrun-module-outputter/loclist*
   |location-list| へ出力します。
   オプション ~
-  outputter/loclist/errorformat	デフォルト: "&errorformat"
+  outputter/loclist/errorformat		デフォルト: "&errorformat"
 	出力を解釈するための 'errorformat' オプションの値です。
   outputter/loclist/open_cmd		デフォルト: "lopen"
 	|location-list-window| を開くためのコマンドです。
@@ -650,7 +650,7 @@ hook は特定のポイントで追加の処理を行うモジュールです。
 	元しようとします。非同期実行を使っていると、予期しない結果になるかもし
 	れません。
   オプション ~
-  hook/cd/directory		デフォルト: ""
+  hook/cd/directory			デフォルト: ""
 	変更先のディレクトリです。空文字列の場合は何もしません。
 	この値は |quickrun-exec-format| のように展開されます。
 
@@ -664,9 +664,9 @@ hook は特定のポイントで追加の処理を行うモジュールです。
     print(1 + 2 * 3);
 < になります。
   オプション ~
-  hook/eval/template		デフォルト: ""
-  テンプレート文字列です。テンプレート内の "%s" が元のソースファイルに置き変え
-  られます。テンプレート内で "%" を使う場合は "%%" と書きます。
+  hook/eval/template			デフォルト: ""
+	テンプレート文字列です。テンプレート内の "%s" が元のソースファイルに置
+	き変えられます。テンプレート内で "%" を使う場合は "%%" と書きます。
 
 - "hook/output_encode"			*quickrun-module-hook/output_encode*
   出力の文字コードと改行を変換します。
@@ -695,7 +695,7 @@ hook は特定のポイントで追加の処理を行うモジュールです。
   NOTE: 時間には quickrun.vim 自体のオーバーヘッドも含まれています。正確な時間
 	を期待しないでください。
   オプション ~
-  hook/time/format		デフォルト: "\n*** time: %g ***"
+  hook/time/format			デフォルト: "\n*** time: %g ***"
 	出力する文字列の書式です。|printf()| に渡されます。第2引数には計測時間
 	が |Float| で渡されます。
   hook/time/dest			デフォルト: ""
