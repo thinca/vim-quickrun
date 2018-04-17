@@ -8,9 +8,12 @@ set cpo&vim
 let s:hook = {
 \   'config': {
 \     'encoding': '&fileencoding',
-\     'fileformat': 0,
+\     'fileformat': '',
 \   },
+\  '_fileformats': {'unix': "\n", 'dos': "\r\n", 'mac': "\r"},
 \ }
+
+let s:M = g:quickrun#V.import('Vim.Message')
 
 function! s:hook.init(session) abort
   let enc = split(self.config.encoding, '[^[:alnum:]-_]')
@@ -22,7 +25,11 @@ function! s:hook.init(session) abort
   else
     let [self._from, self._to] = ['', '']
   endif
-  if self._from ==# '' && !self.config.fileformat
+  let self._eol = get(self._fileformats, self.config.fileformat, '')
+  if self.config.fileformat !=# '' && self._eol ==# ''
+    call s:M.warn("Invalid type in `hook/output_encode/fileformat`.")
+  endif
+  if self._from ==# '' && self._eol ==# ''
     let self.config.enable = 0
   endif
 endfunction
@@ -32,8 +39,8 @@ function! s:hook.on_output(session, context) abort
   if self._from !=# ''
     let data = iconv(data, self._from, self._to)
   endif
-  if self.config.fileformat
-    let data = substitute(data, '\r\n\?', '\n', 'g')
+  if self._eol !=# ''
+    let data = substitute(data, '\r\n\?\|\n', self._eol, 'g')
   endif
   let a:context.data = data
 endfunction
