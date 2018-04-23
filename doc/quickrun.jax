@@ -442,6 +442,13 @@ NOTE: "system" 以外は不安定な場合があります。
 	一時的に 'updatetime' をこの値に変更します。0 の場合は変更しません。
   runner/vimproc/read_timeout		デフォルト: 100
 	1 度の読み込みにかける時間(ミリ秒)です。
+  runner/vimproc/pipe_status_index	デフォルト: -1
+	コマンドがパイプを含む場合、|quickrun-session.exit_code| に設定される
+	終了コードを出力するサブコマンドをパイプ内の位置で指定します。先頭のコ
+	マンドは 0、最後のコマンドは -1 になります。
+	文字列 "pipefail" を指定すると、最後の 0 以外の終了コードが設定されま
+	す。全ての終了コードが 0 の場合は 0 が設定されます。
+
 
 - "runner/concurrent_process"	*quickrun-module-runner/concurrent_process*
   {|vimproc| が必要}

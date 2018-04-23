@@ -451,6 +451,12 @@ default.  NOTE: Everything except for "system" can be unstable.
 	Changes 'updatetime' to the value temporary.  Stays same if this is 0.
   runner/vimproc/read_timeout		Default: 100
 	The time to read at one time. (milliseconds)
+  runner/vimproc/pipe_status_index	Default: -1
+	If the command contains a pipe, select the index of sub-command that
+	sets {exit-code} to |quickrun-session.exit_code|. The first command is 0
+	and the last command is -1.
+	If this value is the string "pipefail", the last non-zero {exit-code}
+	will be used. If all {exit-codes} are zero, 0 is used.
 
 - "runner/concurrent_process"	*quickrun-module-runner/concurrent_process*
   {Requirement: |vimproc|}
