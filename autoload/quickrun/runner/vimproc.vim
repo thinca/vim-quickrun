@@ -19,9 +19,20 @@ let s:runner = {
 \ }
 let s:bufsize = -1
 
+let s:M = g:quickrun#V.import('Vim.Message')
+
 function! s:runner.validate() abort
   if globpath(&runtimepath, 'autoload/vimproc.vim') ==# ''
     throw 'Needs vimproc.'
+  endif
+endfunction
+
+function! s:runner.init(session) abort
+  if type(self.config.pipe_status_index) !=# type(0) &&
+  \  string(self.config.pipe_status_index) !=# string('pipefail')
+    call s:M.warn("Invalid value in `runner/vimproc/pipe_status_index`: "
+    \            .string(self.config.pipe_status_index))
+    let self.config.pipe_status_index = -1
   endif
 endfunction
 
