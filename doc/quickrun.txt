@@ -434,7 +434,7 @@ default.  NOTE: Everything except for "system" can be unstable.
   Runs by |:!|.  This ignores given outputter.
   Option ~
   runner/shell/shellcmd		Default: 'silent !"%s" & pause' for MS Windows
-				    Otherwise '!%s'
+					  Otherwise '!%s'
 	The template of the Vim command to run.  This replaces %s to the
 	command given in exec option.
 
@@ -467,7 +467,7 @@ default.  NOTE: Everything except for "system" can be unstable.
   described below for source file related stuff.
 
   Option ~
-  runner/concurrent_process/load			Default: "load %s"
+  runner/concurrent_process/load	Default: "load %s"
 	Specifies a code with placeholder to write to the stdin of an external
 	command to load and run the file you are editing. |quickrun| will
 	replace %s and %S with the source file like |quickrun-exec-format|
@@ -475,8 +475,10 @@ default.  NOTE: Everything except for "system" can be unstable.
 	you are editing is "/home/ujihisa/a.clj", |quickrun| writes
 	"(load \"/home/ujihisa/a.clj\")\n" to the process it ran based on
 	command option.
-  runner/concurrent_process/prompt			Default: ">>> "
-	TODO
+  runner/concurrent_process/prompt	Default: ">>> "
+	A regular expression that determines the end of a command.
+	"^" is implicity inserted at the beginnig.
+	The last matched line is not output to the result of quickrun.
 
 - "runner/remote"			*quickrun-module-runner/remote*
   {Requirement: |+clientserver|}
@@ -487,7 +489,7 @@ default.  NOTE: Everything except for "system" can be unstable.
   Note that Vim cannot control the process when it doesn't terminate due to
   infinite loop or to wait for input since it runs in background.
   Option ~
-  runner/remote/vimproc		Default: 0
+  runner/remote/vimproc			Default: 0
 	Runs by |vimproc| if it's available.  You can cancel the process after
 	it ran.
 
@@ -502,9 +504,9 @@ default.  NOTE: Everything except for "system" can be unstable.
   {Requirement: |+job|}
   Runs via |job| feature.
   Option ~
-  runner/job/pty		Default: 0
+  runner/job/pty			Default: 0
 	Specifies a value of pty to pass to |job_start()|.
-  runner/job/interval		Default: 0
+  runner/job/interval			Default: 0
 	Before Vim 8.0.0036, job feature checks about every 10 seconds for
 	jobs that ended (|job-exit_cb|).
 	When this value is not 0, this checks the end of job every specified
@@ -516,10 +518,10 @@ default.  NOTE: Everything except for "system" can be unstable.
   {Requirement: |+terminal|}
   Runs commands in terminal window via |terminal| feature.
   Option ~
-  runner/terminal/opener	Default: "new"
-  An Ex command to open a terminal window.
-  runner/terminal/into		Default: 0
-  Moves cursor to the terminal window if this isn't 0.
+  runner/terminal/opener		Default: "new"
+	An Ex command to open a terminal window.
+  runner/terminal/into			Default: 0
+	Moves cursor to the terminal window if this isn't 0.
 
 - "runner/vimscript"			*quickrun-module-runner/vimscript*
   Runs commands as Vim commands.
@@ -570,7 +572,7 @@ available by default.
   Outputs on a variable.  You also can let it output on an environment
   variable or an option.
   Option ~
-  outputter/variable/name			Default: ''
+  outputter/variable/name		Default: ''
 	The name of the variable to output.  Causes an error if it's empty.
   outputter/variable/append		Default: 0
 	Appends if it's 1.
@@ -580,7 +582,7 @@ available by default.
   Option ~
   outputter/file/name			Default: ''
 	The file name where to output.  Cause an error if it's empty.
-  outputter/file/append		Default: 0
+  outputter/file/append			Default: 0
 	Appends if it's 1.
 
 - "outputter/quickfix"			*quickrun-module-outputter/quickfix*
@@ -598,7 +600,7 @@ available by default.
 - "outputter/loclist"			*quickrun-module-outputter/loclist*
   Outputs on |location-list|.
   Option ~
-  outputter/loclist/errorformat	Default: "&errorformat"
+  outputter/loclist/errorformat		Default: "&errorformat"
 	'errorformat' option to parse the output.
   outputter/loclist/open_cmd		Default: "lopen"
 	The command to open |location-list-window|.
@@ -611,7 +613,7 @@ available by default.
   {Requires |open-browser|}
   Opens the output on browser, using |open-browser|.
   Option ~
-  outputter/browser/name			Default: tempname() . '.html'
+  outputter/browser/name		Default: tempname() . '.html'
 	The name of the filename; outputs the result on a file first then open
 	the file on your browser.  The default value, |tempname()|, is called
 	only at once and the same result will be used since the second time.
@@ -700,7 +702,7 @@ hooks are available by default.
   NOTE: The time includes the overhead of quickrun.vim.  Don't expect exact
 	time.
   Option ~
-  hook/time/format		Default: "\n*** time: %g ***"
+  hook/time/format			Default: "\n*** time: %g ***"
 	Format of output string.  This is passed to |printf()|.
 	Measured time is passed to the 2nd argument by |Float|.
   hook/time/dest			Default: ""
