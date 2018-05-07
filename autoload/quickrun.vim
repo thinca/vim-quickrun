@@ -519,6 +519,15 @@ let g:quickrun#default_config = {
 \   'exec': ['%c source-file %s:p'],
 \ },
 \ 'typescript': {
+\   'type': executable('ts-node') ? 'typescript/ts-node' :
+\           executable('tsc') ? 'typescript/tsc' : '',
+\ },
+\ 'typescript/ts-node': {
+\   'command': 'ts-node',
+\   'cmdopt': '--compilerOptions ''{"target": "es2015"}''',
+\   'exec': '%c %o %s',
+\ },
+\ 'typescript/tsc': {
 \   'command': 'tsc',
 \   'exec': ['%c --target es5 --module commonjs %o %s', 'node %s:r.js'],
 \   'tempfile': '%{tempname()}.ts',
