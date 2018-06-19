@@ -376,7 +376,8 @@ let g:quickrun#default_config = {
 \           executable('bluecloth') ? 'markdown/bluecloth':
 \           executable('redcarpet') ? 'markdown/redcarpet':
 \           executable('pandoc') ? 'markdown/pandoc':
-\           executable('markdown_py') ? 'markdown/markdown_py': '',
+\           executable('markdown_py') ? 'markdown/markdown_py':
+\           executable('markdown') ? 'markdown/discount': '',
 \ },
 \ 'markdown/Markdown.pl': {
 \   'command': 'Markdown.pl',
@@ -397,6 +398,9 @@ let g:quickrun#default_config = {
 \ },
 \ 'markdown/markdown_py': {
 \   'command': 'markdown_py',
+\ },
+\ 'markdown/discount': {
+\   'command': 'markdown',
 \ },
 \ 'nim': {
 \   'cmdopt': 'compile --run --verbosity:0',
