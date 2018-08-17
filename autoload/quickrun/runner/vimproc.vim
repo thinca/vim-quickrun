@@ -14,13 +14,25 @@ let s:runner = {
 \     'updatetime': 0,
 \     'sleep': 50,
 \     'read_timeout': 100,
+\     'pipe_status_index': -1,
 \   }
 \ }
 let s:bufsize = -1
 
+let s:M = g:quickrun#V.import('Vim.Message')
+
 function! s:runner.validate() abort
   if globpath(&runtimepath, 'autoload/vimproc.vim') ==# ''
     throw 'Needs vimproc.'
+  endif
+endfunction
+
+function! s:runner.init(session) abort
+  if type(self.config.pipe_status_index) !=# type(0) &&
+  \  string(self.config.pipe_status_index) !=# string('pipefail')
+    call s:M.warn("Invalid value in `runner/vimproc/pipe_status_index`: "
+    \            .string(self.config.pipe_status_index))
+    let self.config.pipe_status_index = -1
   endif
 endfunction
 
@@ -36,13 +48,16 @@ function! s:runner.run(commands, input, session) abort
   if self.config.sleep
     execute 'sleep' self.config.sleep . 'm'
   endif
-  if s:receive_vimproc_result(key, self.config.read_timeout)
+  if s:receive_vimproc_result(key, self.config.read_timeout,
+  \                           self.config.pipe_status_index)
     return
   endif
   " Execution is continuing.
   augroup plugin-quickrun-runner-vimproc
     execute 'autocmd! CursorHold,CursorHoldI * call'
-    \       's:receive_vimproc_result(' . string(key) . ', ' . string(self.config.read_timeout) . ')'
+    \       's:receive_vimproc_result(' . string(key) . ','
+    \         string(self.config.read_timeout) . ','
+    \         string(self.config.pipe_status_index) . ')'
   augroup END
   let self._autocmd = 1
   if self.config.updatetime
@@ -65,7 +80,7 @@ function! s:runner.sweep() abort
 endfunction
 
 
-function! s:receive_vimproc_result(key, read_timeout) abort
+function! s:receive_vimproc_result(key, read_timeout, pipe_status_index) abort
   let session = quickrun#session(a:key)
 
   let vimproc = session._vimproc
@@ -90,8 +105,16 @@ function! s:receive_vimproc_result(key, read_timeout) abort
 
   call vimproc.stdout.close()
   call vimproc.stderr.close()
-  call vimproc.waitpid()
-  call session.finish(get(vimproc, 'status', 1))
+  let status = vimproc.waitpid()[1]
+  if has_key(vimproc, 'pipe_status')
+    let session.pipe_status = map(copy(vimproc.pipe_status), 'v:val[1]')
+    if string(a:pipe_status_index) ==# string('pipefail')
+      let status = get(filter(copy(session.pipe_status), 'v:val'), -1, 0)
+    else
+      let status = get(session.pipe_status, a:pipe_status_index, status)
+    endif
+  endif
+  call session.finish(status)
   return 1
 endfunction
 
