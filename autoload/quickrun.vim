@@ -425,6 +425,20 @@ let g:quickrun#default_config = {
 \   'hook/sweep/files': ['%S:p:h/%S:p:h:t'],
 \   'hook/cd/directory': '%S:p:h',
 \ },
+\ 'prolog': {
+\   'type': executable('swipl') ? 'prolog/swi' :
+\           executable('gprolog') ? 'prolog/gnu' : '',
+\ },
+\ 'prolog/gnu': {
+\   'command': 'gprolog',
+\   'cmdopt': '--consult-file',
+\   'exec': '%c %o %s %a --query-goal halt',
+\ },
+\ 'prolog/swi': {
+\   'command': 'swipl',
+\   'cmdopt': '--quiet -s',
+\   'exec': '%c %o %s %a -g halt',
+\ },
 \ 'ps1': {
 \   'exec': '%c %o -File %s %a',
 \   'command': 'powershell.exe',
