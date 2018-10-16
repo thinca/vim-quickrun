@@ -472,7 +472,7 @@ let g:quickrun#default_config = {
 \ 'rust': {
 \   'command': 'rustc',
 \   'exec': ['%c %o %s -o %s:p:r', '%s:p:r %a'],
-\   'tempfile': '%{tempname()}.rs',
+\   'tempfile': '%{fnamemodify(tempname(), ":r")}.rs',
 \   'hook/shebang/enable': 0,
 \   'hook/sweep/files': '%S:p:r',
 \ },
