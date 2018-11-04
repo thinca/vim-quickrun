@@ -326,6 +326,9 @@ let g:quickrun#default_config = {
 \   'hook/eval/template':
 \     'class _Main { static function main(args : string[]) :void { %s }}',
 \ },
+\ 'julia': {
+\   'command': 'julia',
+\ },
 \ 'kotlin': {
 \    'command': 'java',
 \    'exec': ['kotlinc %o %s -include-runtime -d %s:p:r.jar', '%c -jar %s:p:r.jar'],
