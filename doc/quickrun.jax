@@ -497,7 +497,6 @@ NOTE: "system" 以外は不安定な場合があります。
   警告: X11 環境では使用しないでください。Vim がクラッシュします。
 
 - "runner/job"				*quickrun-module-runner/job*
-  {実験的な機能}
   {|+job| が必要}
   |job| の機能を使ってコマンドを非同期実行します。
   オプション ~
@@ -510,7 +509,6 @@ NOTE: "system" 以外は不安定な場合があります。
 	Vim 8.0.0036 以降を使っている場合、このオプションは不要でしょう。
 
 - "runner/terminal"			*quickrun-module-runner/terminal*
-  {実験的な機能}
   {|+terminal| が必要}
   |terminal| の機能を使ってコマンドを端末ウィンドウで実行します。
   オプション ~

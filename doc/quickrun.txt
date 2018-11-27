@@ -506,7 +506,6 @@ default.  NOTE: Everything except for "system" can be unstable.
   WARNING: Don't use this on X11.  Vim crashes.
 
 - "runner/job"				*quickrun-module-runner/job*
-  {Experimental}
   {Requirement: |+job|}
   Runs via |job| feature.
   Option ~
@@ -520,7 +519,6 @@ default.  NOTE: Everything except for "system" can be unstable.
 	This option may be unnecessary when you use Vim 8.0.0036 or later.
 
 - "runner/terminal"			*quickrun-module-runner/terminal*
-  {Experimental}
   {Requirement: |+terminal|}
   Runs commands in terminal window via |terminal| feature.
   Option ~
