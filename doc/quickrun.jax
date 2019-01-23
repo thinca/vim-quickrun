@@ -1,6 +1,6 @@
 *quickrun.txt*	コマンドを素早く実行します。
 
-Version: 0.6.0
+Version: 0.7.0
 Author: thinca <thinca+vim@gmail.com>
 英訳:
   * ujihisa <ujihisa at gmail com>
@@ -172,13 +172,9 @@ quickrun#sweep_sessions()			*quickrun#sweep_sessions()*
 	実行中のセッションを強制的に終了します。新しく実行を行う前に呼び出され
 	ます。実行が終わらない場合は、手動で呼び出すこともできます。
 
-
-以下の関数は非推奨です。次のバージョンで削除される予定です。
-quickrun#register_module({kind}, {name}, {module})
-quickrun#register_runner({name}, {runner})
-quickrun#register_outputter({name}, {outputter})
-quickrun#register_hook({name}, {hook})
-quickrun#get_module({kind} [, {name}])
+quickrun#is_running()				*quickrun#is_running()*
+	いずれかのセッションが実行中かどうかを調べます。実行中の場合は非 0 を
+	返します。
 
 
 ------------------------------------------------------------------------------
@@ -444,17 +440,15 @@ NOTE: "system" 以外は不安定な場合があります。
 	'updatetime' による待機をする必要がなくなります。
   runner/vimproc/updatetime		デフォルト: 0
 	一時的に 'updatetime' をこの値に変更します。0 の場合は変更しません。
+  runner/vimproc/read_timeout		デフォルト: 100
+	1 度の読み込みにかける時間(ミリ秒)です。
+  runner/vimproc/pipe_status_index	デフォルト: -1
+	コマンドがパイプを含む場合、|quickrun-session.exit_code| に設定される
+	終了コードを出力するサブコマンドをパイプ内の位置で指定します。先頭のコ
+	マンドは 0、最後のコマンドは -1 になります。
+	文字列 "pipefail" を指定すると、最後の 0 以外の終了コードが設定されま
+	す。全ての終了コードが 0 の場合は 0 が設定されます。
 
-- "runner/process_manager"	*quickrun-module-runner/process_manager*
-  (非推奨) |quickrun-module-runner/concurrent_process| と同様、プロセスをばっ
-  バックグラウンドで実行し、かつそれを再利用します。concurrent_processとの違い
-  は使用する下位ライブラリです。
-
-  オプション ~
-  runner/process_manager/load			デフォルト: "load %s"
-  runner/process_manager/prompt			デフォルト: ">>> "
-  いずれもconcurrent_process側を参照してください。両者の間には互換性があり、名
-  前を変えるだけで動作します。
 
 - "runner/concurrent_process"	*quickrun-module-runner/concurrent_process*
   {|vimproc| が必要}
@@ -471,14 +465,14 @@ NOTE: "system" 以外は不安定な場合があります。
   スファイルに関する設定はexecではなく後述するloadに設定してください。
 
   オプション ~
-  runner/concurrent_process/load			デフォルト: "load %s"
+  runner/concurrent_process/load	デフォルト: "load %s"
 	起動した外部コマンドの stdin の書き込む、編集中ファイルを読み込み実行
 	させるための書式を指定します。%s または %S は |quickrun-exec-format|
 	のように、ソースファイル名に置換されます。たとえばこの値が
 	"(load \"%S\")" で編集中ファイル名が "/home/ujihisa/a.clj" ならば、
 	|quickrun| は command オプションによって起動されたプロセスに対し
 	"(load \"/home/ujihisa/a.clj\")\n" という文字列を書き込みます。
-  runner/concurrent_process/prompt			デフォルト: ">>> "
+  runner/concurrent_process/prompt	デフォルト: ">>> "
 	一度の試行の終了を把握するためのとっかかりとして使用する正規表現です。
 	暗黙のうちに先頭に "^" がつきます。なお、各試行における最後にマッチし
 	た部分の文字列は quickrun の結果に出力されません。
@@ -492,7 +486,7 @@ NOTE: "system" 以外は不安定な場合があります。
   バックグラウンドで実行するため、コマンドが無限ループや入力待ち等で終了しな
   い場合、Vim から制御することはできないので注意してください。
   オプション ~
-  runner/remote/vimproc		デフォルト: 0
+  runner/remote/vimproc			デフォルト: 0
 	可能ならば |vimproc| でコマンドを実行します。これにより、実行のキャン
 	セルが可能になります。
 
@@ -501,6 +495,27 @@ NOTE: "system" 以外は不安定な場合があります。
   |python| のスレッドを利用してコマンドを非同期実行します。
   警告: これは非常に不安定です。
   警告: X11 環境では使用しないでください。Vim がクラッシュします。
+
+- "runner/job"				*quickrun-module-runner/job*
+  {|+job| が必要}
+  |job| の機能を使ってコマンドを非同期実行します。
+  オプション ~
+  runner/job/pty			デフォルト: 0
+	|job_start()| に渡す pty の値を指定します。
+  runner/job/interval			デフォルト: 0
+	Vim 8.0.0036 以前は、job 機能は、10 秒毎に job の終了をチェックします
+	(|job-exit_cb|)。このオプションに 0 以外を設定すると、|timer| を
+	使って指定した時間毎に終了をチェックします。単位はミリ秒です。
+	Vim 8.0.0036 以降を使っている場合、このオプションは不要でしょう。
+
+- "runner/terminal"			*quickrun-module-runner/terminal*
+  {|+terminal| が必要}
+  |terminal| の機能を使ってコマンドを端末ウィンドウで実行します。
+  オプション ~
+  runner/terminal/opener		デフォルト: "new"
+	ターミナルウィンドウを開くための Ex コマンドです。
+  runner/terminal/into			デフォルト: 0
+	0 以外を指定すると、開いたターミナルウィンドウに移動します。
 
 - "runner/vimscript"			*quickrun-module-runner/vimscript*
   コマンドを Vim のコマンドとして実行します。
@@ -525,7 +540,7 @@ outputter は結果の出力を行うモジュールです。
   outputter/buffer/append		デフォルト: 0
 	1 の場合は追記を行います。
   outputter/buffer/split
-	デフォルト: '{winwidth(0) * 2 < winheight(0) * 5 ? "" : "vertical"}'
+	デフォルト: '%{winwidth(0) * 2 < winheight(0) * 5 ? "" : "vertical"}'
 	出力専用バッファを開く際の補助コマンドを指定します。バッファを開く際に
 	|:split| コマンドの前に挿入されます。
   outputter/buffer/into			デフォルト: 0
@@ -550,7 +565,7 @@ outputter は結果の出力を行うモジュールです。
 - "outputter/variable"			*quickrun-module-outputter/variable*
   変数に対して出力します。環境変数やオプションに対しても出力可能です。
   オプション ~
-  outputter/variable/name			デフォルト: ''
+  outputter/variable/name		デフォルト: ''
 	出力先の変数名です。空の場合はエラーになります。
   outputter/variable/append		デフォルト: 0
 	1 の場合は追記を行います。
@@ -560,14 +575,34 @@ outputter は結果の出力を行うモジュールです。
   オプション ~
   outputter/file/name			デフォルト: ''
 	出力先のファイル名です。空の場合はエラーになります。
-  outputter/file/append		デフォルト: 0
+  outputter/file/append			デフォルト: 0
 	1 の場合は追記を行います。
 
 - "outputter/quickfix"			*quickrun-module-outputter/quickfix*
   |quickfix| へ出力します。
   オプション ~
-  outputter/quickfix/errorformat		デフォルト: "&errorformat"
+  outputter/quickfix/errorformat	デフォルト: "&errorformat"
 	出力を解釈するための 'errorformat' オプションの値です。
+  outputter/quickfix/open_cmd		デフォルト: "copen"
+	|quickfix-window| を開くためのコマンドです。
+	結果が空だった場合は自動で閉じられます。
+	"cwindow" は使わないでください。いくつかの機能がうまく動作しません。
+  outputter/quickfix/into		デフォルト: 0
+	0 以外を指定すると、結果が出た際に |quickfix-window| へカーソルを移動
+	します。
+
+- "outputter/loclist"			*quickrun-module-outputter/loclist*
+  |location-list| へ出力します。
+  オプション ~
+  outputter/loclist/errorformat		デフォルト: "&errorformat"
+	出力を解釈するための 'errorformat' オプションの値です。
+  outputter/loclist/open_cmd		デフォルト: "lopen"
+	|location-list-window| を開くためのコマンドです。
+	結果が空だった場合は自動で閉じられます。
+	"lwindow" は使わないでください。いくつかの機能がうまく動作しません。
+  outputter/loclist/into		デフォルト: 0
+	0 以外を指定すると、結果が出た際に |location-list-window| へカーソルを
+	移動します。
 
 - "outputter/browser"			*quickrun-module-outputter/browser*
   {|open-browser| が必要}
@@ -620,7 +655,7 @@ hook は特定のポイントで追加の処理を行うモジュールです。
 	元しようとします。非同期実行を使っていると、予期しない結果になるかもし
 	れません。
   オプション ~
-  hook/cd/directory		デフォルト: ""
+  hook/cd/directory			デフォルト: ""
 	変更先のディレクトリです。空文字列の場合は何もしません。
 	この値は |quickrun-exec-format| のように展開されます。
 
@@ -634,16 +669,19 @@ hook は特定のポイントで追加の処理を行うモジュールです。
     print(1 + 2 * 3);
 < になります。
   オプション ~
-  hook/eval/template		デフォルト: ""
-  テンプレート文字列です。テンプレート内の "%s" が元のソースファイルに置き変え
-  られます。テンプレート内で "%" を使う場合は "%%" と書きます。
+  hook/eval/template			デフォルト: ""
+	テンプレート文字列です。テンプレート内の "%s" が元のソースファイルに置
+	き変えられます。テンプレート内で "%" を使う場合は "%%" と書きます。
 
 - "hook/output_encode"			*quickrun-module-hook/output_encode*
-  出力の文字コードを変換します。
+  出力の文字コードと改行を変換します。
   オプション ~
   hook/output_encode/encoding		デフォルト: "&fileencoding"
 	"from:to" の形式で指定します。":to" は省略できます。その場合、
 	"from:&encoding" と解釈されます。
+  hook/output_encode/fileformat		デフォルト: ""
+	出力の改行を指定された形式に変換します。空文字列の場合は何もしません。
+	指定できる値は "unix"、"dos" または "mac" です。
 
 - "hook/shebang"			*quickrun-module-hook/shebang*
   ソースコードの先頭の #! を探し、その後続を command オプション
@@ -662,7 +700,7 @@ hook は特定のポイントで追加の処理を行うモジュールです。
   NOTE: 時間には quickrun.vim 自体のオーバーヘッドも含まれています。正確な時間
 	を期待しないでください。
   オプション ~
-  hook/time/format		デフォルト: "\n*** time: %g ***"
+  hook/time/format			デフォルト: "\n*** time: %g ***"
 	出力する文字列の書式です。|printf()| に渡されます。第2引数には計測時間
 	が |Float| で渡されます。
   hook/time/dest			デフォルト: ""
@@ -731,6 +769,11 @@ session.sweep()				*quickrun-session.sweep()*
 	また、"_vimproc" という属性があった場合、その |vimproc| を強制終了しま
 	す。これは便利ですが、今のところ複数のモジュールから使われた際の名前の
 	衝突が考慮されていません。これは将来改善される可能性があります。
+
+session.config				*quickrun-session.config*
+	|quickrun-options| の辞書です。|quickrun-hook-point-normalized| のタイ
+	ミングから、標準化された config が利用できます。全てのオプションの値が
+	入っているとは限りません。
 
 ------------------------------------------------------------------------------
 共通の属性				*quickrun-module-attributes*
@@ -946,9 +989,15 @@ pandocを使用してmarkdownをhtmlにしてブラウザで開く (要|open-bro
 ==============================================================================
 更新履歴					*quickrun-changelog*
 
-0.6.1dev	2013-03-19
-	- デフォルトの設定に sql を追加 (Added default config for sql)
-	- runner/process_manager を追加 (Thanks ujihisa!)
+dev
+	- |quickrun-module-runner/job| を追加。
+	- |quickrun-module-runner/terminal| を追加。
+	- 古い関数を削除。
+
+0.7.0	2016-07-02
+	- 多くのデフォルトの設定の追加および改善。
+	- runner/concurrent_process を追加。 (Thanks ujihisa!)
+	- outputter/loclist を追加。
 
 0.6.0	2012-06-16
 	- モジュール周りの構成を変更。

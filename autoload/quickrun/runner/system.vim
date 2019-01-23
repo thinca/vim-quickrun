@@ -38,7 +38,9 @@ function! s:execute(cmd, input) abort
     endif
     let cmd = a:cmd
 
-    let cmd = g:quickrun#V.Process.iconv(cmd, &encoding, &termencoding)
+    if v:version < 704 || (v:version == 704 && !has('patch132'))
+      let cmd = g:quickrun#V.Process.iconv(cmd, &encoding, &termencoding)
+    endif
     let result = a:input ==# '' ? system(cmd)
     \                           : system(cmd, a:input)
   finally

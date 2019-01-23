@@ -1,12 +1,12 @@
 " Run commands quickly.
-" Version: 0.6.0
+" Version: 0.7.0
 " Author : thinca <thinca+vim@gmail.com>
 " License: zlib License
 
 let s:save_cpo = &cpo
 set cpo&vim
 
-let s:V = vital#of('quickrun').load(
+let s:V = vital#quickrun#new().load(
 \   'Data.List',
 \   'System.File',
 \   'System.Filepath',
@@ -74,14 +74,7 @@ let g:quickrun#default_config = {
 \ },
 \ 'clojure/clj': {
 \   'command': 'clj',
-\   'exec': '%c %s',
-\ },
-\ 'clojure/process_manager': {
-\   'command': 'clojure-1.6',
-\   'cmdopt': '-e ''(clojure.main/repl :prompt #(print "\nquickrun/pm=> "))''',
-\   'runner': 'process_manager',
-\   'runner/process_manager/load': '(load-file "%S")',
-\   'runner/process_manager/prompt': 'quickrun/pm=> ',
+\   'exec': '%c %s %a',
 \ },
 \ 'clojure/concurrent_process': {
 \   'command': 'clojure-1.6',
@@ -187,8 +180,9 @@ let g:quickrun#default_config = {
 \   'hook/sweep/files': ['%S:p:r'],
 \ },
 \ 'dosbatch': {
-\   'command': '',
-\   'exec': 'call %s %a',
+\   'command': 'cmd',
+\   'exec': '%c /c %s %a',
+\   'hook/output_encode/encoding': 'cp932',
 \   'tempfile': '%{tempname()}.bat',
 \ },
 \ 'dart': {
@@ -214,6 +208,12 @@ let g:quickrun#default_config = {
 \ 'eruby': {
 \   'command': 'erb',
 \   'exec': '%c %o -T - %s %a',
+\ },
+\ 'eta': {
+\   'command': 'eta',
+\   'exec': ['%c %s', 'java -jar %s:h/Run%s:t:r.jar'],
+\   'tempfile': '%{tempname()}.hs',
+\   'hook/sweep/files': ['%S:p:h/Run%S:t:r.jar', '%S:p:r.jar', '%S:p:r.hi'],
 \ },
 \ 'fish': {
 \   'command': 'fish',
@@ -275,6 +275,12 @@ let g:quickrun#default_config = {
 \   'tempfile': '%{tempname()}.hs',
 \   'hook/sweep/files': ['%S:p:r', '%S:p:r.o', '%S:p:r.hi'],
 \ },
+\ 'idris': {
+\   'command': 'idris',
+\   'exec': ['%c %o %s --output %s:p:r', '%s:p:r %a'],
+\   'tempfile': '%{tempname()}.idr',
+\   'hook/sweep/files': ['%S:p:r', '%S:p:r.ibc'],
+\ },
 \ 'io': {},
 \ 'java': {
 \   'exec': ['javac %o -d %s:p:h %s', '%c -cp %s:p:h %s:t:r %a'],
@@ -320,15 +326,22 @@ let g:quickrun#default_config = {
 \   'hook/eval/template':
 \     'class _Main { static function main(args : string[]) :void { %s }}',
 \ },
+\ 'julia': {
+\   'command': 'julia',
+\ },
 \ 'kotlin': {
-\   'exec': [
-\     'kotlinc-jvm %s -d %s:p:r.jar',
-\     'java -Xbootclasspath/a:%{shellescape(fnamemodify(' .
-\       'fnamemodify(g:quickrun#V.System.Filepath.which("kotlinc-jvm"), ":h") . "/../lib/kotlin-runtime.jar", ":p"))}' .
-\       ' -jar %s:p:r.jar'
-\   ],
+\    'command': 'java',
+\    'exec': ['kotlinc %o %s -include-runtime -d %s:p:r.jar', '%c -jar %s:p:r.jar'],
+\    'tempfile': '%{tempname()}.kt',
+\    'hook/sweep/files': '%S:p:r.jar'
+\ },
+\ 'kotlin/concurrent_process': {
+\   'command': 'kotlinc-jvm',
+\   'exec': '%c',
 \   'tempfile': '%{tempname()}.kt',
-\   'hook/sweep/files': ['%S:p:r.jar'],
+\   'runner': 'concurrent_process',
+\   'runner/concurrent_process/load': ':load %S',
+\   'runner/concurrent_process/prompt': '>>> ',
 \ },
 \ 'lisp': {
 \   'type' : executable('sbcl') ? 'lisp/sbcl':
@@ -355,13 +368,19 @@ let g:quickrun#default_config = {
 \   'exec': '%C %s',
 \   'runner': 'vimscript',
 \ },
+\ 'lua/redis': {
+\   'command': 'redis-cli',
+\   'exec': '%c --eval %s %a',
+\   'tempfile': '%{tempname()}.lua'
+\ },
 \ 'markdown': {
 \   'type': executable('Markdown.pl') ? 'markdown/Markdown.pl':
 \           executable('kramdown') ? 'markdown/kramdown':
 \           executable('bluecloth') ? 'markdown/bluecloth':
 \           executable('redcarpet') ? 'markdown/redcarpet':
 \           executable('pandoc') ? 'markdown/pandoc':
-\           executable('markdown_py') ? 'markdown/markdown_py': '',
+\           executable('markdown_py') ? 'markdown/markdown_py':
+\           executable('markdown') ? 'markdown/discount': '',
 \ },
 \ 'markdown/Markdown.pl': {
 \   'command': 'Markdown.pl',
@@ -383,6 +402,9 @@ let g:quickrun#default_config = {
 \ 'markdown/markdown_py': {
 \   'command': 'markdown_py',
 \ },
+\ 'markdown/discount': {
+\   'command': 'markdown',
+\ },
 \ 'nim': {
 \   'cmdopt': 'compile --run --verbosity:0',
 \   'hook/sweep/files': '%S:p:r',
@@ -399,12 +421,37 @@ let g:quickrun#default_config = {
 \ 'perl6': {'hook/eval/template': '{%s}().perl.print'},
 \ 'python': {'hook/eval/template': 'print(%s)'},
 \ 'php': {},
+\ 'pony': {
+\   'command': 'ponyc',
+\   'exec': ['%c -V 0 %o', '%s:p:h/%s:p:h:t %a'],
+\   'tempfile': '%{tempname()}.pony',
+\   'hook/sweep/files': ['%S:p:h/%S:p:h:t'],
+\   'hook/cd/directory': '%S:p:h',
+\ },
+\ 'prolog': {
+\   'type': executable('swipl') ? 'prolog/swi' :
+\           executable('gprolog') ? 'prolog/gnu' : '',
+\ },
+\ 'prolog/gnu': {
+\   'command': 'gprolog',
+\   'cmdopt': '--consult-file',
+\   'exec': '%c %o %s %a --query-goal halt',
+\ },
+\ 'prolog/swi': {
+\   'command': 'swipl',
+\   'cmdopt': '--quiet -s',
+\   'exec': '%c %o %s %a -g halt',
+\ },
 \ 'ps1': {
 \   'exec': '%c %o -File %s %a',
 \   'command': 'powershell.exe',
 \   'cmdopt': '-ExecutionPolicy RemoteSigned',
 \   'tempfile': '%{tempname()}.ps1',
 \   'hook/output_encode/encoding': '&termencoding',
+\ },
+\ 'xquery': {
+\   'command': 'zorba',
+\   'exec': '%c %o %s %a',
 \ },
 \ 'r': {
 \   'command': 'R',
@@ -413,37 +460,34 @@ let g:quickrun#default_config = {
 \ 'ruby': {'hook/eval/template': " p proc {\n%s\n}.call"},
 \ 'ruby/irb': {
 \   'command': 'irb',
-\   'exec': '%c %o --simple-prompt',
-\   'runner': 'process_manager',
-\   'runner/process_manager/load': "load '%s'",
-\   'runner/process_manager/prompt': '>> ',
+\   'cmdopt': '--simple-prompt',
+\   'runner': 'concurrent_process',
+\   'runner/concurrent_process/load': 'load %s',
+\   'runner/concurrent_process/prompt': '>> ',
 \ },
 \ 'ruby/pry': {
 \   'command': 'pry',
-\   'exec': '%c %o --no-color --simple-prompt',
-\   'runner': 'process_manager',
-\   'runner/process_manager/load': "load '%s'",
-\   'runner/process_manager/prompt': '>> ',
+\   'cmdopt': '--no-color --simple-prompt',
+\   'runner': 'concurrent_process',
+\   'runner/concurrent_process/load': 'load %s',
+\   'runner/concurrent_process/prompt': '>> ',
 \ },
 \ 'rust': {
 \   'command': 'rustc',
 \   'exec': ['%c %o %s -o %s:p:r', '%s:p:r %a'],
-\   'tempfile': '%{tempname()}.rs',
+\   'tempfile': '%{fnamemodify(tempname(), ":r")}.rs',
+\   'hook/shebang/enable': 0,
 \   'hook/sweep/files': '%S:p:r',
 \ },
 \ 'rust/cargo': {
 \   'command': 'cargo',
 \   'exec': '%c run %o',
+\   'hook/shebang/enable': 0,
 \ },
 \ 'scala': {
+\   'exec': ['scalac %o -d %s:p:h %s', '%c -cp %s:p:h %s:t:r %a'],
 \   'hook/output_encode/encoding': '&termencoding',
-\ },
-\ 'scala/process_manager': {
-\   'command': 'scala',
-\   'cmdopt': '-nc',
-\   'runner': 'process_manager',
-\   'runner/process_manager/load': ':load %S',
-\   'runner/process_manager/prompt': 'scala> ',
+\   'hook/sweep/files': '%S:p:r.class',
 \ },
 \ 'scala/concurrent_process': {
 \   'command': 'scala',
@@ -491,7 +535,20 @@ let g:quickrun#default_config = {
 \   'command': 'xcrun',
 \   'exec': ['%c swift %s'],
 \ },
+\ 'tmux': {
+\   'command': 'tmux',
+\   'exec': ['%c source-file %s:p'],
+\ },
 \ 'typescript': {
+\   'type': executable('ts-node') ? 'typescript/ts-node' :
+\           executable('tsc') ? 'typescript/tsc' : '',
+\ },
+\ 'typescript/ts-node': {
+\   'command': 'ts-node',
+\   'cmdopt': '--compilerOptions ''{"target": "es2015"}''',
+\   'exec': '%c %o %s',
+\ },
+\ 'typescript/tsc': {
 \   'command': 'tsc',
 \   'exec': ['%c --target es5 --module commonjs %o %s', 'node %s:r.js'],
 \   'tempfile': '%{tempname()}.ts',
@@ -500,7 +557,7 @@ let g:quickrun#default_config = {
 \ 'vim': {
 \   'command': ':source',
 \   'exec': '%C %s',
-\   'hook/eval/template': "echo %s",
+\   'hook/eval/template': 'echo %s',
 \   'runner': 'vimscript',
 \ },
 \ 'wsh': {
@@ -556,12 +613,13 @@ function! s:Session.normalize(config) abort
 
       let body = s:V.Process.iconv(body, &encoding, &fileencoding)
 
+      if !&l:binary &&
+      \  (!exists('&fixendofline') || &l:fixendofline || &l:endofline)
+        let body .= "\n"
+      endif
       if &l:fileformat ==# 'mac'
         let body = substitute(body, "\n", "\r", 'g')
       elseif &l:fileformat ==# 'dos'
-        if !&l:binary
-          let body .= "\n"
-        endif
         let body = substitute(body, "\n", "\r\n", 'g')
       endif
 
@@ -923,7 +981,7 @@ function! quickrun#complete(lead, cmd, pos) abort
         let list = map(filter(quickrun#module#get(opt),
         \                     'v:val.available()'), 'v:val.name')
       endif
-      return filter(list, 'v:val =~# "^".a:lead')
+      return filter(list, 'v:val =~# "^" . a:lead')
     endif
 
   elseif head =~# '^-'
@@ -1262,25 +1320,6 @@ function! s:get_region(region) abort
     let &selection = save_sel
   endif
   return selected
-endfunction
-
-
-" Wrapper functions for compatibility.  {{{1
-function! quickrun#register_runner(name, runner) abort
-  return quickrun#register_module('runner', a:name, a:runner)
-endfunction
-function! quickrun#register_outputter(name, outputter) abort
-  return quickrun#register_module('outputter', a:name, a:outputter)
-endfunction
-function! quickrun#register_hook(name, hook) abort
-  return quickrun#register_module('hook', a:name, a:hook)
-endfunction
-function! quickrun#register_module(kind, name, module) abort
-  return quickrun#module#register(
-  \        extend(a:module, {'kind': a:kind, 'name': a:name}, 'keep'))
-endfunction
-function! quickrun#get_module(kind, ...) abort
-  return call('quickrun#module#get', [a:kind] + a:000)
 endfunction
 
 

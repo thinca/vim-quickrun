@@ -5,6 +5,8 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
+let s:VT = g:quickrun#V.import('Vim.ViewTracer')
+
 let s:outputter = {
 \   'config': {
 \     'name': '[quickrun output]',
@@ -20,45 +22,62 @@ let s:outputter = {
 function! s:outputter.init(session) abort
   let self._append = self.config.append
   let self._line = 0
+  let self._crlf = 0
+  let self._lf = 0
 endfunction
 
 function! s:outputter.start(session) abort
+  let prev_window = s:VT.trace_window()
   call s:open_result_window(self.config, a:session)
   if !self._append
     silent % delete _
+    setlocal fileformat=unix
   endif
   call s:set_running_mark(self.config.running_mark)
-  call s:back_to_previous_window()
+  call s:VT.jump(prev_window)
 endfunction
 
 function! s:outputter.output(data, session) abort
+  let prev_window = s:VT.trace_window()
   call s:open_result_window(self.config, a:session)
-  if self._line == 0
-    let self._line = line('$')
-  endif
+
   let oneline = line('$') == 1
   let data = getline('$') . a:data
   silent $ delete _
-  if data =~# '\n$'
-    " :put command do not insert the last line.
-    let data .= "\n"
+
+  if self._line == 0
+    let self._line = line('$') + (oneline ? 0 : 1)
+    if 2 <= self._line
+      let self._crlf = &l:fileformat ==# 'dos' || search("\r$", 'wn')
+      let self._lf = &l:fileformat ==# 'unix' && search("[^\r]$", 'wn')
+    endif
   endif
 
-  " XXX 'fileformat' of a new buffer depends on 'fileformats'.
+  let self._crlf = self._crlf || a:data =~# "\r\n"
+  let self._lf = self._lf || a:data =~# "[^\r]\n"
+
+  call s:normalize_fileformat(self._crlf, self._lf)
+
   if &l:fileformat ==# 'dos'
     let data = substitute(data, "\r\n", "\n", 'g')
   endif
 
+  if data =~# '\n$'
+    " :put command do not insert the last line.
+    let data .= "\n"
+  endif
   silent $ put = data
   if oneline
     silent 1 delete _
   endif
+
   call s:set_running_mark(self.config.running_mark)
-  call s:back_to_previous_window()
+  call s:VT.jump(prev_window)
   redraw
 endfunction
 
 function! s:outputter.finish(session) abort
+  let prev_window = s:VT.trace_window()
   call s:open_result_window(self.config, a:session)
   execute self._line
   silent normal! zt
@@ -66,7 +85,9 @@ function! s:outputter.finish(session) abort
   if closed
     close
   endif
-  call s:back_to_previous_window(!closed && self.config.into)
+  if closed || !self.config.into
+    call s:VT.jump(prev_window)
+  endif
   redraw
   if closed
     echohl MoreMsg
@@ -77,7 +98,6 @@ endfunction
 
 
 function! s:open_result_window(config, session) abort
-  let w:quickrun_outputter_buffer_prevwin = 1
   let sp = a:config.split
   let sname = s:escape_file_pattern(a:config.name)
   let opened = 0
@@ -86,6 +106,7 @@ function! s:open_result_window(config, session) abort
     edit `=a:config.name`
     nnoremap <buffer> q <C-w>c
     setlocal bufhidden=hide buftype=nofile noswapfile nobuflisted
+    setlocal fileformat=unix
     let opened = 1
   elseif bufwinnr(sname) != -1
     execute bufwinnr(sname) 'wincmd w'
@@ -106,20 +127,16 @@ function! s:open_result_window(config, session) abort
   endif
 endfunction
 
-function! s:back_to_previous_window(...) abort
-  let sweep_only = a:0 && a:1
-  for tabnr in range(1, tabpagenr('$'))
-    for winnr in range(1, tabpagewinnr(tabnr, '$'))
-      let vars = gettabwinvar(tabnr, winnr, '')
-      if has_key(vars, 'quickrun_outputter_buffer_prevwin')
-        if !sweep_only
-          call s:jump_to_window(tabnr, winnr)
-        endif
-        call remove(vars, 'quickrun_outputter_buffer_prevwin')
-        return
-      endif
+function! s:normalize_fileformat(crlf, lf) abort
+  " XXX Do not care `fileformat=mac`
+  if &l:fileformat ==# 'unix' && a:crlf && !a:lf
+    setlocal fileformat=dos
+  elseif &l:fileformat ==# 'dos' && a:lf
+    setlocal fileformat=unix
+    for lnum in range(1, line('$'))
+      call setline(lnum, getline(lnum) . "\r")
     endfor
-  endfor
+  endif
 endfunction
 
 function! s:set_running_mark(mark) abort
@@ -132,15 +149,6 @@ endfunction
 
 function! s:is_empty_buffer() abort
   return line('$') == 1 && getline(1) =~# '^\s*$'
-endfunction
-
-function! s:jump_to_window(tabnr, winnr) abort
-  if tabpagenr() != a:tabnr
-    execute 'tabnext' a:tabnr
-  endif
-  if winnr() != a:winnr
-    execute a:winnr 'wincmd w'
-  endif
 endfunction
 
 function! s:escape_file_pattern(pat) abort
