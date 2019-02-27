@@ -449,6 +449,14 @@ let g:quickrun#default_config = {
 \   'tempfile': '%{tempname()}.ps1',
 \   'hook/output_encode/encoding': '&termencoding',
 \ },
+\ 'purescript': {
+\   'type': executable('pulp') ? 'purescript/pulp' : '',
+\ },
+\ 'purescript/pulp': {
+\   'command': 'pulp',
+\   'cmdopt': '--monochrome',
+\   'exec': '%c %o run',
+\ },
 \ 'xquery': {
 \   'command': 'zorba',
 \   'exec': '%c %o %s %a',
