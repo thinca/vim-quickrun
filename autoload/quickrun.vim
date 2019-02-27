@@ -27,7 +27,7 @@ let g:quickrun#default_config = {
 \   'runner': 'system',
 \   'cmdopt': '',
 \   'args': '',
-\   'tempfile'  : '%{tempname()}',
+\   'tempfile': '%{tempname()}',
 \   'exec': '%c %o %s %a',
 \ },
 \ 'awk': {
@@ -36,9 +36,9 @@ let g:quickrun#default_config = {
 \ 'bash': {},
 \ 'c': {
 \   'type':
-\     s:is_win && executable('cl') ? 'c/vc'  :
-\     executable('gcc')            ? 'c/gcc' :
-\     executable('clang')          ? 'c/clang' : '',
+\     s:is_win && executable('cl')    ? 'c/vc'    :
+\                 executable('gcc')   ? 'c/gcc'   :
+\                 executable('clang') ? 'c/clang' : '',
 \ },
 \ 'c/C': {
 \   'command': 'C',
@@ -64,9 +64,8 @@ let g:quickrun#default_config = {
 \   'hook/sweep/files': ['%S:p:r.exe', '%S:p:r.obj'],
 \ },
 \ 'clojure': {
-\   'type': executable('jark') ? 'clojure/jark':
-\           executable('clj') ? 'clojure/clj':
-\           '',
+\   'type': executable('jark') ? 'clojure/jark' :
+\           executable('clj')  ? 'clojure/clj'  : '',
 \ },
 \ 'clojure/jark': {
 \   'command': 'jark',
@@ -86,9 +85,9 @@ let g:quickrun#default_config = {
 \ 'coffee': {},
 \ 'cpp': {
 \   'type':
-\     s:is_win && executable('cl') ? 'cpp/vc'  :
-\     executable('clang++')        ? 'cpp/clang++'  :
-\     executable('g++')            ? 'cpp/g++' : '',
+\     s:is_win && executable('cl')      ? 'cpp/vc'      :
+\                 executable('clang++') ? 'cpp/clang++' :
+\                 executable('g++')     ? 'cpp/g++'     : '',
 \ },
 \ 'cpp/C': {
 \   'command': 'C',
@@ -124,7 +123,7 @@ let g:quickrun#default_config = {
 \           executable('dmcs') ? 'cs/dmcs' :
 \           executable('smcs') ? 'cs/smcs' :
 \           executable('gmcs') ? 'cs/gmcs' :
-\           executable('mcs') ? 'cs/mcs' : ''
+\           executable('mcs')  ? 'cs/mcs'  : ''
 \ },
 \ 'cs/csc': {
 \   'command': 'csc',
@@ -158,10 +157,9 @@ let g:quickrun#default_config = {
 \   'hook/sweep/files': ['%S:p:r.exe'],
 \ },
 \ 'd': {
-\   'type':
-\     executable('rdmd')           ? 'd/rdmd' :
-\     executable('ldc')            ? 'd/ldc' :
-\     executable('gdc')            ? 'd/gdc' : '',
+\   'type': executable('rdmd') ? 'd/rdmd' :
+\           executable('ldc')  ? 'd/ldc'  :
+\           executable('gdc')  ? 'd/gdc'  : '',
 \ },
 \ 'd/rdmd': {
 \   'command': 'rdmd',
@@ -186,9 +184,7 @@ let g:quickrun#default_config = {
 \   'tempfile': '%{tempname()}.bat',
 \ },
 \ 'dart': {
-\   'type':
-\     executable('dart') ? 'dart/dart/checked':
-\   '',
+\   'type': executable('dart') ? 'dart/dart/checked' : '',
 \ },
 \ 'dart/dart/checked': {
 \   'command': 'dart',
@@ -229,7 +225,7 @@ let g:quickrun#default_config = {
 \ },
 \ 'fsharp': {
 \   'type': executable('fsharpc') ? 'fsharp/mono' :
-\           executable('fsc') ? 'fsharp/vs' : '',
+\           executable('fsc')     ? 'fsharp/vs'   : '',
 \ },
 \ 'fsharp/mono': {
 \   'exec': ['%c %o --out:%s:p:r.exe %s', 'mono %s:p:r.exe %a'],
@@ -288,12 +284,12 @@ let g:quickrun#default_config = {
 \   'hook/sweep/files': '%S:p:r.class',
 \ },
 \ 'javascript': {
-\   'type': executable('js') ? 'javascript/spidermonkey':
-\           executable('d8') ? 'javascript/v8':
-\           executable('node') ? 'javascript/nodejs':
-\           executable('phantomjs') ? 'javascript/phantomjs':
-\           executable('jrunscript') ? 'javascript/rhino':
-\           executable('cscript') ? 'javascript/cscript': '',
+\   'type': executable('js')         ? 'javascript/spidermonkey' :
+\           executable('d8')         ? 'javascript/v8'           :
+\           executable('node')       ? 'javascript/nodejs'       :
+\           executable('phantomjs')  ? 'javascript/phantomjs'    :
+\           executable('jrunscript') ? 'javascript/rhino'        :
+\           executable('cscript')    ? 'javascript/cscript'      : '',
 \ },
 \ 'javascript/cscript': {
 \   'command': 'cscript',
@@ -344,9 +340,9 @@ let g:quickrun#default_config = {
 \   'runner/concurrent_process/prompt': '>>> ',
 \ },
 \ 'lisp': {
-\   'type' : executable('sbcl') ? 'lisp/sbcl':
-\            executable('ccl') ? 'lisp/ccl':
-\            executable('clisp') ? 'lisp/clisp': '',
+\   'type': executable('sbcl')  ? 'lisp/sbcl'  :
+\           executable('ccl')   ? 'lisp/ccl'   :
+\           executable('clisp') ? 'lisp/clisp' : '',
 \ },
 \ 'lisp/sbcl': {
 \   'command': 'sbcl',
@@ -360,7 +356,7 @@ let g:quickrun#default_config = {
 \   'command': 'clisp',
 \ },
 \ 'llvm': {
-\   'exec' : 'llvm-as %s:p -o=- | lli - %a',
+\   'exec': 'llvm-as %s:p -o=- | lli - %a',
 \ },
 \ 'lua': {},
 \ 'lua/vim': {
@@ -374,13 +370,13 @@ let g:quickrun#default_config = {
 \   'tempfile': '%{tempname()}.lua'
 \ },
 \ 'markdown': {
-\   'type': executable('Markdown.pl') ? 'markdown/Markdown.pl':
-\           executable('kramdown') ? 'markdown/kramdown':
-\           executable('bluecloth') ? 'markdown/bluecloth':
-\           executable('redcarpet') ? 'markdown/redcarpet':
-\           executable('pandoc') ? 'markdown/pandoc':
-\           executable('markdown_py') ? 'markdown/markdown_py':
-\           executable('markdown') ? 'markdown/discount': '',
+\   'type': executable('Markdown.pl') ? 'markdown/Markdown.pl' :
+\           executable('kramdown')    ? 'markdown/kramdown'    :
+\           executable('bluecloth')   ? 'markdown/bluecloth'   :
+\           executable('redcarpet')   ? 'markdown/redcarpet'   :
+\           executable('pandoc')      ? 'markdown/pandoc'      :
+\           executable('markdown_py') ? 'markdown/markdown_py' :
+\           executable('markdown')    ? 'markdown/discount'    : '',
 \ },
 \ 'markdown/Markdown.pl': {
 \   'command': 'Markdown.pl',
@@ -429,7 +425,7 @@ let g:quickrun#default_config = {
 \   'hook/cd/directory': '%S:p:h',
 \ },
 \ 'prolog': {
-\   'type': executable('swipl') ? 'prolog/swi' :
+\   'type': executable('swipl')   ? 'prolog/swi' :
 \           executable('gprolog') ? 'prolog/gnu' : '',
 \ },
 \ 'prolog/gnu': {
@@ -497,8 +493,8 @@ let g:quickrun#default_config = {
 \   'runner/concurrent_process/prompt': 'scala> ',
 \ },
 \ 'scheme': {
-\   'type': executable('gosh')     ? 'scheme/gauche':
-\           executable('mzscheme') ? 'scheme/mzscheme': '',
+\   'type': executable('gosh')     ? 'scheme/gauche'   :
+\           executable('mzscheme') ? 'scheme/mzscheme' : '',
 \ },
 \ 'scheme/gauche': {
 \   'command': 'gosh',
@@ -512,9 +508,9 @@ let g:quickrun#default_config = {
 \ 'sed': {},
 \ 'sh': {},
 \ 'sql': {
-\   'type': executable('psql') ? 'sql/postgres' :
-\           executable('mysql') ? 'sql/mysql' :
-\           executable('sqlite3') ? 'sql/sqlite3' : '',
+\   'type': executable('psql')    ? 'sql/postgres' :
+\           executable('mysql')   ? 'sql/mysql'    :
+\           executable('sqlite3') ? 'sql/sqlite3'  : '',
 \ },
 \ 'sql/postgres': {
 \   'command': 'psql',
@@ -529,7 +525,7 @@ let g:quickrun#default_config = {
 \   'exec': ['%c %o < %s'],
 \ },
 \ 'swift': {
-\   'type' : executable('xcrun') ? 'swift/apple' : '',
+\   'type': executable('xcrun') ? 'swift/apple' : '',
 \ },
 \ 'swift/apple': {
 \   'command': 'xcrun',
@@ -541,7 +537,7 @@ let g:quickrun#default_config = {
 \ },
 \ 'typescript': {
 \   'type': executable('ts-node') ? 'typescript/ts-node' :
-\           executable('tsc') ? 'typescript/tsc' : '',
+\           executable('tsc')     ? 'typescript/tsc'     : '',
 \ },
 \ 'typescript/ts-node': {
 \   'command': 'ts-node',
