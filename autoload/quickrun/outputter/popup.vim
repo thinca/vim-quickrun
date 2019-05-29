@@ -19,6 +19,9 @@ function! s:outputter.init(session) abort
 endfunction
 
 function! s:outputter.finish(session) abort
+  if s:winid
+    call popup_close(s:winid)
+  endif
   let result = split(self._result, "\n")
   let width = max(map(copy(result), { _, l -> strwidth(l) }))
   let s:winid = popup_create(result, {'minwidth': width})
