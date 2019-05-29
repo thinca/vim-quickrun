@@ -5,17 +5,12 @@
 
 let s:outputter = quickrun#outputter#buffered#new()
 
-let s:outputter.init_buffered = s:outputter.init
 let s:winid = 0
 
 function! s:outputter.validate() abort
   if !exists('*popup_create')
     throw 'Needs popup feature.'
   endif
-endfunction
-
-function! s:outputter.init(session) abort
-  call self.init_buffered(a:session)
 endfunction
 
 function! s:outputter.finish(session) abort
