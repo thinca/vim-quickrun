@@ -642,6 +642,13 @@ outputter は結果の出力を行うモジュールです。
 - "outputter/null"			*quickrun-module-outputter/null*
   出力を行いません。
 
+- "outputter/popup"			*quickrun-module-outputter/popup*
+  {|popup| 機能が必要}
+  {非常に実験的}
+  ポップアップに出力します。カーソルを動かすとポップアップは閉じられます。
+  ポップアップ機能自体が開発中の機能であるため、これは非常に実験的な機能です。
+  将来的にこの outputter は "buffer" outputter に取り込まれる予定です。
+
 
 ------------------------------------------------------------------------------
 HOOK						*quickrun-module-hook*

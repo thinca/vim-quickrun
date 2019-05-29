@@ -649,6 +649,14 @@ available by default.
 - "outputter/null"			*quickrun-module-outputter/null*
   No outputs.
 
+- "outputter/popup"			*quickrun-module-outputter/popup*
+  {Requires |popup| feature}
+  {Highly Experimental}
+  Outputs to popup.  The popup will be closed when you moved cursor.
+  This is highly experimental because popup feature itself is under
+  development.
+  Maybe, this outputter will be merged to "buffer" outputter in the future.
+
 
 ------------------------------------------------------------------------------
 HOOK						*quickrun-module-hook*
