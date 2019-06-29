@@ -7,8 +7,11 @@ let s:runner = {
 \   'config': {
 \     'pty': 0,
 \     'interval': 0,
+\     'output_buffer_for_cmdwin': '',
 \   }
 \ }
+
+let s:B = g:quickrun#V.import('Vim.Buffer')
 
 function! s:runner.validate() abort
   if !has('job')
@@ -64,8 +67,16 @@ function! s:runner.sweep() abort
   endif
 endfunction
 
+let s:buffered_message = ''
+
 function! s:runner._job_cb(channel, message) abort
-  call quickrun#session(self._key, 'output', a:message)
+  if s:B.is_cmdwin()
+    let self.config.output_buffer_for_cmdwin .= a:message
+  else
+    let message = self.config.output_buffer_for_cmdwin . a:message
+    let self.config.output_buffer_for_cmdwin = ''
+    call quickrun#session(self._key, 'output', message)
+  endif
 endfunction
 
 function! s:runner._job_close_cb(channel) abort
