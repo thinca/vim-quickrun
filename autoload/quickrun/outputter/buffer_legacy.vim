@@ -153,6 +153,6 @@ function s:escape_file_pattern(pat) abort
 endfunction
 
 
-function quickrun#outputter#buffer#new() abort
+function quickrun#outputter#buffer_legacy#new() abort
   return deepcopy(s:outputter)
 endfunction
