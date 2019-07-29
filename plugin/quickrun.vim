@@ -1,5 +1,4 @@
 " Run commands quickly.
-" Version: 0.8.0
 " Author : thinca <thinca+vim@gmail.com>
 " License: zlib License
 
