@@ -47,7 +47,7 @@ License: zlib License
 実行するためのコマンド |:QuickRun| が提供されます。
 
 要件:
-- Vim 7.2 以降
+- Vim 8.1 以降
 
 最新版:
 http://github.com/thinca/vim-quickrun

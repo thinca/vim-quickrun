@@ -47,7 +47,7 @@ INTRODUCTION					*quickrun-introduction*
 It provides |:QuickRun| for it.
 
 Requirement:
-- Vim 7.2 or later
+- Vim 8.1 or later
 
 Latest Version:
 http://github.com/thinca/vim-quickrun
