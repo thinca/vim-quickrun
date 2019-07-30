@@ -4,7 +4,6 @@ quickrun
 Data.List
 System.File
 System.Filepath
-Prelude
 Process
 Vim.Message
 ConcurrentProcess
