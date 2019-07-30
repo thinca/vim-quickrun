@@ -2,10 +2,6 @@
 " Author : thinca <thinca+vim@gmail.com>
 " License: zlib License
 
-let s:save_cpo = &cpo
-set cpo&vim
-
-
 let s:is_win = has('win32') || has('win64')
 let s:runner = {
 \   'config': {
@@ -114,6 +110,3 @@ endfunction
 function! quickrun#runner#remote#new() abort
   return deepcopy(s:runner)
 endfunction
-
-let &cpo = s:save_cpo
-unlet s:save_cpo

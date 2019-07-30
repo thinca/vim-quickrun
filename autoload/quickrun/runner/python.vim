@@ -2,10 +2,6 @@
 " Author : thinca <thinca+vim@gmail.com>
 " License: zlib License
 
-let s:save_cpo = &cpo
-set cpo&vim
-
-
 let s:python_loaded = 0
 if has('python')
   try
@@ -100,7 +96,3 @@ endfunction
 function! quickrun#runner#python#new() abort
   return deepcopy(s:runner)
 endfunction
-
-
-let &cpo = s:save_cpo
-unlet s:save_cpo

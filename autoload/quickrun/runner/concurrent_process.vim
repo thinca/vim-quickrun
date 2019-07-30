@@ -2,9 +2,6 @@
 " Author:  ujihisa <ujihisa at gmail com>
 " License: zlib License
 
-let s:save_cpo = &cpo
-set cpo&vim
-
 let s:runner = {
 \   'config': {
 \     'load': 'load %s',
@@ -96,6 +93,3 @@ endfunction
 function! quickrun#runner#concurrent_process#new() abort
   return deepcopy(s:runner)
 endfunction
-
-let &cpo = s:save_cpo
-unlet s:save_cpo

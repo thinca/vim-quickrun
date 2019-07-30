@@ -2,9 +2,6 @@
 " Author : thinca <thinca+vim@gmail.com>
 " License: zlib License
 
-let s:save_cpo = &cpo
-set cpo&vim
-
 let s:hook = {
 \   'config': {
 \     'directory': '',
@@ -78,6 +75,3 @@ endfunction
 function! quickrun#hook#cd#new() abort
   return deepcopy(s:hook)
 endfunction
-
-let &cpo = s:save_cpo
-unlet s:save_cpo

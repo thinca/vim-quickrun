@@ -2,9 +2,6 @@
 " Author : thinca <thinca+vim@gmail.com>
 " License: zlib License
 
-let s:save_cpo = &cpo
-set cpo&vim
-
 let s:default_name = tempname() . '.html'
 
 let s:outputter = quickrun#outputter#file#new()
@@ -39,6 +36,3 @@ endfunction
 function! quickrun#outputter#browser#new() abort
   return deepcopy(s:outputter)
 endfunction
-
-let &cpo = s:save_cpo
-unlet s:save_cpo

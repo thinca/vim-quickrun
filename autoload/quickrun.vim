@@ -2,9 +2,6 @@
 " Author : thinca <thinca+vim@gmail.com>
 " License: zlib License
 
-let s:save_cpo = &cpo
-set cpo&vim
-
 let s:V = vital#quickrun#new().load(
 \   'Data.List',
 \   'System.File',
@@ -878,7 +875,3 @@ endfunction
 
 " Register the default modules.  {{{1
 call quickrun#module#load()
-
-
-let &cpo = s:save_cpo
-unlet s:save_cpo

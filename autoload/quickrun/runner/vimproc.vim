@@ -2,9 +2,6 @@
 " Author : thinca <thinca+vim@gmail.com>
 " License: zlib License
 
-let s:save_cpo = &cpo
-set cpo&vim
-
 " Create augroup.
 augroup plugin-quickrun-runner-vimproc
 augroup END
@@ -122,6 +119,3 @@ endfunction
 function! quickrun#runner#vimproc#new() abort
   return deepcopy(s:runner)
 endfunction
-
-let &cpo = s:save_cpo
-unlet s:save_cpo

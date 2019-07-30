@@ -2,9 +2,6 @@
 " Author : thinca <thinca+vim@gmail.com>
 " License: zlib License
 
-let s:save_cpo = &cpo
-set cpo&vim
-
 let s:VT = g:quickrun#V.import('Vim.ViewTracer')
 
 let s:outputter = quickrun#outputter#buffered#new()
@@ -88,6 +85,3 @@ endfunction
 function! quickrun#outputter#quickfix#new() abort
   return deepcopy(s:outputter)
 endfunction
-
-let &cpo = s:save_cpo
-unlet s:save_cpo

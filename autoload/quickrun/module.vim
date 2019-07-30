@@ -2,9 +2,6 @@
 " Author : thinca <thinca+vim@gmail.com>
 " License: zlib License
 
-let s:save_cpo = &cpo
-set cpo&vim
-
 " Templates.  {{{1
 let s:templates = {}
 " Template of module.  {{{2
@@ -164,7 +161,3 @@ function! s:deepextend(a, b) abort
   endif
   return a:a
 endfunction
-
-
-let &cpo = s:save_cpo
-unlet s:save_cpo

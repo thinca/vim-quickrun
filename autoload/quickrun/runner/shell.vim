@@ -2,10 +2,6 @@
 " Author : thinca <thinca+vim@gmail.com>
 " License: zlib License
 
-
-let s:save_cpo = &cpo
-set cpo&vim
-
 let s:runner = {
 \   'config': {
 \     'shellcmd': &shell =~? 'cmd\.exe' ? 'silent !%s & pause ' : '!%s',
@@ -63,6 +59,3 @@ endfunction
 function! quickrun#runner#shell#new() abort
   return deepcopy(s:runner)
 endfunction
-
-let &cpo = s:save_cpo
-unlet s:save_cpo

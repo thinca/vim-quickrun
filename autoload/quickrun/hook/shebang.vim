@@ -2,9 +2,6 @@
 " Author : thinca <thinca+vim@gmail.com>
 " License: zlib License
 
-let s:save_cpo = &cpo
-set cpo&vim
-
 let s:Filepath = g:quickrun#V.import('System.Filepath')
 
 let s:hook = {}
@@ -24,6 +21,3 @@ endfunction
 function! quickrun#hook#shebang#new() abort
   return deepcopy(s:hook)
 endfunction
-
-let &cpo = s:save_cpo
-unlet s:save_cpo

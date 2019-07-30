@@ -7,9 +7,6 @@ if exists('g:loaded_quickrun')
 endif
 let g:loaded_quickrun = 1
 
-let s:save_cpo = &cpo
-set cpo&vim
-
 
 command! -nargs=* -range=0 -complete=customlist,quickrun#complete QuickRun
 \ call quickrun#command(<q-args>, <count>, <line1>, <line2>)
@@ -27,6 +24,3 @@ if !hasmapto('<Plug>(quickrun)')
 \      || !g:quickrun_no_default_key_mappings)
   silent! map <unique> <Leader>r <Plug>(quickrun)
 endif
-
-let &cpo = s:save_cpo
-unlet s:save_cpo

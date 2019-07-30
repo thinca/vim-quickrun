@@ -2,9 +2,6 @@
 " Author : thinca <thinca+vim@gmail.com>
 " License: zlib License
 
-let s:save_cpo = &cpo
-set cpo&vim
-
 let s:runner = {}
 
 function! s:runner.run(commands, input, session) abort
@@ -55,6 +52,3 @@ endfunction
 function! quickrun#runner#system#new() abort
   return deepcopy(s:runner)
 endfunction
-
-let &cpo = s:save_cpo
-unlet s:save_cpo
