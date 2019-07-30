@@ -8,21 +8,21 @@ let s:outputter = quickrun#outputter#file#new()
 
 let s:outputter.init_file = s:outputter.init
 
-function! s:outputter.validate() abort
+function s:outputter.validate() abort
   call openbrowser#load()
   if !exists('*openbrowser#open')
     throw 'Needs open-browser.vim.'
   endif
 endfunction
 
-function! s:outputter.init(session) abort
+function s:outputter.init(session) abort
   if self.config.name ==# ''
     let self.config.name = s:default_name
   endif
   call self.init_file(a:session)
 endfunction
 
-function! s:outputter.finish(session) abort
+function s:outputter.finish(session) abort
   let saved = g:openbrowser_open_filepath_in_vim
   try
     let g:openbrowser_open_filepath_in_vim = 0
@@ -33,6 +33,6 @@ function! s:outputter.finish(session) abort
 endfunction
 
 
-function! quickrun#outputter#browser#new() abort
+function quickrun#outputter#browser#new() abort
   return deepcopy(s:outputter)
 endfunction

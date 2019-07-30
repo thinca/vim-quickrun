@@ -16,13 +16,13 @@ let s:CP = g:quickrun#V.import('ConcurrentProcess')
 augroup plugin-quickrun-concurrent-process
 augroup END
 
-function! s:runner.validate() abort
+function s:runner.validate() abort
   if !s:CP.is_available()
     throw 'Needs vimproc.'
   endif
 endfunction
 
-function! s:runner.run(commands, input, session) abort
+function s:runner.run(commands, input, session) abort
   let type = a:session.config.type
 
   let message = a:session.build_command(self.config.load)
@@ -63,7 +63,7 @@ function! s:runner.run(commands, input, session) abort
   let &updatetime = 50
 endfunction
 
-function! s:receive(key) abort
+function s:receive(key) abort
   if s:B.is_cmdwin()
     return 0
   endif
@@ -81,7 +81,7 @@ function! s:receive(key) abort
   return 0
 endfunction
 
-function! s:runner.sweep() abort
+function s:runner.sweep() abort
   if has_key(self, '_autocmd')
     autocmd! plugin-quickrun-concurrent-process
   endif
@@ -90,6 +90,6 @@ function! s:runner.sweep() abort
   endif
 endfunction
 
-function! quickrun#runner#concurrent_process#new() abort
+function quickrun#runner#concurrent_process#new() abort
   return deepcopy(s:runner)
 endfunction

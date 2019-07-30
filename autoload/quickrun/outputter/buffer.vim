@@ -16,14 +16,14 @@ let s:outputter = {
 \   }
 \ }
 
-function! s:outputter.init(session) abort
+function s:outputter.init(session) abort
   let self._append = self.config.append
   let self._line = 0
   let self._crlf = 0
   let self._lf = 0
 endfunction
 
-function! s:outputter.start(session) abort
+function s:outputter.start(session) abort
   let prev_window = s:VT.trace_window()
   call s:open_result_window(self.config, a:session)
   if !self._append
@@ -34,7 +34,7 @@ function! s:outputter.start(session) abort
   call s:VT.jump(prev_window)
 endfunction
 
-function! s:outputter.output(data, session) abort
+function s:outputter.output(data, session) abort
   let prev_window = s:VT.trace_window()
   call s:open_result_window(self.config, a:session)
 
@@ -73,7 +73,7 @@ function! s:outputter.output(data, session) abort
   redraw
 endfunction
 
-function! s:outputter.finish(session) abort
+function s:outputter.finish(session) abort
   let prev_window = s:VT.trace_window()
   call s:open_result_window(self.config, a:session)
   execute self._line
@@ -94,7 +94,7 @@ function! s:outputter.finish(session) abort
 endfunction
 
 
-function! s:open_result_window(config, session) abort
+function s:open_result_window(config, session) abort
   let sp = a:config.split
   let sname = s:escape_file_pattern(a:config.name)
   let opened = 0
@@ -124,7 +124,7 @@ function! s:open_result_window(config, session) abort
   endif
 endfunction
 
-function! s:normalize_fileformat(crlf, lf) abort
+function s:normalize_fileformat(crlf, lf) abort
   " XXX Do not care `fileformat=mac`
   if &l:fileformat ==# 'unix' && a:crlf && !a:lf
     setlocal fileformat=dos
@@ -136,7 +136,7 @@ function! s:normalize_fileformat(crlf, lf) abort
   endif
 endfunction
 
-function! s:set_running_mark(mark) abort
+function s:set_running_mark(mark) abort
   if a:mark !=# '' && !exists('b:quickrun_running_mark')
     let &undolevels = &undolevels  " split the undo block
     silent $ put =a:mark
@@ -144,15 +144,15 @@ function! s:set_running_mark(mark) abort
   endif
 endfunction
 
-function! s:is_empty_buffer() abort
+function s:is_empty_buffer() abort
   return line('$') == 1 && getline(1) =~# '^\s*$'
 endfunction
 
-function! s:escape_file_pattern(pat) abort
+function s:escape_file_pattern(pat) abort
   return join(map(split(a:pat, '\zs'), '"[" . v:val . "]"'), '')
 endfunction
 
 
-function! quickrun#outputter#buffer#new() abort
+function quickrun#outputter#buffer#new() abort
   return deepcopy(s:outputter)
 endfunction

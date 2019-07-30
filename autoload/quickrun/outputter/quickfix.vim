@@ -13,7 +13,7 @@ let s:outputter.config = {
 
 let s:outputter.init_buffered = s:outputter.init
 
-function! s:outputter.init(session) abort
+function s:outputter.init(session) abort
   call self.init_buffered(a:session)
   let self.config.errorformat
 \    = !empty(self.config.errorformat) ? self.config.errorformat
@@ -24,7 +24,7 @@ function! s:outputter.init(session) abort
 endfunction
 
 
-function! s:outputter.finish(session) abort
+function s:outputter.finish(session) abort
   try
     let errorformat = &g:errorformat
     let &g:errorformat = self.config.errorformat
@@ -50,7 +50,7 @@ function! s:outputter.finish(session) abort
   endtry
 endfunction
 
-function! s:outputter._fix_result_list(session, result_list) abort
+function s:outputter._fix_result_list(session, result_list) abort
   let region = get(a:session.config, 'region', {})
   let srcfile = get(a:session.config, 'srcfile', '')
   if empty(region) || srcfile ==# ''
@@ -68,20 +68,20 @@ function! s:outputter._fix_result_list(session, result_list) abort
   return fixed
 endfunction
 
-function! s:outputter._apply_result(expr) abort
+function s:outputter._apply_result(expr) abort
   cgetexpr a:expr
   return getqflist()
 endfunction
 
-function! s:outputter._apply_result_list(result_list) abort
+function s:outputter._apply_result_list(result_list) abort
   call setqflist(a:result_list)
 endfunction
 
-function! s:outputter._close_window() abort
+function s:outputter._close_window() abort
   cclose
 endfunction
 
 
-function! quickrun#outputter#quickfix#new() abort
+function quickrun#outputter#quickfix#new() abort
   return deepcopy(s:outputter)
 endfunction

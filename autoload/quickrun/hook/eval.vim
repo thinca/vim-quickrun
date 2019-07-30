@@ -9,13 +9,13 @@ let s:hook = {
 \   }
 \ }
 
-function! s:hook.init(session) abort
+function s:hook.init(session) abort
   if self.config.template !~# '%s'
     let self.config.enable = 0
   endif
 endfunction
 
-function! s:hook.on_module_loaded(session, context) abort
+function s:hook.on_module_loaded(session, context) abort
   let src = join(readfile(a:session.config.srcfile, 'b'), "\n")
   let new_src = printf(self.config.template, src)
   let srcfile = a:session.tempname(quickrun#expand(a:session.config.tempfile))
@@ -24,6 +24,6 @@ function! s:hook.on_module_loaded(session, context) abort
   endif
 endfunction
 
-function! quickrun#hook#eval#new() abort
+function quickrun#hook#eval#new() abort
   return deepcopy(s:hook)
 endfunction

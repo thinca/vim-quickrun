@@ -18,13 +18,13 @@ let s:bufsize = -1
 
 let s:M = g:quickrun#V.import('Vim.Message')
 
-function! s:runner.validate() abort
+function s:runner.validate() abort
   if globpath(&runtimepath, 'autoload/vimproc.vim') ==# ''
     throw 'Needs vimproc.'
   endif
 endfunction
 
-function! s:runner.init(session) abort
+function s:runner.init(session) abort
   if type(self.config.pipe_status_index) !=# type(0) &&
   \  string(self.config.pipe_status_index) !=# string('pipefail')
     call s:M.warn("Invalid value in `runner/vimproc/pipe_status_index`: "
@@ -33,7 +33,7 @@ function! s:runner.init(session) abort
   endif
 endfunction
 
-function! s:runner.run(commands, input, session) abort
+function s:runner.run(commands, input, session) abort
   let vimproc = vimproc#pgroup_open(join(a:commands, ' && '))
   call vimproc.stdin.write(a:input)
   call vimproc.stdin.close()
@@ -63,11 +63,11 @@ function! s:runner.run(commands, input, session) abort
   endif
 endfunction
 
-function! s:runner.shellescape(str) abort
+function s:runner.shellescape(str) abort
   return '"' . escape(a:str, '\"') . '"'
 endfunction
 
-function! s:runner.sweep() abort
+function s:runner.sweep() abort
   if has_key(self, '_autocmd')
     autocmd! plugin-quickrun-runner-vimproc
   endif
@@ -77,7 +77,7 @@ function! s:runner.sweep() abort
 endfunction
 
 
-function! s:receive_vimproc_result(key, read_timeout, pipe_status_index) abort
+function s:receive_vimproc_result(key, read_timeout, pipe_status_index) abort
   let session = quickrun#session#get(a:key)
 
   let vimproc = session._vimproc
@@ -116,6 +116,6 @@ function! s:receive_vimproc_result(key, read_timeout, pipe_status_index) abort
 endfunction
 
 
-function! quickrun#runner#vimproc#new() abort
+function quickrun#runner#vimproc#new() abort
   return deepcopy(s:runner)
 endfunction

@@ -1,34 +1,34 @@
 let s:V = g:quickrun#V
 
 
-function! quickrun#session#new(...) abort
+function quickrun#session#new(...) abort
   let session = copy(s:Session)
   call session.initialize(a:0 ? a:1 : {})
   return session
 endfunction
 
-function! quickrun#session#get(key) abort
+function quickrun#session#get(key) abort
   return get(s:sessions, a:key, {})
 endfunction
 
-function! quickrun#session#sweep() abort
+function quickrun#session#sweep() abort
   call map(keys(s:sessions), 's:dispose_session(v:val)')
 endfunction
 
-function! quickrun#session#exists() abort
+function quickrun#session#exists() abort
   return !empty(s:sessions)
 endfunction
 
 
 let s:sessions = {}  " Store for sessions.
 
-function! s:save_session(session) abort
+function s:save_session(session) abort
   let key = has('reltime') ? reltimestr(reltime()) : string(localtime())
   let s:sessions[key] = a:session
   return key
 endfunction
 
-function! s:dispose_session(key) abort
+function s:dispose_session(key) abort
   if has_key(s:sessions, a:key)
     let session = remove(s:sessions, a:key)
     call session.sweep()
@@ -38,12 +38,12 @@ endfunction
 
 let s:Session = {}  " {{{1
 " Initialize of instance.
-function! s:Session.initialize(config) abort
+function s:Session.initialize(config) abort
   let self.base_config = s:build_config(a:config)
 endfunction
 
 " The option is appropriately set referring to default options.
-function! s:Session.normalize(config) abort
+function s:Session.normalize(config) abort
   let config = a:config
   if has_key(config, 'input')
     let input = quickrun#expand(config.input)
@@ -106,7 +106,7 @@ function! s:Session.normalize(config) abort
   return config
 endfunction
 
-function! s:Session.setup() abort
+function s:Session.setup() abort
   try
     if has_key(self, 'exit_code')
       call remove(self, 'exit_code')
@@ -138,7 +138,7 @@ function! s:Session.setup() abort
   endtry
 endfunction
 
-function! s:Session.make_module(kind, line) abort
+function s:Session.make_module(kind, line) abort
   let name = ''
   if type(a:line) == type([]) && !empty([])
     let [name; args] = a:line
@@ -170,7 +170,7 @@ function! s:Session.make_module(kind, line) abort
   return module
 endfunction
 
-function! s:Session.run() abort
+function s:Session.run() abort
   if has_key(self, '_running')
     throw 'quickrun: session.run() was called in running.'
   endif
@@ -188,12 +188,12 @@ function! s:Session.run() abort
   endtry
 endfunction
 
-function! s:Session.continue() abort
+function s:Session.continue() abort
   let self._continue_key = s:save_session(self)
   return self._continue_key
 endfunction
 
-function! s:Session.output(data) abort
+function s:Session.output(data) abort
   let context = {'data': a:data}
   call self.invoke_hook('output', context)
   if context.data !=# ''
@@ -201,7 +201,7 @@ function! s:Session.output(data) abort
   endif
 endfunction
 
-function! s:Session.finish(...) abort
+function s:Session.finish(...) abort
   if !has_key(self, 'exit_code')
     let self.exit_code = a:0 ? a:1 : 0
     if self.exit_code == 0
@@ -218,7 +218,7 @@ endfunction
 
 " Build a command to execute it from options.
 " XXX: Undocumented yet.  This is used by core modules only.
-function! s:Session.build_command(tmpl) abort
+function s:Session.build_command(tmpl) abort
   let config = self.config
   let command = config.command
   let rule = {
@@ -268,7 +268,7 @@ function! s:Session.build_command(tmpl) abort
   return substitute(result, '[\r\n]\+', ' ', 'g')
 endfunction
 
-function! s:Session.tempname(...) abort
+function s:Session.tempname(...) abort
   let name = a:0 ? a:1 : tempname()
   if !has_key(self, '_temp_names')
     let self._temp_names = []
@@ -278,7 +278,7 @@ function! s:Session.tempname(...) abort
 endfunction
 
 " Sweep the session.
-function! s:Session.sweep() abort
+function s:Session.sweep() abort
   " Remove temporary files.
   if has_key(self, '_temp_names')
     for name in self._temp_names
@@ -324,7 +324,7 @@ function! s:Session.sweep() abort
   endif
 endfunction
 
-function! s:Session.invoke_hook(point, ...) abort
+function s:Session.invoke_hook(point, ...) abort
   let context = a:0 ? a:1 : {}
   let func = 'on_' . a:point
   let hooks = copy(self.hooks)
@@ -338,7 +338,7 @@ function! s:Session.invoke_hook(point, ...) abort
   endfor
 endfunction
 
-function! s:get_hook_priority(hook, point) abort
+function s:get_hook_priority(hook, point) abort
   try
     return a:hook.priority(a:point) - 0
   catch
@@ -346,7 +346,7 @@ function! s:get_hook_priority(hook, point) abort
   endtry
 endfunction
 
-function! s:build_config(config) abort
+function s:build_config(config) abort
   let config = quickrun#config(a:config)
   if !has_key(config, 'mode')
     let config.mode = histget(':') =~# "^'<,'>\\s*Q\\%[uickRun]" ? 'v' : 'n'
@@ -389,7 +389,7 @@ function! s:build_config(config) abort
   return config
 endfunction
 
-function! s:build_module(module, configs) abort
+function s:build_module(module, configs) abort
   for config in a:configs
     if type(config) == type({})
       for name in keys(a:module.config)
@@ -416,7 +416,7 @@ function! s:build_module(module, configs) abort
   endfor
 endfunction
 
-function! s:parse_module_option(module, argline) abort
+function s:parse_module_option(module, argline) abort
   let sep = a:argline[0]
   let args = split(a:argline[1:], '\V' . escape(sep, '\'))
   let order = copy(a:module.config_order)
@@ -451,7 +451,7 @@ endfunction
 "   'wise': 'v' / 'V' / "\<C-v>",
 "   'selection': 'inclusive' / 'exclusive' / 'old'
 " }
-function! s:get_region(region) abort
+function s:get_region(region) abort
   let wise = get(a:region, 'wise', 'V')
   if wise ==# 'V'
     return join(getline(a:region.first[0], a:region.last[0]), "\n")

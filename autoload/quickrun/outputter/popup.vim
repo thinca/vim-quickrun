@@ -7,13 +7,13 @@ let s:outputter = quickrun#outputter#buffered#new()
 
 let s:winid = 0
 
-function! s:outputter.validate() abort
+function s:outputter.validate() abort
   if !exists('*popup_create')
     throw 'Needs popup feature.'
   endif
 endfunction
 
-function! s:outputter.finish(session) abort
+function s:outputter.finish(session) abort
   if s:winid
     call popup_close(s:winid)
   endif
@@ -22,7 +22,7 @@ function! s:outputter.finish(session) abort
   let s:winid = popup_create(result, {'minwidth': width})
 endfunction
 
-function! quickrun#outputter#popup#new() abort
+function quickrun#outputter#popup#new() abort
   return deepcopy(s:outputter)
 endfunction
 

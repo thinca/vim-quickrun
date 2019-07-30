@@ -10,7 +10,7 @@ let s:runner = {
 \   }
 \ }
 
-function! s:runner.validate() abort
+function s:runner.validate() abort
   if !has('job')
     throw 'Needs +job feature.'
   endif
@@ -22,7 +22,7 @@ function! s:runner.validate() abort
   endif
 endfunction
 
-function! s:runner.run(commands, input, session) abort
+function s:runner.run(commands, input, session) abort
   let command = join(a:commands, ' && ')
   let cmd_arg = s:is_win ? printf('cmd.exe /c (%s)', command)
   \                      : ['sh', '-c', command]
@@ -53,7 +53,7 @@ function! s:runner.run(commands, input, session) abort
   endif
 endfunction
 
-function! s:runner.sweep() abort
+function s:runner.sweep() abort
   if has_key(self, '_job')
     while job_status(self._job) ==# 'run'
       call job_stop(self._job)
@@ -64,11 +64,11 @@ function! s:runner.sweep() abort
   endif
 endfunction
 
-function! s:runner._job_cb(channel, message) abort
+function s:runner._job_cb(channel, message) abort
   call quickrun#session#get(self._key).output(a:message)
 endfunction
 
-function! s:runner._job_close_cb(channel) abort
+function s:runner._job_close_cb(channel) abort
   if has_key(self, '_job_exited')
     call quickrun#session#get(self._key).finish(self._job_exited)
   else
@@ -76,7 +76,7 @@ function! s:runner._job_close_cb(channel) abort
   endif
 endfunction
 
-function! s:runner._job_exit_cb(job, exit_status) abort
+function s:runner._job_exit_cb(job, exit_status) abort
   if has_key(self, '_job_exited')
     call quickrun#session#get(self._key).finish(a:exit_status)
   else
@@ -84,12 +84,12 @@ function! s:runner._job_exit_cb(job, exit_status) abort
   endif
 endfunction
 
-function! s:runner._timer_cb(timer) abort
+function s:runner._timer_cb(timer) abort
   if has_key(self, '_job')
     call job_status(self._job)
   endif
 endfunction
 
-function! quickrun#runner#job#new() abort
+function quickrun#runner#job#new() abort
   return deepcopy(s:runner)
 endfunction

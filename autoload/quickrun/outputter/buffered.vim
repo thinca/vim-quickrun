@@ -8,21 +8,21 @@ let s:outputter = {
 \   },
 \ }
 
-function! s:outputter.init(session) abort
+function s:outputter.init(session) abort
   let self._result = ''
 endfunction
 
-function! s:outputter.output(data, session) abort
+function s:outputter.output(data, session) abort
   let self._result .= a:data
 endfunction
 
-function! s:outputter.finish(session) abort
+function s:outputter.finish(session) abort
   let outputter = a:session.make_module('outputter', self.config.target)
   call outputter.output(self._result, a:session)
   call outputter.finish(a:session)
 endfunction
 
 
-function! quickrun#outputter#buffered#new() abort
+function quickrun#outputter#buffered#new() abort
   return deepcopy(s:outputter)
 endfunction

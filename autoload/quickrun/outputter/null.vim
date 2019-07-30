@@ -4,10 +4,10 @@
 
 let s:outputter = {}
 
-function! s:outputter.output(data, session) abort
+function s:outputter.output(data, session) abort
 endfunction
 
 
-function! quickrun#outputter#null#new() abort
+function quickrun#outputter#null#new() abort
   return deepcopy(s:outputter)
 endfunction

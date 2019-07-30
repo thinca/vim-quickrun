@@ -9,7 +9,7 @@ let s:runner = {
 \   }
 \ }
 
-function! s:runner.validate() abort
+function s:runner.validate() abort
   if !has('clientserver') || v:servername ==# ''
     throw 'Needs +clientserver feature.'
   endif
@@ -18,7 +18,7 @@ function! s:runner.validate() abort
   endif
 endfunction
 
-function! s:runner.run(commands, input, session) abort
+function s:runner.run(commands, input, session) abort
   let selfvim = s:is_win ? 'vim.exe' :
   \             !empty($_) ? $_ : v:progname
 
@@ -78,7 +78,7 @@ function! s:runner.run(commands, input, session) abort
   endif
 endfunction
 
-function! s:conv_vim2remote(runner, selfvim, cmd) abort
+function s:conv_vim2remote(runner, selfvim, cmd) abort
   if a:cmd !~# '^\s*:'
     return a:cmd
   endif
@@ -87,12 +87,12 @@ function! s:conv_vim2remote(runner, selfvim, cmd) abort
   \       printf('quickrun#execute(%s)', string(a:cmd))])
 endfunction
 
-function! s:make_command(runner, args) abort
+function s:make_command(runner, args) abort
   return join([shellescape(a:args[0])] +
   \           map(a:args[1 :], 's:shellescape(v:val)'), ' ')
 endfunction
 
-function! s:shellescape(str) abort
+function s:shellescape(str) abort
   if s:is_cmd_exe()
     return '^"' . substitute(substitute(substitute(a:str,
     \             '[&|<>()^"%]', '^\0', 'g'),
@@ -102,11 +102,11 @@ function! s:shellescape(str) abort
   return shellescape(a:str)
 endfunction
 
-function! s:is_cmd_exe() abort
+function s:is_cmd_exe() abort
   return &shell =~? 'cmd\.exe'
 endfunction
 
 
-function! quickrun#runner#remote#new() abort
+function quickrun#runner#remote#new() abort
   return deepcopy(s:runner)
 endfunction

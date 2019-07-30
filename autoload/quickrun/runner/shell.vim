@@ -8,11 +8,11 @@ let s:runner = {
 \   }
 \ }
 
-function! s:runner.init(session) abort
+function s:runner.init(session) abort
   let a:session.config.outputter = 'null'
 endfunction
 
-function! s:runner.run(commands, input, session) abort
+function s:runner.run(commands, input, session) abort
   if a:input !=# ''
     let inputfile = a:session.tempname()
     call writefile(split(a:input, "\n", 1), inputfile, 'b')
@@ -40,7 +40,7 @@ function! s:runner.run(commands, input, session) abort
   endfor
 endfunction
 
-function! s:execute(cmd) abort
+function s:execute(cmd) abort
   let is_cmd_exe = &shell =~? 'cmd\.exe'
   try
     if is_cmd_exe
@@ -56,6 +56,6 @@ function! s:execute(cmd) abort
 endfunction
 
 
-function! quickrun#runner#shell#new() abort
+function quickrun#runner#shell#new() abort
   return deepcopy(s:runner)
 endfunction

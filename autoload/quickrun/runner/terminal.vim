@@ -14,7 +14,7 @@ let s:runner = {
 \ }
 
 
-function! s:runner.validate() abort
+function s:runner.validate() abort
   if !has('terminal')
     throw 'Needs +terminal feature.'
   endif
@@ -23,11 +23,11 @@ function! s:runner.validate() abort
   endif
 endfunction
 
-function! s:runner.init(session) abort
+function s:runner.init(session) abort
   let a:session.config.outputter = 'null'
 endfunction
 
-function! s:runner.run(commands, input, session) abort
+function s:runner.run(commands, input, session) abort
   let command = join(a:commands, ' && ')
   if a:input !=# ''
     let inputfile = a:session.tempname()
@@ -52,7 +52,7 @@ function! s:runner.run(commands, input, session) abort
   endif
 endfunction
 
-function! s:runner.sweep() abort
+function s:runner.sweep() abort
   if has_key(self, '_bufnr') && bufexists(self._bufnr)
     let job = term_getjob(self._bufnr)
     while job_status(job) ==# 'run'
@@ -61,7 +61,7 @@ function! s:runner.sweep() abort
   endif
 endfunction
 
-function! s:runner._job_close_cb(channel) abort
+function s:runner._job_close_cb(channel) abort
   if has_key(self, '_job_exited')
     call quickrun#session#get(self._key).finish(self._job_exited)
   else
@@ -69,7 +69,7 @@ function! s:runner._job_close_cb(channel) abort
   endif
 endfunction
 
-function! s:runner._job_exit_cb(job, exit_status) abort
+function s:runner._job_exit_cb(job, exit_status) abort
   if has_key(self, '_job_exited')
     call quickrun#session#get(self._key).finish(a:exit_status)
   else
@@ -77,6 +77,6 @@ function! s:runner._job_exit_cb(job, exit_status) abort
   endif
 endfunction
 
-function! quickrun#runner#terminal#new() abort
+function quickrun#runner#terminal#new() abort
   return deepcopy(s:runner)
 endfunction

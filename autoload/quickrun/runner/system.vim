@@ -4,7 +4,7 @@
 
 let s:runner = {}
 
-function! s:runner.run(commands, input, session) abort
+function s:runner.run(commands, input, session) abort
   let code = 0
   for cmd in a:commands
     let [result, code] = s:execute(cmd, a:input)
@@ -16,7 +16,7 @@ function! s:runner.run(commands, input, session) abort
   return code
 endfunction
 
-function! s:execute(cmd, input) abort
+function s:execute(cmd, input) abort
   if a:cmd =~# '^\s*:'
     " A vim command.
     try
@@ -49,6 +49,6 @@ function! s:execute(cmd, input) abort
 endfunction
 
 
-function! quickrun#runner#system#new() abort
+function quickrun#runner#system#new() abort
   return deepcopy(s:runner)
 endfunction

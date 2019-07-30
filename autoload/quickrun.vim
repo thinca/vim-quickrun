@@ -588,11 +588,11 @@ lockvar! g:quickrun#default_config
 
 
 " Deprecated functions.  {{{1
-function! quickrun#new(...) abort
+function quickrun#new(...) abort
   return call('quickrun#session#new', a:000)
 endfunction
 
-function! quickrun#session(key, ...) abort
+function quickrun#session(key, ...) abort
   let session = quickrun#session#get(a:key)
   if a:0 && !empty(session)
     return call(session[a:1], a:000[1 :], session)
@@ -600,17 +600,17 @@ function! quickrun#session(key, ...) abort
   return session
 endfunction
 
-function! quickrun#sweep_sessions() abort
+function quickrun#sweep_sessions() abort
   call quickrun#session#sweep()
 endfunction
 
-function! quickrun#is_running() abort
+function quickrun#is_running() abort
   return quickrun#session#exists()
 endfunction
 
 
 " Interfaces.  {{{1
-function! quickrun#run(...) abort
+function quickrun#run(...) abort
   call quickrun#session#sweep()
 
   let session = quickrun#new(a:0 ? a:1 : {})
@@ -624,7 +624,7 @@ function! quickrun#run(...) abort
 endfunction
 
 " function for |g@|.
-function! quickrun#operator(wise) abort
+function quickrun#operator(wise) abort
   let wise = {
   \ 'line': 'V',
   \ 'char': 'v',
@@ -638,7 +638,7 @@ function! quickrun#operator(wise) abort
 endfunction
 
 " function for main command.
-function! quickrun#command(config, use_range, line1, line2) abort
+function quickrun#command(config, use_range, line1, line2) abort
   try
     let config = {}
     if a:use_range
@@ -655,7 +655,7 @@ function! quickrun#command(config, use_range, line1, line2) abort
 endfunction
 
 " completion function for main command.
-function! quickrun#complete(lead, cmd, pos) abort
+function quickrun#complete(lead, cmd, pos) abort
   let line = split(a:cmd[:a:pos - 1], '', 1)
   let head = line[-1]
   let kinds = quickrun#module#get_kinds()
@@ -710,7 +710,7 @@ endfunction
 " - $ENV_NAME ${ENV_NAME}
 " - %{expr}
 " Escape by \ if you does not want to expand.
-function! quickrun#expand(input) abort
+function quickrun#expand(input) abort
   if type(a:input) == type([]) || type(a:input) == type({})
     return map(copy(a:input), 'quickrun#expand(v:val)')
   elseif type(a:input) != type('')
@@ -765,7 +765,7 @@ function! quickrun#expand(input) abort
 endfunction
 
 " Execute commands by expr.  This is used by remote_expr()
-function! quickrun#execute(cmd) abort
+function quickrun#execute(cmd) abort
   let result = ''
   let temp = tempname()
   try
@@ -786,7 +786,7 @@ function! quickrun#execute(cmd) abort
 endfunction
 
 " Converts a string as argline or a list of config to config object.
-function! quickrun#config(config) abort
+function quickrun#config(config) abort
   if type(a:config) == type('')
     return s:build_config_from_arglist(s:parse_argline(a:config))
   elseif type(a:config) == type([])
@@ -802,7 +802,7 @@ function! quickrun#config(config) abort
   throw 'quickrun: Unsupported config type: ' . type(a:config)
 endfunction
 
-function! quickrun#trigger_keys() abort
+function quickrun#trigger_keys() abort
   if mode() =~# '[iR]'
     let input = "\<C-r>\<ESC>"
   else
@@ -813,7 +813,7 @@ endfunction
 
 
 " Misc functions.  {{{1
-function! s:parse_argline(argline) abort
+function s:parse_argline(argline) abort
   " foo 'bar buz' "hoge \"huga"
   " => ['foo', 'bar buz', 'hoge "huga']
   " TODO: More improve.
@@ -838,7 +838,7 @@ function! s:parse_argline(argline) abort
   return arglist
 endfunction
 
-function! s:build_config_from_arglist(arglist) abort
+function s:build_config_from_arglist(arglist) abort
   let config = {}
   let option = ''
   for arg in a:arglist
