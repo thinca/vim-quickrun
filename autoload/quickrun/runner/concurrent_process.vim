@@ -71,7 +71,7 @@ function! s:receive(key) abort
     return 0
   endif
 
-  let session = quickrun#session(a:key)
+  let session = quickrun#session#get(a:key)
   let label = s:CP.of(session._cmd, '', [['*read*', '_', session._prompt]])
   let [out, err] = s:CP.consume(label, 'x')
   call session.output(out . (err ==# '' ? '' : printf('!!!%s!!!', err)))

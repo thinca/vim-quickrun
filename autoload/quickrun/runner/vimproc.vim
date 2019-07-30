@@ -81,7 +81,7 @@ endfunction
 
 
 function! s:receive_vimproc_result(key, read_timeout, pipe_status_index) abort
-  let session = quickrun#session(a:key)
+  let session = quickrun#session#get(a:key)
 
   let vimproc = session._vimproc
 

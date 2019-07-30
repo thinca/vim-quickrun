@@ -65,12 +65,12 @@ function! s:runner.sweep() abort
 endfunction
 
 function! s:runner._job_cb(channel, message) abort
-  call quickrun#session(self._key, 'output', a:message)
+  call quickrun#session#get(self._key).output(a:message)
 endfunction
 
 function! s:runner._job_close_cb(channel) abort
   if has_key(self, '_job_exited')
-    call quickrun#session(self._key, 'finish', self._job_exited)
+    call quickrun#session#get(self._key).finish(self._job_exited)
   else
     let self._job_exited = 0
   endif
@@ -78,7 +78,7 @@ endfunction
 
 function! s:runner._job_exit_cb(job, exit_status) abort
   if has_key(self, '_job_exited')
-    call quickrun#session(self._key, 'finish', a:exit_status)
+    call quickrun#session#get(self._key).finish(a:exit_status)
   else
     let self._job_exited = a:exit_status
   endif

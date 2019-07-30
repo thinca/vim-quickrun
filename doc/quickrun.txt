@@ -126,9 +126,6 @@ FUNCTIONS					*quickrun-functions*
 quickrun#run([{config}])			*quickrun#run()*
 	A function version of |:QuickRun|.
 
-quickrun#new([{config}])			*quickrun#new()*
-	Creates a {session}(|quickrun-session|).
-
 quickrun#config({line})				*quickrun#config()*
 	Creates {config} from argument line of |:QuickRun|.
 
@@ -163,18 +160,30 @@ quickrun#module#load([{overwrite}])		*quickrun#module#load()*
 	Loads the modules on 'runtimepath'.  This is called by
 	"autoload/quickrun.vim" automatically.
 
-						*quickrun#session()*
-quickrun#session({key} [, {func-name} [, {args} ...]])
-	This is used in a module.  This fetches the current running session
-	if you skipped {func-name}.  This calls the session function with
-	arguments {args} if you specified {func-name}.
+quickrun#session#new([{config}])		*quickrun#session#new()*
+	Creates a {session}(|quickrun-session|).
 
-quickrun#sweep_sessions()			*quickrun#sweep_sessions()*
+						*quickrun#session#get()*
+quickrun#session#get({key} [, {func-name} [, {args} ...]])
+	This is used in a module.  This fetches the current running session.
+
+quickrun#session#sweep()			*quickrun#session#sweep()*
 	Stops the sessions under execution.  This is called before new
 	execution.  When execution doesn't end, you can call this by manually.
 
-quickrun#is_running()				*quickrun#is_running()*
+quickrun#session#exists()			*quickrun#session#exists()*
 	Checks any session is running.  Returns non-zero when running.
+
+The following functions are deprecated.  These will be removed at next
+version.
+quickrun#new([{config}])
+	Use |quickrun#session#new()| instead.
+quickrun#session({key} [, {func-name} [, {args} ...]])
+	Use |quickrun#session#get()| instead.
+quickrun#sweep_sessions()
+	Use |quickrun#session#sweep()| instead.
+quickrun#is_running()
+	Use |quickrun#session#exists()| instead.
 
 
 ------------------------------------------------------------------------------
@@ -762,7 +771,7 @@ session.output({data})			*quickrun-session.output()*
 
 session.continue()			*quickrun-session.continue()*
 	Calls when the runner cannot complete the process at the time.
-	Continues if you give {key} to |quickrun#session()|.
+	Continues if you give {key} to |quickrun#session#get()|.
 
 session.finish([{exit-code}])		*quickrun-session.finish()*
 	Calls when the runner finished the process.  Unless {exit-code} is

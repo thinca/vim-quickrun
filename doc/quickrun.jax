@@ -124,9 +124,6 @@ http://github.com/thinca/vim-quickrun
 quickrun#run([{config}])			*quickrun#run()*
 	|:QuickRun| の関数版です。
 
-quickrun#new([{config}])			*quickrun#new()*
-	{session}(|quickrun-session|) を生成します。
-
 quickrun#config({line})				*quickrun#config()*
 	|:QuickRun| の引数文字列から {config} を生成します。
 
@@ -161,20 +158,30 @@ quickrun#module#load([{overwrite}])		*quickrun#module#load()*
 	'runtimepath' 上にあるモジュールをロードします。これは
 	"autoload/quickrun.vim" がロードされる際に自動で呼ばれます。
 
-						*quickrun#session()*
-quickrun#session({key} [, {func-name} [, {args} ...]])
-	モジュール内で使用されます。
-	{func-name} を省略すると、継続中のセッションを取得します。
-	{func-name} を指定すると、{args} を引数にしてセッションの関数を呼び出
-	します。
+quickrun#session#new([{config}])		*quickrun#session#new()*
+	{session}(|quickrun-session|) を生成します。
 
-quickrun#sweep_sessions()			*quickrun#sweep_sessions()*
+						*quickrun#session#get()*
+quickrun#session#get({key})
+	モジュール内で使用されます。継続中のセッションを取得します。
+
+quickrun#session#sweep()			*quickrun#session#sweep()*
 	実行中のセッションを強制的に終了します。新しく実行を行う前に呼び出され
 	ます。実行が終わらない場合は、手動で呼び出すこともできます。
 
-quickrun#is_running()				*quickrun#is_running()*
+quickrun#session#exists()			*quickrun#session#exists()*
 	いずれかのセッションが実行中かどうかを調べます。実行中の場合は非 0 を
 	返します。
+
+以下の関数は非推奨です。次のバージョンで削除される予定です。
+quickrun#new([{config}])
+	代わりに |quickrun#session#new()| を使用してください。
+quickrun#session({key} [, {func-name} [, {args} ...]])
+	代わりに |quickrun#session#get()| を使用してください。
+quickrun#sweep_sessions()
+	代わりに |quickrun#session#sweep()| を使用してください。
+quickrun#is_running()
+	代わりに |quickrun#session#exists()| を使用してください。
 
 
 ------------------------------------------------------------------------------
@@ -754,8 +761,8 @@ session.output({data})			*quickrun-session.output()*
 
 session.continue()			*quickrun-session.continue()*
 	runner がその場で実行を完了できない時に呼び出します。{key} を返しま
-	す。|quickrun#session()| に {key} を渡すことで継続中の {session} を取
-	得できるので、これを使って実行を継続します。
+	す。|quickrun#session#get()| に {key} を渡すことで継続中の {session}
+	を取得できるので、これを使って実行を継続します。
 
 session.finish([{exit-code}])		*quickrun-session.finish()*
 	runner が実行が全て完了した際に呼び出します。{exit-code} が省略された
@@ -995,6 +1002,9 @@ pandocを使用してmarkdownをhtmlにしてブラウザで開く (要|open-bro
 
 ==============================================================================
 更新履歴					*quickrun-changelog*
+
+develop
+	- session 系の関数の名前を変更。
 
 0.8.0	2019-07-30
 	- |quickrun-module-runner/job| を追加。
