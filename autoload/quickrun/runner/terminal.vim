@@ -4,7 +4,7 @@
 
 let s:VT = g:quickrun#V.import('Vim.ViewTracer')
 
-let s:is_win = g:quickrun#V.Prelude.is_windows()
+let s:is_win = has('win32')
 let s:runner = {
 \   'config': {
 \     'name': 'new',

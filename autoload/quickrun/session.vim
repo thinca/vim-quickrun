@@ -332,7 +332,7 @@ function! s:Session.invoke_hook(point, ...) abort
   let hooks = s:V.Data.List.sort_by(hooks, 'v:val[1]')
   let hooks = map(hooks, 'v:val[0]')
   for hook in hooks
-    if has_key(hook, func) && s:V.Prelude.is_funcref(hook[func])
+    if has_key(hook, func) && type(hook[func]) is# v:t_func
       call call(hook[func], [self, context], hook)
     endif
   endfor
@@ -399,8 +399,8 @@ function! s:build_module(module, configs) abort
         \            name]
           if has_key(config, conf)
             let val = config[conf]
-            if s:V.Prelude.is_list(a:module.config[name])
-              let a:module.config[name] += s:V.Prelude.is_list(val) ? val : [val]
+            if type(a:module.config[name]) is# v:t_list
+              let a:module.config[name] += type(val) is# v:t_list ? val : [val]
             else
               let a:module.config[name] = val
             endif

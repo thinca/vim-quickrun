@@ -2,7 +2,7 @@
 " Author : thinca <thinca+vim@gmail.com>
 " License: zlib License
 
-let s:is_win = g:quickrun#V.Prelude.is_windows()
+let s:is_win = has('win32')
 let s:runner = {
 \   'config': {
 \     'pty': 0,

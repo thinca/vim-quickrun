@@ -10,13 +10,12 @@ let s:V = vital#quickrun#new().load(
 \   'System.File',
 \   'System.Filepath',
 \   'Vim.Message',
-\   'Process',
-\   'Prelude')
+\   'Process')
 unlet! g:quickrun#V
 let g:quickrun#V = s:V
 lockvar! g:quickrun#V
 
-let s:is_win = s:V.Prelude.is_windows()
+let s:is_win = has('win32')
 
 " Default config.  " {{{1
 unlet! g:quickrun#default_config
