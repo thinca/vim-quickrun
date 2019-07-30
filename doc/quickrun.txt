@@ -198,14 +198,6 @@ KEY MAPPINGS					*quickrun-key-mappings*
 			This is normally same as |:QuickRun|
 			without arguments.
 
-					*g:quickrun_no_default_key_mappings*
-Following key mappings will NOT be defined if it's already mapped,
-or |g:quickrun_no_default_key_mappings| has been set to 1.
-
-{lhs}			{rhs}
---------		-----------------------------
-<Leader>r		<Plug>(quickrun)
-
 
 
 ==============================================================================

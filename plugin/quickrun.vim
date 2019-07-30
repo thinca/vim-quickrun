@@ -17,10 +17,3 @@ nnoremap <silent> <Plug>(quickrun-op)
 
 nnoremap <silent> <Plug>(quickrun) :<C-u>QuickRun -mode n<CR>
 vnoremap <silent> <Plug>(quickrun) :<C-u>QuickRun -mode v<CR>
-
-" Default key mappings.
-if !hasmapto('<Plug>(quickrun)')
-\  && (!exists('g:quickrun_no_default_key_mappings')
-\      || !g:quickrun_no_default_key_mappings)
-  silent! map <unique> <Leader>r <Plug>(quickrun)
-endif

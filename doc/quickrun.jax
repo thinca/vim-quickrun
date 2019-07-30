@@ -196,14 +196,6 @@ quickrun#is_running()
 	す。
 	これは単純に |:QuickRun| コマンドを引数なしで実行するのと同じです。
 
-					*g:quickrun_no_default_key_mappings*
-以下のキーマッピングは、既に定義されていたり
-g:quickrun_no_default_key_mappings に 1 が設定されていると定義されません。
-
-{lhs}			{rhs}
---------		-----------------------------
-<Leader>r		<Plug>(quickrun)
-
 
 
 ==============================================================================
@@ -1004,7 +996,9 @@ pandocを使用してmarkdownをhtmlにしてブラウザで開く (要|open-bro
 更新履歴					*quickrun-changelog*
 
 develop
-	- session 系の関数の名前を変更。
+	- 今回のバージョンは多くの非互換の変更を含みます。
+	  - session 系の関数の名前を変更。
+	  - デフォルトのキーマッピング(<Leader>r)を削除。
 
 0.8.0	2019-07-30
 	- |quickrun-module-runner/job| を追加。
