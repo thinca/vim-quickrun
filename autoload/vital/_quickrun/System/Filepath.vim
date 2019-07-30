@@ -4,7 +4,7 @@
 function! s:_SID() abort
   return matchstr(expand('<sfile>'), '<SNR>\zs\d\+\ze__SID$')
 endfunction
-execute join(['function! vital#_quickrun#System#Filepath#import() abort', printf("return map({'path_separator': '', 'is_case_tolerant': '', 'dirname': '', 'abspath': '', 'relpath': '', 'realpath': '', 'unify_separator': '', 'is_root_directory': '', 'split': '', 'path_extensions': '', 'unixpath': '', 'which': '', 'winpath': '', 'join': '', 'separator': '', 'is_relative': '', 'basename': '', 'remove_last_separator': '', 'is_absolute': '', 'contains': ''}, \"vital#_quickrun#function('<SNR>%s_' . v:key)\")", s:_SID()), 'endfunction'], "\n")
+execute join(['function! vital#_quickrun#System#Filepath#import() abort', printf("return map({'path_separator': '', 'is_case_tolerant': '', 'dirname': '', 'abspath': '', 'relpath': '', 'realpath': '', 'unify_separator': '', 'to_slash': '', 'is_root_directory': '', 'split': '', 'path_extensions': '', 'unixpath': '', 'which': '', 'winpath': '', 'from_slash': '', 'join': '', 'separator': '', 'is_relative': '', 'basename': '', 'remove_last_separator': '', 'is_absolute': '', 'contains': ''}, \"vital#_quickrun#function('<SNR>%s_' . v:key)\")", s:_SID()), 'endfunction'], "\n")
 delfunction s:_SID
 " ___vital___
 " You should check the following related builtin functions.
@@ -16,12 +16,36 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 let s:path_sep_pattern = (exists('+shellslash') ? '[\\/]' : '/') . '\+'
-let s:is_windows = has('win16') || has('win32') || has('win64') || has('win95')
+
+" See https://github.com/vim-jp/vital.vim/wiki/Coding-Rule#how-to-check-if-the-runtime-os-is-windows
+let s:is_windows = has('win32')
+
 let s:is_cygwin = has('win32unix')
 let s:is_mac = !s:is_windows && !s:is_cygwin
       \ && (has('mac') || has('macunix') || has('gui_macvim') ||
       \   (!isdirectory('/proc') && executable('sw_vers')))
 let s:is_case_tolerant = filereadable(expand('<sfile>:r') . '.VIM')
+
+if s:is_windows
+  function! s:to_slash(path) abort
+    return tr(a:path, '\', '/')
+  endfunction
+else
+  function! s:to_slash(path) abort
+    return a:path
+  endfunction
+endif
+
+if s:is_windows
+  function! s:from_slash(path) abort
+    return tr(a:path, '/', '\')
+  endfunction
+else
+  function! s:from_slash(path) abort
+    return a:path
+  endfunction
+endif
+
 
 " Get the directory separator.
 function! s:separator() abort
@@ -187,8 +211,8 @@ function! s:abspath(path) abort
     return a:path
   endif
   " Note:
-  "   the behavior of ':p' for non existing file path is not defined
-  return filereadable(a:path)
+  "   the behavior of ':p' for non existing file path/directory is not defined
+  return (filereadable(a:path) || isdirectory(a:path))
         \ ? fnamemodify(a:path, ':p')
         \ : s:join(fnamemodify(getcwd(), ':p'), a:path)
 endfunction
