@@ -25,8 +25,8 @@ function s:runner.run(commands, input, session) abort
   let key = a:session.continue()
   let outfile = a:session.tempname()
   let readfile = printf('join(readfile(%s, 1), "\n")', string(outfile))
-  let expr = printf('quickrun#session#get(%s).output(%s) + ' .
-  \                 'quickrun#session#get(%s).finish()',
+  let expr = printf('quickrun#session#call(%s, "output", %s) + ' .
+  \                 'quickrun#session#call(%s, "finish")',
   \                 string(key), readfile, string(key))
   let cmds = a:commands
   let callback = s:make_command(self,

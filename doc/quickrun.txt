@@ -163,9 +163,13 @@ quickrun#module#load([{overwrite}])		*quickrun#module#load()*
 quickrun#session#new([{config}])		*quickrun#session#new()*
 	Creates a {session}(|quickrun-session|).
 
-						*quickrun#session#get()*
-quickrun#session#get({key} [, {func-name} [, {args} ...]])
-	This is used in a module.  This fetches the current running session.
+			
+quickrun#session#get({key})			*quickrun#session#get()*
+	This fetches the current running session.
+
+						*quickrun#session#call()*
+quickrun#session#call({key} [, {func-name} [, {args} ...]])
+	If there is an ongoing session, call that function.
 
 quickrun#session#sweep()			*quickrun#session#sweep()*
 	Stops the sessions under execution.  This is called before new
@@ -179,7 +183,7 @@ version.
 quickrun#new([{config}])
 	Use |quickrun#session#new()| instead.
 quickrun#session({key} [, {func-name} [, {args} ...]])
-	Use |quickrun#session#get()| instead.
+	Use |quickrun#session#get()| or |quickrun#session#call()| instead.
 quickrun#sweep_sessions()
 	Use |quickrun#session#sweep()| instead.
 quickrun#is_running()

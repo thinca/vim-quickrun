@@ -27,11 +27,11 @@ class QuickRun(threading.Thread):
         except:
             pass
         finally:
-            vim.eval("quickrun#session#get(%s).finish(%s)" % (self.key, ret))
+            vim.eval("quickrun#session#call(%s, 'finish', %s)" % (self.key, ret))
 
     def execute(self, cmd):
         if re.match('^\s*:', cmd):
-            vim.eval("quickrun#session#get(%s).output(quickrun#execute(%s))" %
+            vim.eval("quickrun#session#call(%s, 'output', quickrun#execute(%s))" %
                 (self.key, self.vimstr(cmd)))
             return 0
 
@@ -53,7 +53,7 @@ class QuickRun(threading.Thread):
     def output(self, fp):
         try:
             data = fp.read()
-            vim.eval("quickrun#session#get(%s).output(%s)" %
+            vim.eval("quickrun#session#call(%s, 'output', %s)" %
               (self.key, self.vimstr(data)))
         except:
             pass

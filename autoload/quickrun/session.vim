@@ -11,6 +11,13 @@ function quickrun#session#get(key) abort
   return get(s:sessions, a:key, {})
 endfunction
 
+function quickrun#session#call(key, func, ...) abort
+  let session = quickrun#session#get(a:key)
+  if !empty(session)
+    return call(session[a:func], a:000, session)
+  endif
+endfunction
+
 function quickrun#session#sweep() abort
   call map(keys(s:sessions), 's:dispose_session(v:val)')
 endfunction

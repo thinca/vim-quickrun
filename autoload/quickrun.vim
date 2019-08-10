@@ -593,11 +593,11 @@ function quickrun#new(...) abort
 endfunction
 
 function quickrun#session(key, ...) abort
-  let session = quickrun#session#get(a:key)
-  if a:0 && !empty(session)
-    return call(session[a:1], a:000[1 :], session)
+  if a:0
+    return quickrun#session#call(a:key, a:1, a:000[1 :])
+  else
+    return quickrun#session#get(a:key)
   endif
-  return session
 endfunction
 
 function quickrun#sweep_sessions() abort

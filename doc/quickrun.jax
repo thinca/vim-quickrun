@@ -161,9 +161,13 @@ quickrun#module#load([{overwrite}])		*quickrun#module#load()*
 quickrun#session#new([{config}])		*quickrun#session#new()*
 	{session}(|quickrun-session|) を生成します。
 
-						*quickrun#session#get()*
-quickrun#session#get({key})
-	モジュール内で使用されます。継続中のセッションを取得します。
+
+quickrun#session#get({key})			*quickrun#session#get()*
+	継続中のセッションを取得します。
+
+						*quickrun#session#call()*
+quickrun#session#call({key}, {func-name} [, {args} ...])
+	継続中のセッションが存在していれば、その関数を呼び出します。
 
 quickrun#session#sweep()			*quickrun#session#sweep()*
 	実行中のセッションを強制的に終了します。新しく実行を行う前に呼び出され
@@ -177,7 +181,8 @@ quickrun#session#exists()			*quickrun#session#exists()*
 quickrun#new([{config}])
 	代わりに |quickrun#session#new()| を使用してください。
 quickrun#session({key} [, {func-name} [, {args} ...]])
-	代わりに |quickrun#session#get()| を使用してください。
+	代わりに |quickrun#session#get()| か |quickrun#session#call()| を使用
+	してください。
 quickrun#sweep_sessions()
 	代わりに |quickrun#session#sweep()| を使用してください。
 quickrun#is_running()
