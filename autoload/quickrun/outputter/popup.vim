@@ -13,7 +13,7 @@ function s:outputter.validate() abort
   endif
 endfunction
 
-function s:outputter.finish(session) abort
+function! s:outputter.finish(session) abort
   if s:winid
     call popup_close(s:winid)
   endif

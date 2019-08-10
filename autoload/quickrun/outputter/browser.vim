@@ -15,14 +15,14 @@ function s:outputter.validate() abort
   endif
 endfunction
 
-function s:outputter.init(session) abort
+function! s:outputter.init(session) abort
   if self.config.name ==# ''
     let self.config.name = s:default_name
   endif
   call self.init_file(a:session)
 endfunction
 
-function s:outputter.finish(session) abort
+function! s:outputter.finish(session) abort
   let saved = g:openbrowser_open_filepath_in_vim
   try
     let g:openbrowser_open_filepath_in_vim = 0

@@ -13,7 +13,7 @@ let s:outputter.config = {
 
 let s:outputter.init_buffered = s:outputter.init
 
-function s:outputter.init(session) abort
+function! s:outputter.init(session) abort
   call self.init_buffered(a:session)
   let self.config.errorformat
 \    = !empty(self.config.errorformat) ? self.config.errorformat
@@ -23,8 +23,7 @@ function s:outputter.init(session) abort
   let self._target_buf = bufnr('%')
 endfunction
 
-
-function s:outputter.finish(session) abort
+function! s:outputter.finish(session) abort
   try
     let errorformat = &g:errorformat
     let &g:errorformat = self.config.errorformat
