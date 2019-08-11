@@ -37,6 +37,11 @@ function s:runner.run(commands, input, session) abort
   endif
   if a:input ==# ''
     let options.in_io = 'null'
+  else
+    let in_filename = a:session.tempname()
+    call writefile(split(a:input, "\n", 1), in_filename, 'b')
+    let options.in_io = 'file'
+    let options.in_name = in_filename
   endif
 
   if self.config.interval
@@ -46,11 +51,6 @@ function s:runner.run(commands, input, session) abort
 
   let self._key = a:session.continue()
   let self._job = job_start(cmd_arg, options)
-  if a:input !=# ''
-    let job_ch = job_getchannel(self._job)
-    call ch_sendraw(job_ch, a:input)
-    call ch_close_in(job_ch)
-  endif
 endfunction
 
 function s:runner.sweep() abort
