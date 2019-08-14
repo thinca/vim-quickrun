@@ -62,7 +62,7 @@ function quickrun#command#complete(lead, cmd, pos) abort
   endif
 
   let re = '^\V' . escape(head, '\') . '\v[^/]*/?'
-  return s:V.Data.List.uniq(sort(map(list, 'matchstr(v:val, re)')))
+  return uniq(sort(map(list, 'matchstr(v:val, re)')))
 endfunction
 
 function quickrun#command#parse(argline) abort
