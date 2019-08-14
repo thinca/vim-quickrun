@@ -588,10 +588,6 @@ lockvar! g:quickrun#default_config
 
 
 " Deprecated functions.  {{{1
-function quickrun#new(...) abort
-  return call('quickrun#session#new', a:000)
-endfunction
-
 function quickrun#session(key, ...) abort
   if a:0
     return quickrun#session#call(a:key, a:1, a:000[1 :])
@@ -608,8 +604,19 @@ function quickrun#is_running() abort
   return quickrun#session#exists()
 endfunction
 
+function quickrun#config(config) abort
+  return quickrun#config#normalize(a:config)
+endfunction
+
 
 " Interfaces.  {{{1
+function quickrun#new(...) abort
+  let config = a:0 ? quickrun#config#normalize(a:1) : {}
+  call quickrun#config#apply_recent_region(config)
+  let config = quickrun#config#build(&filetype, config)
+  return quickrun#session#new(config)
+endfunction
+
 function quickrun#run(...) abort
   call quickrun#session#sweep()
 
@@ -785,23 +792,6 @@ function quickrun#execute(cmd) abort
   return result
 endfunction
 
-" Converts a string as argline or a list of config to config object.
-function quickrun#config(config) abort
-  if type(a:config) == type('')
-    return s:build_config_from_arglist(s:parse_argline(a:config))
-  elseif type(a:config) == type([])
-    let config = {}
-    for c in a:config
-      call extend(config, quickrun#config(c))
-      unlet c
-    endfor
-    return config
-  elseif type(a:config) == type({})
-    return deepcopy(a:config)
-  endif
-  throw 'quickrun: Unsupported config type: ' . type(a:config)
-endfunction
-
 function quickrun#trigger_keys() abort
   if mode() =~# '[iR]'
     let input = "\<C-r>\<ESC>"
@@ -809,67 +799,6 @@ function quickrun#trigger_keys() abort
     let input = "g\<ESC>" . (0 < v:count ? v:count : '')
   endif
   call feedkeys(input, 'n')
-endfunction
-
-
-" Misc functions.  {{{1
-function s:parse_argline(argline) abort
-  " foo 'bar buz' "hoge \"huga"
-  " => ['foo', 'bar buz', 'hoge "huga']
-  " TODO: More improve.
-  " ex:
-  " foo ba'r b'uz "hoge \nhuga"
-  " => ['foo, 'bar buz', "hoge \nhuga"]
-  let argline = a:argline
-  let arglist = []
-  while argline !~# '^\s*$'
-    let argline = matchstr(argline, '^\s*\zs.*$')
-    if argline[0] =~# '[''"]'
-      let arg = matchstr(argline, '\v([''"])\zs.{-}\ze\\@<!\1')
-      let argline = argline[strlen(arg) + 2 :]
-    else
-      let arg = matchstr(argline, '\S\+')
-      let argline = argline[strlen(arg) :]
-    endif
-    let arg = substitute(arg, '\\\(.\)', '\1', 'g')
-    call add(arglist, arg)
-  endwhile
-
-  return arglist
-endfunction
-
-function s:build_config_from_arglist(arglist) abort
-  let config = {}
-  let option = ''
-  for arg in a:arglist
-    if option !=# ''
-      if has_key(config, option)
-        if type(config[option]) == type([])
-          call add(config[option], arg)
-        else
-          let newarg = [config[option], arg]
-          unlet config[option]
-          let config[option] = newarg
-        endif
-      else
-        let config[option] = arg
-      endif
-      let option = ''
-    elseif arg[0] ==# '-'
-      let option = arg[1:]
-    elseif arg[0] ==# '>'
-      if arg[1] ==# '>'
-        let config.append = 1
-        let arg = arg[1:]
-      endif
-      let config.outputter = arg[1:]
-    elseif arg[0] ==# '<'
-      let config.input = arg[1:]
-    else
-      let config.type = arg
-    endif
-  endfor
-  return config
 endfunction
 
 

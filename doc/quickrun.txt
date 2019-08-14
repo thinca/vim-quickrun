@@ -126,14 +126,20 @@ FUNCTIONS					*quickrun-functions*
 quickrun#run([{config}])			*quickrun#run()*
 	A function version of |:QuickRun|.
 
-quickrun#config({line})				*quickrun#config()*
-	Creates {config} from argument line of |:QuickRun|.
+quickrun#new([{config}])			*quickrun#new()*
+	Creates a {session}(|quickrun-session|).
+	The config that built from setting variables(|quickrun-settings|) is
+	applied to this.
 
 quickrun#operator({wise})			*quickrun#operator()*
 	A function for 'operatorfunc'.
 	e.g.: >
 	nnoremap <silent> <C-CR> :<C-u>set opfunc=quickrun#operator<CR>g@ip
 <	This runs current paragraph (|ip|) with <C-CR>.
+
+quickrun#config#normalize({config})		*quickrun#config#normalize()*
+	Converts the argument line of |:QuickRun| or list of configs to
+	{config} represented by a single dictionary.
 
 						*quickrun#module#register()*
 quickrun#module#register({module} [, {overwrite}])
@@ -180,8 +186,8 @@ quickrun#session#exists()			*quickrun#session#exists()*
 
 The following functions are deprecated.  These will be removed at next
 version.
-quickrun#new([{config}])
-	Use |quickrun#session#new()| instead.
+quickrun#config({line})
+	Use |quickrun#config#normalize()| instead.
 quickrun#session({key} [, {func-name} [, {args} ...]])
 	Use |quickrun#session#get()| or |quickrun#session#call()| instead.
 quickrun#sweep_sessions()

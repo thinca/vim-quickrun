@@ -124,14 +124,20 @@ http://github.com/thinca/vim-quickrun
 quickrun#run([{config}])			*quickrun#run()*
 	|:QuickRun| の関数版です。
 
-quickrun#config({line})				*quickrun#config()*
-	|:QuickRun| の引数文字列から {config} を生成します。
+quickrun#new([{config}])			*quickrun#rnew()*
+	{session}(|quickrun-session|) を生成します。
+	これには変数(|quickrun-settings|)から構築した {config} が適用されま
+	す。
 
 quickrun#operator({wise})			*quickrun#operator()*
 	'operatorfunc' に対して設定するための関数です。
 	例えば、 >
 	nnoremap <silent> <C-CR> :<C-u>set opfunc=quickrun#operator<CR>g@ip
 <	これは、<C-CR> で現在の段落(|ip|)を実行します。
+
+quickrun#config#normalize({config})		*quickrun#config#normalize()*
+	|:QuickRun| の引数文字列や config のリストを単一の辞書の {config} に変
+	換します。
 
 						*quickrun#module#register()*
 quickrun#module#register({module} [, {overwrite}])
@@ -158,9 +164,8 @@ quickrun#module#load([{overwrite}])		*quickrun#module#load()*
 	'runtimepath' 上にあるモジュールをロードします。これは
 	"autoload/quickrun.vim" がロードされる際に自動で呼ばれます。
 
-quickrun#session#new([{config}])		*quickrun#session#new()*
+quickrun#session#new({config})			*quickrun#session#new()*
 	{session}(|quickrun-session|) を生成します。
-
 
 quickrun#session#get({key})			*quickrun#session#get()*
 	継続中のセッションを取得します。
@@ -180,6 +185,8 @@ quickrun#session#exists()			*quickrun#session#exists()*
 以下の関数は非推奨です。次のバージョンで削除される予定です。
 quickrun#new([{config}])
 	代わりに |quickrun#session#new()| を使用してください。
+quickrun#config({line})
+	代わりに |quickrun#config#normalize()| を使用してください。
 quickrun#session({key} [, {func-name} [, {args} ...]])
 	代わりに |quickrun#session#get()| か |quickrun#session#call()| を使用
 	してください。

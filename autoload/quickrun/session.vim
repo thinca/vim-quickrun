@@ -1,9 +1,9 @@
 let s:V = g:quickrun#V
 
 
-function quickrun#session#new(...) abort
+function quickrun#session#new(config) abort
   let session = copy(s:Session)
-  call session.initialize(a:0 ? a:1 : {})
+  call session.initialize(a:config)
   return session
 endfunction
 
@@ -46,7 +46,7 @@ endfunction
 let s:Session = {}  " {{{1
 " Initialize of instance.
 function s:Session.initialize(config) abort
-  let self.base_config = s:build_config(a:config)
+  let self.base_config = a:config
 endfunction
 
 " The option is appropriately set referring to default options.
@@ -351,49 +351,6 @@ function s:get_hook_priority(hook, point) abort
   catch
     return 0
   endtry
-endfunction
-
-function s:build_config(config) abort
-  let config = quickrun#config(a:config)
-  if !has_key(config, 'mode')
-    let config.mode = histget(':') =~# "^'<,'>\\s*Q\\%[uickRun]" ? 'v' : 'n'
-  endif
-  if config.mode ==# 'v'
-    let config.region = {
-    \   'first': getpos("'<")[1 :],
-    \   'last':  getpos("'>")[1 :],
-    \   'wise': visualmode(),
-    \ }
-  endif
-
-  let type = {'type': &filetype}
-  for c in [
-  \ 'b:quickrun_config',
-  \ 'type',
-  \ 'g:quickrun_config[config.type]',
-  \ 'g:quickrun#default_config[config.type]',
-  \ 'g:quickrun_config["_"]',
-  \ 'g:quickrun_config["*"]',
-  \ 'g:quickrun#default_config["_"]',
-  \ ]
-    if exists(c)
-      let new_config = eval(c)
-      if 0 <= stridx(c, 'config.type')
-        let config_type = ''
-        while has_key(config, 'type')
-        \   && has_key(new_config, 'type')
-        \   && config.type !=# ''
-        \   && config.type !=# config_type
-          let config_type = config.type
-          call extend(config, new_config, 'keep')
-          let config.type = new_config.type
-          let new_config = exists(c) ? eval(c) : {}
-        endwhile
-      endif
-      call extend(config, new_config, 'keep')
-    endif
-  endfor
-  return config
 endfunction
 
 function s:build_module(module, configs) abort
