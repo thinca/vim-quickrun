@@ -42,7 +42,7 @@ function s:runner.run(commands, input, session) abort
           \ ['*read*', 'x', self.config.prompt]])
   else
     call s:CP.shutdown(label)
-    call s:M.warn("Previous process was still running. Restarted.")
+    call s:M.warn('Previous process was still running. Restarted.')
     " TODO be dry, or use ConcurrentProcess' new feature
     let label = s:CP.of(cmd, '', [
           \ ['*read*', '_', self.config.prompt]])

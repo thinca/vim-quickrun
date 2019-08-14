@@ -24,7 +24,7 @@ function s:hook.init(session) abort
   endif
   let self._eol = get(self._fileformats, self.config.fileformat, '')
   if self.config.fileformat !=# '' && self._eol ==# ''
-    call s:M.warn("Invalid type in `hook/output_encode/fileformat`.")
+    call s:M.warn('Invalid type in `hook/output_encode/fileformat`.')
   endif
   if self._from ==# '' && self._eol ==# ''
     let self.config.enable = 0

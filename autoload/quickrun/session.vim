@@ -55,7 +55,7 @@ function s:Session.normalize(config) abort
   if has_key(config, 'input')
     let input = quickrun#expand(config.input)
     try
-      let config.input = input[0] ==# '=' ? input[1:]
+      let config.input = input[0] ==# '=' ? input[1 :]
       \                                  : join(readfile(input, 'b'), "\n")
     catch
       throw 'quickrun: Can not treat input: ' . v:exception
@@ -378,7 +378,7 @@ endfunction
 
 function s:parse_module_option(module, argline) abort
   let sep = a:argline[0]
-  let args = split(a:argline[1:], '\V' . escape(sep, '\'))
+  let args = split(a:argline[1 :], '\V' . escape(sep, '\'))
   let order = copy(a:module.config_order)
   for arg in args
     let name = matchstr(arg, '^\w\+\ze=')

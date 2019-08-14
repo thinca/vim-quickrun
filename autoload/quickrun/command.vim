@@ -18,12 +18,12 @@ function quickrun#command#execute(config, use_range, line1, line2) abort
 endfunction
 
 function quickrun#command#complete(lead, cmd, pos) abort
-  let line = split(a:cmd[:a:pos - 1], '', 1)
+  let line = split(a:cmd[: a:pos - 1], '', 1)
   let head = line[-1]
   let kinds = quickrun#module#get_kinds()
   if 2 <= len(line) && line[-2] =~# '^-'
     " a value of option.
-    let opt = line[-2][1:]
+    let opt = line[-2][1 :]
     if opt !=# 'type'
       let list = []
       if opt ==# 'mode'
@@ -112,15 +112,15 @@ function s:from_arglist(arglist) abort
       endif
       let option = ''
     elseif arg[0] ==# '-'
-      let option = arg[1:]
+      let option = arg[1 :]
     elseif arg[0] ==# '>'
       if arg[1] ==# '>'
         let config.append = 1
-        let arg = arg[1:]
+        let arg = arg[1 :]
       endif
-      let config.outputter = arg[1:]
+      let config.outputter = arg[1 :]
     elseif arg[0] ==# '<'
-      let config.input = arg[1:]
+      let config.input = arg[1 :]
     else
       let config.type = arg
     endif
