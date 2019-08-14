@@ -289,11 +289,7 @@ function s:Session.sweep() abort
   " Remove temporary files.
   if has_key(self, '_temp_names')
     for name in self._temp_names
-      if filewritable(name)
-        call delete(name)
-      elseif isdirectory(name)
-        call s:V.System.File.rmdir(name)
-      endif
+      call delete(name, 'rf')
     endfor
   endif
 
