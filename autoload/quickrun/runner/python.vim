@@ -30,11 +30,6 @@ class QuickRun(threading.Thread):
             vim.eval("quickrun#session#call(%s, 'finish', %s)" % (self.key, ret))
 
     def execute(self, cmd):
-        if re.match('^\s*:', cmd):
-            vim.eval("quickrun#session#call(%s, 'output', quickrun#execute(%s))" %
-                (self.key, self.vimstr(cmd)))
-            return 0
-
         p = subprocess.Popen(cmd,
                              stdin=subprocess.PIPE,
                              stdout=subprocess.PIPE,

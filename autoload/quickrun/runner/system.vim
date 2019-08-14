@@ -17,16 +17,6 @@ function s:runner.run(commands, input, session) abort
 endfunction
 
 function s:execute(cmd, input) abort
-  if a:cmd =~# '^\s*:'
-    " A vim command.
-    try
-      let result = quickrun#execute(a:cmd)
-    catch
-      return ['', 1]
-    endtry
-    return [result, 0]
-  endif
-
   let is_cmd_exe = &shell =~? 'cmd\.exe'
   try
     if is_cmd_exe

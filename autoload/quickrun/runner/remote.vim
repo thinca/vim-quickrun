@@ -32,8 +32,6 @@ function s:runner.run(commands, input, session) abort
   let callback = s:make_command(self,
   \        [selfvim, '--servername', v:servername, '--remote-expr', expr])
 
-  call map(cmds, 's:conv_vim2remote(self, selfvim, v:val)')
-
   let in = a:input
   if in !=# ''
     let inputfile = a:session.tempname()
@@ -76,15 +74,6 @@ function s:runner.run(commands, input, session) abort
       silent! execute '!sh' script '&'
     endif
   endif
-endfunction
-
-function s:conv_vim2remote(runner, selfvim, cmd) abort
-  if a:cmd !~# '^\s*:'
-    return a:cmd
-  endif
-  return s:make_command(a:runner, [a:selfvim,
-  \       '--servername', v:servername, '--remote-expr',
-  \       printf('quickrun#execute(%s)', string(a:cmd))])
 endfunction
 
 function s:make_command(runner, args) abort
