@@ -8,8 +8,8 @@ endif
 let g:loaded_quickrun = 1
 
 
-command! -nargs=* -range=0 -complete=customlist,quickrun#complete QuickRun
-\ call quickrun#command(<q-args>, <count>, <line1>, <line2>)
+command! -nargs=* -range=0 -complete=customlist,quickrun#command#complete
+\ QuickRun call quickrun#command#execute(<q-args>, <count>, <line1>, <line2>)
 
 
 nnoremap <silent> <Plug>(quickrun-op)
