@@ -65,7 +65,7 @@ function s:Session.normalize(config) abort
   endif
 
   let exec = get(config, 'exec', '')
-  let config.exec = type(exec) == type([]) ? exec : [exec]
+  let config.exec = type(exec) == v:t_list ? exec : [exec]
   let config.command = get(config, 'command', config.type)
 
   if has_key(config, 'srcfile')
@@ -147,7 +147,7 @@ endfunction
 
 function s:Session.make_module(kind, line) abort
   let name = ''
-  if type(a:line) == type([]) && !empty([])
+  if type(a:line) == v:t_list && !empty([])
     let [name; args] = a:line
   elseif a:line =~# '^\w'
     let [name, arg] = split(a:line, '^\w\+\zs', 1)
@@ -350,7 +350,7 @@ endfunction
 
 function s:build_module(module, configs) abort
   for config in a:configs
-    if type(config) == type({})
+    if type(config) == v:t_dict
       for name in keys(a:module.config)
         for conf in [a:module.kind . '/' . a:module.name . '/' . name,
         \            a:module.name . '/' . name,
@@ -368,7 +368,7 @@ function s:build_module(module, configs) abort
           endif
         endfor
       endfor
-    elseif type(config) == type('') && config !=# ''
+    elseif type(config) == v:t_string && config !=# ''
       call s:parse_module_option(a:module, config)
     endif
     unlet config
@@ -395,7 +395,7 @@ function s:parse_module_option(module, argline) abort
     if !has_key(a:module.config, name)
       throw 'unknown option: ' . name
     endif
-    if type(a:module.config[name]) == type([])
+    if type(a:module.config[name]) == v:t_list
       call add(a:module.config[name], value)
     else
       let a:module.config[name] = value

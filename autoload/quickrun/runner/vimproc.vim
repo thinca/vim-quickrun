@@ -25,7 +25,7 @@ function s:runner.validate() abort
 endfunction
 
 function s:runner.init(session) abort
-  if type(self.config.pipe_status_index) !=# type(0) &&
+  if type(self.config.pipe_status_index) != v:t_number &&
   \  string(self.config.pipe_status_index) !=# string('pipefail')
     call s:M.warn('Invalid value in `runner/vimproc/pipe_status_index`: '
     \            . string(self.config.pipe_status_index))

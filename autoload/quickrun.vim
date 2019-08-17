@@ -651,9 +651,10 @@ endfunction
 " - %{expr}
 " Escape by \ if you does not want to expand.
 function quickrun#expand(input) abort
-  if type(a:input) == type([]) || type(a:input) == type({})
+  let input_t = type(a:input)
+  if input_t == v:t_list || input_t == v:t_dict
     return map(copy(a:input), 'quickrun#expand(v:val)')
-  elseif type(a:input) != type('')
+  elseif input_t != v:t_string
     return a:input
   endif
   let i = 0
@@ -712,7 +713,7 @@ function quickrun#execute(cmd) abort
     let save_vfile = &verbosefile
     let &verbosefile = temp
 
-    for cmd in type(a:cmd) == type([]) ? a:cmd : [a:cmd]
+    for cmd in type(a:cmd) == v:t_list ? a:cmd : [a:cmd]
       silent execute cmd
     endfor
   finally

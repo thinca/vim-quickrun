@@ -66,7 +66,7 @@ function quickrun#module#register(module, ...) abort
 endfunction
 
 function quickrun#module#unregister(...) abort
-  if a:0 && type(a:1) == type({})
+  if a:0 && type(a:1) == v:t_dict
     let kind = get(a:1, 'kind', '')
     let name = get(a:1, 'name', '')
   elseif 2 <= a:0
@@ -131,22 +131,20 @@ function s:validate_module(module) abort
   endif
 endfunction
 
-let s:list_t = type([])
-let s:dict_t = type({})
 function s:deepextend(a, b) abort
   let type_a = type(a:a)
   if type_a != type(a:b)
     throw ''
   endif
-  if type_a == s:list_t
+  if type_a == v:t_list
     call extend(a:a, a:b)
-  elseif type_a == s:dict_t
+  elseif type_a == v:t_dict
     for [k, V] in items(a:b)
       let copied = 0
       if has_key(a:a, k)
         let type_k = type(a:a[k])
         if type_k == type(V) &&
-        \  (type_k == s:list_t || type_k == s:dict_t)
+        \  (type_k == v:t_list || type_k == v:t_dict)
           call s:deepextend(a:a[k], V)
           let copied = 1
         endif

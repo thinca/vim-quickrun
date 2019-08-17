@@ -100,7 +100,7 @@ function s:from_arglist(arglist) abort
   for arg in a:arglist
     if option !=# ''
       if has_key(config, option)
-        if type(config[option]) == type([])
+        if type(config[option]) == v:t_list
           call add(config[option], arg)
         else
           let newarg = [config[option], arg]
