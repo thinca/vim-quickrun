@@ -145,16 +145,23 @@ function s:Session.setup() abort
   endtry
 endfunction
 
-function s:Session.make_module(kind, line) abort
-  let name = ''
-  if type(a:line) == v:t_list
-    let [name; args] = a:line
-  elseif a:line =~# '^\w'
-    let [name, arg] = split(a:line, '^\w\+\zs', 1)
-    let args = [arg]
+function s:Session.make_module(kind, modualizable) abort
+  let modualizable = a:modualizable
+  let modualizable_t = type(modualizable)
+  let args = []
+
+  if modualizable_t == v:t_list
+    let [modualizable; args] = modualizable
+    let modualizable_t = type(modualizable)
   endif
 
-  let module = deepcopy(quickrun#module#get(a:kind, name))
+  if modualizable_t == v:t_dict
+    let module = quickrun#module#build(a:kind, modualizable)
+  elseif modualizable_t == v:t_string
+    let [name; args] = split(modualizable, '^\w\+\zs', 1)
+
+    let module = deepcopy(quickrun#module#get(a:kind, name))
+  endif
 
   try
     call module.validate()

@@ -51,6 +51,10 @@ let s:modules = map(copy(s:templates), '{}')
 
 
 " functions.  {{{1
+function quickrun#module#build(kind, module) abort
+  return s:deepextend(deepcopy(s:templates[a:kind]), a:module)
+endfunction
+
 function quickrun#module#register(module, ...) abort
   call s:validate_module(a:module)
   let overwrite = a:0 && a:1
@@ -60,8 +64,7 @@ function quickrun#module#register(module, ...) abort
     let s:modules[kind] = {}
   endif
   if overwrite || !quickrun#module#exists(kind, name)
-    let module = s:deepextend(deepcopy(s:templates[kind]), a:module)
-    let s:modules[kind][name] = module
+    let s:modules[kind][name] = quickrun#module#build(kind, a:module)
   endif
 endfunction
 
