@@ -147,7 +147,7 @@ endfunction
 
 function s:Session.make_module(kind, line) abort
   let name = ''
-  if type(a:line) == v:t_list && !empty([])
+  if type(a:line) == v:t_list
     let [name; args] = a:line
   elseif a:line =~# '^\w'
     let [name, arg] = split(a:line, '^\w\+\zs', 1)
