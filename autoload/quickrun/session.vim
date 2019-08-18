@@ -66,7 +66,7 @@ function s:Session.normalize(config) abort
 
   let exec = get(config, 'exec', '')
   let config.exec = type(exec) == v:t_list ? exec : [exec]
-  let config.command = get(config, 'command', config.type)
+  let config.command = get(config, 'command', get(config, 'type', ''))
 
   if has_key(config, 'srcfile')
     let config.srcfile = quickrun#expand(expand(config.srcfile))
