@@ -46,7 +46,7 @@ endfunction
 let s:Session = {}  " {{{1
 " Initialize of instance.
 function s:Session.initialize(config) abort
-  let self.base_config = a:config
+  let self.base_config = extend(copy(g:quickrun#default_config._), a:config)
 endfunction
 
 " The option is appropriately set referring to default options.
