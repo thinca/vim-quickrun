@@ -137,7 +137,7 @@ endfunction
 function s:deepextend(a, b) abort
   let type_a = type(a:a)
   if type_a != type(a:b)
-    throw ''
+    throw 'deepextend: Different type: ' . string(a:a) . ' : ' . string(a:b)
   endif
   if type_a == v:t_list
     call extend(a:a, a:b)
@@ -158,7 +158,7 @@ function s:deepextend(a, b) abort
       unlet V
     endfor
   else
-    throw ''
+    throw 'deepextend: Unsupported type: ' . string(a:a)
   endif
   return a:a
 endfunction
