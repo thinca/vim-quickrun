@@ -158,7 +158,8 @@ function s:Session.make_module(kind, modualizable) abort
   if modualizable_t == v:t_dict
     let module = quickrun#module#build(a:kind, modualizable)
   elseif modualizable_t == v:t_string
-    let [name; args] = split(modualizable, '^\w\+\zs', 1)
+    let [name; line_args] = split(modualizable, '^\w\+\zs', 1)
+    call extend(args, line_args)
 
     let module = deepcopy(quickrun#module#get(a:kind, name))
   endif
