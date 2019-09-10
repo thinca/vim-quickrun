@@ -1,9 +1,9 @@
 let s:V = g:quickrun#V
 
 
-function quickrun#command#execute(config, use_range, line1, line2) abort
+function quickrun#command#execute(argline, use_range, line1, line2) abort
   try
-    let config = {}
+    let config = quickrun#command#parse(a:argline)
     if a:use_range
       let config.region = {
       \   'first': [a:line1, 0, 0],
@@ -11,7 +11,7 @@ function quickrun#command#execute(config, use_range, line1, line2) abort
       \   'wise': 'V',
       \ }
     endif
-    call quickrun#run([config, a:config])
+    call quickrun#run(config)
   catch /^quickrun:/
     call s:V.Vim.Message.error(v:exception)
   endtry
