@@ -160,6 +160,7 @@ function s:Session.make_module(kind, modualizable) abort
 
   if modualizable_t == v:t_dict
     let module = quickrun#module#build(a:kind, modualizable)
+    let name = get(module, 'name', '(no name)')
   elseif modualizable_t == v:t_string
     let [name; line_args] = split(modualizable, '^\w\+\zs', 1)
     call extend(args, line_args)
