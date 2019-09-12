@@ -120,8 +120,11 @@ function s:Session.setup() abort
     endif
     let self.config = deepcopy(self.base_config)
 
-    let self.hooks = map(quickrun#module#get('hook'),
-    \                    'self.make_module("hook", v:val.name)')
+    let hooks = quickrun#module#get('hook')
+    if has_key(self.config, 'hooks')
+      let hooks = self.config.hooks + hooks
+    endif
+    let self.hooks = map(hooks, 'self.make_module("hook", v:val.name)')
     call self.invoke_hook('hook_loaded')
     call filter(self.hooks, 'v:val.config.enable')
     let self.config = self.normalize(self.config)

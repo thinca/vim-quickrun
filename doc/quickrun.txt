@@ -258,6 +258,11 @@ runner					*quickrun-option-runner*
 			Specifies a runner.  See the details in
 			|quickrun-module-runner|.
 
+hooks					*quickrun-option-hooks*
+			Specifies a runner.  See the details in
+			|quickrun-module-hook|.  This is passed in {config}
+			when quickrun is invoked from function.
+
 mode					*quickrun-option-mode*
 			This value is one of "n", "v", "o".
 			This changes behavior of getting the range text.

@@ -254,6 +254,11 @@ runner					*quickrun-option-runner*
 	runner を指定します。詳細は |quickrun-module-runner| を参照してくださ
 	い。
 
+hooks					*quickrun-option-hooks*
+	hook のリストを指定します。詳細は |quickrun-module-hook| を参照してく
+	ださい。これはコマンドラインからではなく関数から起動する場合に
+	{config} に渡されます。
+
 mode					*quickrun-option-mode*
 	実行モードです。n,v のいずれかを指定します。これは範囲をどのように取得
 	するかに影響します。ただし、多くの場合は自動で設定されるので必要ありま
