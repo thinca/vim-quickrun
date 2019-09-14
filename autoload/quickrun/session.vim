@@ -120,11 +120,11 @@ function s:Session.setup() abort
     endif
     let self.config = deepcopy(self.base_config)
 
-    let hooks = quickrun#module#get('hook')
+    let hooks = map(quickrun#module#get('hook'), 'v:val.name')
     if has_key(self.config, 'hooks')
       let hooks = self.config.hooks + hooks
     endif
-    let self.hooks = map(hooks, 'self.make_module("hook", v:val.name)')
+    let self.hooks = map(hooks, 'self.make_module("hook", v:val)')
     call self.invoke_hook('hook_loaded')
     call filter(self.hooks, 'v:val.config.enable')
     let self.config = self.normalize(self.config)
@@ -364,10 +364,17 @@ function s:build_module(module, configs) abort
   for config in a:configs
     if type(config) == v:t_dict
       for name in keys(a:module.config)
-        for conf in [a:module.kind . '/' . a:module.name . '/' . name,
-        \            a:module.name . '/' . name,
-        \            a:module.kind . '/' . name,
-        \            name]
+        if has_key(a:module, 'name')
+          let key_names = [
+          \   a:module.kind . '/' . a:module.name . '/' . name,
+          \   a:module.name . '/' . name,
+          \   a:module.kind . '/' . name,
+          \   name,
+          \ ]
+        else
+          let key_names = [name]
+        endif
+        for conf in key_names
           if has_key(config, conf)
             let val = config[conf]
             if type(a:module.config[name]) is# v:t_list
