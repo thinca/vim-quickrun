@@ -177,7 +177,7 @@ function s:Session.make_module(kind, modualizable) abort
   endtry
 
   try
-    call s:build_module(module, [self.config] + args)
+    call s:apply_module_config(module, [self.config] + args)
     call map(module.config, 'quickrun#expand(v:val)')
     call module.init(self)
   catch
@@ -360,7 +360,7 @@ function s:get_hook_priority(hook, point) abort
   endtry
 endfunction
 
-function s:build_module(module, configs) abort
+function s:apply_module_config(module, configs) abort
   for config in a:configs
     if type(config) == v:t_dict
       for name in keys(a:module.config)
