@@ -573,7 +573,7 @@ let g:quickrun#default_config = {
 \ },
 \ 'vim': {
 \   'command': ':source',
-\   'exec': '%C %s',
+\   'exec': '%C %S',
 \   'hook/eval/template': 'echo %s',
 \   'runner': 'vimscript',
 \ },
