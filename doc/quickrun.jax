@@ -747,6 +747,12 @@ hook は特定のポイントで追加の処理を行うモジュールです。
 作成し、autoload#quickrun#{module-kind}#{module-name}#new() 関数を作っておく
 と、その戻り値が quickrun の初回ロード時に自動的に登録されます。
 
+モジュールを登録せずに利用することも可能です。
+その場合、quickrun を実行する関数(|quickrun#run()| 等)の {config} の
+"runner" や "outputter", "hooks" にモジュールの辞書を直接渡してください。
+[{module}, {arg1}, {arg2}] のようなリストを渡すことで、引数を渡すことも可能で
+す。
+
 ------------------------------------------------------------------------------
 セッション				*quickrun-session*
 
@@ -810,10 +816,10 @@ session.config				*quickrun-session.config*
 以下は全モジュールで共通の属性です。
 
 module.kind				*quickrun-module.kind*
-	必須です。モジュールの種類です。
+	モジュールの種類です。登録する場合は必須です。
 
 module.name				*quickrun-module.name*
-	必須です。モジュールの名前です。
+	モジュールの名前です。登録する場合は必須です。
 
 module.config				*quickrun-module.config*
 	これは辞書で、このモジュールが取る config のデフォルト値です。ここで定
@@ -1013,6 +1019,7 @@ pandocを使用してmarkdownをhtmlにしてブラウザで開く (要|open-bro
 更新履歴					*quickrun-changelog*
 
 develop
+	- 要求する Vim のバージョンを 8.1 に更新。
 	- 今回のバージョンは多くの非互換の変更を含みます。
 	  - session 系の関数の名前を変更。
 	  - デフォルトのキーマッピング(<Leader>r)を削除。

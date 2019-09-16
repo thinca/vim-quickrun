@@ -754,6 +754,13 @@ autoload#quickrun#{module-kind}#{module-name}#new() function in
 autoload/quickrun/{module-kind}/{module-name}.vim in 'runtimepath'.  That'll
 be loaded when quickrun is loaded for the first time in the process.
 
+It is also possible to use without registering the module.
+In that case, please pass the module dictionary directly to "runner",
+"outputter", or "hooks" of {config} of the function that executes quickrun
+(|quickrun#run()| etc.).
+You can pass the arguments as a List like [{module}, {arg1}, {arg2}].
+
+
 ------------------------------------------------------------------------------
 SESSION					*quickrun-session*
 
@@ -813,10 +820,10 @@ each modules, use attributes which name begin with "_" to avoid conflicts.
 Below common attributes among all modules.
 
 module.kind				*quickrun-module.kind*
-	Required.  Kind of the module.
+	Kind of the module.  Required if you register the module.
 
 module.name				*quickrun-module.name*
-	Required.  Name of the module.
+	Name of the module.  Required if you register the module.
 
 module.config				*quickrun-module.config*
 	This is a dictionary for the module config default values.  The items
