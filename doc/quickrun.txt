@@ -559,20 +559,20 @@ available by default.
   quickrun opens output buffer and displays to the output buffer.  If output
   buffer already exists, quickrun uses it.
   Option ~
-  outputter/buffer/name			Default: "[quickrun output]"
+  outputter/buffer/bufname		Default: "quickrun://output"
 	The buffer name.
   outputter/buffer/filetype		Default: "quickrun"
 	Sets this value to 'filetype' of the buffer.
   outputter/buffer/append		Default: 0
-	Appends if it's 1.
-  outputter/buffer/split
-	Default: '%{winwidth(0) * 2 < winheight(0) * 5 ? "" : "vertical"}'
+	Appends if it's TRUE.
+  outputter/buffer/opener
+	Default: '%{winwidth(0) * 2 < winheight(0) * 5 ? "new" : "vnew"}'
 
-	Specifies a sub-command to open a buffer for the output.  |quickrun|
-	inserts this before |:split| command when it opens a buffer.
+	Specifies an Ex command to open a buffer for the output.  |quickrun|
+	passes the buffer name to this Ex command when it opens a buffer.
   outputter/buffer/into			Default: 0
-	Moves cursor to the output buffer if this isn't 0.
-  outputter/buffer/running_mark		Default: ':-)'
+	Moves cursor to the output buffer if this is TRUE.
+  outputter/buffer/running_mark		Default: 'running...'
 	If this value is not an empty string, |quickrun| displays this string
 	to output buffer while it's running.
   outputter/buffer/close_on_empty	Default: 0
@@ -581,6 +581,13 @@ available by default.
   Hook ~
   outputter_buffer_opened
 	When the output buffer is opened.
+
+- "outputter/buffer_legacy"		*quickrun-module-outputter/message*
+  {Deprecated}
+  This is an old version of outputter/buffer.  You should use current version
+  of outputter/buffer instead.  You can use this when something wrong with
+  current outputter/buffer.
+  This will be removed in the future version.
 
 - "outputter/message"			*quickrun-module-outputter/message*
   Outputs on |messages|.

@@ -549,28 +549,34 @@ outputter は結果の出力を行うモジュールです。
   出力専用バッファを開いてそこへ出力します。このバッファは同じものが再利用され
   ます。
   オプション ~
-  outputter/buffer/name			デフォルト: "[quickrun output]"
+  outputter/buffer/bufname		デフォルト: "quickrun://output"
 	バッファ名です。
   outputter/buffer/filetype		デフォルト: "quickrun"
 	バッファに設定される 'filetype' の値です。
   outputter/buffer/append		デフォルト: 0
-	1 の場合は追記を行います。
-  outputter/buffer/split
-	デフォルト: '%{winwidth(0) * 2 < winheight(0) * 5 ? "" : "vertical"}'
-	出力専用バッファを開く際の補助コマンドを指定します。バッファを開く際に
-	|:split| コマンドの前に挿入されます。
+	TRUE の場合は追記を行います。
+  outputter/buffer/opener
+	デフォルト: '%{winwidth(0) * 2 < winheight(0) * 5 ? "new" : "vnew"}'
+
+	出力専用バッファを開くための Ex コマンドです。
   outputter/buffer/into			デフォルト: 0
-	0 以外を指定すると、結果が出た際に出力専用バッファへカーソルを移動しま
+	TRUE を指定すると、結果が出た際に出力専用バッファへカーソルを移動しま
 	す。
-  outputter/buffer/running_mark		デフォルト: ':-)'
+  outputter/buffer/running_mark		デフォルト: 'running...'
 	この値が空文字列でない場合、実行中にこの文字列が出力先に表示されます。
 	表示は実行完了後に削除されます。
-  outputter/buffer/close_on_empty	Default: 0
+  outputter/buffer/close_on_empty	デフォルト: 0
 	終了時にバッファが空だった場合、自動的にバッファを閉じます。
 
   フック ~
   outputter_buffer_opened
 	出力バッファが開いた時。
+
+- "outputter/buffer_legacy"		*quickrun-module-outputter/message*
+  {非推奨}
+  過去の outputter/buffer です。これの代わりに最新の outputter/buffer を使用し
+  てください。最新版に問題がある場合にはこちらを使用できます。
+  これは将来のバージョンで削除されます。
 
 - "outputter/message"			*quickrun-module-outputter/message*
   |messages| に出力します。
