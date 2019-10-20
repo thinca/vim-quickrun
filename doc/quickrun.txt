@@ -111,7 +111,7 @@ COMMANDS					*quickrun-commands*
 	>{output} is abbreviation to -output {output}
 	>>{output} is abbreviation to -append 1 -output {output}
 
-	|:Quickrun| can take |:range|.
+	|:QuickRun| can take |:range|.
 	If it was not given, |:QuickRun| treats whole lines.
 	If you specify '<,'> and do not specify -mode
 	(|quickrun-option-mode|), target is selected text in visual mode.  And
@@ -461,16 +461,16 @@ default.  NOTE: Everything except for "system" can be unstable.
   milliseconds, it shows the result immediately.
   Option ~
   runner/vimproc/sleep			Default: 50
-	Waits specified times in milliseconds.  This is useful to avoid polling
-	by 'updatetime' when program will stop immediately.
+	Waits specified times in milliseconds.  This is useful to avoid
+	polling by 'updatetime' when program will stop immediately.
   runner/vimproc/updatetime		Default: 0
 	Changes 'updatetime' to the value temporary.  Stays same if this is 0.
   runner/vimproc/read_timeout		Default: 100
 	The time to read at one time. (milliseconds)
   runner/vimproc/pipe_status_index	Default: -1
 	If the command contains a pipe, select the index of sub-command that
-	sets {exit-code} to |quickrun-session.exit_code|. The first command is 0
-	and the last command is -1.
+	sets {exit-code} to |quickrun-session.exit_code|. The first command is
+	0 and the last command is -1.
 	If this value is the string "pipefail", the last non-zero {exit-code}
 	will be used. If all {exit-codes} are zero, 0 is used.
 
@@ -582,7 +582,7 @@ available by default.
   outputter_buffer_opened
 	When the output buffer is opened.
 
-- "outputter/buffer_legacy"		*quickrun-module-outputter/message*
+- "outputter/buffer_legacy"	*quickrun-module-outputter/buffer_legacy*
   {Deprecated}
   This is an old version of outputter/buffer.  You should use current version
   of outputter/buffer instead.  You can use this when something wrong with
@@ -801,6 +801,11 @@ session.finish([{exit-code}])		*quickrun-session.finish()*
 session.exit_code			*quickrun-session.exit_code*
 	You can refer this only after the process finished.  This is the value
 	of |quickrun-session.finish()|.
+
+session.tempname([{name}])		*quickrun-session.tempname()*
+	Same to |tempname()| but records the result, and delete that paths
+	when |quickrun-session.sweep()| is called.
+	If {name} is specified, records {name} for deleting.
 
 session.sweep()				*quickrun-session.sweep()*
 	This is a cleaning up.  This deletes the paths registered by

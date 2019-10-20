@@ -468,10 +468,10 @@ NOTE: "system" 以外は不安定な場合があります。
 
 - "runner/concurrent_process"	*quickrun-module-runner/concurrent_process*
   {|vimproc| が必要}
-  |vimproc| と|Vital.ConcurrentProcess|を使ってコマンドをバックグラウンドで実行
-  し、かつ二回目以降の実行は、そのプロセスを再利用します。初回起動が遅いプログ
-  ラミング言語処理系付属 REPL、たとえば JVM 上で動作する言語処理系などで便利で
-  す。
+  |vimproc| と|Vital.ConcurrentProcess|を使ってコマンドをバックグラウンドで実
+  行し、かつ二回目以降の実行は、そのプロセスを再利用します。初回起動が遅いプロ
+  グラミング言語処理系付属 REPL、たとえば JVM 上で動作する言語処理系などで便利
+  です。
   各実行の完了を "runner/vimproc"同様、|CursorHold| と |CursorHoldI| イベント
   を使って検査します。
 
@@ -572,7 +572,7 @@ outputter は結果の出力を行うモジュールです。
   outputter_buffer_opened
 	出力バッファが開いた時。
 
-- "outputter/buffer_legacy"		*quickrun-module-outputter/message*
+- "outputter/buffer_legacy"	*quickrun-module-outputter/buffer_legacy*
   {非推奨}
   過去の outputter/buffer です。これの代わりに最新の outputter/buffer を使用し
   てください。最新版に問題がある場合にはこちらを使用できます。
