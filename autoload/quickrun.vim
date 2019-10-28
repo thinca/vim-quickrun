@@ -192,7 +192,6 @@ let g:quickrun#default_config = {
 \ },
 \ 'dart/dart/checked': {
 \   'command': 'dart',
-\   'cmdopt': '--enable-type-checks',
 \   'tempfile': '%{tempname()}.dart',
 \ },
 \ 'dart/dart/production': {
