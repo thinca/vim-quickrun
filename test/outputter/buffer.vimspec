@@ -138,6 +138,11 @@ Describe outputter/buffer
       Assert Equal(line('.'), 6)
       sleep 1m
       Assert Equal(line('.'), 1)
+
+      let session = s:session({'opener': '3new'}, ["1\n2\n3\n"])
+      call session.run()
+      sleep 1m
+      Assert Equal(line('.'), 1)
     End
   End
 

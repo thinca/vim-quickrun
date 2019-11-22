@@ -87,6 +87,9 @@ function s:try_open_result_window(outputter, session, clear, into) abort
     let bufnr = s:open_result_window(a:outputter, a:session)
     if a:clear
       call s:clear_buffer(bufnr)
+      let a:outputter._baseline = 1
+    elseif a:outputter._baseline is# 0
+      let a:outputter._baseline = line('$')
     endif
     return bufnr
   catch /^Vim([^)]\+):E11:/
@@ -130,10 +133,6 @@ function s:open_result_window(outputter, session) abort
 
   if opened
     call a:session.invoke_hook('outputter_buffer_opened')
-  endif
-
-  if a:outputter._baseline is# 0
-    let a:outputter._baseline = line('$')
   endif
 
   if &l:filetype !=# config.filetype
