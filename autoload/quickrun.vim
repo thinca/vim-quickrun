@@ -442,11 +442,21 @@ let g:quickrun#default_config = {
 \   'exec': '%c %o %s %a -g halt',
 \ },
 \ 'ps1': {
+\   'type' : executable('powershell') ? 'ps1/powershell':
+\            executable('pwsh') ? 'ps1/pwsh': '',
+\ },
+\ 'ps1/powershell': {
 \   'exec': '%c %o -File %s %a',
 \   'command': 'powershell.exe',
 \   'cmdopt': '-ExecutionPolicy RemoteSigned',
 \   'tempfile': '%{tempname()}.ps1',
 \   'hook/output_encode/encoding': '&termencoding',
+\ },
+\ 'ps1/pwsh': {
+\   'exec': '%c %o -File %s %a',
+\   'command': 'pwsh',
+\   'cmdopt': '-ExecutionPolicy RemoteSigned',
+\   'tempfile': '%{tempname()}.ps1',
 \ },
 \ 'purescript': {
 \   'type': executable('pulp') ? 'purescript/pulp' : '',
