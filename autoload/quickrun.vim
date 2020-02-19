@@ -46,15 +46,24 @@ let g:quickrun#default_config = {
 \ },
 \ 'c/clang': {
 \   'command': 'clang',
-\   'exec': ['%c %o %s -o %s:p:r', '%s:p:r %a'],
+\   'exec':
+\     s:is_win
+\      ? ['%c %o %s -o %s:p:r.exe', '%s:p:r %a']
+\      : ['%c %o %s -o %s:p:r', '%s:p:r %a'],
 \   'tempfile': '%{tempname()}.c',
-\   'hook/sweep/files': '%S:p:r',
+\   'hook/sweep/files':
+\     s:is_win
+\      ? ['%S:p:r.exe']
+\      : ['%S:p:r'],
 \ },
 \ 'c/gcc': {
 \   'command': 'gcc',
 \   'exec': ['%c %o %s -o %s:p:r', '%s:p:r %a'],
 \   'tempfile': '%{tempname()}.c',
-\   'hook/sweep/files': '%S:p:r',
+\   'hook/sweep/files':
+\     s:is_win
+\      ? ['%S:p:r.exe']
+\      : ['%S:p:r'],
 \ },
 \ 'c/vc': {
 \   'command': 'cl',
@@ -96,15 +105,24 @@ let g:quickrun#default_config = {
 \ },
 \ 'cpp/clang++': {
 \   'command': 'clang++',
-\   'exec': ['%c %o %s -o %s:p:r', '%s:p:r %a'],
+\   'exec':
+\     s:is_win
+\      ? ['%c %o %s -o %s:p:r.exe', '%s:p:r %a']
+\      : ['%c %o %s -o %s:p:r', '%s:p:r %a'],
 \   'tempfile': '%{tempname()}.cpp',
-\   'hook/sweep/files': ['%S:p:r'],
+\   'hook/sweep/files':
+\     s:is_win
+\      ? ['%S:p:r.exe']
+\      : ['%S:p:r'],
 \ },
 \ 'cpp/g++': {
 \   'command': 'g++',
 \   'exec': ['%c %o %s -o %s:p:r', '%s:p:r %a'],
 \   'tempfile': '%{tempname()}.cpp',
-\   'hook/sweep/files': '%S:p:r',
+\   'hook/sweep/files':
+\     s:is_win
+\      ? ['%S:p:r.exe']
+\      : ['%S:p:r'],
 \ },
 \ 'cpp/vc': {
 \   'command': 'cl',
