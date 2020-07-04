@@ -187,7 +187,6 @@ let g:quickrun#default_config = {
 \ },
 \ 'dart/dart/checked': {
 \   'command': 'dart',
-\   'cmdopt': '--enable-type-checks',
 \   'tempfile': '%{tempname()}.dart',
 \ },
 \ 'dart/dart/production': {
@@ -438,11 +437,21 @@ let g:quickrun#default_config = {
 \   'exec': '%c %o %s %a -g halt',
 \ },
 \ 'ps1': {
+\   'type' : executable('powershell') ? 'ps1/powershell':
+\            executable('pwsh') ? 'ps1/pwsh': '',
+\ },
+\ 'ps1/powershell': {
 \   'exec': '%c %o -File %s %a',
 \   'command': 'powershell.exe',
 \   'cmdopt': '-ExecutionPolicy RemoteSigned',
 \   'tempfile': '%{tempname()}.ps1',
 \   'hook/output_encode/encoding': '&termencoding',
+\ },
+\ 'ps1/pwsh': {
+\   'exec': '%c %o -File %s %a',
+\   'command': 'pwsh',
+\   'cmdopt': '-ExecutionPolicy RemoteSigned',
+\   'tempfile': '%{tempname()}.ps1',
 \ },
 \ 'purescript': {
 \   'type': executable('pulp') ? 'purescript/pulp' : '',
@@ -562,7 +571,7 @@ let g:quickrun#default_config = {
 \ },
 \ 'typescript/ts-node': {
 \   'command': 'ts-node',
-\   'cmdopt': '--compilerOptions ''{"target": "es2015"}''',
+\   'cmdopt': '--compiler-options ''{"target": "es2015"}''',
 \   'exec': '%c %o %s',
 \ },
 \ 'typescript/tsc': {
