@@ -577,6 +577,7 @@ let g:quickrun#default_config = {
 \ 'typescript/ts-node': {
 \   'command': 'ts-node',
 \   'cmdopt': '--compiler-options ''{"target": "es2015"}''',
+\   'tempfile': '%{tempname()}.ts',
 \   'exec': '%c %o %s',
 \ },
 \ 'typescript/tsc': {
