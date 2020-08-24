@@ -597,6 +597,12 @@ let g:quickrun#default_config = {
 \   'cmdopt': '//Nologo',
 \   'hook/output_encode/encoding': '&termencoding',
 \ },
+\ 'zig': {
+\   'command': 'zig',
+\   'exec': ['%c build-exe %o %s', '%s:p:r %a'],
+\   'tempfile': '%{tempname()}.zig',
+\   'hook/sweep/files': '%S:p:r',
+\ },
 \ 'zsh': {},
 \}
 lockvar! g:quickrun#default_config
