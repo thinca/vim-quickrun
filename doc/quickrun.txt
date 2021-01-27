@@ -50,7 +50,7 @@ Requirement:
 - Vim 7.2 or later
 
 Latest Version:
-http://github.com/thinca/vim-quickrun
+https://github.com/thinca/vim-quickrun
 
 
 						*quickrun-synopsis*
