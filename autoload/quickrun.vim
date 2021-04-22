@@ -592,6 +592,11 @@ let g:quickrun#default_config = {
 \   'type': executable('ts-node') ? 'typescript/ts-node' :
 \           executable('tsc') ? 'typescript/tsc' : '',
 \ },
+\ 'typescript/deno' : {
+\   'command': 'deno',
+\   'cmdopt': '--no-check --allow-all --unstable',
+\   'exec': ['%c run %o %s'],
+\ },
 \ 'typescript/ts-node': {
 \   'command': 'ts-node',
 \   'cmdopt': '--compiler-options ''{"target": "es2015"}''',
