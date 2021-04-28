@@ -6,6 +6,7 @@ let s:is_win = has('win32')
 let s:runner = {
 \   'config': {
 \     'pty': 0,
+\     'env': {},
 \     'interval': 0,
 \   }
 \ }
@@ -31,10 +32,10 @@ function s:runner.run(commands, input, session) abort
   \   'callback': self._job_cb,
   \   'close_cb': self._job_close_cb,
   \   'exit_cb': self._job_exit_cb,
+  \   'pty': self.config.pty,
+  \   'env': self.config.env,
   \ }
-  if has('patch-8.0.0744')
-    let options.pty = self.config.pty
-  endif
+
   if a:input ==# ''
     let options.in_io = 'null'
   else

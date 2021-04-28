@@ -8,6 +8,7 @@ let s:runner = {
 \     'name': 'default',
 \     'opener': 'new',
 \     'into': 0,
+\     'env': {},
 \   },
 \ }
 
@@ -40,6 +41,7 @@ function s:runner.run(commands, input, session) abort
   \   'curwin': 1,
   \   'close_cb': self._job_close_cb,
   \   'exit_cb': self._job_exit_cb,
+  \   'env': self.config.env,
   \ }
 
   let self._key = a:session.continue()

@@ -527,6 +527,8 @@ default.  NOTE: Everything except for "system" can be unstable.
   Option ~
   runner/job/pty			Default: 0
 	Specifies a value of pty to pass to |job_start()|.
+  runner/job/env			Default: {}
+	Specifies a dict of environment variables to pass to |job_start()|.
   runner/job/interval			Default: 0
 	Before Vim 8.0.0036, job feature checks about every 10 seconds for
 	jobs that ended (|job-exit_cb|).
@@ -542,6 +544,8 @@ default.  NOTE: Everything except for "system" can be unstable.
 	An Ex command to open a terminal window.
   runner/terminal/into			Default: 0
 	Moves cursor to the terminal window if this isn't 0.
+  runner/terminal/env			Default: {}
+	Specifies a dict of environment variables to pass to |term_start()|.
 
 - "runner/vimscript"			*quickrun-module-runner/vimscript*
   Runs commands as Vim commands.
