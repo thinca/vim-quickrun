@@ -1,0 +1,4 @@
+call themis#option('recursive', 1)
+call themis#option('exclude', ['test/fixture/'])
+
+call themis#helper('command').with(themis#helper('assert'))
