@@ -124,7 +124,7 @@ http://github.com/thinca/vim-quickrun
 quickrun#run([{config}])			*quickrun#run()*
 	|:QuickRun| の関数版です。
 
-quickrun#new([{config}])			*quickrun#rnew()*
+quickrun#new([{config}])			*quickrun#new()*
 	{session}(|quickrun-session|) を生成します。
 	これには変数(|quickrun-settings|)から構築した {config} が適用されま
 	す。
