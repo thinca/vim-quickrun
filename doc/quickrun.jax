@@ -183,8 +183,6 @@ quickrun#session#exists()			*quickrun#session#exists()*
 	返します。
 
 以下の関数は非推奨です。次のバージョンで削除される予定です。
-quickrun#new([{config}])
-	代わりに |quickrun#session#new()| を使用してください。
 quickrun#config({line})
 	代わりに |quickrun#config#normalize()| を使用してください。
 quickrun#session({key} [, {func-name} [, {args} ...]])
