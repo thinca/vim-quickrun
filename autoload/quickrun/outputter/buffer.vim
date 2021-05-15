@@ -83,6 +83,7 @@ endfunction
 
 function s:try_open_result_window(outputter, session, clear, into) abort
   let cur_winid = win_getid()
+  let into = a:into
   try
     let bufnr = s:open_result_window(a:outputter, a:session)
     if a:clear
@@ -95,6 +96,7 @@ function s:try_open_result_window(outputter, session, clear, into) abort
   catch /^Vim([^)]\+):E11:/
     " When the user staying at cmdwin, cursor can not move to other window.
     " This is a common case and should be ignored.
+    let into = 1
     return 0
   catch
     echohl ErrorMsg
@@ -103,7 +105,7 @@ function s:try_open_result_window(outputter, session, clear, into) abort
     echohl NONE
     return 0
   finally
-    if !a:into
+    if !into
       call win_gotoid(cur_winid)
     endif
   endtry
