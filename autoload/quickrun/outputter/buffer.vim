@@ -150,7 +150,7 @@ function s:clear_buffer(bufnr) abort
 endfunction
 
 function s:escape_file_pattern(pat) abort
-  return join(map(split(a:pat, '\zs'), '"[" . v:val . "]"'), '')
+  return '^' . a:pat . '$'
 endfunction
 
 function s:is_empty_buffer(bufnr) abort
