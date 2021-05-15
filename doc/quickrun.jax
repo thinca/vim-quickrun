@@ -1,6 +1,6 @@
 *quickrun.txt*	コマンドを素早く実行します。
 
-Version: 0.8.0
+Version: 0.9.0
 Author: thinca <thinca+vim@gmail.com>
 英訳:
   * ujihisa <ujihisa at gmail com>
@@ -1022,7 +1022,7 @@ pandocを使用してmarkdownをhtmlにしてブラウザで開く (要|open-bro
 ==============================================================================
 更新履歴					*quickrun-changelog*
 
-develop
+0.9.0	2021-05-15
 	- 要求する Vim のバージョンを 8.1 に更新。
 	- 今回のバージョンは多くの非互換の変更を含みます。
 	  - session 系の関数の名前を変更。
