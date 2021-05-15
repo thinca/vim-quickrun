@@ -79,40 +79,9 @@ function! s:_move(tabnr, winnr) abort
   endif
 endfunction
 
-if has('patch-7.4.834')
-  function! s:_gettabdict(tabnr) abort
-    return gettabvar(a:tabnr, '')
-  endfunction
-elseif has('patch-7.4.434')
-  " After Vim 7.4.434, gettabvar() can return the scope variable.
-  " But, gettabvar() sometimes returns '' with new tabpage.
-  " This can avoid by calling gettabvar() twice.
-  " This Bug is fixed in 7.4.834.
-  function! s:_gettabdict(tabnr) abort
-    let dict = gettabvar(a:tabnr, '')
-    return dict is# '' ? gettabvar(a:tabnr, '') : dict
-  endfunction
-else
-  " Before Vim 7.4.434, gettabvar() doesn't return
-  " the scope variable.
-  function! s:_gettabdict(tabnr) abort
-    let cur_tabnr = tabpagenr()
-    if a:tabnr != cur_tabnr
-      let save_lazyredraw = &lazyredraw
-      try
-        set lazyredraw
-        noautocmd execute 'tabnext' a:tabnr
-        let scope_var = t:
-        noautocmd execute 'tabnext' cur_tabnr
-      finally
-        let &lazyredraw = save_lazyredraw
-      endtry
-    else
-      let scope_var = t:
-    endif
-    return scope_var
-  endfunction
-endif
+function! s:_gettabdict(tabnr) abort
+  return gettabvar(a:tabnr, '')
+endfunction
 
 let &cpo = s:save_cpo
 unlet s:save_cpo

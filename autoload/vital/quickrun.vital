@@ -1,10 +1,9 @@
 quickrun
-748bcc2ce8f953500e90a6117ea1825ff7cca6eb
+833c903179d5601704e4cd8c0d325984a2ccb548
 
 Data.List
 System.File
 System.Filepath
-Prelude
 Process
 Vim.Message
 ConcurrentProcess

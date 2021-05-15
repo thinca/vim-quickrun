@@ -19,12 +19,8 @@ set cpo&vim
 
 " FIXME: Unfortunately, can't use s:_vital_loaded() for this purpose.
 " Because these variables are used when this script file is loaded.
-let s:is_windows = has('win16') || has('win32') || has('win64') || has('win95')
+let s:is_windows = has('win32') " This means any versions of windows https://github.com/vim-jp/vital.vim/wiki/Coding-Rule#how-to-check-if-the-runtime-os-is-windows
 let s:is_unix = has('unix')
-" As of 7.4.122, the system()'s 1st argument is converted internally by Vim.
-" Note that Patch 7.4.122 does not convert system()'s 2nd argument and
-" return-value. We must convert them manually.
-let s:need_trans = v:version < 704 || (v:version == 704 && !has('patch122'))
 
 let s:TYPE_DICT = type({})
 let s:TYPE_LIST = type([])
@@ -127,9 +123,6 @@ function! s:system(str, ...) abort
     let command = a:str
   else
     throw 'vital: Process: invalid argument (value type:' . type(a:str) . ')'
-  endif
-  if s:need_trans
-    let command = s:iconv(command, &encoding, 'char')
   endif
   let args = [command] + args
   if background && (use_vimproc || !s:is_windows)

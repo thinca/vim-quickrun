@@ -2,18 +2,15 @@
 " Author : thinca <thinca+vim@gmail.com>
 " License: zlib License
 
-let s:save_cpo = &cpo
-set cpo&vim
-
 let s:outputter = {
 \   'config': {'log': 0},
 \ }
 
-function! s:outputter.init(session) abort
+function s:outputter.init(session) abort
   let self._buf = ''
 endfunction
 
-function! s:outputter.output(data, session) abort
+function s:outputter.output(data, session) abort
   if !self.config.log
     echon a:data
     return
@@ -26,16 +23,13 @@ function! s:outputter.output(data, session) abort
   endfor
 endfunction
 
-function! s:outputter.finish(session) abort
+function s:outputter.finish(session) abort
   if self.config.log && self._buf !=# ''
     echomsg self._buf
   endif
 endfunction
 
 
-function! quickrun#outputter#message#new() abort
+function quickrun#outputter#message#new() abort
   return deepcopy(s:outputter)
 endfunction
-
-let &cpo = s:save_cpo
-unlet s:save_cpo

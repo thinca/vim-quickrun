@@ -2,9 +2,6 @@
 " Author : thinca <thinca+vim@gmail.com>
 " License: zlib License
 
-let s:save_cpo = &cpo
-set cpo&vim
-
 let s:outputter = quickrun#outputter#buffered#new()
 let s:outputter.config = {
 \   'success': 'null',
@@ -21,9 +18,6 @@ function! s:outputter.finish(session) abort
 endfunction
 
 
-function! quickrun#outputter#error#new() abort
+function quickrun#outputter#error#new() abort
   return deepcopy(s:outputter)
 endfunction
-
-let &cpo = s:save_cpo
-unlet s:save_cpo

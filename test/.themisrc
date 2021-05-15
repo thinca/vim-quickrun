@@ -1,0 +1,44 @@
+call themis#option('recursive', 1)
+
+call themis#helper('command').with(themis#helper('assert'))
+
+let s:aliases = {
+\   'Session': quickrun#session#new({}),
+\ }
+for s:kind in quickrun#module#get_kinds()
+  for s:module in quickrun#module#get(s:kind)
+    let s:aliases[printf('kind/%s', s:module.name)] = s:module
+  endfor
+endfor
+call themis#func_alias(s:aliases)
+
+
+" runner/puppet for outputter test
+let g:PuppetRunner = {
+\   'config': {
+\     'result': [],
+\   }
+\ }
+
+function g:PuppetRunner.run(commands, input, session) abort
+  if !empty(self.config.result)
+    call a:session.output(remove(self.config.result, 0))
+  endif
+  if empty(self.config.result)
+    call a:session.finish()
+  else
+    let key = a:session.continue()
+    call timer_start(0, { -> s:continue(key) })
+  endif
+endfunction
+
+function s:continue(key) abort
+  let session = quickrun#session#get(a:key)
+  let result = session.runner.config.result
+  call session.output(remove(result, 0))
+  if empty(result)
+    call session.finish()
+  else
+    call timer_start(0, { -> s:continue(a:key) })
+  endif
+endfunction

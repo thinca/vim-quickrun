@@ -2,9 +2,6 @@
 " Author : thinca <thinca+vim@gmail.com>
 " License: zlib License
 
-let s:save_cpo = &cpo
-set cpo&vim
-
 let s:VT = g:quickrun#V.import('Vim.ViewTracer')
 
 let s:outputter = quickrun#outputter#buffered#new()
@@ -25,7 +22,6 @@ function! s:outputter.init(session) abort
   let self._target_window = s:VT.trace_window()
   let self._target_buf = bufnr('%')
 endfunction
-
 
 function! s:outputter.finish(session) abort
   try
@@ -53,7 +49,7 @@ function! s:outputter.finish(session) abort
   endtry
 endfunction
 
-function! s:outputter._fix_result_list(session, result_list) abort
+function s:outputter._fix_result_list(session, result_list) abort
   let region = get(a:session.config, 'region', {})
   let srcfile = get(a:session.config, 'srcfile', '')
   if empty(region) || srcfile ==# ''
@@ -71,23 +67,20 @@ function! s:outputter._fix_result_list(session, result_list) abort
   return fixed
 endfunction
 
-function! s:outputter._apply_result(expr) abort
+function s:outputter._apply_result(expr) abort
   cgetexpr a:expr
   return getqflist()
 endfunction
 
-function! s:outputter._apply_result_list(result_list) abort
+function s:outputter._apply_result_list(result_list) abort
   call setqflist(a:result_list)
 endfunction
 
-function! s:outputter._close_window() abort
+function s:outputter._close_window() abort
   cclose
 endfunction
 
 
-function! quickrun#outputter#quickfix#new() abort
+function quickrun#outputter#quickfix#new() abort
   return deepcopy(s:outputter)
 endfunction
-
-let &cpo = s:save_cpo
-unlet s:save_cpo

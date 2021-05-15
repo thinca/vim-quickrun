@@ -1,23 +1,18 @@
 " Run commands quickly.
-" Version: 0.8.0
 " Author : thinca <thinca+vim@gmail.com>
 " License: zlib License
-
-let s:save_cpo = &cpo
-set cpo&vim
 
 let s:V = vital#quickrun#new().load(
 \   'Data.List',
 \   'System.File',
 \   'System.Filepath',
 \   'Vim.Message',
-\   'Process',
-\   'Prelude')
+\   'Process')
 unlet! g:quickrun#V
 let g:quickrun#V = s:V
 lockvar! g:quickrun#V
 
-let s:is_win = s:V.Prelude.is_windows()
+let s:is_win = has('win32')
 
 " Default config.  " {{{1
 unlet! g:quickrun#default_config
@@ -612,7 +607,7 @@ let g:quickrun#default_config = {
 \ },
 \ 'vim': {
 \   'command': ':source',
-\   'exec': '%C %s',
+\   'exec': '%C %S',
 \   'hook/eval/template': 'echo %s',
 \   'runner': 'vimscript',
 \ },
@@ -632,359 +627,38 @@ let g:quickrun#default_config = {
 lockvar! g:quickrun#default_config
 
 
-let s:Session = {}  " {{{1
-" Initialize of instance.
-function! s:Session.initialize(config) abort
-  let self.base_config = s:build_config(a:config)
-endfunction
-
-" The option is appropriately set referring to default options.
-function! s:Session.normalize(config) abort
-  let config = a:config
-  if has_key(config, 'input')
-    let input = quickrun#expand(config.input)
-    try
-      let config.input = input[0] ==# '=' ? input[1:]
-      \                                  : join(readfile(input, 'b'), "\n")
-    catch
-      throw 'quickrun: Can not treat input: ' . v:exception
-    endtry
+" Deprecated functions.  {{{1
+function quickrun#session(key, ...) abort
+  if a:0
+    return quickrun#session#call(a:key, a:1, a:000[1 :])
   else
-    let config.input = ''
-  endif
-
-  let exec = get(config, 'exec', '')
-  let config.exec = type(exec) == type([]) ? exec : [exec]
-  let config.command = get(config, 'command', config.type)
-
-  if has_key(config, 'srcfile')
-    let config.srcfile = quickrun#expand(expand(config.srcfile))
-  elseif !has_key(config, 'src')
-    if filereadable(expand('%:p')) &&
-    \  !has_key(config, 'region') && !&modified
-      " Use file in direct.
-      let config.srcfile = expand('%:p')
-    else
-      let config.region = get(config, 'region', {
-      \   'first': [1, 0, 0],
-      \   'last':  [line('$'), 0, 0],
-      \   'wise': 'V',
-      \ })
-      " Executes on the temporary file.
-      let body = s:get_region(config.region)
-
-      let body = s:V.Process.iconv(body, &encoding, &fileencoding)
-
-      if !&l:binary &&
-      \  (!exists('&fixendofline') || &l:fixendofline || &l:endofline)
-        let body .= "\n"
-      endif
-      if &l:fileformat ==# 'mac'
-        let body = substitute(body, "\n", "\r", 'g')
-      elseif &l:fileformat ==# 'dos'
-        let body = substitute(body, "\n", "\r\n", 'g')
-      endif
-
-      let config.src = body
-    endif
-  endif
-
-  if !has_key(config, 'srcfile')
-    let fname = quickrun#expand(config.tempfile)
-    call self.tempname(fname)
-    call writefile(split(config.src, "\n", 1), fname, 'b')
-    let config.srcfile = fname
-  endif
-
-  for opt in ['cmdopt', 'args']
-    let config[opt] = quickrun#expand(config[opt])
-  endfor
-  return config
-endfunction
-
-function! s:Session.setup() abort
-  try
-    if has_key(self, 'exit_code')
-      call remove(self, 'exit_code')
-    endif
-    let self.config = deepcopy(self.base_config)
-
-    let self.hooks = map(quickrun#module#get('hook'),
-    \                    'self.make_module("hook", v:val.name)')
-    call self.invoke_hook('hook_loaded')
-    call filter(self.hooks, 'v:val.config.enable')
-    let self.config = self.normalize(self.config)
-    call self.invoke_hook('normalized')
-
-    let self.runner = self.make_module('runner', self.config.runner)
-    let self.outputter = self.make_module('outputter', self.config.outputter)
-    call self.invoke_hook('module_loaded')
-
-    let commands = copy(self.config.exec)
-    call filter(map(commands, 'self.build_command(quickrun#expand(v:val))'),
-    \           'v:val =~# "\\S"')
-    let self.commands = commands
-  catch /^quickrun:/
-    call self.sweep()
-    throw v:exception
-  catch
-    call self.sweep()
-    throw join(['quickrun: Error occurred in setup():',
-    \           v:exception, v:throwpoint], "\n")
-  endtry
-endfunction
-
-function! s:Session.make_module(kind, line) abort
-  let name = ''
-  if type(a:line) == type([]) && !empty([])
-    let [name; args] = a:line
-  elseif a:line =~# '^\w'
-    let [name, arg] = split(a:line, '^\w\+\zs', 1)
-    let args = [arg]
-  endif
-
-  let module = deepcopy(quickrun#module#get(a:kind, name))
-
-  try
-    call module.validate()
-  catch
-    let exception = matchstr(v:exception, '^\%(quickrun:\s*\)\?\zs.*')
-    throw printf('quickrun: Specified %s is not available: %s: %s',
-    \            a:kind, name, exception)
-  endtry
-
-  try
-    call s:build_module(module, [self.config] + args)
-    call map(module.config, 'quickrun#expand(v:val)')
-    call module.init(self)
-  catch
-    let exception = matchstr(v:exception, '^\%(quickrun:\s*\)\?\zs.*')
-    throw printf('quickrun: %s/%s: %s',
-    \            a:kind, name, exception)
-  endtry
-
-  return module
-endfunction
-
-function! s:Session.run() abort
-  if has_key(self, '_running')
-    throw 'quickrun: session.run() was called in running.'
-  endif
-  let self._running = 1
-  call self.setup()
-  call self.invoke_hook('ready')
-  let exit_code = 1
-  try
-    call self.outputter.start(self)
-    let exit_code = self.runner.run(self.commands, self.config.input, self)
-  finally
-    if !has_key(self, '_continue_key')
-      call self.finish(exit_code)
-    endif
-  endtry
-endfunction
-
-function! s:Session.continue() abort
-  let self._continue_key = s:save_session(self)
-  return self._continue_key
-endfunction
-
-function! s:Session.output(data) abort
-  let context = {'data': a:data}
-  call self.invoke_hook('output', context)
-  if context.data !=# ''
-    call self.outputter.output(context.data, self)
+    return quickrun#session#get(a:key)
   endif
 endfunction
 
-function! s:Session.finish(...) abort
-  if !has_key(self, 'exit_code')
-    let self.exit_code = a:0 ? a:1 : 0
-    if self.exit_code == 0
-      call self.invoke_hook('success')
-    else
-      call self.invoke_hook('failure', {'exit_code': self.exit_code})
-    endif
-    call self.invoke_hook('finish')
-    call self.outputter.finish(self)
-    call self.sweep()
-    call self.invoke_hook('exit')
-  endif
+function quickrun#sweep_sessions() abort
+  call quickrun#session#sweep()
 endfunction
 
-" Build a command to execute it from options.
-" XXX: Undocumented yet.  This is used by core modules only.
-function! s:Session.build_command(tmpl) abort
-  let config = self.config
-  let command = config.command
-  let rule = {
-  \  'c': command,
-  \  's': config.srcfile,
-  \  'o': config.cmdopt,
-  \  'a': config.args,
-  \  '%': '%',
-  \}
-  let rest = a:tmpl
-  let result = ''
-  while 1
-    let pos = match(rest, '%')
-    if pos < 0
-      let result .= rest
-      break
-    elseif pos != 0
-      let result .= rest[: pos - 1]
-      let rest = rest[pos :]
-    endif
-
-    let symbol = rest[1]
-    let value = get(rule, tolower(symbol), '')
-
-    if symbol ==? 'c' && value ==# ''
-      throw 'quickrun: "command" option is empty.'
-    endif
-
-    let rest = rest[2 :]
-    if symbol =~? '^[cs]$'
-      if symbol ==# 'c'
-        let value_ = s:V.System.Filepath.which(value)
-        if value_ !=# ''
-          let value = value_
-        endif
-      endif
-      let mod = matchstr(rest, '^\v\zs%(\:[p8~.htre]|\:g?s(.).{-}\1.{-}\1)*')
-      let value = fnamemodify(value, mod)
-      if symbol =~# '\U'
-        let value = command =~# '^\s*:' ? fnameescape(value)
-        \                               : self.runner.shellescape(value)
-      endif
-      let rest = rest[len(mod) :]
-    endif
-    let result .= value
-  endwhile
-  return substitute(result, '[\r\n]\+', ' ', 'g')
+function quickrun#is_running() abort
+  return quickrun#session#exists()
 endfunction
 
-function! s:Session.tempname(...) abort
-  let name = a:0 ? a:1 : tempname()
-  if !has_key(self, '_temp_names')
-    let self._temp_names = []
-  endif
-  call add(self._temp_names, name)
-  return name
-endfunction
-
-" Sweep the session.
-function! s:Session.sweep() abort
-  " Remove temporary files.
-  if has_key(self, '_temp_names')
-    for name in self._temp_names
-      if filewritable(name)
-        call delete(name)
-      elseif isdirectory(name)
-        call s:V.System.File.rmdir(name)
-      endif
-    endfor
-  endif
-
-  " Sweep the execution of vimproc.
-  if has_key(self, '_vimproc')
-    try
-      call self._vimproc.kill(15)
-      call self._vimproc.waitpid()
-    catch
-    endtry
-    call remove(self, '_vimproc')
-  endif
-
-  if has_key(self, '_continue_key')
-    if has_key(s:sessions, self._continue_key)
-      call remove(s:sessions, self._continue_key)
-    endif
-    call remove(self, '_continue_key')
-  endif
-
-  if has_key(self, 'runner')
-    call self.runner.sweep()
-  endif
-  if has_key(self, 'outputter')
-    call self.outputter.sweep()
-  endif
-  if has_key(self, 'hooks')
-    for hook in self.hooks
-      call hook.sweep()
-    endfor
-  endif
-
-  if has_key(self, '_running')
-    call remove(self, '_running')
-  endif
-endfunction
-
-function! s:Session.invoke_hook(point, ...) abort
-  let context = a:0 ? a:1 : {}
-  let func = 'on_' . a:point
-  let hooks = copy(self.hooks)
-  let hooks = map(hooks, '[v:val, s:get_hook_priority(v:val, a:point)]')
-  let hooks = s:V.Data.List.sort_by(hooks, 'v:val[1]')
-  let hooks = map(hooks, 'v:val[0]')
-  for hook in hooks
-    if has_key(hook, func) && s:V.Prelude.is_funcref(hook[func])
-      call call(hook[func], [self, context], hook)
-    endif
-  endfor
-endfunction
-
-function! s:get_hook_priority(hook, point) abort
-  try
-    return a:hook.priority(a:point) - 0
-  catch
-    return 0
-  endtry
-endfunction
-
-
-let s:sessions = {}  " Store for sessions.
-
-function! s:save_session(session) abort
-  let key = has('reltime') ? reltimestr(reltime()) : string(localtime())
-  let s:sessions[key] = a:session
-  return key
-endfunction
-
-" Call a function of a session by key.
-function! quickrun#session(key, ...) abort
-  let session = get(s:sessions, a:key, {})
-  if a:0 && !empty(session)
-    return call(session[a:1], a:000[1 :], session)
-  endif
-  return session
-endfunction
-
-function! s:dispose_session(key) abort
-  if has_key(s:sessions, a:key)
-    let session = remove(s:sessions, a:key)
-    call session.sweep()
-  endif
-endfunction
-
-function! quickrun#sweep_sessions() abort
-  call map(keys(s:sessions), 's:dispose_session(v:val)')
-endfunction
-
-function! quickrun#is_running() abort
-  return !empty(s:sessions)
+function quickrun#config(config) abort
+  return quickrun#config#normalize(a:config)
 endfunction
 
 
 " Interfaces.  {{{1
-function! quickrun#new(...) abort
-  let session = copy(s:Session)
-  call session.initialize(a:0 ? a:1 : {})
-  return session
+function quickrun#new(...) abort
+  let config = a:0 ? quickrun#config#normalize(a:1) : {}
+  call quickrun#config#apply_recent_region(config)
+  let config = quickrun#config#build(&filetype, config)
+  return quickrun#session#new(config)
 endfunction
 
-function! quickrun#run(...) abort
-  call quickrun#sweep_sessions()
+function quickrun#run(...) abort
+  call quickrun#session#sweep()
 
   let session = quickrun#new(a:0 ? a:1 : {})
 
@@ -997,7 +671,7 @@ function! quickrun#run(...) abort
 endfunction
 
 " function for |g@|.
-function! quickrun#operator(wise) abort
+function quickrun#operator(wise) abort
   let wise = {
   \ 'line': 'V',
   \ 'char': 'v',
@@ -1010,83 +684,17 @@ function! quickrun#operator(wise) abort
   \ }})
 endfunction
 
-" function for main command.
-function! quickrun#command(config, use_range, line1, line2) abort
-  try
-    let config = {}
-    if a:use_range
-      let config.region = {
-      \   'first': [a:line1, 0, 0],
-      \   'last':  [a:line2, 0, 0],
-      \   'wise': 'V',
-      \ }
-    endif
-    call quickrun#run([config, a:config])
-  catch /^quickrun:/
-    call s:V.Vim.Message.error(v:exception)
-  endtry
-endfunction
-
-" completion function for main command.
-function! quickrun#complete(lead, cmd, pos) abort
-  let line = split(a:cmd[:a:pos - 1], '', 1)
-  let head = line[-1]
-  let kinds = quickrun#module#get_kinds()
-  if 2 <= len(line) && line[-2] =~# '^-'
-    " a value of option.
-    let opt = line[-2][1:]
-    if opt !=# 'type'
-      let list = []
-      if opt ==# 'mode'
-        let list = ['n', 'v']
-      elseif 0 <= index(kinds, opt)
-        let list = map(filter(quickrun#module#get(opt),
-        \                     'v:val.available()'), 'v:val.name')
-      endif
-      return filter(list, 'v:val =~# "^" . a:lead')
-    endif
-
-  elseif head =~# '^-'
-    " a name of option.
-    let list = ['type', 'src', 'srcfile', 'input', 'runner', 'outputter',
-    \ 'command', 'exec', 'cmdopt', 'args', 'tempfile', 'mode']
-    let mod_options = {}
-    for kind in kinds
-      for module in filter(quickrun#module#get(kind), 'v:val.available()')
-        for opt in keys(module.config)
-          let mod_options[opt] = 1
-          let mod_options[kind . '/' . opt] = 1
-          let mod_options[module.name . '/' . opt] = 1
-          let mod_options[kind . '/' . module.name . '/' . opt] = 1
-        endfor
-      endfor
-    endfor
-    let list += keys(mod_options)
-    call map(list, '"-" . v:val')
-
-  endif
-  if !exists('list')
-    " no context: types
-    let list = keys(extend(exists('g:quickrun_config') ?
-    \               copy(g:quickrun_config) : {}, g:quickrun#default_config))
-    call filter(list, 'v:val !~# "^[_*]$"')
-  endif
-
-  let re = '^\V' . escape(head, '\') . '\v[^/]*/?'
-  return s:V.Data.List.uniq(sort(map(list, 'matchstr(v:val, re)')))
-endfunction
-
-
 " Expand the keyword.
 " - @register @{register}
 " - &option &{option}
 " - $ENV_NAME ${ENV_NAME}
 " - %{expr}
 " Escape by \ if you does not want to expand.
-function! quickrun#expand(input) abort
-  if type(a:input) == type([]) || type(a:input) == type({})
+function quickrun#expand(input) abort
+  let input_t = type(a:input)
+  if input_t == v:t_list || input_t == v:t_dict
     return map(copy(a:input), 'quickrun#expand(v:val)')
-  elseif type(a:input) != type('')
+  elseif input_t != v:t_string
     return a:input
   endif
   let i = 0
@@ -1138,14 +746,14 @@ function! quickrun#expand(input) abort
 endfunction
 
 " Execute commands by expr.  This is used by remote_expr()
-function! quickrun#execute(cmd) abort
+function quickrun#execute(cmd) abort
   let result = ''
   let temp = tempname()
   try
     let save_vfile = &verbosefile
     let &verbosefile = temp
 
-    for cmd in type(a:cmd) == type([]) ? a:cmd : [a:cmd]
+    for cmd in type(a:cmd) == v:t_list ? a:cmd : [a:cmd]
       silent execute cmd
     endfor
   finally
@@ -1158,24 +766,7 @@ function! quickrun#execute(cmd) abort
   return result
 endfunction
 
-" Converts a string as argline or a list of config to config object.
-function! quickrun#config(config) abort
-  if type(a:config) == type('')
-    return s:build_config_from_arglist(s:parse_argline(a:config))
-  elseif type(a:config) == type([])
-    let config = {}
-    for c in a:config
-      call extend(config, quickrun#config(c))
-      unlet c
-    endfor
-    return config
-  elseif type(a:config) == type({})
-    return deepcopy(a:config)
-  endif
-  throw 'quickrun: Unsupported config type: ' . type(a:config)
-endfunction
-
-function! quickrun#trigger_keys() abort
+function quickrun#trigger_keys() abort
   if mode() =~# '[iR]'
     let input = "\<C-r>\<ESC>"
   else
@@ -1185,209 +776,5 @@ function! quickrun#trigger_keys() abort
 endfunction
 
 
-" Misc functions.  {{{1
-function! s:parse_argline(argline) abort
-  " foo 'bar buz' "hoge \"huga"
-  " => ['foo', 'bar buz', 'hoge "huga']
-  " TODO: More improve.
-  " ex:
-  " foo ba'r b'uz "hoge \nhuga"
-  " => ['foo, 'bar buz', "hoge \nhuga"]
-  let argline = a:argline
-  let arglist = []
-  while argline !~# '^\s*$'
-    let argline = matchstr(argline, '^\s*\zs.*$')
-    if argline[0] =~# '[''"]'
-      let arg = matchstr(argline, '\v([''"])\zs.{-}\ze\\@<!\1')
-      let argline = argline[strlen(arg) + 2 :]
-    else
-      let arg = matchstr(argline, '\S\+')
-      let argline = argline[strlen(arg) :]
-    endif
-    let arg = substitute(arg, '\\\(.\)', '\1', 'g')
-    call add(arglist, arg)
-  endwhile
-
-  return arglist
-endfunction
-
-function! s:build_config_from_arglist(arglist) abort
-  let config = {}
-  let option = ''
-  for arg in a:arglist
-    if option !=# ''
-      if has_key(config, option)
-        if type(config[option]) == type([])
-          call add(config[option], arg)
-        else
-          let newarg = [config[option], arg]
-          unlet config[option]
-          let config[option] = newarg
-        endif
-      else
-        let config[option] = arg
-      endif
-      let option = ''
-    elseif arg[0] ==# '-'
-      let option = arg[1:]
-    elseif arg[0] ==# '>'
-      if arg[1] ==# '>'
-        let config.append = 1
-        let arg = arg[1:]
-      endif
-      let config.outputter = arg[1:]
-    elseif arg[0] ==# '<'
-      let config.input = arg[1:]
-    else
-      let config.type = arg
-    endif
-  endfor
-  return config
-endfunction
-
-function! s:build_config(config) abort
-  let config = quickrun#config(a:config)
-  if !has_key(config, 'mode')
-    let config.mode = histget(':') =~# "^'<,'>\\s*Q\\%[uickRun]" ? 'v' : 'n'
-  endif
-  if config.mode ==# 'v'
-    let config.region = {
-    \   'first': getpos("'<")[1 :],
-    \   'last':  getpos("'>")[1 :],
-    \   'wise': visualmode(),
-    \ }
-  endif
-
-  let type = {'type': &filetype}
-  for c in [
-  \ 'b:quickrun_config',
-  \ 'type',
-  \ 'g:quickrun_config[config.type]',
-  \ 'g:quickrun#default_config[config.type]',
-  \ 'g:quickrun_config["_"]',
-  \ 'g:quickrun_config["*"]',
-  \ 'g:quickrun#default_config["_"]',
-  \ ]
-    if exists(c)
-      let new_config = eval(c)
-      if 0 <= stridx(c, 'config.type')
-        let config_type = ''
-        while has_key(config, 'type')
-        \   && has_key(new_config, 'type')
-        \   && config.type !=# ''
-        \   && config.type !=# config_type
-          let config_type = config.type
-          call extend(config, new_config, 'keep')
-          let config.type = new_config.type
-          let new_config = exists(c) ? eval(c) : {}
-        endwhile
-      endif
-      call extend(config, new_config, 'keep')
-    endif
-  endfor
-  return config
-endfunction
-
-function! s:build_module(module, configs) abort
-  for config in a:configs
-    if type(config) == type({})
-      for name in keys(a:module.config)
-        for conf in [a:module.kind . '/' . a:module.name . '/' . name,
-        \            a:module.name . '/' . name,
-        \            a:module.kind . '/' . name,
-        \            name]
-          if has_key(config, conf)
-            let val = config[conf]
-            if s:V.Prelude.is_list(a:module.config[name])
-              let a:module.config[name] += s:V.Prelude.is_list(val) ? val : [val]
-            else
-              let a:module.config[name] = val
-            endif
-            unlet val
-            break
-          endif
-        endfor
-      endfor
-    elseif type(config) == type('') && config !=# ''
-      call s:parse_module_option(a:module, config)
-    endif
-    unlet config
-  endfor
-endfunction
-
-function! s:parse_module_option(module, argline) abort
-  let sep = a:argline[0]
-  let args = split(a:argline[1:], '\V' . escape(sep, '\'))
-  let order = copy(a:module.config_order)
-  for arg in args
-    let name = matchstr(arg, '^\w\+\ze=')
-    if !empty(name)
-      let value = matchstr(arg, '^\w\+=\zs.*')
-    elseif len(a:module.config) == 1
-      let [name, value] = [keys(a:module.config)[0], arg]
-    elseif !empty(order)
-      let name = remove(order, 0)
-      let value = arg
-    endif
-    if empty(name)
-      throw 'could not parse the option: ' . arg
-    endif
-    if !has_key(a:module.config, name)
-      throw 'unknown option: ' . name
-    endif
-    if type(a:module.config[name]) == type([])
-      call add(a:module.config[name], value)
-    else
-      let a:module.config[name] = value
-    endif
-  endfor
-endfunction
-
-" Get the text of specified region.
-" region = {
-"   'first': [line, col, off],
-"   'last': [line, col, off],
-"   'wise': 'v' / 'V' / "\<C-v>",
-"   'selection': 'inclusive' / 'exclusive' / 'old'
-" }
-function! s:get_region(region) abort
-  let wise = get(a:region, 'wise', 'V')
-  if wise ==# 'V'
-    return join(getline(a:region.first[0], a:region.last[0]), "\n")
-  endif
-
-  if has_key(a:region, 'selection')
-    let save_sel = &selection
-    let &selection = a:region.selection
-  endif
-  let [reg_save, reg_save_type] = [getreg('"'), getregtype('"')]
-  let [pos_c, pos_s, pos_e] = [getpos('.'), getpos("'<"), getpos("'>")]
-
-  call cursor(a:region.first)
-  execute 'silent normal!' wise
-  call cursor(a:region.last)
-  normal! y
-  let selected = @"
-
-  " Restore '< '>
-  call setpos('.', pos_s)
-  execute 'normal!' wise
-  call setpos('.', pos_e)
-  execute 'normal!' wise
-  call setpos('.', pos_c)
-
-  call setreg('"', reg_save, reg_save_type)
-
-  if exists('save_sel')
-    let &selection = save_sel
-  endif
-  return selected
-endfunction
-
-
 " Register the default modules.  {{{1
 call quickrun#module#load()
-
-
-let &cpo = s:save_cpo
-unlet s:save_cpo

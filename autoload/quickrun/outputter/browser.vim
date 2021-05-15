@@ -2,16 +2,13 @@
 " Author : thinca <thinca+vim@gmail.com>
 " License: zlib License
 
-let s:save_cpo = &cpo
-set cpo&vim
-
 let s:default_name = tempname() . '.html'
 
 let s:outputter = quickrun#outputter#file#new()
 
 let s:outputter.init_file = s:outputter.init
 
-function! s:outputter.validate() abort
+function s:outputter.validate() abort
   call openbrowser#load()
   if !exists('*openbrowser#open')
     throw 'Needs open-browser.vim.'
@@ -36,9 +33,6 @@ function! s:outputter.finish(session) abort
 endfunction
 
 
-function! quickrun#outputter#browser#new() abort
+function quickrun#outputter#browser#new() abort
   return deepcopy(s:outputter)
 endfunction
-
-let &cpo = s:save_cpo
-unlet s:save_cpo

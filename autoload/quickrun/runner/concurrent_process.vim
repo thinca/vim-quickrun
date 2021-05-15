@@ -2,9 +2,6 @@
 " Author:  ujihisa <ujihisa at gmail com>
 " License: zlib License
 
-let s:save_cpo = &cpo
-set cpo&vim
-
 let s:runner = {
 \   'config': {
 \     'load': 'load %s',
@@ -19,13 +16,13 @@ let s:CP = g:quickrun#V.import('ConcurrentProcess')
 augroup plugin-quickrun-concurrent-process
 augroup END
 
-function! s:runner.validate() abort
+function s:runner.validate() abort
   if !s:CP.is_available()
     throw 'Needs vimproc.'
   endif
 endfunction
 
-function! s:runner.run(commands, input, session) abort
+function s:runner.run(commands, input, session) abort
   let type = a:session.config.type
 
   let message = a:session.build_command(self.config.load)
@@ -45,7 +42,7 @@ function! s:runner.run(commands, input, session) abort
           \ ['*read*', 'x', self.config.prompt]])
   else
     call s:CP.shutdown(label)
-    call s:M.warn("Previous process was still running. Restarted.")
+    call s:M.warn('Previous process was still running. Restarted.')
     " TODO be dry, or use ConcurrentProcess' new feature
     let label = s:CP.of(cmd, '', [
           \ ['*read*', '_', self.config.prompt]])
@@ -66,12 +63,12 @@ function! s:runner.run(commands, input, session) abort
   let &updatetime = 50
 endfunction
 
-function! s:receive(key) abort
+function s:receive(key) abort
   if s:B.is_cmdwin()
     return 0
   endif
 
-  let session = quickrun#session(a:key)
+  let session = quickrun#session#get(a:key)
   let label = s:CP.of(session._cmd, '', [['*read*', '_', session._prompt]])
   let [out, err] = s:CP.consume(label, 'x')
   call session.output(out . (err ==# '' ? '' : printf('!!!%s!!!', err)))
@@ -84,7 +81,7 @@ function! s:receive(key) abort
   return 0
 endfunction
 
-function! s:runner.sweep() abort
+function s:runner.sweep() abort
   if has_key(self, '_autocmd')
     autocmd! plugin-quickrun-concurrent-process
   endif
@@ -93,9 +90,6 @@ function! s:runner.sweep() abort
   endif
 endfunction
 
-function! quickrun#runner#concurrent_process#new() abort
+function quickrun#runner#concurrent_process#new() abort
   return deepcopy(s:runner)
 endfunction
-
-let &cpo = s:save_cpo
-unlet s:save_cpo

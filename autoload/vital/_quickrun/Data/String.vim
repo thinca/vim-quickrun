@@ -196,15 +196,16 @@ function! s:_split_by_wcswidth(body, x) abort
 endfunction
 
 function! s:trim(str) abort
-  return matchstr(a:str,'^\s*\zs.\{-}\ze\s*$')
+  return substitute(a:str,'\%#=1^[[:space:]]\+\|[[:space:]]\+$', '', 'g')
 endfunction
 
 function! s:trim_start(str) abort
-  return matchstr(a:str,'^\s*\zs.\{-}$')
+  return substitute(a:str,'\%#=1^[[:space:]]\+', '', '')
 endfunction
 
 function! s:trim_end(str) abort
-  return matchstr(a:str,'^.\{-}\ze\s*$')
+  let i = match(a:str, '\%#=2[[:space:]]*$')
+  return i is# 0 ? '' : a:str[: i-1]
 endfunction
 
 function! s:wrap(str,...) abort
@@ -497,50 +498,7 @@ function! s:strwidthpart_reverse(str, width) abort
   return matchstr(str, '\%>' . (vcol < 0 ? 0 : vcol) . 'v.*')
 endfunction
 
-if v:version >= 703
-  " Use builtin function.
-  let s:wcswidth = function('strwidth')
-else
-  function! s:wcswidth(str) abort
-    if a:str =~# '^[\x00-\x7f]*$'
-      return strlen(a:str)
-    endif
-    let mx_first = '^\(.\)'
-    let str = a:str
-    let width = 0
-    while 1
-      let ucs = char2nr(substitute(str, mx_first, '\1', ''))
-      if ucs == 0
-        break
-      endif
-      let width += s:_wcwidth(ucs)
-      let str = substitute(str, mx_first, '', '')
-    endwhile
-    return width
-  endfunction
-
-  " UTF-8 only.
-  function! s:_wcwidth(ucs) abort
-    let ucs = a:ucs
-    if (ucs >= 0x1100
-          \  && (ucs <= 0x115f
-          \  || ucs == 0x2329
-          \  || ucs == 0x232a
-          \  || (ucs >= 0x2e80 && ucs <= 0xa4cf
-          \      && ucs != 0x303f)
-          \  || (ucs >= 0xac00 && ucs <= 0xd7a3)
-          \  || (ucs >= 0xf900 && ucs <= 0xfaff)
-          \  || (ucs >= 0xfe30 && ucs <= 0xfe6f)
-          \  || (ucs >= 0xff00 && ucs <= 0xff60)
-          \  || (ucs >= 0xffe0 && ucs <= 0xffe6)
-          \  || (ucs >= 0x20000 && ucs <= 0x2fffd)
-          \  || (ucs >= 0x30000 && ucs <= 0x3fffd)
-          \  ))
-      return 2
-    endif
-    return 1
-  endfunction
-endif
+let s:wcswidth = function('strwidth')
 
 function! s:remove_ansi_sequences(text) abort
   return substitute(a:text, '\e\[\%(\%(\d\+;\)*\d\+\)\?[mK]', '', 'g')

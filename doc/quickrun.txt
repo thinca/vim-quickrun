@@ -47,7 +47,7 @@ INTRODUCTION					*quickrun-introduction*
 It provides |:QuickRun| for it.
 
 Requirement:
-- Vim 7.2 or later
+- Vim 8.1 or later
 
 Latest Version:
 https://github.com/thinca/vim-quickrun
@@ -111,7 +111,7 @@ COMMANDS					*quickrun-commands*
 	>{output} is abbreviation to -output {output}
 	>>{output} is abbreviation to -append 1 -output {output}
 
-	|:Quickrun| can take |:range|.
+	|:QuickRun| can take |:range|.
 	If it was not given, |:QuickRun| treats whole lines.
 	If you specify '<,'> and do not specify -mode
 	(|quickrun-option-mode|), target is selected text in visual mode.  And
@@ -128,15 +128,18 @@ quickrun#run([{config}])			*quickrun#run()*
 
 quickrun#new([{config}])			*quickrun#new()*
 	Creates a {session}(|quickrun-session|).
-
-quickrun#config({line})				*quickrun#config()*
-	Creates {config} from argument line of |:QuickRun|.
+	The config that built from setting variables(|quickrun-settings|) is
+	applied to this.
 
 quickrun#operator({wise})			*quickrun#operator()*
 	A function for 'operatorfunc'.
 	e.g.: >
 	nnoremap <silent> <C-CR> :<C-u>set opfunc=quickrun#operator<CR>g@ip
 <	This runs current paragraph (|ip|) with <C-CR>.
+
+quickrun#config#normalize({config})		*quickrun#config#normalize()*
+	Converts the argument line of |:QuickRun| or list of configs to
+	{config} represented by a single dictionary.
 
 						*quickrun#module#register()*
 quickrun#module#register({module} [, {overwrite}])
@@ -163,18 +166,34 @@ quickrun#module#load([{overwrite}])		*quickrun#module#load()*
 	Loads the modules on 'runtimepath'.  This is called by
 	"autoload/quickrun.vim" automatically.
 
-						*quickrun#session()*
-quickrun#session({key} [, {func-name} [, {args} ...]])
-	This is used in a module.  This fetches the current running session
-	if you skipped {func-name}.  This calls the session function with
-	arguments {args} if you specified {func-name}.
+quickrun#session#new([{config}])		*quickrun#session#new()*
+	Creates a {session}(|quickrun-session|).
 
-quickrun#sweep_sessions()			*quickrun#sweep_sessions()*
+			
+quickrun#session#get({key})			*quickrun#session#get()*
+	This fetches the current running session.
+
+						*quickrun#session#call()*
+quickrun#session#call({key} [, {func-name} [, {args} ...]])
+	If there is an ongoing session, call that function.
+
+quickrun#session#sweep()			*quickrun#session#sweep()*
 	Stops the sessions under execution.  This is called before new
 	execution.  When execution doesn't end, you can call this by manually.
 
-quickrun#is_running()				*quickrun#is_running()*
+quickrun#session#exists()			*quickrun#session#exists()*
 	Checks any session is running.  Returns non-zero when running.
+
+The following functions are deprecated.  These will be removed at next
+version.
+quickrun#config({line})
+	Use |quickrun#config#normalize()| instead.
+quickrun#session({key} [, {func-name} [, {args} ...]])
+	Use |quickrun#session#get()| or |quickrun#session#call()| instead.
+quickrun#sweep_sessions()
+	Use |quickrun#session#sweep()| instead.
+quickrun#is_running()
+	Use |quickrun#session#exists()| instead.
 
 
 ------------------------------------------------------------------------------
@@ -188,14 +207,6 @@ KEY MAPPINGS					*quickrun-key-mappings*
 			Execute and display the result for current buffer.
 			This is normally same as |:QuickRun|
 			without arguments.
-
-					*g:quickrun_no_default_key_mappings*
-Following key mappings will NOT be defined if it's already mapped,
-or |g:quickrun_no_default_key_mappings| has been set to 1.
-
-{lhs}			{rhs}
---------		-----------------------------
-<Leader>r		<Plug>(quickrun)
 
 
 
@@ -246,6 +257,11 @@ outputter				*quickrun-option-outputter*
 runner					*quickrun-option-runner*
 			Specifies a runner.  See the details in
 			|quickrun-module-runner|.
+
+hooks					*quickrun-option-hooks*
+			Specifies a runner.  See the details in
+			|quickrun-module-hook|.  This is passed in {config}
+			when quickrun is invoked from function.
 
 mode					*quickrun-option-mode*
 			This value is one of "n", "v", "o".
@@ -445,16 +461,16 @@ default.  NOTE: Everything except for "system" can be unstable.
   milliseconds, it shows the result immediately.
   Option ~
   runner/vimproc/sleep			Default: 50
-	Waits specified times in milliseconds.  This is useful to avoid polling
-	by 'updatetime' when program will stop immediately.
+	Waits specified times in milliseconds.  This is useful to avoid
+	polling by 'updatetime' when program will stop immediately.
   runner/vimproc/updatetime		Default: 0
 	Changes 'updatetime' to the value temporary.  Stays same if this is 0.
   runner/vimproc/read_timeout		Default: 100
 	The time to read at one time. (milliseconds)
   runner/vimproc/pipe_status_index	Default: -1
 	If the command contains a pipe, select the index of sub-command that
-	sets {exit-code} to |quickrun-session.exit_code|. The first command is 0
-	and the last command is -1.
+	sets {exit-code} to |quickrun-session.exit_code|. The first command is
+	0 and the last command is -1.
 	If this value is the string "pipefail", the last non-zero {exit-code}
 	will be used. If all {exit-codes} are zero, 0 is used.
 
@@ -543,20 +559,20 @@ available by default.
   quickrun opens output buffer and displays to the output buffer.  If output
   buffer already exists, quickrun uses it.
   Option ~
-  outputter/buffer/name			Default: "[quickrun output]"
+  outputter/buffer/bufname		Default: "quickrun://output"
 	The buffer name.
   outputter/buffer/filetype		Default: "quickrun"
 	Sets this value to 'filetype' of the buffer.
   outputter/buffer/append		Default: 0
-	Appends if it's 1.
-  outputter/buffer/split
-	Default: '%{winwidth(0) * 2 < winheight(0) * 5 ? "" : "vertical"}'
+	Appends if it's TRUE.
+  outputter/buffer/opener
+	Default: '%{winwidth(0) * 2 < winheight(0) * 5 ? "new" : "vnew"}'
 
-	Specifies a sub-command to open a buffer for the output.  |quickrun|
-	inserts this before |:split| command when it opens a buffer.
+	Specifies an Ex command to open a buffer for the output.  |quickrun|
+	passes the buffer name to this Ex command when it opens a buffer.
   outputter/buffer/into			Default: 0
-	Moves cursor to the output buffer if this isn't 0.
-  outputter/buffer/running_mark		Default: ':-)'
+	Moves cursor to the output buffer if this is TRUE.
+  outputter/buffer/running_mark		Default: 'running...'
 	If this value is not an empty string, |quickrun| displays this string
 	to output buffer while it's running.
   outputter/buffer/close_on_empty	Default: 0
@@ -565,6 +581,13 @@ available by default.
   Hook ~
   outputter_buffer_opened
 	When the output buffer is opened.
+
+- "outputter/buffer_legacy"	*quickrun-module-outputter/buffer_legacy*
+  {Deprecated}
+  This is an old version of outputter/buffer.  You should use current version
+  of outputter/buffer instead.  You can use this when something wrong with
+  current outputter/buffer.
+  This will be removed in the future version.
 
 - "outputter/message"			*quickrun-module-outputter/message*
   Outputs on |messages|.
@@ -738,6 +761,13 @@ autoload#quickrun#{module-kind}#{module-name}#new() function in
 autoload/quickrun/{module-kind}/{module-name}.vim in 'runtimepath'.  That'll
 be loaded when quickrun is loaded for the first time in the process.
 
+It is also possible to use without registering the module.
+In that case, please pass the module dictionary directly to "runner",
+"outputter", or "hooks" of {config} of the function that executes quickrun
+(|quickrun#run()| etc.).
+You can pass the arguments as a List like [{module}, {arg1}, {arg2}].
+
+
 ------------------------------------------------------------------------------
 SESSION					*quickrun-session*
 
@@ -762,7 +792,7 @@ session.output({data})			*quickrun-session.output()*
 
 session.continue()			*quickrun-session.continue()*
 	Calls when the runner cannot complete the process at the time.
-	Continues if you give {key} to |quickrun#session()|.
+	Continues if you give {key} to |quickrun#session#get()|.
 
 session.finish([{exit-code}])		*quickrun-session.finish()*
 	Calls when the runner finished the process.  Unless {exit-code} is
@@ -771,6 +801,11 @@ session.finish([{exit-code}])		*quickrun-session.finish()*
 session.exit_code			*quickrun-session.exit_code*
 	You can refer this only after the process finished.  This is the value
 	of |quickrun-session.finish()|.
+
+session.tempname([{name}])		*quickrun-session.tempname()*
+	Same to |tempname()| but records the result, and delete that paths
+	when |quickrun-session.sweep()| is called.
+	If {name} is specified, records {name} for deleting.
 
 session.sweep()				*quickrun-session.sweep()*
 	This is a cleaning up.  This deletes the paths registered by
@@ -797,10 +832,10 @@ each modules, use attributes which name begin with "_" to avoid conflicts.
 Below common attributes among all modules.
 
 module.kind				*quickrun-module.kind*
-	Required.  Kind of the module.
+	Kind of the module.  Required if you register the module.
 
 module.name				*quickrun-module.name*
-	Required.  Name of the module.
+	Name of the module.  Required if you register the module.
 
 module.config				*quickrun-module.config*
 	This is a dictionary for the module config default values.  The items

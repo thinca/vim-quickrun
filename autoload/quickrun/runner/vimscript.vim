@@ -2,12 +2,9 @@
 " Author : thinca <thinca+vim@gmail.com>
 " License: zlib License
 
-let s:save_cpo = &cpo
-set cpo&vim
-
 let s:runner = {}
 
-function! s:runner.run(commands, input, session) abort
+function s:runner.run(commands, input, session) abort
   let code = 0
   for cmd in a:commands
     let [result, code] = s:execute(cmd)
@@ -19,7 +16,7 @@ function! s:runner.run(commands, input, session) abort
   return code
 endfunction
 
-function! s:execute(cmd) abort
+function s:execute(cmd) abort
   let result = ''
   let error = 0
   let temp = tempname()
@@ -48,9 +45,6 @@ function! s:execute(cmd) abort
 endfunction
 
 
-function! quickrun#runner#vimscript#new() abort
+function quickrun#runner#vimscript#new() abort
   return deepcopy(s:runner)
 endfunction
-
-let &cpo = s:save_cpo
-unlet s:save_cpo

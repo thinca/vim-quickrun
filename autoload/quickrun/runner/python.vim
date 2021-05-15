@@ -2,10 +2,6 @@
 " Author : thinca <thinca+vim@gmail.com>
 " License: zlib License
 
-let s:save_cpo = &cpo
-set cpo&vim
-
-
 let s:python_loaded = 0
 if has('python')
   try
@@ -31,14 +27,9 @@ class QuickRun(threading.Thread):
         except:
             pass
         finally:
-            vim.eval("quickrun#session(%s, 'finish', %s)" % (self.key, ret))
+            vim.eval("quickrun#session#call(%s, 'finish', %s)" % (self.key, ret))
 
     def execute(self, cmd):
-        if re.match('^\s*:', cmd):
-            vim.eval("quickrun#session(%s, 'output', quickrun#execute(%s))" %
-                (self.key, self.vimstr(cmd)))
-            return 0
-
         p = subprocess.Popen(cmd,
                              stdin=subprocess.PIPE,
                              stdout=subprocess.PIPE,
@@ -57,7 +48,7 @@ class QuickRun(threading.Thread):
     def output(self, fp):
         try:
             data = fp.read()
-            vim.eval("quickrun#session(%s, 'output', %s)" %
+            vim.eval("quickrun#session#call(%s, 'output', %s)" %
               (self.key, self.vimstr(data)))
         except:
             pass
@@ -81,7 +72,7 @@ endif
 
 let s:runner = {}
 
-function! s:runner.validate() abort
+function s:runner.validate() abort
   if !has('python')
     throw 'Needs +python feature.'
   elseif !s:python_loaded
@@ -89,7 +80,7 @@ function! s:runner.validate() abort
   endif
 endfunction
 
-function! s:runner.run(commands, input, session) abort
+function s:runner.run(commands, input, session) abort
   let key = string(a:session.continue())
   python QuickRun(vim.eval('a:commands'),
   \               vim.eval('key'),
@@ -97,10 +88,6 @@ function! s:runner.run(commands, input, session) abort
 endfunction
 
 
-function! quickrun#runner#python#new() abort
+function quickrun#runner#python#new() abort
   return deepcopy(s:runner)
 endfunction
-
-
-let &cpo = s:save_cpo
-unlet s:save_cpo

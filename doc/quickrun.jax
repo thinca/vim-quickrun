@@ -47,7 +47,7 @@ License: zlib License
 実行するためのコマンド |:QuickRun| が提供されます。
 
 要件:
-- Vim 7.2 以降
+- Vim 8.1 以降
 
 最新版:
 https://github.com/thinca/vim-quickrun
@@ -126,15 +126,18 @@ quickrun#run([{config}])			*quickrun#run()*
 
 quickrun#new([{config}])			*quickrun#new()*
 	{session}(|quickrun-session|) を生成します。
-
-quickrun#config({line})				*quickrun#config()*
-	|:QuickRun| の引数文字列から {config} を生成します。
+	これには変数(|quickrun-settings|)から構築した {config} が適用されま
+	す。
 
 quickrun#operator({wise})			*quickrun#operator()*
 	'operatorfunc' に対して設定するための関数です。
 	例えば、 >
 	nnoremap <silent> <C-CR> :<C-u>set opfunc=quickrun#operator<CR>g@ip
 <	これは、<C-CR> で現在の段落(|ip|)を実行します。
+
+quickrun#config#normalize({config})		*quickrun#config#normalize()*
+	|:QuickRun| の引数文字列や config のリストを単一の辞書の {config} に変
+	換します。
 
 						*quickrun#module#register()*
 quickrun#module#register({module} [, {overwrite}])
@@ -161,20 +164,34 @@ quickrun#module#load([{overwrite}])		*quickrun#module#load()*
 	'runtimepath' 上にあるモジュールをロードします。これは
 	"autoload/quickrun.vim" がロードされる際に自動で呼ばれます。
 
-						*quickrun#session()*
-quickrun#session({key} [, {func-name} [, {args} ...]])
-	モジュール内で使用されます。
-	{func-name} を省略すると、継続中のセッションを取得します。
-	{func-name} を指定すると、{args} を引数にしてセッションの関数を呼び出
-	します。
+quickrun#session#new({config})			*quickrun#session#new()*
+	{session}(|quickrun-session|) を生成します。
 
-quickrun#sweep_sessions()			*quickrun#sweep_sessions()*
+quickrun#session#get({key})			*quickrun#session#get()*
+	継続中のセッションを取得します。
+
+						*quickrun#session#call()*
+quickrun#session#call({key}, {func-name} [, {args} ...])
+	継続中のセッションが存在していれば、その関数を呼び出します。
+
+quickrun#session#sweep()			*quickrun#session#sweep()*
 	実行中のセッションを強制的に終了します。新しく実行を行う前に呼び出され
 	ます。実行が終わらない場合は、手動で呼び出すこともできます。
 
-quickrun#is_running()				*quickrun#is_running()*
+quickrun#session#exists()			*quickrun#session#exists()*
 	いずれかのセッションが実行中かどうかを調べます。実行中の場合は非 0 を
 	返します。
+
+以下の関数は非推奨です。次のバージョンで削除される予定です。
+quickrun#config({line})
+	代わりに |quickrun#config#normalize()| を使用してください。
+quickrun#session({key} [, {func-name} [, {args} ...]])
+	代わりに |quickrun#session#get()| か |quickrun#session#call()| を使用
+	してください。
+quickrun#sweep_sessions()
+	代わりに |quickrun#session#sweep()| を使用してください。
+quickrun#is_running()
+	代わりに |quickrun#session#exists()| を使用してください。
 
 
 ------------------------------------------------------------------------------
@@ -188,14 +205,6 @@ quickrun#is_running()				*quickrun#is_running()*
 	現在のバッファに適したコマンドを実行して結果を別ウィンドウに表示しま
 	す。
 	これは単純に |:QuickRun| コマンドを引数なしで実行するのと同じです。
-
-					*g:quickrun_no_default_key_mappings*
-以下のキーマッピングは、既に定義されていたり
-g:quickrun_no_default_key_mappings に 1 が設定されていると定義されません。
-
-{lhs}			{rhs}
---------		-----------------------------
-<Leader>r		<Plug>(quickrun)
 
 
 
@@ -242,6 +251,11 @@ outputter				*quickrun-option-outputter*
 runner					*quickrun-option-runner*
 	runner を指定します。詳細は |quickrun-module-runner| を参照してくださ
 	い。
+
+hooks					*quickrun-option-hooks*
+	hook のリストを指定します。詳細は |quickrun-module-hook| を参照してく
+	ださい。これはコマンドラインからではなく関数から起動する場合に
+	{config} に渡されます。
 
 mode					*quickrun-option-mode*
 	実行モードです。n,v のいずれかを指定します。これは範囲をどのように取得
@@ -452,10 +466,10 @@ NOTE: "system" 以外は不安定な場合があります。
 
 - "runner/concurrent_process"	*quickrun-module-runner/concurrent_process*
   {|vimproc| が必要}
-  |vimproc| と|Vital.ConcurrentProcess|を使ってコマンドをバックグラウンドで実行
-  し、かつ二回目以降の実行は、そのプロセスを再利用します。初回起動が遅いプログ
-  ラミング言語処理系付属 REPL、たとえば JVM 上で動作する言語処理系などで便利で
-  す。
+  |vimproc| と|Vital.ConcurrentProcess|を使ってコマンドをバックグラウンドで実
+  行し、かつ二回目以降の実行は、そのプロセスを再利用します。初回起動が遅いプロ
+  グラミング言語処理系付属 REPL、たとえば JVM 上で動作する言語処理系などで便利
+  です。
   各実行の完了を "runner/vimproc"同様、|CursorHold| と |CursorHoldI| イベント
   を使って検査します。
 
@@ -533,28 +547,34 @@ outputter は結果の出力を行うモジュールです。
   出力専用バッファを開いてそこへ出力します。このバッファは同じものが再利用され
   ます。
   オプション ~
-  outputter/buffer/name			デフォルト: "[quickrun output]"
+  outputter/buffer/bufname		デフォルト: "quickrun://output"
 	バッファ名です。
   outputter/buffer/filetype		デフォルト: "quickrun"
 	バッファに設定される 'filetype' の値です。
   outputter/buffer/append		デフォルト: 0
-	1 の場合は追記を行います。
-  outputter/buffer/split
-	デフォルト: '%{winwidth(0) * 2 < winheight(0) * 5 ? "" : "vertical"}'
-	出力専用バッファを開く際の補助コマンドを指定します。バッファを開く際に
-	|:split| コマンドの前に挿入されます。
+	TRUE の場合は追記を行います。
+  outputter/buffer/opener
+	デフォルト: '%{winwidth(0) * 2 < winheight(0) * 5 ? "new" : "vnew"}'
+
+	出力専用バッファを開くための Ex コマンドです。
   outputter/buffer/into			デフォルト: 0
-	0 以外を指定すると、結果が出た際に出力専用バッファへカーソルを移動しま
+	TRUE を指定すると、結果が出た際に出力専用バッファへカーソルを移動しま
 	す。
-  outputter/buffer/running_mark		デフォルト: ':-)'
+  outputter/buffer/running_mark		デフォルト: 'running...'
 	この値が空文字列でない場合、実行中にこの文字列が出力先に表示されます。
 	表示は実行完了後に削除されます。
-  outputter/buffer/close_on_empty	Default: 0
+  outputter/buffer/close_on_empty	デフォルト: 0
 	終了時にバッファが空だった場合、自動的にバッファを閉じます。
 
   フック ~
   outputter_buffer_opened
 	出力バッファが開いた時。
+
+- "outputter/buffer_legacy"	*quickrun-module-outputter/buffer_legacy*
+  {非推奨}
+  過去の outputter/buffer です。これの代わりに最新の outputter/buffer を使用し
+  てください。最新版に問題がある場合にはこちらを使用できます。
+  これは将来のバージョンで削除されます。
 
 - "outputter/message"			*quickrun-module-outputter/message*
   |messages| に出力します。
@@ -731,6 +751,12 @@ hook は特定のポイントで追加の処理を行うモジュールです。
 作成し、autoload#quickrun#{module-kind}#{module-name}#new() 関数を作っておく
 と、その戻り値が quickrun の初回ロード時に自動的に登録されます。
 
+モジュールを登録せずに利用することも可能です。
+その場合、quickrun を実行する関数(|quickrun#run()| 等)の {config} の
+"runner" や "outputter", "hooks" にモジュールの辞書を直接渡してください。
+[{module}, {arg1}, {arg2}] のようなリストを渡すことで、引数を渡すことも可能で
+す。
+
 ------------------------------------------------------------------------------
 セッション				*quickrun-session*
 
@@ -754,8 +780,8 @@ session.output({data})			*quickrun-session.output()*
 
 session.continue()			*quickrun-session.continue()*
 	runner がその場で実行を完了できない時に呼び出します。{key} を返しま
-	す。|quickrun#session()| に {key} を渡すことで継続中の {session} を取
-	得できるので、これを使って実行を継続します。
+	す。|quickrun#session#get()| に {key} を渡すことで継続中の {session}
+	を取得できるので、これを使って実行を継続します。
 
 session.finish([{exit-code}])		*quickrun-session.finish()*
 	runner が実行が全て完了した際に呼び出します。{exit-code} が省略された
@@ -794,10 +820,10 @@ session.config				*quickrun-session.config*
 以下は全モジュールで共通の属性です。
 
 module.kind				*quickrun-module.kind*
-	必須です。モジュールの種類です。
+	モジュールの種類です。登録する場合は必須です。
 
 module.name				*quickrun-module.name*
-	必須です。モジュールの名前です。
+	モジュールの名前です。登録する場合は必須です。
 
 module.config				*quickrun-module.config*
 	これは辞書で、このモジュールが取る config のデフォルト値です。ここで定
@@ -995,6 +1021,12 @@ pandocを使用してmarkdownをhtmlにしてブラウザで開く (要|open-bro
 
 ==============================================================================
 更新履歴					*quickrun-changelog*
+
+develop
+	- 要求する Vim のバージョンを 8.1 に更新。
+	- 今回のバージョンは多くの非互換の変更を含みます。
+	  - session 系の関数の名前を変更。
+	  - デフォルトのキーマッピング(<Leader>r)を削除。
 
 0.8.0	2019-07-30
 	- |quickrun-module-runner/job| を追加。

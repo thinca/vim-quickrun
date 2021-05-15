@@ -2,10 +2,6 @@
 " Author : thinca <thinca+vim@gmail.com>
 " License: zlib License
 
-let s:save_cpo = &cpo
-set cpo&vim
-
-
 let s:is_win = has('win32') || has('win64')
 let s:runner = {
 \   'config': {
@@ -13,7 +9,7 @@ let s:runner = {
 \   }
 \ }
 
-function! s:runner.validate() abort
+function s:runner.validate() abort
   if !has('clientserver') || v:servername ==# ''
     throw 'Needs +clientserver feature.'
   endif
@@ -22,21 +18,19 @@ function! s:runner.validate() abort
   endif
 endfunction
 
-function! s:runner.run(commands, input, session) abort
+function s:runner.run(commands, input, session) abort
   let selfvim = s:is_win ? 'vim.exe' :
   \             !empty($_) ? $_ : v:progname
 
   let key = a:session.continue()
   let outfile = a:session.tempname()
   let readfile = printf('join(readfile(%s, 1), "\n")', string(outfile))
-  let expr = printf('quickrun#session(%s, "output", %s) + ' .
-  \                 'quickrun#session(%s, "finish")',
+  let expr = printf('quickrun#session#call(%s, "output", %s) + ' .
+  \                 'quickrun#session#call(%s, "finish")',
   \                 string(key), readfile, string(key))
   let cmds = a:commands
   let callback = s:make_command(self,
   \        [selfvim, '--servername', v:servername, '--remote-expr', expr])
-
-  call map(cmds, 's:conv_vim2remote(self, selfvim, v:val)')
 
   let in = a:input
   if in !=# ''
@@ -82,21 +76,12 @@ function! s:runner.run(commands, input, session) abort
   endif
 endfunction
 
-function! s:conv_vim2remote(runner, selfvim, cmd) abort
-  if a:cmd !~# '^\s*:'
-    return a:cmd
-  endif
-  return s:make_command(a:runner, [a:selfvim,
-  \       '--servername', v:servername, '--remote-expr',
-  \       printf('quickrun#execute(%s)', string(a:cmd))])
-endfunction
-
-function! s:make_command(runner, args) abort
+function s:make_command(runner, args) abort
   return join([shellescape(a:args[0])] +
   \           map(a:args[1 :], 's:shellescape(v:val)'), ' ')
 endfunction
 
-function! s:shellescape(str) abort
+function s:shellescape(str) abort
   if s:is_cmd_exe()
     return '^"' . substitute(substitute(substitute(a:str,
     \             '[&|<>()^"%]', '^\0', 'g'),
@@ -106,14 +91,11 @@ function! s:shellescape(str) abort
   return shellescape(a:str)
 endfunction
 
-function! s:is_cmd_exe() abort
+function s:is_cmd_exe() abort
   return &shell =~? 'cmd\.exe'
 endfunction
 
 
-function! quickrun#runner#remote#new() abort
+function quickrun#runner#remote#new() abort
   return deepcopy(s:runner)
 endfunction
-
-let &cpo = s:save_cpo
-unlet s:save_cpo

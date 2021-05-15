@@ -1,0 +1,393 @@
+Describe outputter/buffer
+  function s:session(outputter_config, result, ...) abort
+    let outputter_config = extend({'running_mark': ''}, a:outputter_config)
+    let config = {
+    \   'runner': [g:PuppetRunner, {'result': a:result}],
+    \   'outputter': ['buffer', outputter_config],
+    \   'exec': '',
+    \ }
+    if a:0
+      call extend(config, a:1)
+    endif
+    return quickrun#session#new(config)
+  endfunction
+
+  After each
+    silent! bwipeout quickrun://output
+  End
+
+  It opens a result buffer and outputs the result to it
+    let result = ['foo', "bar\nbuz", '', "hoge\npiyo"]
+    let session = s:session({}, result)
+    call session.run()
+    Assert True(bufexists('quickrun://output'))
+    let bufnr = bufnr('quickrun://output')
+    Assert Equal(getbufline(bufnr, 1, '$'), ['foo'])
+    sleep 1m
+    Assert Equal(getbufline(bufnr, 1, '$'), ['foobar', 'buz'])
+    sleep 1m
+    Assert Equal(getbufline(bufnr, 1, '$'), ['foobar', 'buz'])
+    sleep 1m
+    Assert Equal(getbufline(bufnr, 1, '$'), ['foobar', 'buzhoge', 'piyo'])
+  End
+
+  Describe opening a buffer
+    Context when there are no target buffer
+      It opens a new window with a new buffer
+        Assert False(bufexists('quickrun://output'))
+        let session = s:session({}, [])
+        call session.run()
+        Assert True(bufexists('quickrun://output'))
+        let bufnr = bufnr('quickrun://output')
+        Assert Equal(len(win_findbuf(bufnr)), 1)
+      End
+    End
+
+    Context when there is alerady a target buffer
+      Before each
+        let session = s:session({}, ['foo'])
+        call session.run()
+      End
+
+      Context when the buffer is opend
+        It reuses
+          let session = s:session({}, ['bar'])
+          call session.run()
+          let bufnr = bufnr('quickrun://output')
+          Assert Equal(len(win_findbuf(bufnr)), 1)
+          Assert Equal(getbufline(bufnr, 1, '$'), ['bar'])
+        End
+      End
+
+      Context when the buffer is not opened
+        Before each
+          let bufnr = bufnr('quickrun://output')
+          for winid in win_findbuf(bufnr)
+            call win_execute(winid, 'noautocmd close')
+          endfor
+        End
+
+        It opens a new window with an existed buffer
+          Assert True(bufexists('quickrun://output'))
+          let bufnr = bufnr('quickrun://output')
+          let session = s:session({}, ['bar'])
+          call session.run()
+          Assert True(bufexists('quickrun://output'))
+          Assert Equal(bufnr('quickrun://output'), bufnr)
+          Assert Equal(len(win_findbuf(bufnr)), 1)
+          Assert Equal(getbufline(bufnr, 1, '$'), ['bar'])
+        End
+      End
+    End
+
+    Context when cmdwin is opened
+      " TODO:
+      " How to open a cmdwin from Vim script?
+    End
+
+    Describe hook
+      Context when a buffer is opened
+        It invokes 'outputter_buffer_opened' hook
+          let hook = {
+          \   'on_outputter_buffer_opened':
+          \     { session -> extend(session, {'hook_called': 1}) }
+          \ }
+          let result = ['foo']
+
+          let session = s:session({}, result, {'hooks': [hook]})
+          let session.hook_called = 0
+          Assert False(session.hook_called)
+          call session.run()
+          Assert True(session.hook_called)
+        End
+      End
+
+      Context when a buffer is already opened
+        It does not invoke 'outputter_buffer_opened' hook
+          let result = ['foo']
+
+          " Open the result buffer
+          let session = s:session({}, result)
+          call session.run()
+
+          let hook = {
+          \   'on_outputter_buffer_opened':
+          \     { session -> extend(session, {'hook_called': 1}) }
+          \ }
+
+          let session = s:session({}, result, {'hooks': [hook]})
+          let session.hook_called = 0
+          Assert False(session.hook_called)
+          call session.run()
+          Assert False(session.hook_called)
+        End
+      End
+    End
+  End
+
+  Describe scrolling a window with the result
+    It scrolls to the tail
+      let result = ["1\n2\n3\n", "4\n5\n", '']
+      let session = s:session({'opener': '3new'}, result)
+      call session.run()
+      let bufnr = bufnr('quickrun://output')
+      let winid = win_findbuf(bufnr)[0]
+      call win_gotoid(winid)
+      Assert Equal(line('.'), 4)
+      sleep 1m
+      Assert Equal(line('.'), 6)
+      sleep 1m
+      Assert Equal(line('.'), 1)
+
+      let session = s:session({'opener': '3new'}, ["1\n2\n3\n"])
+      call session.run()
+      sleep 1m
+      Assert Equal(line('.'), 1)
+    End
+  End
+
+  Describe adjusting fileformat
+    Context when there is no line breaks
+      It sets 'fileformat' to `unix`
+        let result = ['foobarbuz']
+        let session = s:session({}, result)
+        call session.run()
+        Assert True(bufexists('quickrun://output'))
+        let bufnr = bufnr('quickrun://output')
+        Assert Equal(getbufvar(bufnr, '&fileformat'), 'unix')
+        Assert Equal(getbufline(bufnr, 1, '$'), ['foobarbuz'])
+      End
+    End
+
+    Context when all lines are ended by LF
+      It sets 'fileformat' to `unix`
+        let result = ["foo\nbar\nbuz\n"]
+        let session = s:session({}, result)
+        call session.run()
+        Assert True(bufexists('quickrun://output'))
+        let bufnr = bufnr('quickrun://output')
+        Assert Equal(getbufvar(bufnr, '&fileformat'), 'unix')
+        Assert Equal(getbufline(bufnr, 1, '$'), ['foo', 'bar', 'buz', ''])
+      End
+    End
+
+    Context when all lines are ended by CRLF
+      It sets 'fileformat' to `dos`
+        let result = ["foo\r\nbar\r\nbuz\r\n"]
+        let session = s:session({}, result)
+        call session.run()
+        Assert True(bufexists('quickrun://output'))
+        let bufnr = bufnr('quickrun://output')
+        Assert Equal(getbufvar(bufnr, '&fileformat'), 'dos')
+        Assert Equal(getbufline(bufnr, 1, '$'), ['foo', 'bar', 'buz', ''])
+      End
+    End
+
+    Context when all lines are ended by CR
+      It sets 'fileformat' to `mac`
+        let result = ["foo\rbar\rbuz\r"]
+        let session = s:session({}, result)
+        call session.run()
+        Assert True(bufexists('quickrun://output'))
+        let bufnr = bufnr('quickrun://output')
+        Assert Equal(getbufvar(bufnr, '&fileformat'), 'mac')
+        Assert Equal(getbufline(bufnr, 1, '$'), ['foo', 'bar', 'buz', ''])
+      End
+    End
+
+    Context when end of lines are mixed by LF and CRLF
+      It sets 'fileformat' to unix and ^M at the end of CRLF line
+        let result = ["foo\nbar\r\nbuz\n"]
+        let session = s:session({}, result)
+        call session.run()
+        Assert True(bufexists('quickrun://output'))
+        let bufnr = bufnr('quickrun://output')
+        Assert Equal(getbufvar(bufnr, '&fileformat'), 'unix')
+        Assert Equal(getbufline(bufnr, 1, '$'), ['foo', "bar\r", 'buz', ''])
+      End
+
+      Context when CRLF appears first then appears LF after
+        It is `dos` first but changes to `unix` after
+          let result = ["foo\r\nbar\r\n", "buz\nqux"]
+          let session = s:session({}, result)
+          call session.run()
+          Assert True(bufexists('quickrun://output'))
+          let bufnr = bufnr('quickrun://output')
+          Assert Equal(getbufvar(bufnr, '&fileformat'), 'dos')
+          Assert Equal(getbufline(bufnr, 1, '$'), ['foo', 'bar', ''])
+          sleep 1m
+          Assert Equal(getbufvar(bufnr, '&fileformat'), 'unix')
+          Assert Equal(getbufline(bufnr, 1, '$'), ["foo\r", "bar\r", 'buz', 'qux'])
+        End
+      End
+
+      Context when CR appears first then appears CRLF then appears LF after
+        It is `mac` first but changes to `unix` at last
+          let result = ["foo\r", "bar\r\n", "buz\nqux"]
+          let session = s:session({}, result)
+          call session.run()
+          Assert True(bufexists('quickrun://output'))
+          let bufnr = bufnr('quickrun://output')
+          Assert Equal(getbufvar(bufnr, '&fileformat'), 'mac')
+          Assert Equal(getbufline(bufnr, 1, '$'), ['foo', ''])
+          sleep 1m
+          Assert Equal(getbufvar(bufnr, '&fileformat'), 'mac')
+          Assert Equal(getbufline(bufnr, 1, '$'), ['foo', "bar", "\n"])
+          sleep 1m
+          Assert Equal(getbufvar(bufnr, '&fileformat'), 'unix')
+          Assert Equal(getbufline(bufnr, 1, '$'), ["foo\rbar\r", 'buz', 'qux'])
+        End
+      End
+    End
+
+    Context when end of lines are mixed by CR, LF, and CRLF
+      It sets 'fileformat' to unix and CR line is joined by ^M
+        let result = ["foo\nbar\r\nbuz\rqux"]
+        let session = s:session({}, result)
+        call session.run()
+        Assert True(bufexists('quickrun://output'))
+        let bufnr = bufnr('quickrun://output')
+        Assert Equal(getbufvar(bufnr, '&fileformat'), 'unix')
+        Assert Equal(getbufline(bufnr, 1, '$'), ['foo', "bar\r", "buz\rqux"])
+      End
+
+      Context when CR appears first then appears LF after
+        It is `dos` first but changes to `unix` after
+          let result = ["foo\rbar\r", "buz\nqux"]
+          let session = s:session({}, result)
+          call session.run()
+          Assert True(bufexists('quickrun://output'))
+          let bufnr = bufnr('quickrun://output')
+          Assert Equal(getbufvar(bufnr, '&fileformat'), 'mac')
+          Assert Equal(getbufline(bufnr, 1, '$'), ['foo', 'bar', ''])
+          sleep 1m
+          Assert Equal(getbufvar(bufnr, '&fileformat'), 'unix')
+          Assert Equal(getbufline(bufnr, 1, '$'), ["foo\rbar\rbuz", 'qux'])
+        End
+      End
+    End
+  End
+
+  Describe config.bufname
+    It is used for buffer name
+      let session = s:session({'bufname': '[quickrun output]'}, ['result'])
+      call session.run()
+      Assert True(bufexists('[quickrun output]'))
+      let bufnr = bufnr('[quickrun output]')
+      Assert Equal(getbufline(bufnr, 1, '$'), ['result'])
+      execute bufnr 'bwipeout'
+    End
+  End
+
+  Describe config.filetype
+    It sets filetype
+      let session = s:session({'filetype': 'foobar'}, [])
+      call session.run()
+      Assert True(bufexists('quickrun://output'))
+      let bufnr = bufnr('quickrun://output')
+      Assert Equal(getbufvar(bufnr, '&filetype'), 'foobar')
+    End
+  End
+
+  Describe config.append
+    Before each
+      let session = s:session({}, ['foo'])
+      call session.run()
+    End
+
+    Context when it is TRUE
+      It appends the result to a buffer
+        let session = s:session({'append': 1}, ['bar'])
+        call session.run()
+        let bufnr = bufnr('quickrun://output')
+        Assert Equal(getbufline(bufnr, 1, '$'), ['foobar'])
+      End
+    End
+
+    Context when it is FALSE
+      It clears a buffer at first
+        let session = s:session({'append': 0}, ['bar'])
+        call session.run()
+        let bufnr = bufnr('quickrun://output')
+        Assert Equal(getbufline(bufnr, 1, '$'), ['bar'])
+      End
+    End
+  End
+
+  Describe config.opener
+    " TODO: How to test?
+  End
+
+  Describe config.into
+    Context when it is TRUE
+      It moves the cursor into the result buffer
+        let result = ["foo\nbar\n"]
+        let session = s:session({'into': 1}, result)
+        call session.run()
+        Assert Equal(bufnr('quickrun://output'), bufnr('%'))
+      End
+    End
+
+    Context when it is FALSE
+      It moves the cursor into the result buffer
+        let result = ["foo\nbar\n"]
+        let session = s:session({'into': 0}, result)
+        call session.run()
+        Assert NotEqual(bufnr('quickrun://output'), bufnr('%'))
+      End
+    End
+  End
+
+  Describe config.running_mark
+    It sets running_mark at the tail of buffer while running
+      let result = ['foo', "bar\nbuz", '', "hoge\npiyo"]
+      let session = s:session({'running_mark': '***'}, result)
+      call session.run()
+      Assert True(bufexists('quickrun://output'))
+      let bufnr = bufnr('quickrun://output')
+      Assert Equal(getbufline(bufnr, 1, '$'), ['foo', '***'])
+      sleep 1m
+      Assert Equal(getbufline(bufnr, 1, '$'), ['foobar', 'buz', '***'])
+      sleep 1m
+      Assert Equal(getbufline(bufnr, 1, '$'), ['foobar', 'buz', '***'])
+      sleep 1m
+      Assert Equal(getbufline(bufnr, 1, '$'), ['foobar', 'buzhoge', 'piyo'])
+    End
+  End
+
+  Describe config.close_on_empty
+    Context when it is TRUE
+      Context when the result is empty
+        It closes the result buffer
+          let result = ['']
+          let session = s:session({'close_on_empty': 1}, result)
+          call session.run()
+          let bufnr = bufnr('quickrun://output')
+          Assert Empty(win_findbuf(bufnr))
+        End
+      End
+
+      Context when the result is not empty
+        It does not close the result buffer
+          let result = ['foo']
+          let session = s:session({'close_on_empty': 1}, result)
+          call session.run()
+          let bufnr = bufnr('quickrun://output')
+          Assert NotEmpty(win_findbuf(bufnr))
+        End
+      End
+    End
+
+    Context when it is FALSE
+      Context when the result is empty
+        It does not close the result buffer
+          let result = ['']
+          let session = s:session({'close_on_empty': 0}, result)
+          call session.run()
+          let bufnr = bufnr('quickrun://output')
+          Assert NotEmpty(win_findbuf(bufnr))
+        End
+      End
+    End
+  End
+End
