@@ -630,7 +630,7 @@ lockvar! g:quickrun#default_config
 " Deprecated functions.  {{{1
 function quickrun#session(key, ...) abort
   if a:0
-    return quickrun#session#call(a:key, a:1, a:000[1 :])
+    return call('quickrun#session#call', [a:key] + a:000)
   else
     return quickrun#session#get(a:key)
   endif
