@@ -560,13 +560,13 @@ let g:quickrun#default_config = {
 \   'command': 'sqlite3',
 \   'exec': ['%c %o < %s'],
 \ },
-\ 'sql/oracle': { 
+\ 'sql/oracle': {
 \   'command': 'sqlplus',
 \   'exec': ['%c %o \@%s'],
 \   'hook/output_encode/enable' : 1,
 \   'hook/output_encode/encoding' : '&termencoding',
 \ },
-\ 'sql/mssql': { 
+\ 'sql/mssql': {
 \   'command': 'sqlcmd',
 \   'exec': ['%c %o -i %s'],
 \   'hook/output_encode/enable' : 1,
