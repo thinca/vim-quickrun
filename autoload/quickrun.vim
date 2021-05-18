@@ -377,7 +377,7 @@ let g:quickrun#default_config = {
 \ 'lua': {},
 \ 'lua/vim': {
 \   'command': ':luafile',
-\   'exec': '%C %s',
+\   'exec': '%C %S',
 \   'runner': 'vimscript',
 \ },
 \ 'lua/redis': {
