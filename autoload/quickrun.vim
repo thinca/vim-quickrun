@@ -377,7 +377,7 @@ let g:quickrun#default_config = {
 \ 'lua': {},
 \ 'lua/vim': {
 \   'command': ':luafile',
-\   'exec': '%C %s',
+\   'exec': '%C %S',
 \   'runner': 'vimscript',
 \ },
 \ 'lua/redis': {
@@ -560,13 +560,13 @@ let g:quickrun#default_config = {
 \   'command': 'sqlite3',
 \   'exec': ['%c %o < %s'],
 \ },
-\ 'sql/oracle': { 
+\ 'sql/oracle': {
 \   'command': 'sqlplus',
 \   'exec': ['%c %o \@%s'],
 \   'hook/output_encode/enable' : 1,
 \   'hook/output_encode/encoding' : '&termencoding',
 \ },
-\ 'sql/mssql': { 
+\ 'sql/mssql': {
 \   'command': 'sqlcmd',
 \   'exec': ['%c %o -i %s'],
 \   'hook/output_encode/enable' : 1,
@@ -630,7 +630,7 @@ lockvar! g:quickrun#default_config
 " Deprecated functions.  {{{1
 function quickrun#session(key, ...) abort
   if a:0
-    return quickrun#session#call(a:key, a:1, a:000[1 :])
+    return call('quickrun#session#call', [a:key] + a:000)
   else
     return quickrun#session#get(a:key)
   endif
