@@ -13,12 +13,17 @@ let g:quickrun#V = s:V
 lockvar! g:quickrun#V
 
 let s:is_win = has('win32')
+let s:is_modern_outputter_buffer_support =
+\ exists('*win_execute') &&
+\ exists('*appendbufline') &&
+\ exists('*deletebufline')
 
 " Default config.  " {{{1
 unlet! g:quickrun#default_config
 let g:quickrun#default_config = {
 \ '_': {
-\   'outputter': 'buffer',
+\   'outputter':
+\     s:is_modern_outputter_buffer_support ? 'buffer' : 'buffer_legacy',
 \   'runner': 'system',
 \   'cmdopt': '',
 \   'args': '',
