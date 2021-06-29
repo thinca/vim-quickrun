@@ -18,6 +18,7 @@ endfunction
 
 function s:outputter.finish(session) abort
   let outputter = a:session.make_module('outputter', self.config.target)
+  call outputter.start(a:session)
   call outputter.output(self._result, a:session)
   call outputter.finish(a:session)
 endfunction

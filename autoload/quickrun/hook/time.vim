@@ -25,6 +25,7 @@ function s:hook.on_finish(session, context) abort
   let time = str2float(reltimestr(reltime(self._start, self._end)))
   let text = printf(self.config.format, time)
   if has_key(self, '_outputter')
+    call self._outputter.start(a:session)
     call self._outputter.output(text, a:session)
     call self._outputter.finish(a:session)
   else
