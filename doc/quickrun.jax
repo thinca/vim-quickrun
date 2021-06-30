@@ -516,6 +516,8 @@ NOTE: "system" 以外は不安定な場合があります。
   オプション ~
   runner/job/pty			デフォルト: 0
 	|job_start()| に渡す pty の値を指定します。
+  runner/job/env			デフォルト: {}
+	|job_start()| に渡す環境変数の dict を指定します。
   runner/job/interval			デフォルト: 0
 	Vim 8.0.0036 以前は、job 機能は、10 秒毎に job の終了をチェックします
 	(|job-exit_cb|)。このオプションに 0 以外を設定すると、|timer| を
@@ -530,6 +532,8 @@ NOTE: "system" 以外は不安定な場合があります。
 	ターミナルウィンドウを開くための Ex コマンドです。
   runner/terminal/into			デフォルト: 0
 	0 以外を指定すると、開いたターミナルウィンドウに移動します。
+  runner/terminal/env			デフォルト: {}
+	|term_start()| に渡す環境変数の dict を指定します。
 
 - "runner/vimscript"			*quickrun-module-runner/vimscript*
   コマンドを Vim のコマンドとして実行します。

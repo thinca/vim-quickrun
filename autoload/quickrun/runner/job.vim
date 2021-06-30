@@ -6,6 +6,7 @@ let s:is_win = has('win32')
 let s:runner = {
 \   'config': {
 \     'pty': 0,
+\     'env': {},
 \     'interval': 0,
 \   }
 \ }
@@ -34,6 +35,9 @@ function s:runner.run(commands, input, session) abort
   \ }
   if has('patch-8.0.0744')
     let options.pty = self.config.pty
+  endif
+  if has('patch-8.0.0909')
+    let options.env = self.config.env
   endif
   if a:input ==# ''
     let options.in_io = 'null'

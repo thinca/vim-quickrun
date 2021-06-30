@@ -10,6 +10,7 @@ let s:runner = {
 \     'name': 'new',
 \     'opener': 'new',
 \     'into': 0,
+\     'env': {},
 \   },
 \ }
 
@@ -42,6 +43,9 @@ function s:runner.run(commands, input, session) abort
   \   'close_cb': self._job_close_cb,
   \   'exit_cb': self._job_exit_cb,
   \ }
+  if has('patch-8.0.0909')
+    let options.env = self.config.env
+  endif
 
   let self._key = a:session.continue()
   let prev_window = s:VT.trace_window()
