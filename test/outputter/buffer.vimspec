@@ -12,6 +12,12 @@ Describe outputter/buffer
     return quickrun#session#new(config)
   endfunction
 
+  Before each
+    if v:version < 802
+      Skip requires Vim 8.2
+    endif
+  End
+
   After each
     silent! bwipeout quickrun://output
   End
