@@ -23,11 +23,11 @@ Describe outputter/buffer
     Assert True(bufexists('quickrun://output'))
     let bufnr = bufnr('quickrun://output')
     Assert Equal(getbufline(bufnr, 1, '$'), ['foo'])
-    sleep 1m
+    call session.runner.next()
     Assert Equal(getbufline(bufnr, 1, '$'), ['foobar', 'buz'])
-    sleep 1m
+    call session.runner.next()
     Assert Equal(getbufline(bufnr, 1, '$'), ['foobar', 'buz'])
-    sleep 1m
+    call session.runner.next()
     Assert Equal(getbufline(bufnr, 1, '$'), ['foobar', 'buzhoge', 'piyo'])
   End
 
@@ -134,14 +134,14 @@ Describe outputter/buffer
       let winid = win_findbuf(bufnr)[0]
       call win_gotoid(winid)
       Assert Equal(line('.'), 4)
-      sleep 1m
+      call session.runner.next()
       Assert Equal(line('.'), 6)
-      sleep 1m
+      call session.runner.next()
       Assert Equal(line('.'), 1)
 
       let session = s:session({'opener': '3new'}, ["1\n2\n3\n"])
       call session.run()
-      sleep 1m
+      call session.runner.next()
       Assert Equal(line('.'), 1)
     End
   End
@@ -215,7 +215,7 @@ Describe outputter/buffer
           let bufnr = bufnr('quickrun://output')
           Assert Equal(getbufvar(bufnr, '&fileformat'), 'dos')
           Assert Equal(getbufline(bufnr, 1, '$'), ['foo', 'bar', ''])
-          sleep 1m
+          call session.runner.next()
           Assert Equal(getbufvar(bufnr, '&fileformat'), 'unix')
           Assert Equal(getbufline(bufnr, 1, '$'), ["foo\r", "bar\r", 'buz', 'qux'])
         End
@@ -230,10 +230,10 @@ Describe outputter/buffer
           let bufnr = bufnr('quickrun://output')
           Assert Equal(getbufvar(bufnr, '&fileformat'), 'mac')
           Assert Equal(getbufline(bufnr, 1, '$'), ['foo', ''])
-          sleep 1m
+          call session.runner.next()
           Assert Equal(getbufvar(bufnr, '&fileformat'), 'mac')
           Assert Equal(getbufline(bufnr, 1, '$'), ['foo', "bar", "\n"])
-          sleep 1m
+          call session.runner.next()
           Assert Equal(getbufvar(bufnr, '&fileformat'), 'unix')
           Assert Equal(getbufline(bufnr, 1, '$'), ["foo\rbar\r", 'buz', 'qux'])
         End
@@ -260,7 +260,7 @@ Describe outputter/buffer
           let bufnr = bufnr('quickrun://output')
           Assert Equal(getbufvar(bufnr, '&fileformat'), 'mac')
           Assert Equal(getbufline(bufnr, 1, '$'), ['foo', 'bar', ''])
-          sleep 1m
+          call session.runner.next()
           Assert Equal(getbufvar(bufnr, '&fileformat'), 'unix')
           Assert Equal(getbufline(bufnr, 1, '$'), ["foo\rbar\rbuz", 'qux'])
         End
@@ -346,11 +346,11 @@ Describe outputter/buffer
       Assert True(bufexists('quickrun://output'))
       let bufnr = bufnr('quickrun://output')
       Assert Equal(getbufline(bufnr, 1, '$'), ['foo', '***'])
-      sleep 1m
+      call session.runner.next()
       Assert Equal(getbufline(bufnr, 1, '$'), ['foobar', 'buz', '***'])
-      sleep 1m
+      call session.runner.next()
       Assert Equal(getbufline(bufnr, 1, '$'), ['foobar', 'buz', '***'])
-      sleep 1m
+      call session.runner.next()
       Assert Equal(getbufline(bufnr, 1, '$'), ['foobar', 'buzhoge', 'piyo'])
     End
   End

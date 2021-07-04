@@ -27,18 +27,18 @@ function g:PuppetRunner.run(commands, input, session) abort
   if empty(self.config.result)
     call a:session.finish()
   else
-    let key = a:session.continue()
-    call timer_start(0, { -> s:continue(key) })
+    let self._key = a:session.continue()
   endif
 endfunction
 
-function s:continue(key) abort
-  let session = quickrun#session#get(a:key)
+function g:PuppetRunner.next() abort
+  if !has_key(self, '_key')
+    return
+  endif
+  let session = quickrun#session#get(self._key)
   let result = session.runner.config.result
   call session.output(remove(result, 0))
   if empty(result)
     call session.finish()
-  else
-    call timer_start(0, { -> s:continue(a:key) })
   endif
 endfunction
