@@ -63,6 +63,16 @@ Describe outputter/buffer
           Assert Equal(len(win_findbuf(bufnr)), 1)
           Assert Equal(getbufline(bufnr, 1, '$'), ['bar'])
         End
+
+        Context when buffer name contains special characters
+          It reuses
+            let session = s:session({'bufname': '[v]'}, ['bar'])
+            call session.run()
+            let bufnr = bufnr('^\V[v]\$')
+            Assert Equal(len(win_findbuf(bufnr)), 1)
+            Assert Equal(getbufline(bufnr, 1, '$'), ['bar'])
+          End
+        End
       End
 
       Context when the buffer is not opened

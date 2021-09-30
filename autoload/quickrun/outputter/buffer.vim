@@ -152,7 +152,7 @@ function s:clear_buffer(bufnr) abort
 endfunction
 
 function s:escape_file_pattern(pat) abort
-  return '^' . a:pat . '$'
+  return '^\V' . escape(a:pat, '\') . '\$'
 endfunction
 
 function s:is_empty_buffer(bufnr) abort
