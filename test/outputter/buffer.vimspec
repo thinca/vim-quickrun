@@ -53,43 +53,67 @@ Describe outputter/buffer
       Before each
         let session = s:session({}, ['foo'])
         call session.run()
+        let bufnr = bufnr('quickrun://output')
       End
 
       Context when the buffer is opend
         It reuses
+          Assert Equal(len(win_findbuf(bufnr)), 1)
           let session = s:session({}, ['bar'])
           call session.run()
-          let bufnr = bufnr('quickrun://output')
           Assert Equal(len(win_findbuf(bufnr)), 1)
           Assert Equal(getbufline(bufnr, 1, '$'), ['bar'])
-        End
-
-        Context when buffer name contains special characters
-          It reuses
-            let session = s:session({'bufname': '[v]'}, ['bar'])
-            call session.run()
-            let bufnr = bufnr('^\V[v]\$')
-            Assert Equal(len(win_findbuf(bufnr)), 1)
-            Assert Equal(getbufline(bufnr, 1, '$'), ['bar'])
-          End
         End
       End
 
       Context when the buffer is not opened
         Before each
-          let bufnr = bufnr('quickrun://output')
           for winid in win_findbuf(bufnr)
             call win_execute(winid, 'noautocmd close')
           endfor
         End
 
         It opens a new window with an existed buffer
-          Assert True(bufexists('quickrun://output'))
-          let bufnr = bufnr('quickrun://output')
+          Assert Equal(len(win_findbuf(bufnr)), 0)
           let session = s:session({}, ['bar'])
           call session.run()
-          Assert True(bufexists('quickrun://output'))
           Assert Equal(bufnr('quickrun://output'), bufnr)
+          Assert Equal(len(win_findbuf(bufnr)), 1)
+          Assert Equal(getbufline(bufnr, 1, '$'), ['bar'])
+        End
+      End
+    End
+
+    Context when buffer name contains special characters
+      Before each
+        let config = {'bufname': '[v]'}
+        let session = s:session(config, ['foo'])
+        call session.run()
+        let bufnr = bufnr('^\V[v]\$')
+      End
+
+      Context when the buffer is opend
+        It reuses
+          Assert Equal(len(win_findbuf(bufnr)), 1)
+          let session = s:session(config, ['bar'])
+          call session.run()
+          Assert Equal(len(win_findbuf(bufnr)), 1)
+          Assert Equal(getbufline(bufnr, 1, '$'), ['bar'])
+        End
+      End
+
+      Context when the buffer is not opened
+        Before each
+          for winid in win_findbuf(bufnr)
+            call win_execute(winid, 'noautocmd close')
+          endfor
+        End
+
+        It opens a new window with an existed buffer
+          Assert Equal(len(win_findbuf(bufnr)), 0)
+          let session = s:session(config, ['bar'])
+          call session.run()
+          Assert Equal(bufnr('^\[v\]$'), bufnr)
           Assert Equal(len(win_findbuf(bufnr)), 1)
           Assert Equal(getbufline(bufnr, 1, '$'), ['bar'])
         End
@@ -289,7 +313,7 @@ Describe outputter/buffer
       let session = s:session({'bufname': '[quickrun output]'}, ['result'])
       call session.run()
       Assert True(bufexists('[quickrun output]'))
-      let bufnr = bufnr('[quickrun output]')
+      let bufnr = bufnr('\[quickrun output\]')
       Assert Equal(getbufline(bufnr, 1, '$'), ['result'])
       execute bufnr 'bwipeout'
     End
