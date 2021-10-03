@@ -89,7 +89,7 @@ Describe outputter/buffer
         let config = {'bufname': '[v]'}
         let session = s:session(config, ['foo'])
         call session.run()
-        let bufnr = bufnr('^\V[v]\$')
+        let bufnr = bufnr('^[[]v[]]$')
       End
 
       Context when the buffer is opend
@@ -113,7 +113,7 @@ Describe outputter/buffer
           Assert Equal(len(win_findbuf(bufnr)), 0)
           let session = s:session(config, ['bar'])
           call session.run()
-          Assert Equal(bufnr('^\[v\]$'), bufnr)
+          Assert Equal(bufnr('[[]v[]]$'), bufnr)
           Assert Equal(len(win_findbuf(bufnr)), 1)
           Assert Equal(getbufline(bufnr, 1, '$'), ['bar'])
         End
@@ -313,7 +313,7 @@ Describe outputter/buffer
       let session = s:session({'bufname': '[quickrun output]'}, ['result'])
       call session.run()
       Assert True(bufexists('[quickrun output]'))
-      let bufnr = bufnr('\[quickrun output\]')
+      let bufnr = bufnr('[[]quickrun output[]]')
       Assert Equal(getbufline(bufnr, 1, '$'), ['result'])
       execute bufnr 'bwipeout'
     End

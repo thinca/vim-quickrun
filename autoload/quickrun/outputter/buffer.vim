@@ -115,7 +115,7 @@ function s:open_result_window(outputter, session) abort
   let config = a:outputter.config
   let opened = 0
   if bufexists(config.bufname)
-    let bufnr = bufnr(s:escape_file_pattern(config.bufname))
+    let bufnr = s:bufnr_from_strict_bufname(config.bufname)
     let wins = win_findbuf(bufnr)
     let tabnr = tabpagenr()
     call filter(map(wins, 'win_id2tabwin(v:val)'), 'v:val[0] is# tabnr')
@@ -151,8 +151,14 @@ function s:clear_buffer(bufnr) abort
   call setbufvar(a:bufnr, 'quickrun_ff_info', ff_info)
 endfunction
 
-function s:escape_file_pattern(pat) abort
-  return '^\V' . escape(a:pat, '\') . '\$'
+function s:bufnr_from_strict_bufname(bufname) abort
+  let l = 0 <= stridx(a:bufname, '://') ? 0 : -len(a:bufname)
+  for info in getbufinfo()
+    if info.name[l :] is# a:bufname
+      return info.bufnr
+    endif
+  endfor
+  return -1
 endfunction
 
 function s:is_empty_buffer(bufnr) abort
