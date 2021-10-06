@@ -2,8 +2,6 @@
 " Author : thinca <thinca+vim@gmail.com>
 " License: zlib License
 
-let s:VT = g:quickrun#V.import('Vim.ViewTracer')
-
 let s:is_win = has('win32')
 let s:runner = {
 \   'config': {
@@ -44,11 +42,11 @@ function s:runner.run(commands, input, session) abort
   \ }
 
   let self._key = a:session.continue()
-  let prev_window = s:VT.trace_window()
+  let prev_winid = win_getid()
   execute self.config.opener
   let self._bufnr = term_start(cmd_arg, options)
   if !self.config.into
-    call s:VT.jump(prev_window)
+    call win_gotoid(prev_winid)
   endif
 endfunction
 
