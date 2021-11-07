@@ -5,12 +5,13 @@
 let s:is_win = has('win32')
 let s:runner = {
 \   'config': {
-\     'name': 'new',
+\     'name': 'default',
 \     'opener': 'new',
 \     'into': 0,
 \   },
 \ }
 
+let s:wins = {}
 
 function s:runner.validate() abort
   if !has('terminal')
@@ -43,8 +44,14 @@ function s:runner.run(commands, input, session) abort
 
   let self._key = a:session.continue()
   let prev_winid = win_getid()
-  execute self.config.opener
+
+  let jumped = s:goto_last_win(self.config.name)
+  if !jumped
+    execute self.config.opener
+    let s:wins[self.config.name] += [win_getid()]
+  endif
   let self._bufnr = term_start(cmd_arg, options)
+  setlocal bufhidden=wipe
   if !self.config.into
     call win_gotoid(prev_winid)
   endif
@@ -73,6 +80,24 @@ function s:runner._job_exit_cb(job, exit_status) abort
   else
     let self._job_exited = a:exit_status
   endif
+endfunction
+
+function s:goto_last_win(name) abort
+  if !has_key(s:wins, a:name)
+    let s:wins[a:name] = []
+  endif
+
+  " sweep
+  call filter(s:wins[a:name], 'win_id2tabwin(v:val)[0] != 0')
+
+  for win_id in s:wins[a:name]
+    let winnr = win_id2win(win_id)
+    if winnr
+      call win_gotoid(win_id)
+      return 1
+    endif
+  endfor
+  return 0
 endfunction
 
 function quickrun#runner#terminal#new() abort
