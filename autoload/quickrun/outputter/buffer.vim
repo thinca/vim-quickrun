@@ -120,25 +120,35 @@ function s:open_result_window(outputter, session) abort
     let tabnr = tabpagenr()
     call filter(map(wins, 'win_id2tabwin(v:val)'), 'v:val[0] is# tabnr')
     if empty(wins)
-      execute config.opener fnameescape(config.bufname)
-      let opened = 1
+      if config.opener =~# '\S'
+        execute config.opener fnameescape(config.bufname)
+        let opened = 1
+      endif
     else
       execute wins[0][1] 'wincmd w'
     endif
   else
-    execute config.opener fnameescape(config.bufname)
-    setlocal bufhidden=hide buftype=nofile noswapfile nobuflisted
-    setlocal fileformat=unix
-    let bufnr = bufnr('%')
-    let opened = 1
+    if config.opener =~# '\S'
+      execute config.opener fnameescape(config.bufname)
+      let bufnr = bufnr('%')
+      let opened = 1
+    else
+      let bufnr = bufnr(config.bufname, 1)
+      call bufload(bufnr)
+    endif
+    call setbufvar(bufnr, '&bufhidden', 'hide')
+    call setbufvar(bufnr, '&buftype', 'nofile')
+    call setbufvar(bufnr, '&swapfile', 0)
+    call setbufvar(bufnr, '&buflisted', 0)
+    call setbufvar(bufnr, '&fileformat', 'unix')
   endif
 
   if opened
     call a:session.invoke_hook('outputter_buffer_opened')
   endif
 
-  if &l:filetype !=# config.filetype
-    let &l:filetype = config.filetype
+  if getbufvar(bufnr, '&filetype') !=# config.filetype
+    call setbufvar(bufnr, '&filetype', config.filetype)
   endif
 
   return bufnr
