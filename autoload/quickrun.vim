@@ -245,8 +245,14 @@ let g:quickrun#default_config = {
 \   'hook/sweep/files': ['%S:p:r'],
 \ },
 \ 'fsharp': {
-\   'type': executable('fsharpc') ? 'fsharp/mono' :
+\   'type': executable('dotnet') ? 'fsharp/dotnet' :
+\           executable('fsharpc') ? 'fsharp/mono' :
 \           executable('fsc') ? 'fsharp/vs' : '',
+\ },
+\ 'fsharp/dotnet': {
+\   'exec': ['%c fsi %o %s'],
+\   'command': 'dotnet',
+\   'cmdopt': '--nologo --utf8output --codepage:65001',
 \ },
 \ 'fsharp/mono': {
 \   'exec': ['%c %o --out:%s:p:r.exe %s', 'mono %s:p:r.exe %a'],
