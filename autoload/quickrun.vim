@@ -252,7 +252,7 @@ let g:quickrun#default_config = {
 \ 'fsharp/dotnet': {
 \   'exec': ['%c fsi %o %s'],
 \   'command': 'dotnet',
-\   'cmdopt': '--utf8output --codepage:65001',
+\   'cmdopt': '--nologo --utf8output --codepage:65001',
 \ },
 \ 'fsharp/mono': {
 \   'exec': ['%c %o --out:%s:p:r.exe %s', 'mono %s:p:r.exe %a'],
