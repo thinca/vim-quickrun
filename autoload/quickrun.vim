@@ -515,10 +515,16 @@ let g:quickrun#default_config = {
 \ },
 \ 'rust': {
 \   'command': 'rustc',
-\   'exec': ['%c %o %s -o %s:p:r', '%s:p:r %a'],
+\   'exec':
+\     s:is_win
+\      ? ['%c %o %s -o %s:p:r.exe', '%s:p:r %a']
+\      : ['%c %o %s -o %s:p:r', '%s:p:r %a'],
 \   'tempfile': '%{fnamemodify(tempname(), ":r")}.rs',
 \   'hook/shebang/enable': 0,
-\   'hook/sweep/files': '%S:p:r',
+\   'hook/sweep/files':
+\     s:is_win
+\      ? ['%S:p:r.exe']
+\      : ['%S:p:r'],
 \ },
 \ 'rust/cargo': {
 \   'command': 'cargo',
