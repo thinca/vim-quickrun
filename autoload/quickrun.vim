@@ -635,9 +635,16 @@ let g:quickrun#default_config = {
 \ },
 \ 'zig': {
 \   'command': 'zig',
-\   'exec': ['%c build-exe %o %s', '%s:p:r %a'],
-\   'tempfile': '%{tempname()}.zig',
-\   'hook/sweep/files': '%S:p:r',
+\   'exec':
+\     s:is_win
+\      ? ['%c build-exe %o -femit-bin=%s:p:r.exe %s', '%s:p:r %a']
+\      : ['%c build-exe %o -femit-bin=%s:p:r %s', '%s:p:r %a'],
+\   'tempfile': '%{fnamemodify(tempname(), ":r")}.zig',
+\   'hook/shebang/enable': 0,
+\   'hook/sweep/files':
+\     s:is_win
+\      ? ['%S:p:r.exe', '%S:p:r.pdb']
+\      : ['%S:p:r'],
 \ },
 \ 'zsh': {},
 \}
