@@ -601,7 +601,8 @@ let g:quickrun#default_config = {
 \ },
 \ 'typescript': {
 \   'type': executable('ts-node') ? 'typescript/ts-node' :
-\           executable('tsc') ? 'typescript/tsc' : '',
+\           executable('tsc') ? 'typescript/tsc' :
+\           executable('deno') ? 'typescript/deno' : '',
 \ },
 \ 'typescript/deno' : {
 \   'command': 'deno',
