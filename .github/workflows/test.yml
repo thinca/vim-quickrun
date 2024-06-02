@@ -8,6 +8,8 @@ jobs:
       matrix:
         vim_version:
           - 'head'
+          - 'v9.1.0000'
+          - 'v9.0.0000'
           - 'v8.2.0000'
           - 'v8.1.0001'
         platform: ['Linux', 'MacOS', 'Windows']
@@ -29,7 +31,7 @@ jobs:
     timeout-minutes: 10
 
     steps:
-      - uses: 'actions/checkout@v2'
+      - uses: 'actions/checkout@v4'
       - name: 'Setup Vim'
         id: 'vim'
         uses: 'thinca/action-setup-vim@v1'
@@ -40,10 +42,10 @@ jobs:
         run: |
           ${{ steps.vim.outputs.executable }} --version
       - name: 'Setup themis.vim'
-        uses: 'actions/checkout@v2'
+        uses: 'actions/checkout@v4'
         with:
           repository: 'thinca/vim-themis'
-          ref: 'v1.5.5'
+          ref: 'v1.7.0'
           path: 'themis'
       - name: 'Run test'
         env:
