@@ -606,7 +606,7 @@ let g:quickrun#default_config = {
 \ },
 \ 'typescript/deno' : {
 \   'command': 'deno',
-\   'cmdopt': '--no-check --allow-all --unstable',
+\   'cmdopt': '--no-check --allow-all',
 \   'tempfile': '%{tempname()}.ts',
 \   'exec': ['%c run %o %s'],
 \ },
